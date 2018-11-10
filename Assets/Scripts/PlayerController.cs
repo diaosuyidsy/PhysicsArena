@@ -5,6 +5,7 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float AccelerationSpeed;
+    public float DeccelerationSpeed;
     public float RotateSpeed;
     public float MaxSpeed;
 
@@ -18,7 +19,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         float HLAxis = Input.GetAxis("XboxHorizontal");
         float VLAxis = Input.GetAxis("XboxVertical");
         float HRAxis = Input.GetAxis("XboxHorizontalRight");
@@ -43,6 +43,14 @@ public class PlayerController : MonoBehaviour
         if (_rb.velocity.z <= -MaxSpeed)
         {
             _rb.velocity = new Vector3(_rb.velocity.x, _rb.velocity.y, -MaxSpeed);
+        }
+        if (Mathf.Approximately(HLAxis, 0f))
+        {
+            _rb.velocity = new Vector3(0f, _rb.velocity.y, _rb.velocity.z);
+        }
+        if (Mathf.Approximately(VLAxis, 0f))
+        {
+            _rb.velocity = new Vector3(_rb.velocity.x, _rb.velocity.y, 0f);
         }
     }
 }

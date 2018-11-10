@@ -25,6 +25,10 @@ public class CarMovement : MonoBehaviour
 			MoveCar.transform.Translate(xspeed, 0, zspeed);
 		}
 		
+		if (other.CompareTag("Team2"))
+		{
+			MoveCar.transform.Translate(-xspeed, 0, -zspeed);
+		}
 	}
 	
 }

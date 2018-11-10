@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class CarMovement : MonoBehaviour {
-
+public class CarMovement : MonoBehaviour
+{
+	public GameObject MoveCar;
+	public float xspeed = 3f;
+	public float zspeed;
+	
 	// Use this for initialization
 	void Start () {
 		
@@ -11,6 +15,16 @@ public class CarMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+		 
+	}
+	
+	void OnTriggerStay(Collider other)
+	{
+		if (other.CompareTag("Team1"))
+		{
+			MoveCar.transform.Translate(xspeed, 0, zspeed);
+		}
 		
 	}
+	
 }

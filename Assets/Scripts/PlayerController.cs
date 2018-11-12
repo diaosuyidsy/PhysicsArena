@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float AccelerationSpeed;
-    public float DeccelerationSpeed;
-    public float RotateSpeed;
-    public float MaxSpeed;
+    public float AccelerationSpeed = 50f;
+    //public float DeccelerationSpeed;
+    //public float RotateSpeed;
+    public float MaxSpeed = 10f;
 
     private Rigidbody _rb;
 

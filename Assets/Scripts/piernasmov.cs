@@ -2,22 +2,25 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class piernasmov : MonoBehaviour {
+public class piernasmov : MonoBehaviour
+{
 
     public HingeJoint hj;
     public Transform objetivo;
     public bool invertido;
     // Suscribe Edsonxn Channel On Youtube!!
     //for more tutorials
-    
-    
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+
+
+    // Use this for initialization
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
         JointSpring js = hj.spring;
         js.targetPosition = objetivo.localEulerAngles.x;
         if (js.targetPosition > 180)
@@ -28,5 +31,5 @@ public class piernasmov : MonoBehaviour {
             js.targetPosition = js.targetPosition * -1;
         }
         hj.spring = js;
-	}
+    }
 }

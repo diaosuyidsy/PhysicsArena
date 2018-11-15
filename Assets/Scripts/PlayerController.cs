@@ -8,6 +8,7 @@ public class PlayerController : MonoBehaviour
     //public float DeccelerationSpeed;
     //public float RotateSpeed;
     public float MaxSpeed = 10f;
+    public GameObject[] Legs;
 
     private Rigidbody _rb;
 

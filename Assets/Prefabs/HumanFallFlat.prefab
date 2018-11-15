@@ -24,7 +24,7 @@ GameObject:
   - component: {fileID: 23371386356017424}
   - component: {fileID: 95606504609684950}
   m_Layer: 0
-  m_Name: mov_piernas
+  m_Name: Leg_Swing
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -118,7 +118,7 @@ GameObject:
   - component: {fileID: 59490869252236386}
   - component: {fileID: 114420385594353482}
   m_Layer: 9
-  m_Name: Pierna_derecha
+  m_Name: Right_Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 4400178065873422}
   - component: {fileID: 137423204210359984}
   m_Layer: 0
-  m_Name: modelo
+  m_Name: Model
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -152,7 +152,7 @@ GameObject:
   - component: {fileID: 65605340784131454}
   - component: {fileID: 59544684843615380}
   m_Layer: 9
-  m_Name: pie_izquierdo
+  m_Name: Left_Foot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -170,7 +170,7 @@ GameObject:
   - component: {fileID: 65639568368758654}
   - component: {fileID: 59844519620399026}
   m_Layer: 9
-  m_Name: pie_derecho
+  m_Name: Right_Foot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -189,7 +189,7 @@ GameObject:
   - component: {fileID: 59371991509515946}
   - component: {fileID: 114692427121745656}
   m_Layer: 9
-  m_Name: Pierna_izquierda
+  m_Name: Left_Leg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -243,8 +243,9 @@ GameObject:
   - component: {fileID: 65714243811850154}
   - component: {fileID: 136454636493001370}
   - component: {fileID: 114916357384139900}
+  - component: {fileID: 114519460086521476}
   m_Layer: 9
-  m_Name: Cadera
+  m_Name: Hip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -263,7 +264,7 @@ GameObject:
   - component: {fileID: 59962903790127284}
   - component: {fileID: 114369427668526264}
   m_Layer: 9
-  m_Name: Pierna_izquierda2
+  m_Name: Left_Leg2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -281,7 +282,7 @@ GameObject:
   - component: {fileID: 65404020858074434}
   - component: {fileID: 59512685002508912}
   m_Layer: 9
-  m_Name: Pecho
+  m_Name: Chest
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -409,7 +410,7 @@ GameObject:
   - component: {fileID: 59566078099809878}
   - component: {fileID: 114634243960024632}
   m_Layer: 9
-  m_Name: Pierna_derecha2
+  m_Name: Right_Leg2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1185,7 +1186,7 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 96
   m_CollisionDetection: 0
@@ -2025,6 +2026,19 @@ MonoBehaviour:
   hj: {fileID: 59490869252236386}
   objetivo: {fileID: 4287140474895380}
   invertido: 0
+--- !u!114 &114519460086521476
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1739955421027054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4b8dbe361d31b48559f82cae547cd64e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  AccelerationSpeed: 100
+  MaxSpeed: 10
 --- !u!114 &114634243960024632
 MonoBehaviour:
   m_ObjectHideFlags: 1

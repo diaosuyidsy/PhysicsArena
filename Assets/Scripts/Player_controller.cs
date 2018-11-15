@@ -45,6 +45,6 @@ public class Player_controller : MonoBehaviour
 
     void FixedUpdate()
     {
-        rb.AddForce(new Vector3(transform.forward.x, 0, transform.forward.z) * Velocidad);
+        //rb.AddForce(new Vector3(transform.forward.x, 0, transform.forward.z) * Velocidad);
     }
 }

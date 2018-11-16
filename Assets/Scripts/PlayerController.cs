@@ -4,13 +4,9 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    //public float AccelerationSpeed = 50f;
-    //public float DeccelerationSpeed;
-    //public float RotateSpeed;
-    public float Thrust = 20f;
-    public float MaxSpeed = 10f;
-    public GameObject[] Legs;
-    public GameObject[] Feet;
+
+    public float Thrust = 300f;
+    public GameObject LegSwingReference;
 
     private Rigidbody _rb;
 
@@ -22,49 +18,41 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CheckMovement();
+    }
+
+    private void CheckJump()
+    {
+        if (Input.GetButtonDown("XboxA"))
+        {
+            _rb.AddForce(new Vector3(0, Thrust, 0), ForceMode.Impulse);
+        }
+    }
+
+    private void CheckMovement()
+    {
         float HLAxis = Input.GetAxis("XboxHorizontal");
         float VLAxis = Input.GetAxis("XboxVertical");
         float HRAxis = Input.GetAxis("XboxHorizontalRight");
         float VRAxis = Input.GetAxis("XboxVerticalRight");
 
-        //_rb.velocity = new Vector3(HLAxis * WalkSpeed, _rb.velocity.y, -1f * VLAxis * WalkSpeed);
-        //transform.Rotate(Vector3.up, Time.deltaTime * RotateSpeed * HRAxis);
-        // Player's velocity is determined by accleration
-        //_rb.velocity += new Vector3(HLAxis * AccelerationSpeed * Time.deltaTime, 0f, VLAxis * AccelerationSpeed * Time.deltaTime);
-        //foreach (GameObject leg in Legs)
-        //{
-        //    leg.GetComponent<HingeJoint>().axis = new Vector3(leg.GetComponent<HingeJoint>().axis.x, leg.GetComponent<HingeJoint>().axis.y, VLAxis);
-        //}
-        //foreach (GameObject foot in Feet)
-        //{
-        //    foot.GetComponent<HingeJoint>().axis = new Vector3(foot.GetComponent<HingeJoint>().axis.x, VLAxis >= 0f ? 1f : -1f, foot.GetComponent<HingeJoint>().axis.z);
-        //}
-        _rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust);
-        transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
-        //if (_rb.velocity.x >= MaxSpeed)
-        //{
-        //    _rb.velocity = new Vector3(MaxSpeed, _rb.velocity.y, _rb.velocity.z);
-        //}
-        //if (_rb.velocity.x <= -MaxSpeed)
-        //{
-        //    _rb.velocity = new Vector3(-MaxSpeed, _rb.velocity.y, _rb.velocity.z);
-        //}
-        //if (_rb.velocity.z >= MaxSpeed)
-        //{
-        //    _rb.velocity = new Vector3(_rb.velocity.x, _rb.velocity.y, MaxSpeed);
-        //}
-        //if (_rb.velocity.z <= -MaxSpeed)
-        //{
-        //    _rb.velocity = new Vector3(_rb.velocity.x, _rb.velocity.y, -MaxSpeed);
-        //}
-        //if (Mathf.Approximately(HLAxis, 0f))
-        //{
-        //    _rb.velocity = new Vector3(0f, _rb.velocity.y, _rb.velocity.z);
-        //}
-        //if (Mathf.Approximately(VLAxis, 0f))
-        //{
-        //    _rb.velocity = new Vector3(_rb.velocity.x, _rb.velocity.y, 0f);
-        //}
+        if (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f))
+        {
+            // Turn on the animator of the Leg Swing Preference
+            LegSwingReference.GetComponent<Animator>().enabled = true;
+            // Get the percent of input force player put in
+            float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
+            // Add force based on that percentage
+            _rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal);
+            // Turn player according to the rotation of the joystick
+            transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
+        }
+        else
+        {
+            LegSwingReference.GetComponent<Animator>().enabled = false;
+            LegSwingReference.transform.eulerAngles = Vector3.zero;
+        }
     }
+
 
 }

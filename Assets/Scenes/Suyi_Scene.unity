@@ -113,6 +113,11 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &145372765 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1588404195253556, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+    type: 2}
+  m_PrefabInternal: {fileID: 368470405}
 --- !u!1 &270985953
 GameObject:
   m_ObjectHideFlags: 0
@@ -207,6 +212,16 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 114519460086521476, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+        type: 2}
+      propertyPath: Legs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 114519460086521476, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+        type: 2}
+      propertyPath: Feet.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4857391089963294, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a, type: 2}
       propertyPath: m_LocalPosition.x
       value: 4.383889
@@ -315,12 +330,12 @@ Prefab:
     - target: {fileID: 59490869252236386, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
         type: 2}
       propertyPath: m_Axis.z
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 59371991509515946, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
         type: 2}
       propertyPath: m_Axis.z
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 59844519620399026, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
         type: 2}
@@ -345,12 +360,12 @@ Prefab:
     - target: {fileID: 114519460086521476, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
         type: 2}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114916357384139900, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
         type: 2}
       propertyPath: m_Enabled
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 54933284841908096, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
         type: 2}
@@ -365,6 +380,36 @@ Prefab:
     - target: {fileID: 59544684843615380, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
         type: 2}
       propertyPath: m_Axis.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114519460086521476, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+        type: 2}
+      propertyPath: Legs.Array.data[0]
+      value: 
+      objectReference: {fileID: 1078344523}
+    - target: {fileID: 114519460086521476, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+        type: 2}
+      propertyPath: Legs.Array.data[1]
+      value: 
+      objectReference: {fileID: 1140041356}
+    - target: {fileID: 114519460086521476, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+        type: 2}
+      propertyPath: Feet.Array.data[0]
+      value: 
+      objectReference: {fileID: 2079622124}
+    - target: {fileID: 114519460086521476, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+        type: 2}
+      propertyPath: Feet.Array.data[1]
+      value: 
+      objectReference: {fileID: 145372765}
+    - target: {fileID: 114519460086521476, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+        type: 2}
+      propertyPath: Thrust
+      value: 500
+      objectReference: {fileID: 0}
+    - target: {fileID: 95606504609684950, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+        type: 2}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
@@ -510,6 +555,16 @@ MonoBehaviour:
       enableFptlForForwardOpaque: 1
       enableBigTilePrepass: 1
       isFptlEnabled: 1
+--- !u!1 &1078344523 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1359083304147134, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+    type: 2}
+  m_PrefabInternal: {fileID: 368470405}
+--- !u!1 &1140041356 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1680046069643846, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+    type: 2}
+  m_PrefabInternal: {fileID: 368470405}
 --- !u!1 &2010242469
 GameObject:
   m_ObjectHideFlags: 0
@@ -660,3 +715,8 @@ MonoBehaviour:
   showAdditionalSettings: 0
   displayLightIntensity: 3.1415927
   displayAreaLightEmissiveMesh: 0
+--- !u!1 &2079622124 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1660646575685242, guid: f24a49a6febd1ee4d9f4dad9e6a7ae8a,
+    type: 2}
+  m_PrefabInternal: {fileID: 368470405}

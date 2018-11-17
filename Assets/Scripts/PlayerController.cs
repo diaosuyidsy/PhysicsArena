@@ -9,16 +9,28 @@ public class PlayerController : MonoBehaviour
     public float JumpForce = 300f;
     public GameObject LegSwingReference;
     public GameObject Chest;
+    public GameObject LeftArm;
+    public GameObject RightArm;
+    public GameObject LeftHand;
+    public GameObject RightHand;
 
     private Rigidbody _rb;
     private float _distToGround;
     private HingeJoint _chesthj;
+    private HingeJoint _leftArmhj;
+    private HingeJoint _rightArmhj;
+    private HingeJoint _leftHandhj;
+    private HingeJoint _rightHandhj;
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
         _chesthj = Chest.GetComponent<HingeJoint>();
+        _leftArmhj = LeftArm.GetComponent<HingeJoint>();
+        _rightArmhj = RightArm.GetComponent<HingeJoint>();
+        _leftHandhj = LeftHand.GetComponent<HingeJoint>();
+        _rightHandhj = RightHand.GetComponent<HingeJoint>();
     }
 
     // Update is called once per frame
@@ -33,7 +45,24 @@ public class PlayerController : MonoBehaviour
     private void CheckArm()
     {
         float LeftTrigger = Input.GetAxis("XboxLT");
-        Debug.Log("Left Trigger: " + LeftTrigger);
+        LeftTrigger = Mathf.Approximately(LeftTrigger, 0f) || Mathf.Approximately(LeftTrigger, -1f) ? 0f : 1f;
+
+        JointSpring js = _leftArmhj.spring;
+        js.targetPosition = 100f * LeftTrigger;
+        js.targetPosition = Mathf.Clamp(js.targetPosition, _leftArmhj.limits.min + 5, _leftArmhj.limits.max - 5);
+        _leftArmhj.spring = js;
+
+        float RightTrigger = Input.GetAxis("XboxRT");
+        RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
+
+        JointSpring js1 = _rightArmhj.spring;
+        js1.targetPosition = 100f * RightTrigger;
+        js1.targetPosition = Mathf.Clamp(js1.targetPosition, _rightArmhj.limits.min + 5, _rightArmhj.limits.max - 5);
+        _rightArmhj.spring = js;
+
+        //JointLimits limits = _leftHandhj.limits;
+        //limits.max = 90f * (1f - LeftTrigger);
+        //_leftHandhj.limits = limits;
     }
 
     private void CheckBend()

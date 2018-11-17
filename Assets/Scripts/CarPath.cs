@@ -10,20 +10,22 @@ public class CarPath : MonoBehaviour
 	public float speed;
 
 	private int current = 5;
-	private int dir = 0;
+	private int dir;
 	
 	void OnTriggerStay(Collider other)
 	{
 		if (current == target.Length)
 		{
+			GetComponent<Rigidbody>().velocity = Vector3.zero;
 			Debug.Log("Team 1 Wins");
 		}
 		if (current == 0)
 		{
+			GetComponent<Rigidbody>().velocity = Vector3.zero;
 			Debug.Log("Team 2 Wins");
 		}
-	
-		if (other.CompareTag("Team1") && other.CompareTag("Team2"))
+
+		if (other.CompareTag("Team1")&&other.CompareTag("Team2")) 
 		{
 			GetComponent<Rigidbody>().velocity = Vector3.zero;
 		}
@@ -37,6 +39,8 @@ public class CarPath : MonoBehaviour
 				dir = 1;
 				Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
 				GetComponent<Rigidbody>().MovePosition(pos);
+				Vector3 relativePos = target[current].position - transform.position;
+				transform.rotation = Quaternion.LookRotation (relativePos);
 			}
 			else current = current + 1;
 
@@ -52,6 +56,8 @@ public class CarPath : MonoBehaviour
 				dir = 2;
 				Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
 				GetComponent<Rigidbody>().MovePosition(pos);
+				Vector3 relativePos = target[current].position - transform.position;
+				transform.rotation = Quaternion.LookRotation (relativePos);
 			}
 			else current = current - 1;
 			

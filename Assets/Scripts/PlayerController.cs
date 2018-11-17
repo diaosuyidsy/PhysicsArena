@@ -6,26 +6,52 @@ public class PlayerController : MonoBehaviour
 {
 
     public float Thrust = 300f;
+    public float JumpForce = 300f;
     public GameObject LegSwingReference;
+    public GameObject Chest;
 
     private Rigidbody _rb;
+    private float _distToGround;
+    private HingeJoint _chesthj;
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
+        _distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
+        _chesthj = Chest.GetComponent<HingeJoint>();
     }
 
     // Update is called once per frame
     void Update()
     {
         CheckMovement();
+        CheckJump();
+        CheckBend();
+        CheckArm();
+    }
+
+    private void CheckArm()
+    {
+        float LeftTrigger = Input.GetAxis("XboxLT");
+        Debug.Log("Left Trigger: " + LeftTrigger);
+    }
+
+    private void CheckBend()
+    {
+        //float HRAxis = Input.GetAxis("XboxHorizontalRight");
+        float VRAxis = Input.GetAxis("XboxVerticalRight") * -1f;
+
+        JointSpring js = _chesthj.spring;
+        js.targetPosition = VRAxis * 90f;
+        js.targetPosition = Mathf.Clamp(js.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
+        _chesthj.spring = js;
     }
 
     private void CheckJump()
     {
-        if (Input.GetButtonDown("XboxA"))
+        if (Input.GetKeyDown(KeyCode.JoystickButton16) && IsGrounded())
         {
-            _rb.AddForce(new Vector3(0, Thrust, 0), ForceMode.Impulse);
+            _rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
         }
     }
 
@@ -33,8 +59,6 @@ public class PlayerController : MonoBehaviour
     {
         float HLAxis = Input.GetAxis("XboxHorizontal");
         float VLAxis = Input.GetAxis("XboxVertical");
-        float HRAxis = Input.GetAxis("XboxHorizontalRight");
-        float VRAxis = Input.GetAxis("XboxVerticalRight");
 
         if (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f))
         {
@@ -54,5 +78,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-
+    #region Helper Functions
+    private bool IsGrounded()
+    {
+        return Physics.Raycast(transform.position, -Vector3.up, _distToGround + 0.1f);
+    }
+    #endregion
 }

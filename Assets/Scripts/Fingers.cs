@@ -19,6 +19,10 @@ public class Fingers : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
+        if (col.collider.CompareTag("Ground"))
+        {
+            return;
+        }
         if (!taken)
         {
             SpringJoint sp = gameObject.AddComponent<SpringJoint>();

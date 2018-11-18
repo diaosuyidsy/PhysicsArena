@@ -138,7 +138,7 @@ public class PlayerController : MonoBehaviour
                 JumpCode = KeyCode.Joystick1Button16;
 #endif
 #if UNITY_EDITOR_WIN
-        KeyCode JumpCode = KeyCode.Joystick1Button0;
+         JumpCode = KeyCode.Joystick1Button0;
 #endif
                 break;
             case "2":
@@ -146,7 +146,7 @@ public class PlayerController : MonoBehaviour
                 JumpCode = KeyCode.Joystick2Button16;
 #endif
 #if UNITY_EDITOR_WIN
-        KeyCode JumpCode = KeyCode.Joystick2Button0;
+         JumpCode = KeyCode.Joystick2Button0;
 #endif
                 break;
             case "3":
@@ -154,7 +154,7 @@ public class PlayerController : MonoBehaviour
                 JumpCode = KeyCode.Joystick3Button16;
 #endif
 #if UNITY_EDITOR_WIN
-        KeyCode JumpCode = KeyCode.Joystick3Button0;
+         JumpCode = KeyCode.Joystick3Button0;
 #endif
                 break;
             case "4":
@@ -162,7 +162,7 @@ public class PlayerController : MonoBehaviour
                 JumpCode = KeyCode.Joystick4Button16;
 #endif
 #if UNITY_EDITOR_WIN
-        KeyCode JumpCode = KeyCode.Joystick4Button0;
+         JumpCode = KeyCode.Joystick4Button0;
 #endif
                 break;
         }

@@ -9,28 +9,35 @@ public class PlayerController : MonoBehaviour
     public float JumpForce = 300f;
     public GameObject LegSwingReference;
     public GameObject Chest;
-    public GameObject LeftArm;
-    public GameObject RightArm;
-    public GameObject LeftHand;
-    public GameObject RightHand;
+    [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
+    public GameObject[] LeftArms;
+    [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
+    public GameObject[] RightArms;
 
+    #region Private Variable
     private Rigidbody _rb;
     private float _distToGround;
     private HingeJoint _chesthj;
+    private HingeJoint _leftArm2hj;
+    private HingeJoint _rightArm2hj;
     private HingeJoint _leftArmhj;
     private HingeJoint _rightArmhj;
     private HingeJoint _leftHandhj;
     private HingeJoint _rightHandhj;
+
+    #endregion
 
     private void Start()
     {
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
         _chesthj = Chest.GetComponent<HingeJoint>();
-        _leftArmhj = LeftArm.GetComponent<HingeJoint>();
-        _rightArmhj = RightArm.GetComponent<HingeJoint>();
-        _leftHandhj = LeftHand.GetComponent<HingeJoint>();
-        _rightHandhj = RightHand.GetComponent<HingeJoint>();
+        _leftArm2hj = LeftArms[0].GetComponent<HingeJoint>();
+        _rightArm2hj = RightArms[0].GetComponent<HingeJoint>();
+        _leftArmhj = LeftArms[1].GetComponent<HingeJoint>();
+        _rightArmhj = RightArms[1].GetComponent<HingeJoint>();
+        _leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
+        _rightHandhj = RightArms[2].GetComponent<HingeJoint>();
     }
 
     // Update is called once per frame
@@ -38,32 +45,69 @@ public class PlayerController : MonoBehaviour
     {
         CheckMovement();
         CheckJump();
-        CheckBend();
+        //CheckBend();
         CheckArm();
     }
 
+
     private void CheckArm()
     {
+        // For the left side
         float LeftTrigger = Input.GetAxis("XboxLT");
         LeftTrigger = Mathf.Approximately(LeftTrigger, 0f) || Mathf.Approximately(LeftTrigger, -1f) ? 0f : 1f;
 
-        JointSpring js = _leftArmhj.spring;
-        js.targetPosition = 100f * LeftTrigger;
-        js.targetPosition = Mathf.Clamp(js.targetPosition, _leftArmhj.limits.min + 5, _leftArmhj.limits.max - 5);
-        _leftArmhj.spring = js;
+        // Arm2: Min -90 --> 89
+        // Arm: Connected Mass Scale 1 --> 0
+        //      Target Position: 0 --> 180
+        //      Limits: -90, -90 --> 81, 120
+        // Hand: Limit Max: 90 --> 0
 
+        CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
+
+        // Same for the right side
         float RightTrigger = Input.GetAxis("XboxRT");
         RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
 
-        JointSpring js1 = _rightArmhj.spring;
-        js1.targetPosition = 100f * RightTrigger;
-        js1.targetPosition = Mathf.Clamp(js1.targetPosition, _rightArmhj.limits.min + 5, _rightArmhj.limits.max - 5);
-        _rightArmhj.spring = js;
+        CheckArmHelper(RightTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
 
-        //JointLimits limits = _leftHandhj.limits;
-        //limits.max = 90f * (1f - LeftTrigger);
-        //_leftHandhj.limits = limits;
+        // Bend the body all together
+        JointSpring tempjs = _chesthj.spring;
+        tempjs.targetPosition = (Mathf.Approximately(LeftTrigger, 1f) || Mathf.Approximately(RightTrigger, 1f) ? 1f : 0f) * 90f;
+        tempjs.targetPosition = Mathf.Clamp(tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
+        _chesthj.spring = tempjs;
     }
+
+    private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+    {
+        // Arm2: Min -90 --> 89
+        JointLimits lm1 = Arm2hj.limits;
+        if (IsLeftHand)
+            lm1.min = Mathf.Approximately(TriggerValue, 1f) ? 89f : -90f;
+        else
+            lm1.max = Mathf.Approximately(TriggerValue, 1f) ? -89f : 90f;
+        Arm2hj.limits = lm1;
+
+        // Arm: Connected Mass Scale 1 --> 0
+        Armhj.connectedMassScale = Mathf.Approximately(TriggerValue, 1f) ? 0f : 1f;
+
+        //  Arm: Limits: -90, 90 --> 81, 120
+        JointLimits lm = Armhj.limits;
+        lm.max = Mathf.Approximately(TriggerValue, 1f) ? 120f : 90f;
+        lm.min = Mathf.Approximately(TriggerValue, 1f) ? 81 : -90f;
+        Armhj.limits = lm;
+
+        // Arm: Target Position: 0 --> 180
+        JointSpring js = Armhj.spring;
+        js.targetPosition = 180f * TriggerValue;
+        Armhj.spring = js;
+
+        // Hand: Limit Max: 90 --> 0
+        JointLimits tlm = Handhj.limits;
+        tlm.max = 90f * (1f - TriggerValue);
+        Handhj.limits = tlm;
+
+    }
+
 
     private void CheckBend()
     {
@@ -114,3 +158,28 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 }
+
+
+//// Arm2: Min -90 --> 89
+//JointLimits lm1 = _leftArm2hj.limits;
+//lm1.min = Mathf.Approximately(LeftTrigger, 1f) ? 89f : -90f;
+//_leftArm2hj.limits = lm1;
+
+//// Arm: Connected Mass Scale 1 --> 0
+//_leftArmhj.connectedMassScale = Mathf.Approximately(LeftTrigger, 1f) ? 0f : 1f;
+
+////  Arm: Limits: -90, 90 --> 81, 120
+//JointLimits lm = _leftArmhj.limits;
+//lm.max = Mathf.Approximately(LeftTrigger, 1f) ? 120f : 90f;
+//lm.min = Mathf.Approximately(LeftTrigger, 1f) ? 81 : -90f;
+//_leftArmhj.limits = lm;
+
+//// Arm: Target Position: 0 --> 180
+//JointSpring js = _leftArmhj.spring;
+//js.targetPosition = 180f * LeftTrigger;
+//_leftArmhj.spring = js;
+
+//// Hand: Limit Max: 90 --> 0
+//JointLimits tlm = _leftHandhj.limits;
+//tlm.max = 90f * (1f - LeftTrigger);
+//_leftHandhj.limits = tlm;

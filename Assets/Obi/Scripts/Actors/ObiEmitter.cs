@@ -17,8 +17,9 @@ namespace Obi{
 
 		public int fluidPhase = 1;
 
+
 		[SerializeProperty("EmitterMaterial")]
-		[SerializeField] private ObiEmitterMaterial emitterMaterial = null;
+		[SerializeField] private ObiEmitterMaterial emitterMaterial;
 	
 		[Tooltip("Amount of solver particles used by this emitter.")]
 		[SerializeProperty("NumParticles")]
@@ -27,20 +28,21 @@ namespace Obi{
 		[Tooltip("Changes how the emitter behaves. Available modes are Stream and Burst.")]
 		public EmissionMethod emissionMethod = EmissionMethod.STREAM;
 
-		[Tooltip("Speed (in units/second) of emitted particles. Setting it to zero will stop emission. Large values will cause more particles to be emitted.")]
-		public float speed = 0.25f;
+		[Tooltip(
+			"Speed (in units/second) of emitted particles. Setting it to zero will stop emission. Large values will cause more particles to be emitted.")]
+		public float speed;
 
 		[Tooltip("Lifespan of each particle.")]
 		public float lifespan = 4;
 
 		[Range(0,1)]
 		[Tooltip("Amount of randomization applied to particles.")]
-		public float randomVelocity = 0;
+		public float randomVelocity;
 
 		[HideInInspector][SerializeField]private List<ObiEmitterShape> emitterShapes = new List<ObiEmitterShape>();
 		private IEnumerator<ObiEmitterShape.DistributionPoint> distEnumerator;
 
-		private int activeParticleCount = 0;			/**< number of currently active particles*/
+		private int activeParticleCount;			/**< number of currently active particles*/
 		[HideInInspector] public float[] life;			/**< per particle remaining life in seconds.*/
 
 		private float unemittedBursts = 0;
@@ -300,7 +302,6 @@ namespace Obi{
 		}
 
 		public void ResetParticlePosition(int index, float offset){	
-
 			distEnumerator.MoveNext();
 			ObiEmitterShape.DistributionPoint distributionPoint = distEnumerator.Current;
 

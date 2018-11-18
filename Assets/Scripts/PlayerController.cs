@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-
+    [Tooltip("Enter 1 Digit 1-4")]
+    public string PlayerControllerNumber;
     public float Thrust = 300f;
     public float JumpForce = 300f;
     public GameObject LegSwingReference;
@@ -52,7 +53,16 @@ public class PlayerController : MonoBehaviour
     private void CheckArm()
     {
         // For the left side
-        float LeftTrigger = Input.GetAxis("XboxLT");
+#if UNITY_EDITOR_OSX
+        string LTStr = "Joy" + PlayerControllerNumber + "Axis5";
+        string RTStr = "Joy" + PlayerControllerNumber + "Axis6";
+#endif
+
+#if UNITY_EDITOR_WIN
+        string LTStr = "Joy" + PlayerControllerNumber + "Axis9";
+        string RTStr = "Joy" + PlayerControllerNumber + "Axis10";
+#endif
+        float LeftTrigger = Input.GetAxis(LTStr);
         LeftTrigger = Mathf.Approximately(LeftTrigger, 0f) || Mathf.Approximately(LeftTrigger, -1f) ? 0f : 1f;
 
         // Arm2: Min -90 --> 89
@@ -64,7 +74,7 @@ public class PlayerController : MonoBehaviour
         CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
 
         // Same for the right side
-        float RightTrigger = Input.GetAxis("XboxRT");
+        float RightTrigger = Input.GetAxis(RTStr);
         RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
 
         CheckArmHelper(RightTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
@@ -120,7 +130,44 @@ public class PlayerController : MonoBehaviour
 
     private void CheckJump()
     {
-        if (Input.GetKeyDown(KeyCode.JoystickButton16) && IsGrounded())
+        KeyCode JumpCode = KeyCode.A;
+        switch (PlayerControllerNumber)
+        {
+            case "1":
+#if UNITY_EDITOR_OSX
+                JumpCode = KeyCode.Joystick1Button16;
+#endif
+#if UNITY_EDITOR_WIN
+        KeyCode JumpCode = KeyCode.Joystick1Button0;
+#endif
+                break;
+            case "2":
+#if UNITY_EDITOR_OSX
+                JumpCode = KeyCode.Joystick2Button16;
+#endif
+#if UNITY_EDITOR_WIN
+        KeyCode JumpCode = KeyCode.Joystick2Button0;
+#endif
+                break;
+            case "3":
+#if UNITY_EDITOR_OSX
+                JumpCode = KeyCode.Joystick3Button16;
+#endif
+#if UNITY_EDITOR_WIN
+        KeyCode JumpCode = KeyCode.Joystick3Button0;
+#endif
+                break;
+            case "4":
+#if UNITY_EDITOR_OSX
+                JumpCode = KeyCode.Joystick4Button16;
+#endif
+#if UNITY_EDITOR_WIN
+        KeyCode JumpCode = KeyCode.Joystick4Button0;
+#endif
+                break;
+        }
+
+        if (Input.GetKeyDown(JumpCode) && IsGrounded())
         {
             _rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
         }
@@ -128,8 +175,10 @@ public class PlayerController : MonoBehaviour
 
     private void CheckMovement()
     {
-        float HLAxis = Input.GetAxis("XboxHorizontal");
-        float VLAxis = Input.GetAxis("XboxVertical");
+        string HLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis1";
+        string VLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis2";
+        float HLAxis = Input.GetAxis(HLcontrollerStr);
+        float VLAxis = Input.GetAxis(VLcontrollerStr);
 
         if (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f))
         {

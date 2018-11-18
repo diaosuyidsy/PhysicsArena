@@ -45,7 +45,6 @@ public class PlayerController : MonoBehaviour
     {
         CheckMovement();
         CheckJump();
-        //CheckBend();
         CheckArm();
     }
 
@@ -111,7 +110,6 @@ public class PlayerController : MonoBehaviour
 
     private void CheckBend()
     {
-        //float HRAxis = Input.GetAxis("XboxHorizontalRight");
         float VRAxis = Input.GetAxis("XboxVerticalRight") * -1f;
 
         JointSpring js = _chesthj.spring;

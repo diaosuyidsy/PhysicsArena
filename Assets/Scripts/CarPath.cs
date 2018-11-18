@@ -5,10 +5,8 @@ using UnityEngine.Analytics;
 
 public class CarPath : MonoBehaviour
 {
-
 	public Transform[] target;
 	public float speed;
-
 	private int current = 5;
 	private int dir;
 	
@@ -25,15 +23,16 @@ public class CarPath : MonoBehaviour
 			Debug.Log("Team 2 Wins");
 		}
 
-		if (other.CompareTag("Team1")&&other.CompareTag("Team2")) 
-		{
-			GetComponent<Rigidbody>().velocity = Vector3.zero;
-		}
+		//if (other.CompareTag("Team1") && other.CompareTag("Team2")) 
+		//{
+			//GetComponent<Rigidbody>().velocity = Vector3.zero;
+		//}
 		
 		else if (other.CompareTag("Team1") && current < target.Length)
 		{
 			if (transform.position != target[current].position)
-			{   if(dir == 2){
+			{   if(dir == 2)
+				{
 					current = current + 1;
 				}
 				dir = 1;
@@ -43,14 +42,14 @@ public class CarPath : MonoBehaviour
 				transform.rotation = Quaternion.LookRotation (relativePos);
 			}
 			else current = current + 1;
-
 		}
 
 		else if (other.CompareTag("Team2") && current >= 0)
 		{
 			if (transform.position != target[current].position)
 			{   
-				if(dir == 1){
+				if(dir == 1)
+				{
 					current = current - 1;
 				}
 				dir = 2;
@@ -59,8 +58,7 @@ public class CarPath : MonoBehaviour
 				Vector3 relativePos = target[current].position - transform.position;
 				transform.rotation = Quaternion.LookRotation (relativePos);
 			}
-			else current = current - 1;
-			
+			else current = current - 1;	
 		}	
 	}
 }

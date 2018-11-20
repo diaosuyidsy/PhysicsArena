@@ -72,12 +72,12 @@ public class PlayerController : MonoBehaviour
         // Hand: Limit Max: 90 --> 0
 
         CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
+        CheckArmHelper(LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
 
         // Same for the right side
         float RightTrigger = Input.GetAxis(RTStr);
         RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
 
-        CheckArmHelper(RightTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
 
         // Bend the body all together
         JointSpring tempjs = _chesthj.spring;

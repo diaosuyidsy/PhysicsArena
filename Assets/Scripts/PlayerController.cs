@@ -8,12 +8,15 @@ public class PlayerController : MonoBehaviour
     public string PlayerControllerNumber;
     public float Thrust = 300f;
     public float JumpForce = 300f;
+    public float RotationSpeed = 200f;
     public GameObject LegSwingReference;
     public GameObject Chest;
     [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
     public GameObject[] LeftArms;
     [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
     public GameObject[] RightArms;
+
+    public GameObject TurnReference;
 
     #region Private Variable
     private Rigidbody _rb;
@@ -190,17 +193,23 @@ public class PlayerController : MonoBehaviour
             _rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal);
             // Turn player according to the rotation of the joystick
             //transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
-            Debug.Log("Player Rotation: " + transform.rotation.eulerAngles.y);
-            Debug.Log("Controller Rotation: " + Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg);
-            if (!Mathf.Approximately(transform.rotation.eulerAngles.y, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg))
-            {
-                float rotation = HLAxis >= 0f ? 100f : -100f;
-                transform.Rotate(new Vector3(0f, rotation, 0f) * Time.deltaTime);
-            }
-            else
-            {
-                Debug.Log("Lined Up");
-            }
+            //float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
+            //float controllerRot = Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
+            //if (!(Mathf.Abs(playerRot - controllerRot) < 1f))
+            //{
+            //    //float mirrorAngle = playerRot > 0f ? (playerRot - 180f) : (playerRot + 180f);
+            //    float rotation = controllerRot - playerRot > 0f ? 1f : -1f;
+            //    Debug.Log("Controller Rotation: " + controllerRot);
+            //    Debug.Log("Plauer Rotation: " + playerRot);
+            //    transform.Rotate(new Vector3(0f, rotation * RotationSpeed, 0f) * Time.deltaTime);
+            //}
+            Transform target = TurnReference.transform.GetChild(0);
+            Vector3 relativePos = target.position - transform.position;
+
+            TurnReference.transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
+            Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+            Quaternion tr = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * RotationSpeed);
+            transform.rotation = tr;
         }
         else
         {

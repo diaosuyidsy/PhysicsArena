@@ -189,7 +189,18 @@ public class PlayerController : MonoBehaviour
             // Add force based on that percentage
             _rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal);
             // Turn player according to the rotation of the joystick
-            transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
+            //transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
+            Debug.Log("Player Rotation: " + transform.rotation.eulerAngles.y);
+            Debug.Log("Controller Rotation: " + Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg);
+            if (!Mathf.Approximately(transform.rotation.eulerAngles.y, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg))
+            {
+                float rotation = HLAxis >= 0f ? 100f : -100f;
+                transform.Rotate(new Vector3(0f, rotation, 0f) * Time.deltaTime);
+            }
+            else
+            {
+                Debug.Log("Lined Up");
+            }
         }
         else
         {

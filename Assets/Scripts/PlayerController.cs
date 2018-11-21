@@ -17,6 +17,7 @@ public class PlayerController : MonoBehaviour
     public GameObject[] RightArms;
 
     public GameObject TurnReference;
+    public LayerMask JumpMask;
 
     #region Private Variable
     private Rigidbody _rb;
@@ -193,16 +194,23 @@ public class PlayerController : MonoBehaviour
             _rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal);
             // Turn player according to the rotation of the joystick
             //transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
-            //float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
-            //float controllerRot = Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
-            //if (!(Mathf.Abs(playerRot - controllerRot) < 1f))
-            //{
-            //    //float mirrorAngle = playerRot > 0f ? (playerRot - 180f) : (playerRot + 180f);
-            //    float rotation = controllerRot - playerRot > 0f ? 1f : -1f;
-            //    Debug.Log("Controller Rotation: " + controllerRot);
-            //    Debug.Log("Plauer Rotation: " + playerRot);
-            //    transform.Rotate(new Vector3(0f, rotation * RotationSpeed, 0f) * Time.deltaTime);
-            //}
+            float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
+            float controllerRot = Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
+            if (!(Mathf.Abs(playerRot - controllerRot) < 20f))
+            {
+                //float mirrorAngle = playerRot > 0f ? (playerRot - 180f) : (playerRot + 180f);
+                //float rotation = controllerRot - playerRot > 0f ? 1f : -1f;
+                //Debug.Log("Controller Rotation: " + controllerRot);
+                //Debug.Log("Plauer Rotation: " + playerRot);
+                //transform.Rotate(new Vector3(0f, rotation * RotationSpeed, 0f) * Time.deltaTime);
+                //_rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal * 3f);
+                RotationSpeed += Time.deltaTime * 2f;
+            }
+            else
+            {
+                RotationSpeed = 4f;
+            }
+            RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
             Transform target = TurnReference.transform.GetChild(0);
             Vector3 relativePos = target.position - transform.position;
 
@@ -221,7 +229,7 @@ public class PlayerController : MonoBehaviour
     #region Helper Functions
     private bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, _distToGround + 0.1f);
+        return Physics.Raycast(transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask);
     }
     #endregion
 }

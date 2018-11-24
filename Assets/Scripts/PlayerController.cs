@@ -69,10 +69,11 @@ public class PlayerController : MonoBehaviour
         float LeftTrigger = Input.GetAxis (LTStr);
         LeftTrigger = Mathf.Approximately (LeftTrigger, 0f) || Mathf.Approximately (LeftTrigger, -1f) ? 0f : 1f;
 
-        // Arm2: Min -90 --> 89
+        // Arm2: right max: 90 --> -74
+        //       left min: -75 --> 69
         // Arm: Connected Mass Scale 1 --> 0
         //      Target Position: 0 --> 180
-        //      Limits: -90, -90 --> 81, 120
+        //      Limits: max 90 --> 121
         // Hand: Limit Max: 90 --> 0
 
         CheckArmHelper (LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
@@ -90,23 +91,24 @@ public class PlayerController : MonoBehaviour
         _chesthj.spring = tempjs;
     }
 
-    private void CheckArmHelper (float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+    private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
     {
-        // Arm2: Min -90 --> 89
+        // Arm2: right max: 90 --> -74
+        //       left min: -75 --> 69        
         JointLimits lm1 = Arm2hj.limits;
         if (IsLeftHand)
-            lm1.min = Mathf.Approximately (TriggerValue, 1f) ? 89f : -90f;
+            lm1.min = Mathf.Approximately(TriggerValue, 1f) ? 69f : -75f;
         else
-            lm1.max = Mathf.Approximately (TriggerValue, 1f) ? -89f : 90f;
+            lm1.max = Mathf.Approximately(TriggerValue, 1f) ? -74f : 90f;
         Arm2hj.limits = lm1;
 
         // Arm: Connected Mass Scale 1 --> 0
         Armhj.connectedMassScale = Mathf.Approximately (TriggerValue, 1f) ? 0f : 1f;
 
-        //  Arm: Limits: -90, 90 --> 81, 120
+        //  Arm: Limits: -90, 90 --> 0, 121
         JointLimits lm = Armhj.limits;
-        lm.max = Mathf.Approximately (TriggerValue, 1f) ? 120f : 90f;
-        lm.min = Mathf.Approximately (TriggerValue, 1f) ? 81 : -90f;
+        lm.max = Mathf.Approximately(TriggerValue, 1f) ? 121f : 90f;
+        lm.min = Mathf.Approximately(TriggerValue, 1f) ? 0f : -90f;
         Armhj.limits = lm;
 
         // Arm: Target Position: 0 --> 180

@@ -6,6 +6,7 @@ public class Fingers : MonoBehaviour
 {
 
     public float Force = 4000;
+    public GameObject OtherHand;
     Rigidbody rb;
 
     [HideInInspector]
@@ -25,11 +26,24 @@ public class Fingers : MonoBehaviour
         }
         if (!taken)
         {
-            SpringJoint sp = gameObject.AddComponent<SpringJoint>();
-            sp.connectedBody = col.rigidbody;
-            sp.spring = 12000;
-            sp.breakForce = Force;
-            taken = true;
+            OtherHand.GetComponent<Fingers>().taken = true;
+            // If it's a weapon, do something else
+            if (col.collider.CompareTag("Weapon"))
+            {
+                col.transform.parent = GetComponentInParent<PlayerController>().HeadGunPos.transform;
+                taken = true;
+                PickUpItem(col.collider.tag);
+                return;
+            }
+            else
+            {
+                SpringJoint sp = gameObject.AddComponent<SpringJoint>();
+                sp.connectedBody = col.rigidbody;
+                sp.spring = 12000;
+                sp.breakForce = Force;
+                taken = true;
+            }
+
         }
     }
 
@@ -37,6 +51,11 @@ public class Fingers : MonoBehaviour
     {
         taken = false;
 
+    }
+
+    void PickUpItem(string _tag)
+    {
+        GetComponentInParent<PlayerController>().OnPickUpItem(_tag);
     }
 
 }

@@ -214,7 +214,7 @@ GameObject:
   m_Layer: 9
   m_Name: TurnPoint
   m_TagString: Untagged
-  m_Icon: {fileID: 1206586993520771344, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -365,6 +365,21 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1 &1532413283199806
+GameObject:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4846187170402896}
+  m_Layer: 9
+  m_Name: Gun__Pos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
 --- !u!1 &1533015957858758
 GameObject:
   m_ObjectHideFlags: 1
@@ -428,7 +443,7 @@ GameObject:
   m_Layer: 9
   m_Name: TurningReference
   m_TagString: Untagged
-  m_Icon: {fileID: 7422848464349959988, guid: 0000000000000000d000000000000000, type: 0}
+  m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
@@ -901,8 +916,8 @@ Transform:
   m_LocalPosition: {x: -0.43226695, y: -0.00022179696, z: -0.012695078}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 4793232025025920}
   - {fileID: 4165384733284668}
+  - {fileID: 4793232025025920}
   - {fileID: 4618815320947880}
   - {fileID: 4718144634689022}
   m_Father: {fileID: 4762365268883554}
@@ -920,7 +935,7 @@ Transform:
   m_Children:
   - {fileID: 4128685320911802}
   m_Father: {fileID: 4156316599178592}
-  m_RootOrder: 1
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4205590344859172
 Transform:
@@ -1253,7 +1268,8 @@ Transform:
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -2.7871884e-16, y: 0.3138095, z: 6.967974e-17}
   m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
+  m_Children:
+  - {fileID: 4846187170402896}
   m_Father: {fileID: 4717175650360316}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1335,7 +1351,7 @@ Transform:
   m_Children:
   - {fileID: 4786477838657602}
   m_Father: {fileID: 4156316599178592}
-  m_RootOrder: 0
+  m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4795143875486484
 Transform:
@@ -1365,6 +1381,19 @@ Transform:
   - {fileID: 4007869718923600}
   - {fileID: 4940805236883668}
   m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &4846187170402896
+Transform:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1532413283199806}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.46, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 4740129403954068}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4860430220713044
@@ -2543,7 +2572,11 @@ MonoBehaviour:
   PlayerControllerNumber: 1
   Thrust: 300
   JumpForce: 400
+  JumpMask:
+    serializedVersion: 2
+    m_Bits: 1024
   RotationSpeed: 4
+  HeadGunPos: {fileID: 1532413283199806}
   LegSwingReference: {fileID: 1694084379956174}
   Chest: {fileID: 1558221434653460}
   LeftArms:
@@ -2555,9 +2588,6 @@ MonoBehaviour:
   - {fileID: 1560852218980714}
   - {fileID: 1478278590264554}
   TurnReference: {fileID: 1562309494506570}
-  JumpMask:
-    serializedVersion: 2
-    m_Bits: 1024
 --- !u!114 &114159125259564732
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2570,6 +2600,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Force: 4000
+  OtherHand: {fileID: 1710639892953262}
   taken: 0
 --- !u!114 &114187019818786086
 MonoBehaviour:
@@ -2583,6 +2614,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Force: 4000
+  OtherHand: {fileID: 1823864082846572}
   taken: 0
 --- !u!114 &114374518843558204
 MonoBehaviour:

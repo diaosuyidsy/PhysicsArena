@@ -18,8 +18,13 @@ public class PlayerController : MonoBehaviour
     public GameObject[] LeftArms;
     [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
     public GameObject[] RightArms;
+    public GameObject LeftHand;
+    public GameObject RightHand;
 
     public GameObject TurnReference;
+
+    [HideInInspector]
+    public bool HandTaken = false;
 
     #region Private Variable
     private Rigidbody _rb;
@@ -67,20 +72,28 @@ public class PlayerController : MonoBehaviour
                 CheckArmHelper(0f, _rightArm2hj, _rightArmhj, _rightHandhj, false);
                 // Bend the body back
                 JointSpring tempjs = _chesthj.spring;
-                tempjs.targetPosition = 0f;
+                tempjs.targetPosition = 10f;
                 _chesthj.spring = tempjs;
 
-                PickWeaponHelper(_leftArm2hj, _leftArmhj, _leftHandhj, true);
-                //PickWeaponHelper(_rightArm2hj, _rightArmhj, _rightHandhj, false);
+                StartCoroutine(StartPickUpWeapon(0.1f));
 
-                // Then correct the Weapon Position
-                Destroy(HeadGunPos.transform.GetChild(0).GetComponent<Rigidbody>());
-                HeadGunPos.transform.GetChild(0).localPosition = Vector3.zero;
-                HeadGunPos.transform.GetChild(0).localRotation = Quaternion.Euler(90f, 0f, 0f);
                 break;
             default:
                 break;
         }
+    }
+
+    IEnumerator StartPickUpWeapon(float time)
+    {
+        yield return new WaitForSeconds(time);
+        PickWeaponHelper(_leftArm2hj, _leftArmhj, _leftHandhj, true);
+        PickWeaponHelper(_rightArm2hj, _rightArmhj, _rightHandhj, false);
+
+        yield return new WaitForSeconds(0.05f);
+        // Then correct the Weapon Position
+        Destroy(HeadGunPos.transform.GetChild(0).GetComponent<Rigidbody>());
+        HeadGunPos.transform.GetChild(0).localPosition = Vector3.zero;
+        HeadGunPos.transform.GetChild(0).localRotation = Quaternion.Euler(90f, 0f, 0f);
     }
 
     private void CheckArm()
@@ -105,8 +118,8 @@ public class PlayerController : MonoBehaviour
         //      Limits: max 90 --> 121
         // Hand: Limit Max: 90 --> 0
 
-        CheckArmHelper (LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
-        CheckArmHelper (LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
+        CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
+        CheckArmHelper(LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
 
         // Same for the right side
         float RightTrigger = Input.GetAxis(RTStr);
@@ -282,7 +295,7 @@ public class PlayerController : MonoBehaviour
         Armhj.limits = lm;
 
         JointSpring js = Armhj.spring;
-        js.targetPosition = 110f;
+        js.targetPosition = 50f;
         Armhj.spring = js;
 
         // Hand: Limit Max: 90 --> 0

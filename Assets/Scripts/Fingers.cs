@@ -7,6 +7,7 @@ public class Fingers : MonoBehaviour
 
     public float Force = 4000;
     public GameObject OtherHand;
+    public GameObject Hip;
     Rigidbody rb;
 
     [HideInInspector]
@@ -27,6 +28,7 @@ public class Fingers : MonoBehaviour
         if (!taken)
         {
             OtherHand.GetComponent<Fingers>().taken = true;
+            Hip.GetComponent<PlayerController>().HandTaken = true;
             // If it's a weapon, do something else
             if (col.collider.CompareTag("Weapon"))
             {

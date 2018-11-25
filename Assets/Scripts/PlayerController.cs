@@ -20,11 +20,14 @@ public class PlayerController : MonoBehaviour
     public GameObject[] RightArms;
     public GameObject LeftHand;
     public GameObject RightHand;
-
     public GameObject TurnReference;
 
     [HideInInspector]
     public bool HandTaken = false;
+
+    #region Debug Toggle
+    public bool debugT_CheckArm = true;
+    #endregion
 
     #region Private Variable
     private Rigidbody _rb;
@@ -58,7 +61,7 @@ public class PlayerController : MonoBehaviour
     {
         CheckMovement();
         CheckJump();
-        if (_checkArm)
+        if (_checkArm && debugT_CheckArm)
             CheckArm();
     }
 
@@ -68,11 +71,10 @@ public class PlayerController : MonoBehaviour
         {
             case "Weapon":
                 _checkArm = false;
-                CheckArmHelper(0f, _leftArm2hj, _leftArmhj, _leftHandhj, true);
-                CheckArmHelper(0f, _rightArm2hj, _rightArmhj, _rightHandhj, false);
+
                 // Bend the body back
                 JointSpring tempjs = _chesthj.spring;
-                tempjs.targetPosition = 10f;
+                tempjs.targetPosition = -10f;
                 _chesthj.spring = tempjs;
 
                 StartCoroutine(StartPickUpWeapon(0.1f));
@@ -86,14 +88,14 @@ public class PlayerController : MonoBehaviour
     IEnumerator StartPickUpWeapon(float time)
     {
         yield return new WaitForSeconds(time);
-        PickWeaponHelper(_leftArm2hj, _leftArmhj, _leftHandhj, true);
-        PickWeaponHelper(_rightArm2hj, _rightArmhj, _rightHandhj, false);
+        PickWeaponHelper(_leftArm2hj, _leftArmhj, true);
+        PickWeaponHelper(_rightArm2hj, _rightArmhj, false);
 
-        yield return new WaitForSeconds(0.05f);
+        //yield return new WaitForSeconds(0.05f);
         // Then correct the Weapon Position
-        Destroy(HeadGunPos.transform.GetChild(0).GetComponent<Rigidbody>());
-        HeadGunPos.transform.GetChild(0).localPosition = Vector3.zero;
-        HeadGunPos.transform.GetChild(0).localRotation = Quaternion.Euler(90f, 0f, 0f);
+        //Destroy(HeadGunPos.transform.GetChild(0).GetComponent<Rigidbody>());
+        //HeadGunPos.transform.GetChild(0).localPosition = Vector3.zero;
+        //HeadGunPos.transform.GetChild(0).localRotation = Quaternion.Euler(0f, 90f, 0f);
     }
 
     private void CheckArm()
@@ -275,58 +277,27 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void PickWeaponHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+    private void PickWeaponHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
     {
         // Arm2: right min: --> 87
         //       left max: --> -5
         JointLimits lm1 = Arm2hj.limits;
         if (IsLeftHand)
-            lm1.max = -92f;
+        {
+            lm1.max = 89f;
+        }
         else
-            lm1.min = 87f;
-        Arm2hj.limits = lm1;
+        {
+            lm1.min = -106f;
 
-        // Arm: Connected Mass Scale 1 --> 0
-        Armhj.connectedMassScale = 0f;
+        }
+        Arm2hj.limits = lm1;
 
         // Arm: Limits Max --> -10
         JointLimits lm = Armhj.limits;
-        lm.max = -10f;
+        lm.max = 180f;
         Armhj.limits = lm;
 
-        JointSpring js = Armhj.spring;
-        js.targetPosition = 50f;
-        Armhj.spring = js;
-
-        // Hand: Limit Max: 90 --> 0
-        JointLimits tlm = Handhj.limits;
-        tlm.max = 0f;
-        Handhj.limits = tlm;
     }
     #endregion
 }
-
-
-//// Arm2: Min -90 --> 89
-//JointLimits lm1 = _leftArm2hj.limits;
-//lm1.min = Mathf.Approximately(LeftTrigger, 1f) ? 89f : -90f;
-//_leftArm2hj.limits = lm1;
-
-//// Arm: Connected Mass Scale 1 --> 0
-//_leftArmhj.connectedMassScale = Mathf.Approximately(LeftTrigger, 1f) ? 0f : 1f;
-
-////  Arm: Limits: -90, 90 --> 81, 120
-//JointLimits lm = _leftArmhj.limits;
-//lm.max = Mathf.Approximately(LeftTrigger, 1f) ? 120f : 90f;
-//lm.min = Mathf.Approximately(LeftTrigger, 1f) ? 81 : -90f;
-//_leftArmhj.limits = lm;
-
-//// Arm: Target Position: 0 --> 180
-//JointSpring js = _leftArmhj.spring;
-//js.targetPosition = 180f * LeftTrigger;
-//_leftArmhj.spring = js;
-
-//// Hand: Limit Max: 90 --> 0
-//JointLimits tlm = _leftHandhj.limits;
-//tlm.max = 90f * (1f - LeftTrigger);
-//_leftHandhj.limits = tlm;

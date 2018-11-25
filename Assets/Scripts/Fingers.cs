@@ -32,7 +32,10 @@ public class Fingers : MonoBehaviour
             // If it's a weapon, do something else
             if (col.collider.CompareTag("Weapon"))
             {
-                col.transform.parent = GetComponentInParent<PlayerController>().HeadGunPos.transform;
+                //col.transform.parent = GetComponentInParent<PlayerController>().HeadGunPos.transform;
+                col.collider.GetComponent<GunPositionControl>().Owner = Hip;
+                Destroy(col.collider.GetComponent<Rigidbody>());
+                col.gameObject.layer = 9;
                 taken = true;
                 PickUpItem(col.collider.tag);
                 return;

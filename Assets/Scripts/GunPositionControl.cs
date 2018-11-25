@@ -15,7 +15,7 @@ public class GunPositionControl : MonoBehaviour
             GameObject lh = Owner.GetComponent<PlayerController>().LeftHand;
             GameObject rh = Owner.GetComponent<PlayerController>().RightHand;
             transform.position = (lh.transform.position + rh.transform.position) / 2f;
-            transform.rotation = Owner.transform.rotation;
+            transform.eulerAngles = new Vector3(0f, Owner.transform.eulerAngles.y + 90f, 0f);
         }
     }
 }

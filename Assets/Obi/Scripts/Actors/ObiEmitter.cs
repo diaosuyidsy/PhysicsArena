@@ -75,7 +75,6 @@ namespace Obi{
 				}
 			}
 		}*/
-
 		public ObiEmitterMaterial EmitterMaterial{
 			set{
 				if (emitterMaterial != value){

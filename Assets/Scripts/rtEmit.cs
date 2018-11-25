@@ -6,14 +6,20 @@ using UnityEngine;
 public class rtEmit : MonoBehaviour
 {
 	public GameObject WaterBall;
-	// Use this for initialization
-	void Start () {
-	}
-	
+	public float Speed;
+	private bool isFire;
+
 	// Update is called once per frame
 	void Update () {
+		Shoot();
+	}
+
+	private void Shoot()
+	{
 		float Fire = Input.GetAxis("XboxRT");
 		Fire = Mathf.Approximately(Fire, 0f) || Mathf.Approximately(Fire, -1f) ? 0f : 1f;
-		WaterBall.GetComponent<ObiEmitter>().speed = Fire * 8f;
+		WaterBall.GetComponent<ObiEmitter>().speed = Fire * Speed;
+		
 	}
+
 }

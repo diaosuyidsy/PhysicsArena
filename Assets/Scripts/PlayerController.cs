@@ -105,8 +105,8 @@ public class PlayerController : MonoBehaviour
         //      Limits: max 90 --> 121
         // Hand: Limit Max: 90 --> 0
 
-        CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
-        CheckArmHelper(LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
+        CheckArmHelper (LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
+        CheckArmHelper (LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
 
         // Same for the right side
         float RightTrigger = Input.GetAxis(RTStr);

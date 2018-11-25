@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour
     private HingeJoint _leftHandhj;
     private HingeJoint _rightHandhj;
     private bool _checkArm = true;
+    private string _rightTriggerRegister = "";
 
     #endregion
 
@@ -63,10 +64,42 @@ public class PlayerController : MonoBehaviour
         CheckJump ();
         if (_checkArm && debugT_CheckArm)
             CheckArm ();
+        CheckFire ();
+    }
+
+    public void CheckFire ()
+    {
+        // For the left side
+#if UNITY_EDITOR_OSX
+        string RTStr = "Joy" + PlayerControllerNumber + "Axis6";
+#endif
+
+#if UNITY_EDITOR_WIN
+        string RTStr = "Joy" + PlayerControllerNumber + "Axis10";
+#endif
+        float RightTrigger = Input.GetAxis (RTStr);
+        RightTrigger = Mathf.Approximately (RightTrigger, 0f) || Mathf.Approximately (RightTrigger, -1f) ? 0f : 1f;
+        if (Mathf.Approximately (RightTrigger, 1f))
+        {
+            // Means we want to fire
+            switch (_rightTriggerRegister)
+            {
+                case "Throwable":
+                    LeftHand.GetComponent<Fingers> ().Throw ();
+                    RightHand.GetComponent<Fingers> ().Throw ();
+                    break;
+                case "Weapon":
+                    // TODO: Add weapon right trigger action
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
     public void OnPickUpItem (string tag)
     {
+        _rightTriggerRegister = tag;
         switch (tag)
         {
             case "Weapon":
@@ -77,26 +110,15 @@ public class PlayerController : MonoBehaviour
                 tempjs.targetPosition = -5f;
                 _chesthj.spring = tempjs;
 
-                //StartCoroutine (StartPickUpWeapon (0.6f));
-                StartCoroutine (PickUpWeaponHelper (_leftArm2hj, _leftArmhj, true, 0.7f));
-                StartCoroutine (PickUpWeaponHelper (_rightArm2hj, _rightArmhj, false, 0.7f));
+                StartCoroutine (PickUpWeaponHelper (_leftArm2hj, _leftArmhj, true, 0.6f));
+                StartCoroutine (PickUpWeaponHelper (_rightArm2hj, _rightArmhj, false, 0.6f));
+                break;
+            case "Throwable":
+
                 break;
             default:
                 break;
         }
-    }
-
-    IEnumerator StartPickUpWeapon (float time)
-    {
-        yield return new WaitForSeconds (time);
-        PickWeaponHelper (_leftArm2hj, _leftArmhj, true);
-        PickWeaponHelper (_rightArm2hj, _rightArmhj, false);
-
-        //yield return new WaitForSeconds(0.05f);
-        // Then correct the Weapon Position
-        //Destroy(HeadGunPos.transform.GetChild(0).GetComponent<Rigidbody>());
-        //HeadGunPos.transform.GetChild(0).localPosition = Vector3.zero;
-        //HeadGunPos.transform.GetChild(0).localRotation = Quaternion.Euler(0f, 90f, 0f);
     }
 
     private void CheckArm ()
@@ -131,7 +153,7 @@ public class PlayerController : MonoBehaviour
 
         // Bend the body all together
         JointSpring tempjs = _chesthj.spring;
-        tempjs.targetPosition = (Mathf.Approximately (LeftTrigger, 1f) || Mathf.Approximately (RightTrigger, 1f) ? 1f : 0f) * 90f;
+        tempjs.targetPosition = (Mathf.Approximately (LeftTrigger, 1f) ? 1f : 0f) * 90f;
         tempjs.targetPosition = Mathf.Clamp (tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
         _chesthj.spring = tempjs;
     }
@@ -334,3 +356,17 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 }
+
+
+//IEnumerator StartPickUpWeapon (float time)
+//{
+//    yield return new WaitForSeconds (time);
+//    PickWeaponHelper (_leftArm2hj, _leftArmhj, true);
+//    PickWeaponHelper (_rightArm2hj, _rightArmhj, false);
+
+//    //yield return new WaitForSeconds(0.05f);
+//    // Then correct the Weapon Position
+//    //Destroy(HeadGunPos.transform.GetChild(0).GetComponent<Rigidbody>());
+//    //HeadGunPos.transform.GetChild(0).localPosition = Vector3.zero;
+//    //HeadGunPos.transform.GetChild(0).localRotation = Quaternion.Euler(0f, 90f, 0f);
+//}

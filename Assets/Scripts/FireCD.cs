@@ -17,7 +17,6 @@ public class FireCD : MonoBehaviour
         
         if (Time.time > nextFireTime)
         {
-            
             if (StartToFire())
             {
                 print("Cooldown started");

@@ -1985,7 +1985,7 @@ HingeJoint:
     freeSpin: 0
   m_UseLimits: 1
   m_Limits:
-    min: -100
+    min: -75
     max: 70
     bounciness: 0
     bounceMinVelocity: 0.2
@@ -2571,7 +2571,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerControllerNumber: 1
   Thrust: 300
-  JumpForce: 400
+  JumpForce: 300
   JumpMask:
     serializedVersion: 2
     m_Bits: 1024
@@ -2591,6 +2591,7 @@ MonoBehaviour:
   RightHand: {fileID: 1710639892953262}
   TurnReference: {fileID: 1562309494506570}
   HandTaken: 0
+  debugT_CheckArm: 1
 --- !u!114 &114159125259564732
 MonoBehaviour:
   m_ObjectHideFlags: 1

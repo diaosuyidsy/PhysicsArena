@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
 
         // Bend the body all together
         JointSpring tempjs = _chesthj.spring;
-        tempjs.targetPosition = (Mathf.Approximately (LeftTrigger, 1f) || Mathf.Approximately (RightTrigger, 1f) ? 1f : 0f) * 90f;
+        tempjs.targetPosition = (Mathf.Approximately (LeftTrigger, 1f) ? 1f : 0f) * 90f;
         tempjs.targetPosition = Mathf.Clamp (tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
         _chesthj.spring = tempjs;
     }

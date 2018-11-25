@@ -504,7 +504,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4646776164723954, guid: 6471dc4e598cfca4a97c4907bbdad5c7, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 0.59
+      value: 0.478
       objectReference: {fileID: 0}
     - target: {fileID: 4646776164723954, guid: 6471dc4e598cfca4a97c4907bbdad5c7, type: 2}
       propertyPath: m_LocalPosition.z
@@ -566,7 +566,7 @@ Rigidbody:
   m_Drag: 0
   m_AngularDrag: 0.05
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
@@ -696,6 +696,11 @@ Prefab:
         type: 2}
       propertyPath: m_Limits.min
       value: -75
+      objectReference: {fileID: 0}
+    - target: {fileID: 114048781729507990, guid: 167805f8be96e2c4c8c1832a0b8bd79e,
+        type: 2}
+      propertyPath: JumpForce
+      value: 300
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 167805f8be96e2c4c8c1832a0b8bd79e, type: 2}

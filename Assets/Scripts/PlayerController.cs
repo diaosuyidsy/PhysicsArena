@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [Tooltip("Enter 1 Digit 1-4")]
+    [Tooltip ("Enter 1 Digit 1-4")]
     public string PlayerControllerNumber;
     public float Thrust = 300f;
     public float JumpForce = 300f;
@@ -14,9 +14,9 @@ public class PlayerController : MonoBehaviour
     public GameObject HeadGunPos;
     public GameObject LegSwingReference;
     public GameObject Chest;
-    [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
+    [Tooltip ("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
     public GameObject[] LeftArms;
-    [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
+    [Tooltip ("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
     public GameObject[] RightArms;
     public GameObject LeftHand;
     public GameObject RightHand;
@@ -43,29 +43,29 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
-    private void Start()
+    private void Start ()
     {
-        _rb = GetComponent<Rigidbody>();
-        _distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
-        _chesthj = Chest.GetComponent<HingeJoint>();
-        _leftArm2hj = LeftArms[0].GetComponent<HingeJoint>();
-        _rightArm2hj = RightArms[0].GetComponent<HingeJoint>();
-        _leftArmhj = LeftArms[1].GetComponent<HingeJoint>();
-        _rightArmhj = RightArms[1].GetComponent<HingeJoint>();
-        _leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
-        _rightHandhj = RightArms[2].GetComponent<HingeJoint>();
+        _rb = GetComponent<Rigidbody> ();
+        _distToGround = GetComponent<CapsuleCollider> ().bounds.extents.y;
+        _chesthj = Chest.GetComponent<HingeJoint> ();
+        _leftArm2hj = LeftArms[0].GetComponent<HingeJoint> ();
+        _rightArm2hj = RightArms[0].GetComponent<HingeJoint> ();
+        _leftArmhj = LeftArms[1].GetComponent<HingeJoint> ();
+        _rightArmhj = RightArms[1].GetComponent<HingeJoint> ();
+        _leftHandhj = LeftArms[2].GetComponent<HingeJoint> ();
+        _rightHandhj = RightArms[2].GetComponent<HingeJoint> ();
     }
 
     // Update is called once per frame
-    void Update()
+    void Update ()
     {
-        CheckMovement();
-        CheckJump();
+        CheckMovement ();
+        CheckJump ();
         if (_checkArm && debugT_CheckArm)
-            CheckArm();
+            CheckArm ();
     }
 
-    public void OnPickUpItem(string tag)
+    public void OnPickUpItem (string tag)
     {
         switch (tag)
         {
@@ -74,22 +74,23 @@ public class PlayerController : MonoBehaviour
 
                 // Bend the body back
                 JointSpring tempjs = _chesthj.spring;
-                tempjs.targetPosition = -10f;
+                tempjs.targetPosition = -5f;
                 _chesthj.spring = tempjs;
 
-                StartCoroutine(StartPickUpWeapon(0.1f));
-
+                //StartCoroutine (StartPickUpWeapon (0.6f));
+                StartCoroutine (PickUpWeaponHelper (_leftArm2hj, _leftArmhj, true, 0.7f));
+                StartCoroutine (PickUpWeaponHelper (_rightArm2hj, _rightArmhj, false, 0.7f));
                 break;
             default:
                 break;
         }
     }
 
-    IEnumerator StartPickUpWeapon(float time)
+    IEnumerator StartPickUpWeapon (float time)
     {
-        yield return new WaitForSeconds(time);
-        PickWeaponHelper(_leftArm2hj, _leftArmhj, true);
-        PickWeaponHelper(_rightArm2hj, _rightArmhj, false);
+        yield return new WaitForSeconds (time);
+        PickWeaponHelper (_leftArm2hj, _leftArmhj, true);
+        PickWeaponHelper (_rightArm2hj, _rightArmhj, false);
 
         //yield return new WaitForSeconds(0.05f);
         // Then correct the Weapon Position
@@ -98,7 +99,7 @@ public class PlayerController : MonoBehaviour
         //HeadGunPos.transform.GetChild(0).localRotation = Quaternion.Euler(0f, 90f, 0f);
     }
 
-    private void CheckArm()
+    private void CheckArm ()
     {
         // For the left side
 #if UNITY_EDITOR_OSX
@@ -110,8 +111,8 @@ public class PlayerController : MonoBehaviour
         string LTStr = "Joy" + PlayerControllerNumber + "Axis9";
         string RTStr = "Joy" + PlayerControllerNumber + "Axis10";
 #endif
-        float LeftTrigger = Input.GetAxis(LTStr);
-        LeftTrigger = Mathf.Approximately(LeftTrigger, 0f) || Mathf.Approximately(LeftTrigger, -1f) ? 0f : 1f;
+        float LeftTrigger = Input.GetAxis (LTStr);
+        LeftTrigger = Mathf.Approximately (LeftTrigger, 0f) || Mathf.Approximately (LeftTrigger, -1f) ? 0f : 1f;
 
         // Arm2: right max: 90 --> -74
         //       left min: -75 --> 69
@@ -120,32 +121,32 @@ public class PlayerController : MonoBehaviour
         //      Limits: max 90 --> 121
         // Hand: Limit Max: 90 --> 0
 
-        CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
-        CheckArmHelper(LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
+        CheckArmHelper (LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
+        CheckArmHelper (LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
 
         // Same for the right side
-        float RightTrigger = Input.GetAxis(RTStr);
-        RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
+        float RightTrigger = Input.GetAxis (RTStr);
+        RightTrigger = Mathf.Approximately (RightTrigger, 0f) || Mathf.Approximately (RightTrigger, -1f) ? 0f : 1f;
 
 
         // Bend the body all together
         JointSpring tempjs = _chesthj.spring;
-        tempjs.targetPosition = (Mathf.Approximately(LeftTrigger, 1f) || Mathf.Approximately(RightTrigger, 1f) ? 1f : 0f) * 90f;
-        tempjs.targetPosition = Mathf.Clamp(tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
+        tempjs.targetPosition = (Mathf.Approximately (LeftTrigger, 1f) || Mathf.Approximately (RightTrigger, 1f) ? 1f : 0f) * 90f;
+        tempjs.targetPosition = Mathf.Clamp (tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
         _chesthj.spring = tempjs;
     }
 
-    private void CheckBend()
+    private void CheckBend ()
     {
-        float VRAxis = Input.GetAxis("XboxVerticalRight") * -1f;
+        float VRAxis = Input.GetAxis ("XboxVerticalRight") * -1f;
 
         JointSpring js = _chesthj.spring;
         js.targetPosition = VRAxis * 90f;
-        js.targetPosition = Mathf.Clamp(js.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
+        js.targetPosition = Mathf.Clamp (js.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
         _chesthj.spring = js;
     }
 
-    private void CheckJump()
+    private void CheckJump ()
     {
         KeyCode JumpCode = KeyCode.A;
         switch (PlayerControllerNumber)
@@ -184,32 +185,32 @@ public class PlayerController : MonoBehaviour
                 break;
         }
 
-        if (Input.GetKeyDown(JumpCode) && IsGrounded())
+        if (Input.GetKeyDown (JumpCode) && IsGrounded ())
         {
-            _rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
+            _rb.AddForce (new Vector3 (0, JumpForce, 0), ForceMode.Impulse);
         }
     }
 
-    private void CheckMovement()
+    private void CheckMovement ()
     {
         string HLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis1";
         string VLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis2";
-        float HLAxis = Input.GetAxis(HLcontrollerStr);
-        float VLAxis = Input.GetAxis(VLcontrollerStr);
+        float HLAxis = Input.GetAxis (HLcontrollerStr);
+        float VLAxis = Input.GetAxis (VLcontrollerStr);
 
-        if (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f))
+        if (!Mathf.Approximately (HLAxis, 0f) || !Mathf.Approximately (VLAxis, 0f))
         {
             // Turn on the animator of the Leg Swing Preference
-            LegSwingReference.GetComponent<Animator>().enabled = IsGrounded();
+            LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded ();
             // Get the percent of input force player put in
-            float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
+            float normalizedInputVal = Mathf.Sqrt (Mathf.Pow (HLAxis, 2f) + Mathf.Pow (VLAxis, 2f)) / Mathf.Sqrt (2);
             // Add force based on that percentage
-            _rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal);
+            _rb.GetComponent<Rigidbody> ().AddForce (transform.forward * Thrust * normalizedInputVal);
             // Turn player according to the rotation of the joystick
             //transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
             float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
-            float controllerRot = Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
-            if (!(Mathf.Abs(playerRot - controllerRot) < 20f))
+            float controllerRot = Mathf.Atan2 (HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
+            if (!(Mathf.Abs (playerRot - controllerRot) < 20f))
             {
                 //float mirrorAngle = playerRot > 0f ? (playerRot - 180f) : (playerRot + 180f);
                 //float rotation = controllerRot - playerRot > 0f ? 1f : -1f;
@@ -223,46 +224,46 @@ public class PlayerController : MonoBehaviour
             {
                 RotationSpeed = 4f;
             }
-            RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
-            Transform target = TurnReference.transform.GetChild(0);
+            RotationSpeed = Mathf.Clamp (RotationSpeed, 4f, 15f);
+            Transform target = TurnReference.transform.GetChild (0);
             Vector3 relativePos = target.position - transform.position;
 
-            TurnReference.transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
-            Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-            Quaternion tr = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * RotationSpeed);
+            TurnReference.transform.eulerAngles = new Vector3 (transform.eulerAngles.x, Mathf.Atan2 (HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
+            Quaternion rotation = Quaternion.LookRotation (relativePos, Vector3.up);
+            Quaternion tr = Quaternion.Slerp (transform.rotation, rotation, Time.deltaTime * RotationSpeed);
             transform.rotation = tr;
         }
         else
         {
-            LegSwingReference.GetComponent<Animator>().enabled = false;
+            LegSwingReference.GetComponent<Animator> ().enabled = false;
             LegSwingReference.transform.eulerAngles = Vector3.zero;
         }
     }
 
     #region Helper Functions
-    private bool IsGrounded()
+    private bool IsGrounded ()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask);
+        return Physics.Raycast (transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask);
     }
 
-    private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+    private void CheckArmHelper (float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
     {
         // Arm2: right max: 90 --> -74
         //       left min: -75 --> 69        
         JointLimits lm1 = Arm2hj.limits;
         if (IsLeftHand)
-            lm1.min = Mathf.Approximately(TriggerValue, 1f) ? 69f : -75f;
+            lm1.min = Mathf.Approximately (TriggerValue, 1f) ? 69f : -75f;
         else
-            lm1.max = Mathf.Approximately(TriggerValue, 1f) ? -74f : 90f;
+            lm1.max = Mathf.Approximately (TriggerValue, 1f) ? -74f : 90f;
         Arm2hj.limits = lm1;
 
         // Arm: Connected Mass Scale 1 --> 0
-        Armhj.connectedMassScale = Mathf.Approximately(TriggerValue, 1f) ? 0f : 1f;
+        Armhj.connectedMassScale = Mathf.Approximately (TriggerValue, 1f) ? 0f : 1f;
 
         //  Arm: Limits: -90, 90 --> 0, 121
         JointLimits lm = Armhj.limits;
-        lm.max = Mathf.Approximately(TriggerValue, 1f) ? 121f : 90f;
-        lm.min = Mathf.Approximately(TriggerValue, 1f) ? 0f : -90f;
+        lm.max = Mathf.Approximately (TriggerValue, 1f) ? 121f : 90f;
+        lm.min = Mathf.Approximately (TriggerValue, 1f) ? 0f : -90f;
         Armhj.limits = lm;
 
         // Arm: Target Position: 0 --> 180
@@ -277,23 +278,55 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    private void PickWeaponHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
+    IEnumerator PickUpWeaponHelper (HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
+    {
+        float elapesdTime = 0f;
+        JointLimits lm2 = Arm2hj.limits;
+        JointLimits lm = Armhj.limits;
+
+        float initLm2LeftMax = lm2.max;
+        float initLm2LeftMin = lm2.min;
+
+        float initLmMax = lm.max;
+        while (elapesdTime < time)
+        {
+            elapesdTime += Time.deltaTime;
+            if (IsLeftHand)
+            {
+                lm2.max = Mathf.Lerp (initLm2LeftMax, 103f, elapesdTime / time);
+                lm2.min = Mathf.Lerp (initLm2LeftMin, 95f, elapesdTime / time);
+            }
+            else
+            {
+                lm2.max = Mathf.Lerp (initLm2LeftMax, -110f, elapesdTime / time);
+                lm2.min = Mathf.Lerp (initLm2LeftMin, -106f, elapesdTime / time);
+            }
+            lm.max = Mathf.Lerp (initLmMax, 180f, elapesdTime / time);
+            yield return new WaitForEndOfFrame ();
+        }
+        Arm2hj.limits = lm2;
+        Armhj.limits = lm;
+    }
+
+    // Useless ATM
+    private void PickWeaponHelper (HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
     {
         // Arm2: right min: --> 87
         //       left max: --> -5
         JointLimits lm1 = Arm2hj.limits;
         if (IsLeftHand)
         {
-            lm1.max = 89f;
+            lm1.max = 103f;
+            lm1.min = 95f;
         }
         else
         {
             lm1.min = -106f;
-
+            lm1.max = -110f;
         }
         Arm2hj.limits = lm1;
 
-        // Arm: Limits Max --> -10
+        // Arm: Limits Max --> 180
         JointLimits lm = Armhj.limits;
         lm.max = 180f;
         Armhj.limits = lm;

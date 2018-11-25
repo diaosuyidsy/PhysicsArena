@@ -64,6 +64,7 @@ namespace Obi{
 
 		public override bool SelfCollisions{
 			get{return selfCollisions;}
+			set { selfCollisions = value; }
 		}
 
 		/*public ObiEmitterShape EmitterShape{

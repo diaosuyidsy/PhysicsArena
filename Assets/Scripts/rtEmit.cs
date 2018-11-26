@@ -32,9 +32,7 @@ public class rtEmit : MonoBehaviour
             gpc.Owner.GetComponent<Rigidbody>().AddForce(-gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
             gpc.Owner.GetComponent<Rigidbody>().AddForce(gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
         }
-        if (Mathf.Approximately(1f, TriggerVal))
-            // Reduce Ammon
-            currentAmmo--;
+        currentAmmo--;
 
     }
 

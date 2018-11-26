@@ -19,6 +19,12 @@ public class rtEmit : MonoBehaviour
 
     public void Shoot(float TriggerVal)
     {
+        //For inspection purpose
+        if (currentAmmo <= 0)
+        {
+            print("NoAmmo");
+        }
+        
         if (Mathf.Approximately(TriggerVal, 0f) || currentAmmo <= 0)
         {
             WaterBall.GetComponent<ObiEmitter>().speed = 0f;

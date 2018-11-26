@@ -175,9 +175,12 @@ GameObject:
   - component: {fileID: 4320702497290378}
   - component: {fileID: 95764708417100340}
   - component: {fileID: 114356269558556462}
+  - component: {fileID: 54127289479514558}
+  - component: {fileID: 136961592473372396}
+  - component: {fileID: 114241190815906894}
   m_Layer: 0
   m_Name: WaterGun_1New
-  m_TagString: Untagged
+  m_TagString: Weapon
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -272,8 +275,8 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1905247705955312}
-  m_LocalRotation: {x: 0.44985148, y: 0.44985148, z: -0.5455581, w: 0.5455581}
-  m_LocalPosition: {x: -10.7, y: 1.789, z: -9.044}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 9.89, y: 0.57, z: 4.74}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children:
   - {fileID: 4148247910483858}
@@ -688,6 +691,21 @@ MeshFilter:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1583324513292374}
   m_Mesh: {fileID: 4300012, guid: d1379e91ce82ab44896854c0c4911b7b, type: 3}
+--- !u!54 &54127289479514558
+Rigidbody:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1905247705955312}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
 --- !u!95 &95764708417100340
 Animator:
   serializedVersion: 3
@@ -706,6 +724,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &114241190815906894
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1905247705955312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8736a190d38e4d6c80799fbd3bcafe6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Owner: {fileID: 0}
 --- !u!114 &114248525287821882
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -806,7 +836,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WaterBall: {fileID: 1214813184190486}
-  Speed: 11
+  Speed: 40
 --- !u!114 &114608128390381850
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -818,7 +848,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8b45ebbf86be4df6b0e6cd933812af2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  render: 0
+  render: 1
   shader: {fileID: 4800000, guid: 801733041f66b49e1b3c2101471db877, type: 3}
   particleColor: {r: 0.8915094, g: 0.9658376, b: 1, a: 1}
   radiusScale: 2
@@ -21951,3 +21981,16 @@ MonoBehaviour:
   - 0
   - 0
   - 0
+--- !u!136 &136961592473372396
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1905247705955312}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.09897902
+  m_Height: 0.4436326
+  m_Direction: 0
+  m_Center: {x: 0, y: 0, z: 0}

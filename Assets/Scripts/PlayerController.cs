@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public float JumpForce = 300f;
     public LayerMask JumpMask;
     public float RotationSpeed = 200f;
+    public float RunSpeedMultiplier = 1f;
 
     public GameObject HeadGunPos;
     public GameObject LegSwingReference;
@@ -21,6 +22,8 @@ public class PlayerController : MonoBehaviour
     public GameObject LeftHand;
     public GameObject RightHand;
     public GameObject TurnReference;
+
+    public GameObject HandObject;
 
     [HideInInspector]
     public bool HandTaken = false;
@@ -44,6 +47,13 @@ public class PlayerController : MonoBehaviour
 
     #endregion
 
+    #region Controller Variables
+    private KeyCode JumpCode;
+    private KeyCode RunCode;
+    private string RTStr;
+    private string LTStr;
+    #endregion
+
     private void Start ()
     {
         _rb = GetComponent<Rigidbody> ();
@@ -60,23 +70,19 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        CheckAllInput ();
         CheckMovement ();
         CheckJump ();
         if (_checkArm && debugT_CheckArm)
             CheckArm ();
         CheckFire ();
+        CheckRun ();
     }
+
+
 
     public void CheckFire ()
     {
-        // For the left side
-#if UNITY_EDITOR_OSX
-        string RTStr = "Joy" + PlayerControllerNumber + "Axis6";
-#endif
-
-#if UNITY_EDITOR_WIN
-        string RTStr = "Joy" + PlayerControllerNumber + "Axis10";
-#endif
         float RightTrigger = Input.GetAxis (RTStr);
         RightTrigger = Mathf.Approximately (RightTrigger, 0f) || Mathf.Approximately (RightTrigger, -1f) ? 0f : 1f;
         if (Mathf.Approximately (RightTrigger, 1f))
@@ -90,6 +96,22 @@ public class PlayerController : MonoBehaviour
                     break;
                 case "Weapon":
                     // TODO: Add weapon right trigger action
+                    HandObject.SendMessage ("Shoot", 1f);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            switch (_rightTriggerRegister)
+            {
+                // Means we release the button
+                case "Throwable":
+                    break;
+                case "Weapon":
+                    // TODO: Add weapon right trigger action
+                    HandObject.SendMessage ("Shoot", 0f);
                     break;
                 default:
                     break;
@@ -123,16 +145,6 @@ public class PlayerController : MonoBehaviour
 
     private void CheckArm ()
     {
-        // For the left side
-#if UNITY_EDITOR_OSX
-        string LTStr = "Joy" + PlayerControllerNumber + "Axis5";
-        string RTStr = "Joy" + PlayerControllerNumber + "Axis6";
-#endif
-
-#if UNITY_EDITOR_WIN
-        string LTStr = "Joy" + PlayerControllerNumber + "Axis9";
-        string RTStr = "Joy" + PlayerControllerNumber + "Axis10";
-#endif
         float LeftTrigger = Input.GetAxis (LTStr);
         LeftTrigger = Mathf.Approximately (LeftTrigger, 0f) || Mathf.Approximately (LeftTrigger, -1f) ? 0f : 1f;
 
@@ -158,55 +170,16 @@ public class PlayerController : MonoBehaviour
         _chesthj.spring = tempjs;
     }
 
-    private void CheckBend ()
+    private void CheckRun ()
     {
-        float VRAxis = Input.GetAxis ("XboxVerticalRight") * -1f;
-
-        JointSpring js = _chesthj.spring;
-        js.targetPosition = VRAxis * 90f;
-        js.targetPosition = Mathf.Clamp (js.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
-        _chesthj.spring = js;
+        if (Input.GetKey (RunCode) && IsGrounded ())
+        {
+            _rb.GetComponent<Rigidbody> ().AddForce (transform.forward * Thrust * RunSpeedMultiplier);
+        }
     }
 
     private void CheckJump ()
     {
-        KeyCode JumpCode = KeyCode.A;
-        switch (PlayerControllerNumber)
-        {
-            case "1":
-#if UNITY_EDITOR_OSX
-                JumpCode = KeyCode.Joystick1Button16;
-#endif
-#if UNITY_EDITOR_WIN
-                JumpCode = KeyCode.Joystick1Button0;
-#endif
-                break;
-            case "2":
-#if UNITY_EDITOR_OSX
-                JumpCode = KeyCode.Joystick2Button16;
-#endif
-#if UNITY_EDITOR_WIN
-                JumpCode = KeyCode.Joystick2Button0;
-#endif
-                break;
-            case "3":
-#if UNITY_EDITOR_OSX
-                JumpCode = KeyCode.Joystick3Button16;
-#endif
-#if UNITY_EDITOR_WIN
-                JumpCode = KeyCode.Joystick3Button0;
-#endif
-                break;
-            case "4":
-#if UNITY_EDITOR_OSX
-                JumpCode = KeyCode.Joystick4Button16;
-#endif
-#if UNITY_EDITOR_WIN
-                JumpCode = KeyCode.Joystick4Button0;
-#endif
-                break;
-        }
-
         if (Input.GetKeyDown (JumpCode) && IsGrounded ())
         {
             _rb.AddForce (new Vector3 (0, JumpForce, 0), ForceMode.Impulse);
@@ -240,7 +213,7 @@ public class PlayerController : MonoBehaviour
                 //Debug.Log("Plauer Rotation: " + playerRot);
                 //transform.Rotate(new Vector3(0f, rotation * RotationSpeed, 0f) * Time.deltaTime);
                 //_rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal * 3f);
-                RotationSpeed += Time.deltaTime * 2f;
+                RotationSpeed += Time.deltaTime;
             }
             else
             {
@@ -263,6 +236,65 @@ public class PlayerController : MonoBehaviour
     }
 
     #region Helper Functions
+
+    private void CheckAllInput ()
+    {
+        // For L&R Triggers
+#if UNITY_EDITOR_OSX
+        LTStr = "Joy" + PlayerControllerNumber + "Axis5";
+        RTStr = "Joy" + PlayerControllerNumber + "Axis6";
+#endif
+
+#if UNITY_EDITOR_WIN
+        LTStr = "Joy" + PlayerControllerNumber + "Axis9";
+        RTStr = "Joy" + PlayerControllerNumber + "Axis10";
+#endif
+        // For A, B, X, Y Buttons
+        switch (PlayerControllerNumber)
+        {
+            case "1":
+#if UNITY_EDITOR_OSX
+                JumpCode = KeyCode.Joystick1Button16;
+                RunCode = KeyCode.Joystick1Button19;
+#endif
+#if UNITY_EDITOR_WIN
+                JumpCode = KeyCode.Joystick1Button0;
+                RunCode = KeyCode.Joystick1Button3;
+#endif
+                break;
+            case "2":
+#if UNITY_EDITOR_OSX
+                JumpCode = KeyCode.Joystick2Button16;
+                RunCode = KeyCode.Joystick1Button19;
+#endif
+#if UNITY_EDITOR_WIN
+                JumpCode = KeyCode.Joystick2Button0;
+                RunCode = KeyCode.Joystick1Button3;
+#endif
+                break;
+            case "3":
+#if UNITY_EDITOR_OSX
+                JumpCode = KeyCode.Joystick3Button16;
+                RunCode = KeyCode.Joystick1Button19;
+#endif
+#if UNITY_EDITOR_WIN
+                JumpCode = KeyCode.Joystick3Button0;
+                RunCode = KeyCode.Joystick1Button3;
+#endif
+                break;
+            case "4":
+#if UNITY_EDITOR_OSX
+                JumpCode = KeyCode.Joystick4Button16;
+                RunCode = KeyCode.Joystick1Button19;
+#endif
+#if UNITY_EDITOR_WIN
+                JumpCode = KeyCode.Joystick4Button0;
+                RunCode = KeyCode.Joystick1Button3;
+#endif
+                break;
+        }
+    }
+
     private bool IsGrounded ()
     {
         return Physics.Raycast (transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask);

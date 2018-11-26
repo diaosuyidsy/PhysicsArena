@@ -31,7 +31,7 @@ public class Fingers : MonoBehaviour
 
     void OnCollisionEnter (Collision col)
     {
-        if (col.collider.CompareTag ("Ground"))
+        if (col.collider.CompareTag ("Ground") || col.collider.CompareTag ("Payload"))
         {
             return;
         }
@@ -40,13 +40,15 @@ public class Fingers : MonoBehaviour
             // Tell other necessary components that it has taken something
             OtherHand.GetComponent<Fingers> ().taken = true;
             Hip.GetComponent<PlayerController> ().HandTaken = true;
+            GetComponentInParent<PlayerController> ().HandObject = col.gameObject;
+
 
             // If it's a weapon, apply it to specific position
             if (col.collider.CompareTag ("Weapon"))
             {
                 // Tell the collected weapon who picked it up
                 col.collider.GetComponent<GunPositionControl> ().Owner = Hip;
-                Destroy (col.collider.GetComponent<Rigidbody> ());
+                //Destroy (col.collider.GetComponent<Rigidbody> ());
                 col.gameObject.layer = 9;
             }
             else

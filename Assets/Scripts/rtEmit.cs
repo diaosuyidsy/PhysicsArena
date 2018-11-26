@@ -9,17 +9,33 @@ public class rtEmit : MonoBehaviour
     public float Speed;
     public float BackFireThrust;
     public float UpThrust = 1f;
+    public int MaxAmmo = 1000;
+    public int currentAmmo;
 
-    public void Shoot (float TriggerVal)
+    private void Start()
     {
-        WaterBall.GetComponent<ObiEmitter> ().speed = TriggerVal * Speed;
-        GunPositionControl gpc = GetComponent<GunPositionControl> ();
+        currentAmmo = MaxAmmo;
+    }
+
+    public void Shoot(float TriggerVal)
+    {
+        if (Mathf.Approximately(TriggerVal, 0f) || currentAmmo <= 0)
+        {
+            WaterBall.GetComponent<ObiEmitter>().speed = 0f;
+            return;
+        }
+        WaterBall.GetComponent<ObiEmitter>().speed = Speed;
+        GunPositionControl gpc = GetComponent<GunPositionControl>();
         if (gpc != null)
         {
-            gpc.Owner.GetComponent<Rigidbody> ().AddForce (-gpc.Owner.transform.forward * BackFireThrust * TriggerVal, ForceMode.Impulse);
-            gpc.Owner.GetComponent<Rigidbody> ().AddForce (gpc.Owner.transform.up * BackFireThrust * TriggerVal * UpThrust, ForceMode.Impulse);
-
+            Debug.Log("BackFire");
+            gpc.Owner.GetComponent<Rigidbody>().AddForce(-gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
+            gpc.Owner.GetComponent<Rigidbody>().AddForce(gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
         }
+        if (Mathf.Approximately(1f, TriggerVal))
+            // Reduce Ammon
+            currentAmmo--;
+
     }
 
 }

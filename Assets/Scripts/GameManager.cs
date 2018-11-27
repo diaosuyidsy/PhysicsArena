@@ -9,15 +9,16 @@ public class GameManager : MonoBehaviour
     public static GameManager GM;
     public Text Result;
     public GameObject[] Players;
+    public GameObject RunSandVFX;
 
-    private void Awake ()
+    private void Awake()
     {
         GM = this;
     }
 
-    public void GameOver (int winner)
+    public void GameOver(int winner)
     {
         Result.text = "TEAM " + (winner == 1 ? "ONE" : "TWO") + " VICTORY";
-        Result.transform.parent.gameObject.SetActive (true);
+        Result.transform.parent.gameObject.SetActive(true);
     }
 }

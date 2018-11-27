@@ -85,7 +85,7 @@ public class PlayerController : MonoBehaviour
         if (HandObject == null)
             return;
 
-        // If taken something, and pushed LT, drop the thing
+        // If taken something, and pushed Y, drop the thing
         if (Input.GetKeyDown(YButton))
         {
             // Drop the thing
@@ -103,6 +103,7 @@ public class PlayerController : MonoBehaviour
             HandObject = null;
             // Clear the right trigger register
             _rightTriggerRegister = "";
+            ResetBody();
         }
     }
 
@@ -120,7 +121,7 @@ public class PlayerController : MonoBehaviour
                     RightHand.GetComponent<Fingers>().Throw();
                     break;
                 case "Weapon":
-                    // TODO: Add weapon right trigger action
+                    // Add weapon right trigger action
                     HandObject.SendMessage("Shoot", 1f);
                     break;
                 default:
@@ -135,7 +136,7 @@ public class PlayerController : MonoBehaviour
                 case "Throwable":
                     break;
                 case "Weapon":
-                    // TODO: Add weapon right trigger action
+                    // Add weapon right trigger action
                     if (HandObject != null)
                         HandObject.SendMessage("Shoot", 0f);
                     break;
@@ -371,6 +372,31 @@ public class PlayerController : MonoBehaviour
 
     }
 
+
+    private void ResetBody()
+    {
+        ResetBodyHelper(_leftArm2hj, _leftArmhj, true);
+        ResetBodyHelper(_rightArm2hj, _rightArmhj, false);
+    }
+
+    void ResetBodyHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
+    {
+        JointLimits lm2 = Arm2hj.limits;
+
+        if (IsLeftHand)
+        {
+            lm2.max = 70f;
+            lm2.min = -75f;
+        }
+        else
+        {
+            lm2.max = 90f;
+            lm2.min = -75f;
+        }
+        Arm2hj.limits = lm2;
+    }
+
+
     IEnumerator PickUpWeaponHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
     {
         float elapesdTime = 0f;
@@ -399,46 +425,6 @@ public class PlayerController : MonoBehaviour
             Armhj.limits = lm;
             yield return new WaitForEndOfFrame();
         }
-
-    }
-
-    // Useless ATM
-    private void PickWeaponHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
-    {
-        // Arm2: right min: --> 87
-        //       left max: --> -5
-        JointLimits lm1 = Arm2hj.limits;
-        if (IsLeftHand)
-        {
-            lm1.max = 103f;
-            lm1.min = 95f;
-        }
-        else
-        {
-            lm1.min = -106f;
-            lm1.max = -110f;
-        }
-        Arm2hj.limits = lm1;
-
-        // Arm: Limits Max --> 180
-        JointLimits lm = Armhj.limits;
-        lm.max = 180f;
-        Armhj.limits = lm;
-
     }
     #endregion
 }
-
-
-//IEnumerator StartPickUpWeapon (float time)
-//{
-//    yield return new WaitForSeconds (time);
-//    PickWeaponHelper (_leftArm2hj, _leftArmhj, true);
-//    PickWeaponHelper (_rightArm2hj, _rightArmhj, false);
-
-//    //yield return new WaitForSeconds(0.05f);
-//    // Then correct the Weapon Position
-//    //Destroy(HeadGunPos.transform.GetChild(0).GetComponent<Rigidbody>());
-//    //HeadGunPos.transform.GetChild(0).localPosition = Vector3.zero;
-//    //HeadGunPos.transform.GetChild(0).localRotation = Quaternion.Euler(0f, 90f, 0f);
-//}

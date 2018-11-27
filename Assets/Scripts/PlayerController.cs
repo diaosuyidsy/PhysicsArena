@@ -93,17 +93,20 @@ public class PlayerController : MonoBehaviour
             HandTaken = false;
             // Return the body to normal position
             _checkArm = true;
+            StopAllCoroutines();
+            ResetBody();
             // Specialized checking
             if (HandObject.CompareTag("Weapon"))
             {
                 HandObject.GetComponent<Rigidbody>().isKinematic = false;
                 HandObject.layer = 0;
+                // Stop the shooting
+                HandObject.SendMessage("Shoot", 0f);
             }
             // Nullify the holder
             HandObject = null;
             // Clear the right trigger register
             _rightTriggerRegister = "";
-            ResetBody();
         }
     }
 
@@ -122,7 +125,8 @@ public class PlayerController : MonoBehaviour
                     break;
                 case "Weapon":
                     // Add weapon right trigger action
-                    HandObject.SendMessage("Shoot", 1f);
+                    if (HandObject != null)
+                        HandObject.SendMessage("Shoot", 1f);
                     break;
                 default:
                     break;
@@ -296,40 +300,40 @@ public class PlayerController : MonoBehaviour
             case "2":
 #if UNITY_EDITOR_OSX
                 JumpCode = KeyCode.Joystick2Button16;
-                RunCode = KeyCode.Joystick1Button11;
-                YButton = KeyCode.Joystick1Button19;
+                RunCode = KeyCode.Joystick2Button11;
+                YButton = KeyCode.Joystick2Button19;
 
 #endif
 #if UNITY_EDITOR_WIN
                 JumpCode = KeyCode.Joystick2Button0;
-                RunCode = KeyCode.Joystick1Button8;                
-                YButton = KeyCode.Joystick1Button3;
+                RunCode = KeyCode.Joystick2Button8;                
+                YButton = KeyCode.Joystick2Button3;
 #endif
                 break;
             case "3":
 #if UNITY_EDITOR_OSX
                 JumpCode = KeyCode.Joystick3Button16;
-                RunCode = KeyCode.Joystick1Button11;
-                YButton = KeyCode.Joystick1Button19;
+                RunCode = KeyCode.Joystick3Button11;
+                YButton = KeyCode.Joystick3Button19;
 
 #endif
 #if UNITY_EDITOR_WIN
                 JumpCode = KeyCode.Joystick3Button0;
-                RunCode = KeyCode.Joystick1Button8;                
-                YButton = KeyCode.Joystick1Button3;
+                RunCode = KeyCode.Joystick3Button8;                
+                YButton = KeyCode.Joystick3Button3;
 #endif
                 break;
             case "4":
 #if UNITY_EDITOR_OSX
                 JumpCode = KeyCode.Joystick4Button16;
-                RunCode = KeyCode.Joystick1Button11;
-                YButton = KeyCode.Joystick1Button19;
+                RunCode = KeyCode.Joystick4Button11;
+                YButton = KeyCode.Joystick4Button19;
 
 #endif
 #if UNITY_EDITOR_WIN
                 JumpCode = KeyCode.Joystick4Button0;
-                RunCode = KeyCode.Joystick1Button8;
-                YButton = KeyCode.Joystick1Button3;
+                RunCode = KeyCode.Joystick4Button8;
+                YButton = KeyCode.Joystick4Button3;
 #endif
                 break;
         }
@@ -372,8 +376,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-
-    private void ResetBody()
+    void ResetBody()
     {
         ResetBodyHelper(_leftArm2hj, _leftArmhj, true);
         ResetBodyHelper(_rightArm2hj, _rightArmhj, false);

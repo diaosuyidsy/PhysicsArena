@@ -32,7 +32,7 @@ public class Fingers : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.collider.CompareTag("Ground") || col.collider.CompareTag("Payload"))
+        if (col.collider.CompareTag("Ground") || col.collider.CompareTag("Payload") || col.collider.CompareTag("Team1") || col.collider.CompareTag("Team2"))
         {
             return;
         }
@@ -51,7 +51,8 @@ public class Fingers : MonoBehaviour
                 col.collider.GetComponent<GunPositionControl>().Owner = Hip;
                 //Destroy (col.collider.GetComponent<Rigidbody> ());
                 col.collider.GetComponent<Rigidbody>().isKinematic = true;
-                col.gameObject.layer = 9;
+                //col.collider.isTrigger = true;
+                col.collider.gameObject.layer = gameObject.layer;
             }
             else
             {

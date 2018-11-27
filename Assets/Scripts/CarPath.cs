@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Analytics;
 
 public class CarPath : MonoBehaviour
 {
@@ -18,6 +17,9 @@ public class CarPath : MonoBehaviour
     private int winner;
     private Transform[] target;
 
+    private int team1Tracker = 0;
+    private int team2Tracker = 0;
+
     private void Start()
     {
         target = new Transform[WaypointsHolder.childCount];
@@ -27,14 +29,40 @@ public class CarPath : MonoBehaviour
         }
     }
 
-    void OnTriggerStay(Collider other)
+    void OnTriggerEnter(Collider other)
     {
+        if (other.CompareTag("Team1"))
+        {
+            team1Tracker++;
+        }
 
+        if (other.CompareTag("Team2"))
+        {
+            team2Tracker++;
+        }
+    }
+    
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Team1"))
+        {
+            team1Tracker--;
+        }
+
+        if (other.CompareTag("Team2"))
+        {
+            team2Tracker--;
+        }
+    }
+
+    private void Update()
+    {
         if (ending)
         {
             GameManager.GM.GameOver(winner);
             return;
         }
+
         // When the car gets to Team 1's home, it stops and print out "Team 1 wins."
         if (current == target.Length)
         {
@@ -42,6 +70,7 @@ public class CarPath : MonoBehaviour
             ending = true;
             winner = 1;
         }
+
         // When the car gets to Team 2's home, it stops and print out "Team 2 wins."
         if (current == -1)
         {
@@ -49,15 +78,17 @@ public class CarPath : MonoBehaviour
             ending = true;
             winner = 2;
         }
-        // When Team 1 player enters trigger, move the car toward next element in array.
-        else if (other.CompareTag("Team1") && current < target.Length)
+        // When Team 1 player enters trigger, move the car toward next element in an array.
+        else if (team1Tracker > 0 && team2Tracker == 0 && current < target.Length)
         {
             if (transform.position != target[current].position)
-            {   // If wrong direction, change [current].
+            {
+                // If wrong direction, change [current].
                 if (dir == 2)
                 {
                     current++;
                 }
+
                 dir = 1;
                 // Rotate car facing target location.			
                 Vector3 relativePos = target[current].position - transform.position;
@@ -65,18 +96,22 @@ public class CarPath : MonoBehaviour
                 // Move car toward target location.
                 Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
                 GetComponent<Rigidbody>().MovePosition(pos);
+                // Change dotted line to Team1
+                DotLine.color = Team1Color;
             }
             else current++;
         }
         // When Team 2 player enters trigger, move the car toward previous element in array.
-        else if (other.CompareTag("Team2") && current >= 0)
+        else if (team2Tracker > 0 && team1Tracker == 0 && current >= 0)
         {
             if (transform.position != target[current].position)
-            {// If wrong direction, change [current]   
+            {
+                // If wrong direction, change [current]   
                 if (dir == 1)
                 {
                     current--;
                 }
+
                 dir = 2;
                 // Rotate car facing target location.
                 Vector3 relativePos = target[current].position - transform.position;
@@ -84,13 +119,20 @@ public class CarPath : MonoBehaviour
                 // Move car toward target location.
                 Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
                 GetComponent<Rigidbody>().MovePosition(pos);
-
+                // Change dotted line to Team2 color
+                DotLine.color = Team2Color;
             }
             else current--;
         }
-        else
+        else if (team1Tracker == 0 && team2Tracker == 0)
         {
-            // Change DotLine Color To Neutral
+            //车不动惹
+            DotLine.color = NeutralColor;
+        }
+        else if (team1Tracker > 0 && team2Tracker > 0)
+        {
+            //车也不动惹
+            DotLine.color = NeutralColor;
         }
     }
 

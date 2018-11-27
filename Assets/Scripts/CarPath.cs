@@ -94,14 +94,13 @@ public class CarPath : MonoBehaviour
         }
     }
 
-    void turnTowardsTarget(Transform _target)
+/*    void turnTowardsTarget(Transform _target)
     {
         Vector3 diff = _target.position - transform.position;
         diff.Normalize();
 
         float rot_z = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.Euler(0f, rot_z, 0f);
-
-    }
+    }*/
 
 }

@@ -8,7 +8,7 @@ public class RunVFXControl : MonoBehaviour
     {
         if (collision.collider.CompareTag("Ground"))
         {
-            Instantiate(GameManager.GM.RunSandVFX, transform.position, Quaternion.identity);
+            Instantiate(GameManager.GM.RunSandVFX, transform.GetChild(0));
         }
     }
 

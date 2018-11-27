@@ -41,7 +41,7 @@ public class CameraController : MonoBehaviour
         transform.position = new Vector3(FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
         GetComponent<Camera>().fieldOfView += (MaxDistance() - _maxDistanceOrigin) * CameraScaleSpeed;
         _maxDistanceOrigin = MaxDistance();
-        GetComponent<Camera>().fieldOfView = Mathf.Clamp(GetComponent<Camera>().orthographicSize, FOVSizeMin, FOVSizeMax);
+        GetComponent<Camera>().fieldOfView = Mathf.Clamp(GetComponent<Camera>().fieldOfView, FOVSizeMin, FOVSizeMax);
     }
 
     void SetTarget()

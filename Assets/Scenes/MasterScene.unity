@@ -586,6 +586,12 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &292936380 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114005193888070662, guid: 6471dc4e598cfca4a97c4907bbdad5c7,
+    type: 2}
+  m_PrefabInternal: {fileID: 1064375245}
+  m_Script: {fileID: 11500000, guid: c8b45ebbf86be4df6b0e6cd933812af2, type: 3}
 --- !u!1 &299531921
 GameObject:
   m_ObjectHideFlags: 0
@@ -1070,6 +1076,16 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114005193888070662, guid: 6471dc4e598cfca4a97c4907bbdad5c7,
+        type: 2}
+      propertyPath: render
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114362950801207710, guid: 6471dc4e598cfca4a97c4907bbdad5c7,
+        type: 2}
+      propertyPath: selfCollisions
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6471dc4e598cfca4a97c4907bbdad5c7, type: 2}
   m_IsPrefabAsset: 0
@@ -1187,6 +1203,16 @@ Prefab:
     - target: {fileID: 1079855093589630, guid: 6471dc4e598cfca4a97c4907bbdad5c7, type: 2}
       propertyPath: m_Name
       value: WaterGun_1 (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 114005193888070662, guid: 6471dc4e598cfca4a97c4907bbdad5c7,
+        type: 2}
+      propertyPath: render
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114362950801207710, guid: 6471dc4e598cfca4a97c4907bbdad5c7,
+        type: 2}
+      propertyPath: selfCollisions
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6471dc4e598cfca4a97c4907bbdad5c7, type: 2}
@@ -1946,6 +1972,12 @@ CanvasRenderer:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1716944702}
   m_CullTransparentMesh: 0
+--- !u!114 &1774940351 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 114005193888070662, guid: 6471dc4e598cfca4a97c4907bbdad5c7,
+    type: 2}
+  m_PrefabInternal: {fileID: 876796997}
+  m_Script: {fileID: 11500000, guid: c8b45ebbf86be4df6b0e6cd933812af2, type: 3}
 --- !u!1 &1907436572
 GameObject:
   m_ObjectHideFlags: 0
@@ -2061,11 +2093,16 @@ Prefab:
         type: 2}
       propertyPath: particleRenderers.Array.data[0]
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 1774940351}
     - target: {fileID: 114917404445205532, guid: f8d6c631da37749db9f9744813be0f39,
         type: 2}
       propertyPath: particleRenderers.Array.data[1]
       value: 
+      objectReference: {fileID: 292936380}
+    - target: {fileID: 114917404445205532, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 2}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8d6c631da37749db9f9744813be0f39, type: 2}

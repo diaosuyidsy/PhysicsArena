@@ -155,13 +155,12 @@ public class PlayerController : MonoBehaviour
         //      Limits: max 90 --> 121
         // Hand: Limit Max: 90 --> 0
 
+        LeftHand.GetComponent<Fingers>().SetTaken(!Mathf.Approximately(1f, LeftTrigger));
+        //RightHand.GetComponent<Fingers>().SetTaken(LeftTrigger);
+
+
         CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
         CheckArmHelper(LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
-
-        // Same for the right side
-        float RightTrigger = Input.GetAxis(RTStr);
-        RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
-
 
         // Bend the body all together
         JointSpring tempjs = _chesthj.spring;

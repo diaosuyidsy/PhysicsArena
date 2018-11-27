@@ -11,69 +11,75 @@ public class Fingers : MonoBehaviour
     Rigidbody rb;
 
     [HideInInspector]
-    public bool taken = false;
+    public bool taken = true;
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
-        rb = GetComponent<Rigidbody> ();
+        rb = GetComponent<Rigidbody>();
+        taken = true;
     }
 
-    public void Throw ()
+    public void Throw()
     {
-        SpringJoint thisSJ = GetComponent<SpringJoint> ();
+        SpringJoint thisSJ = GetComponent<SpringJoint>();
         if (thisSJ != null)
         {
             thisSJ.connectedBody = null;
-            Destroy (thisSJ);
+            Destroy(thisSJ);
         }
     }
 
-    void OnCollisionEnter (Collision col)
+    void OnCollisionEnter(Collision col)
     {
-        if (col.collider.CompareTag ("Ground") || col.collider.CompareTag ("Payload"))
+        if (col.collider.CompareTag("Ground") || col.collider.CompareTag("Payload"))
         {
             return;
         }
         if (!taken)
         {
             // Tell other necessary components that it has taken something
-            OtherHand.GetComponent<Fingers> ().taken = true;
-            Hip.GetComponent<PlayerController> ().HandTaken = true;
-            GetComponentInParent<PlayerController> ().HandObject = col.gameObject;
+            OtherHand.GetComponent<Fingers>().taken = true;
+            Hip.GetComponent<PlayerController>().HandTaken = true;
+            GetComponentInParent<PlayerController>().HandObject = col.gameObject;
 
 
             // If it's a weapon, apply it to specific position
-            if (col.collider.CompareTag ("Weapon"))
+            if (col.collider.CompareTag("Weapon"))
             {
                 // Tell the collected weapon who picked it up
-                col.collider.GetComponent<GunPositionControl> ().Owner = Hip;
+                col.collider.GetComponent<GunPositionControl>().Owner = Hip;
                 //Destroy (col.collider.GetComponent<Rigidbody> ());
                 col.gameObject.layer = 9;
             }
             else
             {
                 // If picked up a stone or something, add a spring joint to it
-                SpringJoint sp = gameObject.AddComponent<SpringJoint> ();
+                SpringJoint sp = gameObject.AddComponent<SpringJoint>();
                 sp.connectedBody = col.rigidbody;
                 sp.spring = 12000;
                 sp.breakForce = Force;
             }
-            PickUpItem (col.collider.tag);
+            PickUpItem(col.collider.tag);
             taken = true;
 
         }
     }
 
-    void OnJointBreak ()
+    void OnJointBreak()
     {
         taken = false;
 
     }
 
-    void PickUpItem (string _tag)
+    void PickUpItem(string _tag)
     {
-        GetComponentInParent<PlayerController> ().OnPickUpItem (_tag);
+        GetComponentInParent<PlayerController>().OnPickUpItem(_tag);
+    }
+
+    public void SetTaken(bool _taken)
+    {
+        taken = _taken;
     }
 
 }

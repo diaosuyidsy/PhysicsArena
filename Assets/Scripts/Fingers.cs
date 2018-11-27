@@ -50,6 +50,7 @@ public class Fingers : MonoBehaviour
                 // Tell the collected weapon who picked it up
                 col.collider.GetComponent<GunPositionControl>().Owner = Hip;
                 //Destroy (col.collider.GetComponent<Rigidbody> ());
+                col.collider.GetComponent<Rigidbody>().isKinematic = true;
                 col.gameObject.layer = 9;
             }
             else

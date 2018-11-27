@@ -24,7 +24,7 @@ public class rtEmit : MonoBehaviour
         {
             print("NoAmmo");
         }
-        
+
         if (Mathf.Approximately(TriggerVal, 0f) || currentAmmo <= 0)
         {
             WaterBall.GetComponent<ObiEmitter>().speed = 0f;
@@ -34,7 +34,6 @@ public class rtEmit : MonoBehaviour
         GunPositionControl gpc = GetComponent<GunPositionControl>();
         if (gpc != null)
         {
-            Debug.Log("BackFire");
             gpc.Owner.GetComponent<Rigidbody>().AddForce(-gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
             gpc.Owner.GetComponent<Rigidbody>().AddForce(gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
         }

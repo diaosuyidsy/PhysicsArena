@@ -44,12 +44,12 @@ public class PlayerController : MonoBehaviour
     private HingeJoint _rightHandhj;
     private bool _checkArm = true;
     private string _rightTriggerRegister = "";
-
     #endregion
 
     #region Controller Variables
     private KeyCode JumpCode;
     private KeyCode RunCode;
+    private KeyCode YButton;
     private string RTStr;
     private string LTStr;
     #endregion
@@ -77,9 +77,34 @@ public class PlayerController : MonoBehaviour
             CheckArm();
         CheckFire();
         CheckRun();
+        CheckDrop();
     }
 
+    private void CheckDrop()
+    {
+        if (HandObject == null)
+            return;
 
+        // If taken something, and pushed LT, drop the thing
+        if (Input.GetKeyDown(YButton))
+        {
+            // Drop the thing
+            HandObject.SendMessage("Drop");
+            HandTaken = false;
+            // Return the body to normal position
+            _checkArm = true;
+            // Specialized checking
+            if (HandObject.CompareTag("Weapon"))
+            {
+                HandObject.GetComponent<Rigidbody>().isKinematic = false;
+                HandObject.layer = 0;
+            }
+            // Nullify the holder
+            HandObject = null;
+            // Clear the right trigger register
+            _rightTriggerRegister = "";
+        }
+    }
 
     public void CheckFire()
     {
@@ -111,7 +136,8 @@ public class PlayerController : MonoBehaviour
                     break;
                 case "Weapon":
                     // TODO: Add weapon right trigger action
-                    HandObject.SendMessage("Shoot", 0f);
+                    if (HandObject != null)
+                        HandObject.SendMessage("Shoot", 0f);
                     break;
                 default:
                     break;
@@ -249,46 +275,60 @@ public class PlayerController : MonoBehaviour
         RTStr = "Joy" + PlayerControllerNumber + "Axis10";
 #endif
         // For A, B, X, Y Buttons
+        // RunCode is Button L Axis
+        // JumpCode is Button A
         switch (PlayerControllerNumber)
         {
             case "1":
 #if UNITY_EDITOR_OSX
                 JumpCode = KeyCode.Joystick1Button16;
-                RunCode = KeyCode.Joystick1Button19;
+                RunCode = KeyCode.Joystick1Button11;
+                YButton = KeyCode.Joystick1Button19;
 #endif
 #if UNITY_EDITOR_WIN
                 JumpCode = KeyCode.Joystick1Button0;
-                RunCode = KeyCode.Joystick1Button3;
+                RunCode = KeyCode.Joystick1Button8;
+                YButton = KeyCode.Joystick1Button3;
+
 #endif
                 break;
             case "2":
 #if UNITY_EDITOR_OSX
                 JumpCode = KeyCode.Joystick2Button16;
-                RunCode = KeyCode.Joystick1Button19;
+                RunCode = KeyCode.Joystick1Button11;
+                YButton = KeyCode.Joystick1Button19;
+
 #endif
 #if UNITY_EDITOR_WIN
                 JumpCode = KeyCode.Joystick2Button0;
-                RunCode = KeyCode.Joystick1Button3;
+                RunCode = KeyCode.Joystick1Button8;                
+                YButton = KeyCode.Joystick1Button3;
 #endif
                 break;
             case "3":
 #if UNITY_EDITOR_OSX
                 JumpCode = KeyCode.Joystick3Button16;
-                RunCode = KeyCode.Joystick1Button19;
+                RunCode = KeyCode.Joystick1Button11;
+                YButton = KeyCode.Joystick1Button19;
+
 #endif
 #if UNITY_EDITOR_WIN
                 JumpCode = KeyCode.Joystick3Button0;
-                RunCode = KeyCode.Joystick1Button3;
+                RunCode = KeyCode.Joystick1Button8;                
+                YButton = KeyCode.Joystick1Button3;
 #endif
                 break;
             case "4":
 #if UNITY_EDITOR_OSX
                 JumpCode = KeyCode.Joystick4Button16;
-                RunCode = KeyCode.Joystick1Button19;
+                RunCode = KeyCode.Joystick1Button11;
+                YButton = KeyCode.Joystick1Button19;
+
 #endif
 #if UNITY_EDITOR_WIN
                 JumpCode = KeyCode.Joystick4Button0;
-                RunCode = KeyCode.Joystick1Button3;
+                RunCode = KeyCode.Joystick1Button8;
+                YButton = KeyCode.Joystick1Button3;
 #endif
                 break;
         }

@@ -1400,7 +1400,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1163968497}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.62, z: 0}
+  m_LocalPosition: {x: 0, y: 0.62, z: 0.187}
   m_LocalScale: {x: 0.60586, y: 0.60586, z: 0.60586}
   m_Children: []
   m_Father: {fileID: 1358917566}
@@ -2924,7 +2924,7 @@ GameObject:
   - component: {fileID: 2027676364}
   - component: {fileID: 2027676363}
   - component: {fileID: 2027676362}
-  - component: {fileID: 2027676361}
+  - component: {fileID: 2027676365}
   m_Layer: 0
   m_Name: Payload
   m_TagString: Payload
@@ -2932,25 +2932,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2027676361
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 114294142733773378, guid: 0f101ddb3a8a3a24ebd20d9f637432cc,
-    type: 2}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 2027676360}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e643c2df12cfa4503954fff7632b91c1, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WaypointsHolder: {fileID: 137660133}
-  speed: 1
-  current: 4
-  DotLine: {fileID: 1437846825}
-  Team1Color: {r: 1, g: 0.7879717, b: 0.2688679, a: 1}
-  Team2Color: {r: 1, g: 0.25, b: 0.25, a: 1}
-  NeutralColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!54 &2027676362
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -2995,6 +2976,24 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2027676365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2027676360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4362bc8d4ccb4fbc8892963c75be507, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WaypointsHolder: {fileID: 137660133}
+  speed: 1
+  current: 4
+  DotLine: {fileID: 1437846825}
+  Team1Color: {r: 1, g: 0.5000555, b: 0.4481132, a: 1}
+  Team2Color: {r: 0.4764151, g: 0.6119314, b: 1, a: 1}
+  NeutralColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &2133396998
 Prefab:
   m_ObjectHideFlags: 0

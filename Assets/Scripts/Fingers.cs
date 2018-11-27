@@ -32,7 +32,7 @@ public class Fingers : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        if (col.collider.CompareTag("Ground") || col.collider.CompareTag("Payload") || col.collider.CompareTag("Team1") || col.collider.CompareTag("Team2"))
+        if (col.collider.CompareTag("Ground") || col.collider.CompareTag("Payload") || GameManager.GM.AllPlayers == (GameManager.GM.AllPlayers | (1 << col.collider.gameObject.layer)))
         {
             return;
         }

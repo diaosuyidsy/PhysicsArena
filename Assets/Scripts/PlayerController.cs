@@ -44,6 +44,7 @@ public class PlayerController : MonoBehaviour
     private HingeJoint _rightHandhj;
     private bool _checkArm = true;
     private string _rightTriggerRegister = "";
+    private bool _startMelee = false;
     #endregion
 
     #region Controller Variables
@@ -129,6 +130,14 @@ public class PlayerController : MonoBehaviour
                         HandObject.SendMessage("Shoot", 1f);
                     break;
                 default:
+                    //If we don't have anything on hand, we are applying melee action
+                    if (!_startMelee)
+                    {
+                        _startMelee = true;
+                        _checkArm = false;
+                        StopAllCoroutines();
+                        StartCoroutine(MeleeClockFistHelper(_rightArm2hj, _rightArmhj, _rightHandhj, 1f));
+                    }
                     break;
             }
         }
@@ -145,6 +154,13 @@ public class PlayerController : MonoBehaviour
                         HandObject.SendMessage("Shoot", 0f);
                     break;
                 default:
+                    // If we previously started melee and released the trigger, then release the fist
+                    if (_startMelee)
+                    {
+                        _startMelee = false;
+                        StopAllCoroutines();
+                        StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, 0.2f));
+                    }
                     break;
             }
         }
@@ -399,6 +415,61 @@ public class PlayerController : MonoBehaviour
         Arm2hj.limits = lm2;
     }
 
+    IEnumerator MeleeClockFistHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time)
+    {
+        float elapesdTime = 0f;
+        JointLimits lm2 = Arm2hj.limits;
+        JointLimits hl = Handhj.limits;
+        JointSpring js = Armhj.spring;
+
+        float initLm2Max = lm2.max;
+        float initLm2Min = lm2.min;
+        float initLmTargetPosition = js.targetPosition;
+        float inithlMax = hl.max;
+        float inithlMin = hl.min;
+
+        while (elapesdTime < time)
+        {
+            elapesdTime += Time.deltaTime;
+            lm2.max = Mathf.Lerp(initLm2Max, 4f, elapesdTime / time);
+            lm2.min = Mathf.Lerp(initLm2Min, -17f, elapesdTime / time);
+
+            js.targetPosition = Mathf.Lerp(initLmTargetPosition, -85f, elapesdTime / time);
+            hl.max = Mathf.Lerp(inithlMax, 130f, elapesdTime / time);
+            hl.min = Mathf.Lerp(inithlMin, 128f, elapesdTime / time);
+            Arm2hj.limits = lm2;
+            Armhj.spring = js;
+            Handhj.limits = hl;
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    IEnumerator MeleePunchHelper(HingeJoint Armhj, HingeJoint Handhj, float time)
+    {
+        float elapesdTime = 0f;
+        JointLimits hl = Handhj.limits;
+        JointSpring js = Armhj.spring;
+
+        float initLmTargetPosition = js.targetPosition;
+        float inithlMax = hl.max;
+        float inithlMin = hl.min;
+        Armhj.connectedMassScale = 0.2f;
+
+        while (elapesdTime < time)
+        {
+            elapesdTime += Time.deltaTime;
+
+            js.targetPosition = Mathf.Lerp(initLmTargetPosition, 180f, elapesdTime / time);
+            hl.max = Mathf.Lerp(inithlMax, 12f, elapesdTime / time);
+            hl.min = Mathf.Lerp(inithlMin, -2.8f, elapesdTime / time);
+            Armhj.spring = js;
+            Handhj.limits = hl;
+            yield return new WaitForEndOfFrame();
+        }
+        yield return new WaitForSeconds(0.1f);
+        _checkArm = true;
+        ResetBody();
+    }
 
     IEnumerator PickUpWeaponHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
     {

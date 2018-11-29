@@ -220,7 +220,7 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKey(RunCode) && IsGrounded())
         {
-            _rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * RunSpeedMultiplier);
+            _rb.AddForce(transform.forward * Thrust * RunSpeedMultiplier);
         }
     }
 
@@ -230,6 +230,17 @@ public class PlayerController : MonoBehaviour
         {
             _rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
         }
+    }
+
+    public void ApplyWalkForce(float _force)
+    {
+        string HLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis1";
+        string VLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis2";
+        float HLAxis = Input.GetAxis(HLcontrollerStr);
+        float VLAxis = Input.GetAxis(VLcontrollerStr);
+
+        if (IsGrounded() && (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f)))
+            _rb.AddForce(transform.forward * _force, ForceMode.Impulse);
     }
 
     private void CheckMovement()
@@ -246,7 +257,7 @@ public class PlayerController : MonoBehaviour
             // Get the percent of input force player put in
             float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
             // Add force based on that percentage
-            _rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal);
+            _rb.AddForce(transform.forward * Thrust * normalizedInputVal);
             // Turn player according to the rotation of the joystick
             //transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
             float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
@@ -269,7 +280,7 @@ public class PlayerController : MonoBehaviour
             // Then disable the animator if so
             float playerVelRot = Mathf.Atan2(_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
 
-            LegSwingReference.GetComponent<Animator>().enabled = Mathf.Abs(playerVelRot - controllerRot) < 90f;
+            LegSwingReference.GetComponent<Animator>().enabled = Mathf.Abs(playerVelRot - playerRot) < 90f;
 
             RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
             Transform target = TurnReference.transform.GetChild(0);

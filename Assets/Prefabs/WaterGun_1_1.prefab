@@ -71,6 +71,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4571886260412050}
   - component: {fileID: 95983707937028562}
+  - component: {fileID: 136706991332541306}
+  - component: {fileID: 136959907267225976}
   m_Layer: 0
   m_Name: WaterGun_1_1
   m_TagString: Untagged
@@ -341,7 +343,7 @@ Animator:
   m_GameObject: {fileID: 1800207738836302}
   m_Enabled: 1
   m_Avatar: {fileID: 9000000, guid: 87670163293e61349bcf955fb9088150, type: 3}
-  m_Controller: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 55c9f26cfe418434cb8dc03116ed37f2, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -350,3 +352,29 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!136 &136706991332541306
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1800207738836302}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.17579067
+  m_Height: 0.7595945
+  m_Direction: 0
+  m_Center: {x: 0.008013397, y: -0.032054067, z: -0.4287231}
+--- !u!136 &136959907267225976
+CapsuleCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1800207738836302}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.48030415
+  m_Height: 1.7692981
+  m_Direction: 0
+  m_Center: {x: -0.25643277, y: 0, z: -0.0040067136}

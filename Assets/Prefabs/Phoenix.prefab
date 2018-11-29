@@ -1501,7 +1501,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1596648263302726}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 27.69, y: -2.619264e-19, z: -10.02}
+  m_LocalPosition: {x: 11.05, y: -2.619264e-19, z: -12.93}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children:
   - {fileID: 4415517028065566}
@@ -2027,7 +2027,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.5287781, y: -0.0830822, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: 0.5287819, y: -0.0830822, z: -1.1264888e-16}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2095,7 +2095,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.0000023841858, y: -9.6471386e-11, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: 0.0000014305115, y: 5.7882834e-11, z: -1.1264888e-16}
   m_UseSpring: 1
   m_Spring:
     spring: 60
@@ -2129,7 +2129,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.5287781, y: -0.0830822, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: -0.5287819, y: -0.0830822, z: -1.1264888e-16}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2265,7 +2265,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.0000023841858, y: -3.0596477e-11, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: -0.0000014305115, y: 1.8357885e-11, z: -1.1264888e-16}
   m_UseSpring: 1
   m_Spring:
     spring: 60
@@ -2367,7 +2367,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.63852495, y: -0.023741955, z: -5.638523e-16}
+  m_ConnectedAnchor: {x: -0.63852876, y: -0.023741955, z: -5.638523e-16}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2727,13 +2727,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerControllerNumber: 1
-  Thrust: 700
-  JumpForce: 300
+  Thrust: 300
+  JumpForce: 200
   JumpMask:
     serializedVersion: 2
     m_Bits: 8192
   RotationSpeed: 4
-  RunSpeedMultiplier: 2
+  RunSpeedMultiplier: 1.005
   HeadGunPos: {fileID: 1532413283199806}
   LegSwingReference: {fileID: 1694084379956174}
   Chest: {fileID: 1558221434653460}

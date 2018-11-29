@@ -2,15 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LegControl : MonoBehaviour {
+public class LegControl : MonoBehaviour
+{
+    public PlayerController Hip;
+    public float WalkThrust = 50f;
+    private bool _walked = false;
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
-	}
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (_walked)
+            return;
+        _walked = true;
+        Hip.ApplyWalkForce(WalkThrust);
+    }
+
+    private void OnCollisionExit(Collision collision)
+    {
+        _walked = false;
+    }
+
 }

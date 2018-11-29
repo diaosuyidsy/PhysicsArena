@@ -499,6 +499,7 @@ public class PlayerController : MonoBehaviour
             Armhj.limits = lm;
             yield return new WaitForEndOfFrame();
         }
+        Armhj.connectedMassScale = 1f;
     }
     #endregion
 }

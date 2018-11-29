@@ -265,6 +265,12 @@ public class PlayerController : MonoBehaviour
             {
                 RotationSpeed = 4f;
             }
+            // Check if player's speed is not within x degree of the controller angle
+            // Then disable the animator if so
+            float playerVelRot = Mathf.Atan2(_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
+
+            LegSwingReference.GetComponent<Animator>().enabled = Mathf.Abs(playerVelRot - controllerRot) < 90f;
+
             RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
             Transform target = TurnReference.transform.GetChild(0);
             Vector3 relativePos = target.position - transform.position;

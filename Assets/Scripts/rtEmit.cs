@@ -41,4 +41,9 @@ public class rtEmit : MonoBehaviour
 
     }
 
+    private void ChangeAmmoUI ()
+    {
+
+    }
+
 }

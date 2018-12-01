@@ -6,6 +6,7 @@ using UnityEngine;
 public class rtEmit : MonoBehaviour
 {
     public GameObject WaterBall;
+    public GameObject WaterUI;
     public float Speed;
     public float BackFireThrust;
     public float UpThrust = 1f;
@@ -38,12 +39,13 @@ public class rtEmit : MonoBehaviour
             gpc.Owner.GetComponent<Rigidbody>().AddForce(gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
         }
         currentAmmo--;
-
+        // If we changed ammo, then need to change UI as well
+        ChangeAmmoUI ();
     }
 
     private void ChangeAmmoUI ()
     {
-
+        //WaterUI.transform.localScale
     }
 
 }

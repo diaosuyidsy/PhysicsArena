@@ -91,15 +91,21 @@ public class CarPath : MonoBehaviour
 
                 dir = 1;
                 // Rotate car facing target location.			
-                Vector3 relativePos = target[current].position - transform.position;
-                transform.rotation = Quaternion.LookRotation(relativePos);
+                //Vector3 relativePos = target[current].position - transform.position;
+                //transform.rotation = Quaternion.LookRotation(relativePos);
                 // Move car toward target location.
-                Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
-                GetComponent<Rigidbody>().MovePosition(pos);
+                Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
+                GetComponent<Rigidbody> ().MovePosition (pos);
                 // Change dotted line to Team1
                 DotLine.color = Team1Color;
             }
-            else current++;
+            // If it became the same position, then turn toward the next target location
+            else
+            {
+                current++;
+                Vector3 relativePos = -target[current].position + transform.position;
+                transform.rotation = Quaternion.LookRotation(relativePos);
+            }
         }
         // When Team 2 player enters trigger, move the car toward previous element in array.
         else if (team2Tracker > 0 && team1Tracker == 0 && current >= 0)
@@ -114,15 +120,20 @@ public class CarPath : MonoBehaviour
 
                 dir = 2;
                 // Rotate car facing target location.
-                Vector3 relativePos = target[current].position - transform.position;
-                transform.rotation = Quaternion.LookRotation(relativePos);
+                //Vector3 relativePos = target[current].position - transform.position;
+                //transform.rotation = Quaternion.LookRotation(relativePos);
                 // Move car toward target location.
-                Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
-                GetComponent<Rigidbody>().MovePosition(pos);
+                Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
+                GetComponent<Rigidbody> ().MovePosition (pos);
                 // Change dotted line to Team2 color
                 DotLine.color = Team2Color;
             }
-            else current--;
+            else
+            {
+                current--;
+                Vector3 relativePos = target[current].position - transform.position;
+                transform.rotation = Quaternion.LookRotation (relativePos);
+            }
         }
         else if (team1Tracker == 0 && team2Tracker == 0)
         {

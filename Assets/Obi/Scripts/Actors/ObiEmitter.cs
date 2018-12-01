@@ -107,7 +107,7 @@ namespace Obi{
 		public override void Awake()
 		{
 			base.Awake();
-			selfCollisions = true;
+			//selfCollisions = true;
 			distEnumerator = GetDistributionEnumerator();
 			IEnumerator generation = Initialize();
 			while (generation.MoveNext());

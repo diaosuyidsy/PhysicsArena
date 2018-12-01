@@ -45,7 +45,8 @@ public class rtEmit : MonoBehaviour
 
     private void ChangeAmmoUI ()
     {
-        //WaterUI.transform.localScale
+        float scaleY = currentAmmo * 1.0f / MaxAmmo;
+        WaterUI.transform.localScale = new Vector3 (1f, scaleY, 1f);
     }
 
 }

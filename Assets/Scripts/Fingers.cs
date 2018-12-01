@@ -32,7 +32,6 @@ public class Fingers : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        CheckMeleeHit();
         // Make it so that you cannot stick to the ground, payload or any other players
         if (col.collider.CompareTag("Ground") || col.collider.CompareTag("Payload") || GameManager.GM.AllPlayers == (GameManager.GM.AllPlayers | (1 << col.collider.gameObject.layer)))
         {
@@ -67,10 +66,6 @@ public class Fingers : MonoBehaviour
             PickUpItem(col.collider.tag);
             taken = true;
         }
-    }
-
-    void CheckMeleeHit()
-    {
     }
 
     void OnJointBreak()

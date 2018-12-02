@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     public GameObject RightHand;
     public GameObject TurnReference;
     public GameObject HandObject;
+    public GameObject[] OnDeathHidden;
 
     [HideInInspector]
     public float MeleeCharge = 0f;
@@ -48,6 +49,7 @@ public class PlayerController : MonoBehaviour
     private bool _checkArm = true;
     private string _rightTriggerRegister = "";
     private bool _startMelee = false;
+    private bool _canControl = true;
     #endregion
 
     #region Controller Variables
@@ -74,6 +76,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        if (!_canControl)
+            return;
+
         CheckAllInput ();
         CheckMovement ();
         CheckJump ();
@@ -84,6 +89,27 @@ public class PlayerController : MonoBehaviour
         CheckDrop ();
     }
 
+    public void OnEnterDeathZone ()
+    {
+        _canControl = false;
+        foreach (GameObject go in OnDeathHidden)
+        {
+            go.SetActive (false);
+        }
+        GameManager.GM.SetToRespawn (gameObject);
+        StartCoroutine (respawn (GameManager.GM.RespawnTime));
+    }
+
+    IEnumerator respawn (float time)
+    {
+        yield return new WaitForSeconds (time);
+        foreach (GameObject go in OnDeathHidden)
+        {
+            go.SetActive (true);
+        }
+        _canControl = true;
+    }
+
     private void CheckDrop ()
     {
         if (HandObject == null)
@@ -92,26 +118,31 @@ public class PlayerController : MonoBehaviour
         // If taken something, and pushed Y, drop the thing
         if (Input.GetKeyDown (YButton))
         {
-            // Drop the thing
-            HandObject.SendMessage ("Drop");
-            HandTaken = false;
-            // Return the body to normal position
-            _checkArm = true;
-            StopAllCoroutines ();
-            ResetBody ();
-            // Specialized checking
-            if (HandObject.CompareTag ("Weapon"))
-            {
-                HandObject.GetComponent<Rigidbody> ().isKinematic = false;
-                HandObject.layer = 0;
-                // Stop the shooting
-                HandObject.SendMessage ("Shoot", 0f);
-            }
-            // Nullify the holder
-            HandObject = null;
-            // Clear the right trigger register
-            _rightTriggerRegister = "";
+            DropHelper ();
         }
+    }
+
+    private void DropHelper ()
+    {
+        // Drop the thing
+        HandObject.SendMessage ("Drop");
+        HandTaken = false;
+        // Return the body to normal position
+        _checkArm = true;
+        StopAllCoroutines ();
+        ResetBody ();
+        // Specialized checking
+        if (HandObject.CompareTag ("Weapon"))
+        {
+            HandObject.GetComponent<Rigidbody> ().isKinematic = false;
+            HandObject.layer = 0;
+            // Stop the shooting
+            HandObject.SendMessage ("Shoot", 0f);
+        }
+        // Nullify the holder
+        HandObject = null;
+        // Clear the right trigger register
+        _rightTriggerRegister = "";
     }
 
     public void CheckFire ()

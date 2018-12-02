@@ -14,7 +14,6 @@ public class MeleeControl : MonoBehaviour
 
         if (pc != null && pc.IsPunching)
         {
-            Debug.Log ("Hit : " + pc.MeleeCharge);
             pc.IsPunching = false;
             collision.collider.SendMessageUpwards ("OnMeleeHit", transform.forward * Thrust * pc.MeleeCharge);
         }

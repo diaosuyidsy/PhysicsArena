@@ -7,10 +7,6 @@ public class CarPath : MonoBehaviour
     public Transform WaypointsHolder;
     public float speed;
     public int current;
-    public SpriteRenderer DotLine;
-    public Color Team1Color;
-    public Color Team2Color;
-    public Color NeutralColor;
 
     private int dir;
     private bool ending = false;
@@ -20,63 +16,39 @@ public class CarPath : MonoBehaviour
     private int team1Tracker = 0;
     private int team2Tracker = 0;
 
-    private void Start()
+    private void Start ()
     {
         target = new Transform[WaypointsHolder.childCount];
         for (int i = 0; i < WaypointsHolder.childCount; i++)
         {
-            target[i] = WaypointsHolder.GetChild(i);
+            target[i] = WaypointsHolder.GetChild (i);
         }
     }
 
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Team1"))
-        {
-            team1Tracker++;
-        }
-
-        if (other.CompareTag("Team2"))
-        {
-            team2Tracker++;
-        }
-    }
-    
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Team1"))
-        {
-            team1Tracker--;
-        }
-
-        if (other.CompareTag("Team2"))
-        {
-            team2Tracker--;
-        }
-    }
-
-    private void Update()
+    private void Update ()
     {
         if (ending)
         {
-            GameManager.GM.GameOver(winner);
+            GameManager.GM.GameOver (winner);
             return;
         }
 
         // When the car gets to Team 1's home, it stops and print out "Team 1 wins."
         if (current == target.Length)
         {
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody> ().velocity = Vector3.zero;
             ending = true;
             winner = 1;
+            return;
         }
 
         // When the car gets to Team 2's home, it stops and print out "Team 2 wins."
         if (current == -1)
         {
-            GetComponent<Rigidbody>().velocity = Vector3.zero;
+            GetComponent<Rigidbody> ().velocity = Vector3.zero;
             ending = true;
             winner = 2;
+            return;
         }
         // When Team 1 player enters trigger, move the car toward next element in an array.
         else if (team1Tracker > 0 && team2Tracker == 0 && current < target.Length)
@@ -90,21 +62,17 @@ public class CarPath : MonoBehaviour
                 }
 
                 dir = 1;
-                // Rotate car facing target location.			
-                //Vector3 relativePos = target[current].position - transform.position;
-                //transform.rotation = Quaternion.LookRotation(relativePos);
                 // Move car toward target location.
                 Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
-                GetComponent<Rigidbody> ().MovePosition (pos);
-                // Change dotted line to Team1
-                DotLine.color = Team1Color;
+                //GetComponent<Rigidbody> ().MovePosition (pos);
+                transform.position = pos;
             }
             // If it became the same position, then turn toward the next target location
             else
             {
                 current++;
                 Vector3 relativePos = -target[current].position + transform.position;
-                transform.rotation = Quaternion.LookRotation(relativePos);
+                transform.rotation = Quaternion.LookRotation (relativePos);
             }
         }
         // When Team 2 player enters trigger, move the car toward previous element in array.
@@ -119,14 +87,10 @@ public class CarPath : MonoBehaviour
                 }
 
                 dir = 2;
-                // Rotate car facing target location.
-                //Vector3 relativePos = target[current].position - transform.position;
-                //transform.rotation = Quaternion.LookRotation(relativePos);
                 // Move car toward target location.
                 Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
-                GetComponent<Rigidbody> ().MovePosition (pos);
-                // Change dotted line to Team2 color
-                DotLine.color = Team2Color;
+                //GetComponent<Rigidbody> ().MovePosition (pos);
+                transform.position = pos;
             }
             else
             {
@@ -137,23 +101,21 @@ public class CarPath : MonoBehaviour
         }
         else if (team1Tracker == 0 && team2Tracker == 0)
         {
-            //车不动惹
-            DotLine.color = NeutralColor;
         }
         else if (team1Tracker > 0 && team2Tracker > 0)
         {
-            //车也不动惹
-            DotLine.color = NeutralColor;
         }
     }
 
-/*    void turnTowardsTarget(Transform _target)
+    public void IncrementTracker (bool increment, TeamNum tn)
     {
-        Vector3 diff = _target.position - transform.position;
-        diff.Normalize();
-
-        float rot_z = Mathf.Atan2(diff.y, diff.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(0f, rot_z, 0f);
-    }*/
-
+        if (tn == TeamNum.Team1)
+        {
+            team1Tracker += increment ? 1 : -1;
+        }
+        else
+        {
+            team2Tracker += increment ? 1 : -1;
+        }
+    }
 }

@@ -19,7 +19,7 @@ public class GunPositionControl : MonoBehaviour
             GameObject lh = Owner.GetComponent<PlayerController> ().LeftHand;
             GameObject rh = Owner.GetComponent<PlayerController> ().RightHand;
             transform.position = (lh.transform.position + rh.transform.position) / 2f;
-            transform.eulerAngles = new Vector3 (0f, Owner.transform.eulerAngles.y + 90f, DownAngle);
+            transform.eulerAngles = new Vector3 (0f, Owner.transform.eulerAngles.y + FaceAngleOffset, DownAngle);
         }
     }
 

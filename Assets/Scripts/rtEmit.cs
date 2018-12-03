@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Obi;
 using UnityEngine;
+using UnityEngine.Experimental.PlayerLoop;
 
 public class rtEmit : MonoBehaviour
 {
@@ -49,4 +50,37 @@ public class rtEmit : MonoBehaviour
         WaterUI.transform.localScale = new Vector3 (1f, scaleY, 1f);
     }
 
+    /*private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Ground") && currentAmmo == 0)
+        {
+            currentAmmo = MaxAmmo;
+            GameManager.GM.HideWeapon(gameObject);
+        }
+        else if (other.CompareTag("DeathZone"))
+        {
+            currentAmmo = MaxAmmo;
+            GameManager.GM.HideWeapon(gameObject);
+        }
+    }*/
+
+/*    private void OnCollisionEnter(Collision other)
+    {
+        if (other.collider.CompareTag("Ground") && currentAmmo == 0)
+        {
+            currentAmmo = MaxAmmo;
+            GameManager.GM.HideWeapon(gameObject);
+            GameManager.GM.CallGunIEnu();
+        }
+    }*/
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("DeathZone"))
+        {
+            currentAmmo = MaxAmmo;
+            GameManager.GM.HideWeapon(gameObject);
+        }
+    }
+    
 }

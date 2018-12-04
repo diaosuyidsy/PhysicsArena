@@ -19,10 +19,16 @@ public class GameManager : MonoBehaviour
 
     private int Team1RespawnIndex = 0;
     private int Team2RespawnIndex = 0;
-    
-   //teleport a weapon to a random position within a given space
+
+    //teleport a weapon to a random position within a given space
     public Vector3 weaponSpawnerCenter;
     public Vector3 weaponSpawnerSize;
+
+    // Need to manually set up world center until we figure out a way to automatically do it.
+    [Header ("World Limit Setting")]
+    public Vector3 WorldCenter;
+    public Vector3 WorldSize;
+
     private Vector3 targetPos;
     public int weaponTracker = 2;
 
@@ -32,23 +38,25 @@ public class GameManager : MonoBehaviour
     }
 
     //make the space for weapon to respawn (weapon-spawner) visible in scene
-    private void OnDrawGizmosSelected()
+    private void OnDrawGizmosSelected ()
     {
-        Gizmos.color = new Color(1,0,0,0.5f);
-        Gizmos.DrawCube(weaponSpawnerCenter,weaponSpawnerSize);
+        Gizmos.color = new Color (1, 0, 0, 0.5f);
+        Gizmos.DrawCube (weaponSpawnerCenter, weaponSpawnerSize);
+        Gizmos.color = new Color (0, 0, 0, 0.5f);
+        Gizmos.DrawCube (WorldCenter, WorldSize);
     }
 
     //move weapon to weapon-spawner
-    public void HideWeapon(GameObject weapon)
+    public void HideWeapon (GameObject weapon)
     {
-        targetPos = weaponSpawnerCenter + new Vector3(Random.Range(-weaponSpawnerSize.x / 2, weaponSpawnerSize.x / 2), Random.Range(-weaponSpawnerSize.y / 2, weaponSpawnerSize.y / 2), Random.Range(-weaponSpawnerSize.z / 2, weaponSpawnerSize.z / 2));
+        targetPos = weaponSpawnerCenter + new Vector3 (Random.Range (-weaponSpawnerSize.x / 2, weaponSpawnerSize.x / 2), Random.Range (-weaponSpawnerSize.y / 2, weaponSpawnerSize.y / 2), Random.Range (-weaponSpawnerSize.z / 2, weaponSpawnerSize.z / 2));
         weapon.transform.position = targetPos;
         weaponTracker--;
-        print("current gun = " + weaponTracker);
-        weapon.SetActive(false);
-        StartCoroutine(ActivateWeapon(WeaponRespawnTime, weapon)); 
+        print ("current gun = " + weaponTracker);
+        weapon.SetActive (false);
+        StartCoroutine (ActivateWeapon (WeaponRespawnTime, weapon));
     }
-    
+
     //activate weapon after WeaponRespawnTime
     IEnumerator ActivateWeapon (float time, GameObject go)
     {
@@ -56,7 +64,7 @@ public class GameManager : MonoBehaviour
         go.SetActive (true);
         weaponTracker++;
     }
-    
+
     public void SetToRespawn (GameObject player)
     {
         if (player.CompareTag ("Team1"))
@@ -80,7 +88,22 @@ public class GameManager : MonoBehaviour
     private void Update ()
     {
         CheckRestart ();
-        weaponSpawnerCenter = Camera.main.GetComponent<CameraController>().FollowTarget;
+        SetWeaponSpawn ();
+    }
+
+    // This method set the weaponspawn area to follow the center of the player
+    // Also, clamp the weeaponspawn area to not let it exceed the boundaries of the world
+    void SetWeaponSpawn ()
+    {
+        weaponSpawnerCenter = Camera.main.GetComponent<CameraController> ().FollowTarget;
+        // Trying to clamp the weapon Spawn Area within the world space
+        float xmin = WorldCenter.x - WorldSize.x / 2 + weaponSpawnerSize.x / 2;
+        float xmax = WorldCenter.x + WorldSize.x / 2 - weaponSpawnerSize.x / 2;
+        float zmin = WorldCenter.z - WorldSize.z / 2 + weaponSpawnerSize.z / 2;
+        float zmax = WorldCenter.z + WorldSize.z / 2 - weaponSpawnerSize.z / 2;
+
+        weaponSpawnerCenter.x = Mathf.Clamp (weaponSpawnerCenter.x, xmin, xmax);
+        weaponSpawnerCenter.z = Mathf.Clamp (weaponSpawnerCenter.z, zmin, zmax);
     }
 
     void CheckRestart ()

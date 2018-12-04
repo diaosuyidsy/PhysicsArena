@@ -58,6 +58,9 @@ public class PlayerController : MonoBehaviour
     private KeyCode YButton;
     private string RTStr;
     private string LTStr;
+    private bool CanDrop = false;
+    private float RightTrigger;
+    private float LeftTrigger;
     #endregion
 
     private void Start ()
@@ -93,7 +96,6 @@ public class PlayerController : MonoBehaviour
     {
         if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
         {
-            print ("Dropped");
             DropHelper ();
         }
     }
@@ -121,12 +123,13 @@ public class PlayerController : MonoBehaviour
 
     private void CheckDrop ()
     {
-        if (HandObject == null)
+        if (HandObject == null || !CanDrop)
             return;
 
         // If taken something, and pushed Y, drop the thing
-        if (Input.GetKeyDown (YButton))
+        if (Mathf.Approximately (1f, LeftTrigger))
         {
+            CanDrop = false;
             DropHelper ();
         }
     }
@@ -157,8 +160,7 @@ public class PlayerController : MonoBehaviour
 
     public void CheckFire ()
     {
-        float RightTrigger = Input.GetAxis (RTStr);
-        RightTrigger = Mathf.Approximately (RightTrigger, 0f) || Mathf.Approximately (RightTrigger, -1f) ? 0f : 1f;
+
         if (Mathf.Approximately (RightTrigger, 1f))
         {
             // Means we want to fire
@@ -236,9 +238,6 @@ public class PlayerController : MonoBehaviour
 
     private void CheckArm ()
     {
-        float LeftTrigger = Input.GetAxis (LTStr);
-        LeftTrigger = Mathf.Approximately (LeftTrigger, 0f) || Mathf.Approximately (LeftTrigger, -1f) ? 0f : 1f;
-
         // Arm2: right max: 90 --> -74
         //       left min: -75 --> 69
         // Arm: Connected Mass Scale 1 --> 0
@@ -366,6 +365,15 @@ public class PlayerController : MonoBehaviour
         LTStr = "Joy" + PlayerControllerNumber + "Axis9";
         RTStr = "Joy" + PlayerControllerNumber + "Axis10";
 #endif
+        RightTrigger = Input.GetAxis (RTStr);
+        RightTrigger = Mathf.Approximately (RightTrigger, 0f) || Mathf.Approximately (RightTrigger, -1f) ? 0f : 1f;
+
+        LeftTrigger = Input.GetAxis (LTStr);
+        LeftTrigger = Mathf.Approximately (LeftTrigger, 0f) || Mathf.Approximately (LeftTrigger, -1f) ? 0f : 1f;
+
+        if (Mathf.Approximately (0f, LeftTrigger) && HandObject != null)
+            CanDrop = true;
+
         // For A, B, X, Y Buttons
         // RunCode is Button L Axis
         // JumpCode is Button A
@@ -424,6 +432,7 @@ public class PlayerController : MonoBehaviour
 #endif
                 break;
         }
+
     }
 
     private bool IsGrounded ()

@@ -6,38 +6,59 @@ using UnityEngine.Experimental.PlayerLoop;
 
 public class rtEmit : MonoBehaviour
 {
-    public GameObject WaterBall;
+    public ObiEmitter WaterBall;
     public GameObject WaterUI;
     public float Speed;
     public float BackFireThrust;
     public float UpThrust = 1f;
     public int MaxAmmo = 1000;
     public int currentAmmo;
+    public float ShootMaxCD = 0.3f;
 
-    private void Start()
+    private float _shootCD = 0f;
+    private GunPositionControl _gpc;
+
+    private void Start ()
     {
         currentAmmo = MaxAmmo;
+        _gpc = GetComponent<GunPositionControl> ();
     }
 
-    public void Shoot(float TriggerVal)
+    // This function is called by PlayerController, when player is holding a gun
+    // And it's holding down RT
+    public void Shoot (float TriggerVal)
     {
         //For inspection purpose
         if (currentAmmo <= 0)
         {
-            print("NoAmmo");
+            print ("NoAmmo");
         }
 
-        if (Mathf.Approximately(TriggerVal, 0f) || currentAmmo <= 0)
+        // If player was holding down the RT button
+        // CD will add up
+        // If CD >= MaxCD, nothing works, only releasing the RT will replenish the CD
+        if (Mathf.Approximately (TriggerVal, 1f))
         {
-            WaterBall.GetComponent<ObiEmitter>().speed = 0f;
+            _shootCD += Time.deltaTime;
+            if (_shootCD >= ShootMaxCD)
+            {
+                WaterBall.speed = 0f;
+                return;
+            }
+        }
+
+        if (Mathf.Approximately (TriggerVal, 0f) || currentAmmo <= 0)
+        {
+            // Need to reset shoot CD if player has released RT
+            _shootCD = 0f;
+            WaterBall.speed = 0f;
             return;
         }
-        WaterBall.GetComponent<ObiEmitter>().speed = Speed;
-        GunPositionControl gpc = GetComponent<GunPositionControl>();
-        if (gpc != null)
+        WaterBall.speed = Speed;
+        if (_gpc != null)
         {
-            gpc.Owner.GetComponent<Rigidbody>().AddForce(-gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
-            gpc.Owner.GetComponent<Rigidbody>().AddForce(gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
+            _gpc.Owner.GetComponent<Rigidbody> ().AddForce (-_gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
+            _gpc.Owner.GetComponent<Rigidbody> ().AddForce (_gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
         }
         currentAmmo--;
         // If we changed ammo, then need to change UI as well
@@ -64,23 +85,23 @@ public class rtEmit : MonoBehaviour
         }
     }*/
 
-/*    private void OnCollisionEnter(Collision other)
-    {
-        if (other.collider.CompareTag("Ground") && currentAmmo == 0)
+    /*    private void OnCollisionEnter(Collision other)
         {
-            currentAmmo = MaxAmmo;
-            GameManager.GM.HideWeapon(gameObject);
-            GameManager.GM.CallGunIEnu();
-        }
-    }*/
+            if (other.collider.CompareTag("Ground") && currentAmmo == 0)
+            {
+                currentAmmo = MaxAmmo;
+                GameManager.GM.HideWeapon(gameObject);
+                GameManager.GM.CallGunIEnu();
+            }
+        }*/
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter (Collider other)
     {
-        if (other.CompareTag("DeathZone"))
+        if (other.CompareTag ("DeathZone"))
         {
             currentAmmo = MaxAmmo;
-            GameManager.GM.HideWeapon(gameObject);
+            GameManager.GM.HideWeapon (gameObject);
         }
     }
-    
+
 }

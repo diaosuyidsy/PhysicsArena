@@ -5,9 +5,13 @@ using UnityEngine;
 public class WeaponGenerationManager : MonoBehaviour
 {
     public static WeaponGenerationManager WGM;
-    public int MaxWeaponsNum;
+
     public GameObject[] Weapons;
-    private bool[] _weaponTrackers;
+    public float WeaponSpawnCD = 10f;
+    public int NextSpawnAmount;
+
+    private int _activatedWeaponNum = 0;
+    private int _nextspawnamount;
 
     private void Awake ()
     {
@@ -16,6 +20,32 @@ public class WeaponGenerationManager : MonoBehaviour
 
     private void Start ()
     {
+        _nextspawnamount = NextSpawnAmount;
+        foreach (GameObject weapon in Weapons)
+        {
+            weapon.SetActive (false);
+        }
 
+        // We need to invoke weapon generation from the start
+        InvokeRepeating ("GenerateWeapon", 5f, WeaponSpawnCD);
+    }
+
+    private void GenerateWeapon ()
+    {
+        // If next weapon in array is deactivated
+        // Then move it to the current random spawn location
+        // Then activate it
+        foreach (GameObject weapon in Weapons)
+        {
+            if (!weapon.activeSelf && _nextspawnamount > 0)
+            {
+                GameManager.GM.MoveWeaponToSpawnArea (weapon);
+                weapon.SetActive (true);
+                _nextspawnamount--;
+            }
+        }
+
+        // If we want to change next spawn amount accordingly, do it here
+        _nextspawnamount = NextSpawnAmount;
     }
 }

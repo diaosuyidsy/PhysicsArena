@@ -71,27 +71,14 @@ public class rtEmit : MonoBehaviour
         WaterUI.transform.localScale = new Vector3 (1f, scaleY, 1f);
     }
 
-    /*private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Ground") && currentAmmo == 0)
-        {
-            currentAmmo = MaxAmmo;
-            GameManager.GM.HideWeapon(gameObject);
-        }
-        else if (other.CompareTag("DeathZone"))
-        {
-            currentAmmo = MaxAmmo;
-            GameManager.GM.HideWeapon(gameObject);
-        }
-    }*/
-
     // If weapon collide to the ground, and has no ammo, then despawn it
     private void OnCollisionEnter (Collision other)
     {
         if (other.collider.CompareTag ("Ground") && currentAmmo == 0)
         {
             currentAmmo = MaxAmmo;
-            GameManager.GM.HideWeapon (gameObject);
+            //GameManager.GM.HideWeapon (gameObject);
+            gameObject.SetActive (false);
         }
     }
 
@@ -101,7 +88,8 @@ public class rtEmit : MonoBehaviour
         if (other.CompareTag ("DeathZone"))
         {
             currentAmmo = MaxAmmo;
-            GameManager.GM.HideWeapon (gameObject);
+            //GameManager.GM.HideWeapon (gameObject);
+            gameObject.SetActive (false);
         }
     }
 

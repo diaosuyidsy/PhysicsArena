@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour
     public Vector3 WorldCenter;
     public Vector3 WorldSize;
 
-    private Vector3 targetPos;
     public int weaponTracker = 2;
 
     private void Awake ()
@@ -48,12 +47,17 @@ public class GameManager : MonoBehaviour
     //move weapon to weapon-spawner
     public void HideWeapon (GameObject weapon)
     {
-        targetPos = weaponSpawnerCenter + new Vector3 (Random.Range (-weaponSpawnerSize.x / 2, weaponSpawnerSize.x / 2), Random.Range (-weaponSpawnerSize.y / 2, weaponSpawnerSize.y / 2), Random.Range (-weaponSpawnerSize.z / 2, weaponSpawnerSize.z / 2));
-        weapon.transform.position = targetPos;
+        MoveWeaponToSpawnArea (weapon);
         weaponTracker--;
         print ("current gun = " + weaponTracker);
         weapon.SetActive (false);
         StartCoroutine (ActivateWeapon (WeaponRespawnTime, weapon));
+    }
+
+    public void MoveWeaponToSpawnArea (GameObject weapon)
+    {
+        Vector3 targetPos = weaponSpawnerCenter + new Vector3 (Random.Range (-weaponSpawnerSize.x / 2, weaponSpawnerSize.x / 2), Random.Range (-weaponSpawnerSize.y / 2, weaponSpawnerSize.y / 2), Random.Range (-weaponSpawnerSize.z / 2, weaponSpawnerSize.z / 2));
+        weapon.transform.position = targetPos;
     }
 
     //activate weapon after WeaponRespawnTime

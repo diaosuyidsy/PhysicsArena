@@ -125,6 +125,7 @@ public class PlayerController : MonoBehaviour
 
     private void DropHelper ()
     {
+        if (HandObject == null) return;
         // Drop the thing
         HandObject.SendMessage ("Drop");
         HandTaken = false;

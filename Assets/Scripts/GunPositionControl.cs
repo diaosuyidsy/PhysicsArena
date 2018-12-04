@@ -11,6 +11,8 @@ public class GunPositionControl : MonoBehaviour
     [Tooltip ("This Angle is for weapon y axis angle offset, normally it's 90f")]
     public float FaceAngleOffset = 90f;
 
+    public float VerticalOffset = 10f;
+
     // Update is called once per frame
     void Update ()
     {
@@ -18,7 +20,9 @@ public class GunPositionControl : MonoBehaviour
         {
             GameObject lh = Owner.GetComponent<PlayerController> ().LeftHand;
             GameObject rh = Owner.GetComponent<PlayerController> ().RightHand;
-            transform.position = (lh.transform.position + rh.transform.position) / 2f;
+            //transform.position = (lh.transform.position + rh.transform.position) / 2f;
+            Vector3 targetposition = (lh.transform.position + rh.transform.position) / 2f;
+            transform.position = new Vector3(targetposition.x, targetposition.y + VerticalOffset, targetposition.z);
             transform.eulerAngles = new Vector3 (0f, Owner.transform.eulerAngles.y + FaceAngleOffset, DownAngle);
         }
     }

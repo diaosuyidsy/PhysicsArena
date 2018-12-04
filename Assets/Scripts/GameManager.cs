@@ -14,7 +14,9 @@ public class GameManager : MonoBehaviour
     public GameObject[] Team1RespawnPts;
     public GameObject[] Team2RespawnPts;
     public float RespawnTime = 5f;
+    [Tooltip ("This is CD for on drop respawn method")]
     public float WeaponRespawnTime = 2f;
+    public float DropWeaponVelocityThreshold = 2f;
 
     private int Team1RespawnIndex = 0;
     private int Team2RespawnIndex = 0;

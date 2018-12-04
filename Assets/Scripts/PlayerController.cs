@@ -89,6 +89,14 @@ public class PlayerController : MonoBehaviour
         CheckDrop ();
     }
 
+    private void FixedUpdate ()
+    {
+        if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
+        {
+            print ("Dropped");
+            DropHelper ();
+        }
+    }
     public void OnEnterDeathZone ()
     {
         _canControl = false;
@@ -123,7 +131,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void DropHelper ()
+    public void DropHelper ()
     {
         if (HandObject == null) return;
         // Drop the thing
@@ -296,7 +304,8 @@ public class PlayerController : MonoBehaviour
             // Get the percent of input force player put in
             float normalizedInputVal = Mathf.Sqrt (Mathf.Pow (HLAxis, 2f) + Mathf.Pow (VLAxis, 2f)) / Mathf.Sqrt (2);
             // Add force based on that percentage
-            _rb.AddForce (transform.forward * Thrust * normalizedInputVal);
+            if (IsGrounded ())
+                _rb.AddForce (transform.forward * Thrust * normalizedInputVal);
             // Turn player according to the rotation of the joystick
             //transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
             float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;

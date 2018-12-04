@@ -291,8 +291,6 @@ public class PlayerController : MonoBehaviour
 
         if (!Mathf.Approximately (HLAxis, 0f) || !Mathf.Approximately (VLAxis, 0f))
         {
-            // Turn on the animator of the Leg Swing Preference
-            LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded ();
             // Get the percent of input force player put in
             float normalizedInputVal = Mathf.Sqrt (Mathf.Pow (HLAxis, 2f) + Mathf.Pow (VLAxis, 2f)) / Mathf.Sqrt (2);
             // Add force based on that percentage
@@ -317,9 +315,10 @@ public class PlayerController : MonoBehaviour
             }
             // Check if player's speed is not within x degree of the controller angle
             // Then disable the animator if so
+            // Turn on the animator of the Leg Swing Preference
             float playerVelRot = Mathf.Atan2 (_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
 
-            LegSwingReference.GetComponent<Animator> ().enabled = Mathf.Abs (playerVelRot - playerRot) < 90f;
+            LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded () && (Mathf.Abs (playerVelRot - playerRot) < 90f);
 
             RotationSpeed = Mathf.Clamp (RotationSpeed, 4f, 15f);
             Transform target = TurnReference.transform.GetChild (0);

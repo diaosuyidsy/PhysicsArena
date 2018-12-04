@@ -14,30 +14,32 @@ public class rtEmit : MonoBehaviour
     public int MaxAmmo = 1000;
     public int currentAmmo;
 
-    private void Start()
+    private void Start ()
     {
         currentAmmo = MaxAmmo;
     }
 
-    public void Shoot(float TriggerVal)
+    // This function is called by PlayerController, when player is holding a gun
+    // And it's holding down RT
+    public void Shoot (float TriggerVal)
     {
         //For inspection purpose
         if (currentAmmo <= 0)
         {
-            print("NoAmmo");
+            print ("NoAmmo");
         }
 
-        if (Mathf.Approximately(TriggerVal, 0f) || currentAmmo <= 0)
+        if (Mathf.Approximately (TriggerVal, 0f) || currentAmmo <= 0)
         {
-            WaterBall.GetComponent<ObiEmitter>().speed = 0f;
+            WaterBall.GetComponent<ObiEmitter> ().speed = 0f;
             return;
         }
-        WaterBall.GetComponent<ObiEmitter>().speed = Speed;
-        GunPositionControl gpc = GetComponent<GunPositionControl>();
+        WaterBall.GetComponent<ObiEmitter> ().speed = Speed;
+        GunPositionControl gpc = GetComponent<GunPositionControl> ();
         if (gpc != null)
         {
-            gpc.Owner.GetComponent<Rigidbody>().AddForce(-gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
-            gpc.Owner.GetComponent<Rigidbody>().AddForce(gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
+            gpc.Owner.GetComponent<Rigidbody> ().AddForce (-gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
+            gpc.Owner.GetComponent<Rigidbody> ().AddForce (gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
         }
         currentAmmo--;
         // If we changed ammo, then need to change UI as well
@@ -64,23 +66,23 @@ public class rtEmit : MonoBehaviour
         }
     }*/
 
-/*    private void OnCollisionEnter(Collision other)
-    {
-        if (other.collider.CompareTag("Ground") && currentAmmo == 0)
+    /*    private void OnCollisionEnter(Collision other)
         {
-            currentAmmo = MaxAmmo;
-            GameManager.GM.HideWeapon(gameObject);
-            GameManager.GM.CallGunIEnu();
-        }
-    }*/
+            if (other.collider.CompareTag("Ground") && currentAmmo == 0)
+            {
+                currentAmmo = MaxAmmo;
+                GameManager.GM.HideWeapon(gameObject);
+                GameManager.GM.CallGunIEnu();
+            }
+        }*/
 
-    private void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter (Collider other)
     {
-        if (other.CompareTag("DeathZone"))
+        if (other.CompareTag ("DeathZone"))
         {
             currentAmmo = MaxAmmo;
-            GameManager.GM.HideWeapon(gameObject);
+            GameManager.GM.HideWeapon (gameObject);
         }
     }
-    
+
 }

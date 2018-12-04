@@ -553,8 +553,8 @@ public class PlayerController : MonoBehaviour
             }
             else
             {
-                lm2.max = Mathf.Lerp (initLm2LeftMax, -110f, elapesdTime / time);
-                lm2.min = Mathf.Lerp (initLm2LeftMin, -106f, elapesdTime / time);
+                lm2.max = Mathf.Lerp (initLm2LeftMax, -88f, elapesdTime / time);
+                lm2.min = Mathf.Lerp (initLm2LeftMin, -98f, elapesdTime / time);
             }
             lm.max = Mathf.Lerp (initLmMax, 180f, elapesdTime / time);
             Arm2hj.limits = lm2;

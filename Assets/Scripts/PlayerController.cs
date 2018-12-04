@@ -264,7 +264,12 @@ public class PlayerController : MonoBehaviour
     {
         if (Input.GetKey (RunCode) && IsGrounded ())
         {
+            LegSwingReference.GetComponent<Animator> ().speed = 2f;
             _rb.AddForce (transform.forward * Thrust * RunSpeedMultiplier);
+        }
+        else
+        {
+            LegSwingReference.GetComponent<Animator> ().speed = 1.6f;
         }
     }
 

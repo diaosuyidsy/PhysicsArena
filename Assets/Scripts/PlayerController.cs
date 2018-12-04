@@ -96,6 +96,7 @@ public class PlayerController : MonoBehaviour
         {
             go.SetActive (false);
         }
+        DropHelper ();
         GameManager.GM.SetToRespawn (gameObject);
         StartCoroutine (respawn (GameManager.GM.RespawnTime));
     }

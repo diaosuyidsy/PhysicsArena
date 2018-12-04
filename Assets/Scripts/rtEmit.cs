@@ -85,16 +85,17 @@ public class rtEmit : MonoBehaviour
         }
     }*/
 
-    /*    private void OnCollisionEnter(Collision other)
+    // If weapon collide to the ground, and has no ammo, then despawn it
+    private void OnCollisionEnter (Collision other)
+    {
+        if (other.collider.CompareTag ("Ground") && currentAmmo == 0)
         {
-            if (other.collider.CompareTag("Ground") && currentAmmo == 0)
-            {
-                currentAmmo = MaxAmmo;
-                GameManager.GM.HideWeapon(gameObject);
-                GameManager.GM.CallGunIEnu();
-            }
-        }*/
+            currentAmmo = MaxAmmo;
+            GameManager.GM.HideWeapon (gameObject);
+        }
+    }
 
+    // If the weapon is taken down the death zone, then despawn it
     private void OnTriggerEnter (Collider other)
     {
         if (other.CompareTag ("DeathZone"))

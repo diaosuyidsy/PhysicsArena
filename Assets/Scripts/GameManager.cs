@@ -95,7 +95,9 @@ public class GameManager : MonoBehaviour
     // Also, clamp the weeaponspawn area to not let it exceed the boundaries of the world
     void SetWeaponSpawn ()
     {
-        weaponSpawnerCenter = Camera.main.GetComponent<CameraController> ().FollowTarget;
+        weaponSpawnerCenter.x = Camera.main.GetComponent<CameraController> ().FollowTarget.x;
+        weaponSpawnerCenter.z = Camera.main.GetComponent<CameraController> ().FollowTarget.z;
+
         // Trying to clamp the weapon Spawn Area within the world space
         float xmin = WorldCenter.x - WorldSize.x / 2 + weaponSpawnerSize.x / 2;
         float xmax = WorldCenter.x + WorldSize.x / 2 - weaponSpawnerSize.x / 2;
@@ -119,7 +121,7 @@ public class GameManager : MonoBehaviour
 #if UNITY_EDITOR_WIN
         if (Input.GetKeyDown (KeyCode.Joystick1Button6))
         {
-            SceneManager.LoadScene ("MasterScene");
+            SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
         }
 #endif
 

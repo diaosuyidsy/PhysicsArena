@@ -46,7 +46,7 @@ public class Fingers : MonoBehaviour
             GetComponentInParent<PlayerController>().HandObject = col.gameObject;
 
             // If it's a weapon, apply it to specific position
-            if (col.collider.CompareTag("Weapon"))
+            if (col.collider.CompareTag("Weapon") || col.collider.CompareTag("Team1Resource") || col.collider.CompareTag("Team2Resource"))
             {
                 // Tell the collected weapon who picked it up
                 col.collider.GetComponent<GunPositionControl>().Owner = Hip;

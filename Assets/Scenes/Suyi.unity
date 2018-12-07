@@ -1378,9 +1378,33 @@ Prefab:
       propertyPath: m_AllowMSAA
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 114917404445205532, guid: f8d6c631da37749db9f9744813be0f39, type: 2}
   m_SourcePrefab: {fileID: 100100000, guid: f8d6c631da37749db9f9744813be0f39, type: 2}
   m_IsPrefabAsset: 0
+--- !u!1 &1918725807 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1995234145574352, guid: f8d6c631da37749db9f9744813be0f39,
+    type: 2}
+  m_PrefabInternal: {fileID: 1918725806}
+--- !u!114 &1918725808
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1918725807}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90d1945bbd58b4cf98eb19621dd83cdd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  particleRenderers:
+  - {fileID: 1247480695}
+  autoupdate: 1
+  blurRadius: 0.02
+  thicknessCutoff: 1.2
+  colorMaterial: {fileID: 2100000, guid: d16ca3f3b0ff44edb8bc98af8c286687, type: 2}
+  fluidMaterial: {fileID: 2100000, guid: 0247f7af5bd7d41d7a0a17ab9f40d3be, type: 2}
 --- !u!1 &2010242469
 GameObject:
   m_ObjectHideFlags: 0

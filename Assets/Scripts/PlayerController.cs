@@ -1,9 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+    [Header ("Player Basic Control Section")]
     [Tooltip ("Enter 1 Digit 1-4")]
     public string PlayerControllerNumber;
     public float Thrust = 300f;
@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     public LayerMask JumpMask;
     public float RotationSpeed = 200f;
     public float RunSpeedMultiplier = 1f;
-
+    [Header ("Player Body Setting Section")]
     public GameObject HeadGunPos;
     public GameObject LegSwingReference;
     public GameObject Chest;
@@ -23,8 +23,10 @@ public class PlayerController : MonoBehaviour
     public GameObject RightHand;
     public GameObject TurnReference;
     public GameObject[] OnDeathHidden;
-    public float MaxWeaponCD = 0.3f;
+
+    [Header ("Auxillary Aiming Section")]
     public bool EnableAuxillaryAiming = true;
+    public float MaxWeaponCD = 0.3f;
 
     [HideInInspector]
     public GameObject HandObject;
@@ -34,10 +36,6 @@ public class PlayerController : MonoBehaviour
     public bool IsPunching = false;
     [HideInInspector]
     public bool HandTaken = false;
-
-    #region Debug Toggle
-    public bool debugT_CheckArm = true;
-    #endregion
 
     #region Private Variable
     private Rigidbody _rb;
@@ -72,6 +70,11 @@ public class PlayerController : MonoBehaviour
     private bool CanDrop = false;
     private float RightTrigger;
     private float LeftTrigger;
+    #endregion
+
+    [Header ("Debug Section: Don't Ever Touch")]
+    #region Debug Toggle
+    public bool debugT_CheckArm = true;
     #endregion
 
     private void Start ()

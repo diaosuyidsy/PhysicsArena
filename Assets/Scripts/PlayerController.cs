@@ -221,6 +221,8 @@ public class PlayerController : MonoBehaviour
         if (HandObject == null) return;
         // Drop the thing
         HandObject.SendMessage ("Drop");
+        normalState = State.Empty;
+        _dropping = false;
         // Change to non-dropping state after a while
         HandTaken = false;
         // Return the body to normal position

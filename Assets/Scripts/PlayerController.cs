@@ -37,6 +37,24 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public bool HandTaken = false;
 
+    #region States
+    private enum State
+    {
+        Empty,
+        Walking,
+        Jumping,
+        Shooting,
+        Meleeing,
+        Picking,
+        Holding,
+        Dead,
+    }
+    // Normal State should include: Walking, Jumping, Picking, Holding, Dead
+    private State normalState;
+    // Attack State Should include: Shooting, Meleeing
+    private State attackState;
+    #endregion
+
     #region Private Variable
     private Rigidbody _rb;
     private float _distToGround;
@@ -67,7 +85,7 @@ public class PlayerController : MonoBehaviour
     private KeyCode YButton;
     private string RTStr;
     private string LTStr;
-    private bool CanDrop = false;
+    //private bool CanDrop = false;
     private float RightTrigger;
     private float LeftTrigger;
     #endregion
@@ -107,6 +125,7 @@ public class PlayerController : MonoBehaviour
         CheckDrop ();
     }
 
+    // This is primarily for dropping item when velocity change too much 
     private void FixedUpdate ()
     {
         if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
@@ -124,6 +143,7 @@ public class PlayerController : MonoBehaviour
         transform.localEulerAngles = _freezeBody;
     }
 
+    // OnEnterDeathZone controls the behavior how player reacts when it dies
     public void OnEnterDeathZone ()
     {
         _canControl = false;
@@ -148,13 +168,14 @@ public class PlayerController : MonoBehaviour
 
     private void CheckDrop ()
     {
-        if (HandObject == null || !CanDrop)
+        // Drop Only happens when player is holding something
+        if (HandObject == null || normalState != State.Holding || attackState == State.Shooting)
             return;
 
         // If taken something, and pushed Y, drop the thing
         if (Mathf.Approximately (1f, LeftTrigger))
         {
-            CanDrop = false;
+            normalState = State.Empty;
             DropHelper ();
         }
     }
@@ -203,6 +224,7 @@ public class PlayerController : MonoBehaviour
                     // Add weapon right trigger action
                     if (HandObject != null)
                     {
+                        attackState = State.Shooting;
                         HandObject.SendMessage ("Shoot", 1f);
                         if (EnableAuxillaryAiming)
                             AuxillaryAim ();
@@ -210,9 +232,9 @@ public class PlayerController : MonoBehaviour
                     break;
                 default:
                     //If we don't have anything on hand, we are applying melee action
-                    if (!_startMelee)
+                    if (attackState != State.Meleeing && normalState != State.Picking)
                     {
-                        _startMelee = true;
+                        attackState = State.Meleeing;
                         _checkArm = false;
                         StopAllCoroutines ();
                         StartCoroutine (MeleeClockFistHelper (_rightArm2hj, _rightArmhj, _rightHandhj, 1f));
@@ -228,6 +250,7 @@ public class PlayerController : MonoBehaviour
                 case "Throwable":
                     break;
                 case "Weapon":
+                    attackState = State.Empty;
                     // Add weapon right trigger action
                     if (HandObject != null)
                         HandObject.SendMessage ("Shoot", 0f);
@@ -237,9 +260,9 @@ public class PlayerController : MonoBehaviour
                     break;
                 default:
                     // If we previously started melee and released the trigger, then release the fist
-                    if (_startMelee)
+                    if (attackState == State.Meleeing)
                     {
-                        _startMelee = false;
+                        attackState = State.Empty;
                         StopAllCoroutines ();
                         StartCoroutine (MeleePunchHelper (_rightArmhj, _rightHandhj, 0.2f));
                     }
@@ -288,6 +311,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnPickUpItem (string tag)
     {
+        // Actual Logic Below
         _rightTriggerRegister = tag;
         switch (tag)
         {
@@ -320,11 +344,15 @@ public class PlayerController : MonoBehaviour
         //      Target Position: 0 --> 180
         //      Limits: max 90 --> 121
         // Hand: Limit Max: 90 --> 0
-        if (Mathf.Approximately (1f, RightTrigger) && Mathf.Approximately (1f, LeftTrigger)) return;
+        if (attackState == State.Meleeing || normalState == State.Holding) return;
 
-        LeftHand.GetComponent<Fingers> ().SetTaken (!Mathf.Approximately (1f, LeftTrigger));
-        //RightHand.GetComponent<Fingers>().SetTaken(LeftTrigger);
+        LeftHand.GetComponent<Fingers> ().SetTaken (Mathf.Approximately (0f, LeftTrigger));
+        RightHand.GetComponent<Fingers> ().SetTaken (Mathf.Approximately (0f, LeftTrigger));
 
+        if (Mathf.Approximately (1f, LeftTrigger))
+            normalState = State.Picking;
+        else
+            normalState = State.Empty;
 
         CheckArmHelper (LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
         CheckArmHelper (LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
@@ -449,8 +477,9 @@ public class PlayerController : MonoBehaviour
         LeftTrigger = Input.GetAxis (LTStr);
         LeftTrigger = Mathf.Approximately (LeftTrigger, 0f) || Mathf.Approximately (LeftTrigger, -1f) ? 0f : 1f;
 
+        // Only change to holding state when player released the LT button and holding something
         if (Mathf.Approximately (0f, LeftTrigger) && HandObject != null)
-            CanDrop = true;
+            normalState = State.Holding;
 
         // For A, B, X, Y Buttons
         // RunCode is Button L Axis

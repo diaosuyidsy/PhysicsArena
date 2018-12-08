@@ -50,6 +50,7 @@ public class PlayerController : MonoBehaviour
     private string _rightTriggerRegister = "";
     private bool _startMelee = false;
     private bool _canControl = true;
+    private Vector3 _freezeBody;
     #endregion
 
     #region Controller Variables
@@ -74,6 +75,7 @@ public class PlayerController : MonoBehaviour
         _rightArmhj = RightArms[1].GetComponent<HingeJoint> ();
         _leftHandhj = LeftArms[2].GetComponent<HingeJoint> ();
         _rightHandhj = RightArms[2].GetComponent<HingeJoint> ();
+        _freezeBody = new Vector3 (0, transform.localEulerAngles.y, 0);
     }
 
     // Update is called once per frame
@@ -99,6 +101,13 @@ public class PlayerController : MonoBehaviour
             DropHelper ();
         }
     }
+
+    private void LateUpdate ()
+    {
+        _freezeBody.y = transform.localEulerAngles.y;
+        transform.localEulerAngles = _freezeBody;
+    }
+
     public void OnEnterDeathZone ()
     {
         _canControl = false;

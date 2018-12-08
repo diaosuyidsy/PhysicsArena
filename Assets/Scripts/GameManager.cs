@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager GM;
     public Text Result;
+    [HideInInspector]
     public GameObject[] Players;
     public GameObject RunSandVFX;
     public LayerMask AllPlayers;
@@ -35,6 +36,17 @@ public class GameManager : MonoBehaviour
     private void Awake ()
     {
         GM = this;
+        GameObject[] team1Players = GameObject.FindGameObjectsWithTag ("Team1");
+        GameObject[] team2Players = GameObject.FindGameObjectsWithTag ("Team2");
+        Players = new GameObject[team1Players.Length + team2Players.Length];
+        int index = 0;
+        for (int i = 0; i < team1Players.Length; i++)
+        {
+            Players[index] = team1Players[i];
+            index++;
+            Players[index] = team2Players[i];
+            index++;
+        }
     }
 
     //make the space for weapon to respawn (weapon-spawner) visible in scene

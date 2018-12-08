@@ -62,6 +62,7 @@ public class PlayerController : MonoBehaviour
     private bool CanDrop = false;
     private float RightTrigger;
     private float LeftTrigger;
+    private float _previousFrameVel = 0f;
     #endregion
 
     private void Start ()
@@ -96,12 +97,15 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate ()
     {
-        if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
+        if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
         {
             DropHelper ();
         }
+        _previousFrameVel = _rb.velocity.magnitude;
+
     }
 
+    // Late Update is for standing the character
     private void LateUpdate ()
     {
         _freezeBody.y = transform.localEulerAngles.y;

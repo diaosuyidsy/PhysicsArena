@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
     [Tooltip ("This is CD for on drop respawn method")]
     public float WeaponRespawnTime = 2f;
     public float DropWeaponVelocityThreshold = 2f;
+    public string[] PlayerCanPickupTags;
 
     private int Team1RespawnIndex = 0;
     private int Team2RespawnIndex = 0;

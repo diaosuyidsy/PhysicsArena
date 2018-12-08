@@ -464,11 +464,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: Players.Array.size
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -513,59 +508,14 @@ Prefab:
       objectReference: {fileID: 312524303}
     - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
         type: 2}
-      propertyPath: Team1RespawnPts.Array.data[0]
-      value: 
-      objectReference: {fileID: 894461017}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: weaponSpawnerSize.x
-      value: 5.4
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: weaponSpawnerSize.z
-      value: 6.54
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: weaponSpawnerCenter.y
-      value: 6.71
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: WorldCenter.y
-      value: 0.42
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: WorldSize.x
-      value: 14.78
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: WorldSize.z
-      value: 13.17
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: WorldCenter.x
-      value: 12.77
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: WorldCenter.z
-      value: -9.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: DropWeaponVelocityThreshold
-      value: 7.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
       propertyPath: Players.Array.data[1]
       value: 
       objectReference: {fileID: 370636999}
+    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 2}
+      propertyPath: Team1RespawnPts.Array.data[0]
+      value: 
+      objectReference: {fileID: 894461017}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
   m_IsPrefabAsset: 0
@@ -659,25 +609,6 @@ Transform:
   m_Father: {fileID: 4513536}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &942221020 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1110226647717638, guid: 1d54c92011a4fa44abc8bcea479467c2,
-    type: 2}
-  m_PrefabInternal: {fileID: 528674772}
---- !u!114 &942221023
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 942221020}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f74465dfe022c4e478f5c3f94166f153, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Weapons: []
-  WeaponSpawnCD: 2
-  NextSpawnAmount: 1
 --- !u!1001 &1157860384
 Prefab:
   m_ObjectHideFlags: 0

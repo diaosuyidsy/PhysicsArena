@@ -177,6 +177,11 @@ public class PlayerController : MonoBehaviour
             // Stop the shooting
             HandObject.SendMessage ("Shoot", 0f);
         }
+        if (HandObject.CompareTag ("Team1Resource") || HandObject.CompareTag ("Team2Resource"))
+        {
+            HandObject.GetComponent<Rigidbody> ().isKinematic = false;
+            HandObject.layer = 0;
+        }
         // Nullify the holder
         HandObject = null;
         // Clear the right trigger register
@@ -185,7 +190,6 @@ public class PlayerController : MonoBehaviour
 
     public void CheckFire ()
     {
-
         if (Mathf.Approximately (RightTrigger, 1f))
         {
             // Means we want to fire
@@ -287,6 +291,8 @@ public class PlayerController : MonoBehaviour
         _rightTriggerRegister = tag;
         switch (tag)
         {
+            case "Team1Resource":
+            case "Team2Resource":
             case "Weapon":
                 _checkArm = false;
 

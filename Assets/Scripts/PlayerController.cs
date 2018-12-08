@@ -22,9 +22,12 @@ public class PlayerController : MonoBehaviour
     public GameObject LeftHand;
     public GameObject RightHand;
     public GameObject TurnReference;
-    public GameObject HandObject;
     public GameObject[] OnDeathHidden;
+    public float MaxWeaponCD = 0.3f;
+    public bool EnableAuxillaryAiming = true;
 
+    [HideInInspector]
+    public GameObject HandObject;
     [HideInInspector]
     public float MeleeCharge = 0f;
     [HideInInspector]
@@ -51,6 +54,13 @@ public class PlayerController : MonoBehaviour
     private bool _startMelee = false;
     private bool _canControl = true;
     private Vector3 _freezeBody;
+    private float _previousFrameVel = 0f;
+    private float _weaponCD;
+    [SerializeField]
+    private float _axuillaryMaxDistance = 30f;
+    [SerializeField]
+    private float _auxillaryMaxAngle = 5f;
+    private bool _auxillaryRotationLock = false;
     #endregion
 
     #region Controller Variables
@@ -62,7 +72,6 @@ public class PlayerController : MonoBehaviour
     private bool CanDrop = false;
     private float RightTrigger;
     private float LeftTrigger;
-    private float _previousFrameVel = 0f;
     #endregion
 
     private void Start ()
@@ -91,7 +100,7 @@ public class PlayerController : MonoBehaviour
         if (_checkArm && debugT_CheckArm)
             CheckArm ();
         CheckFire ();
-        CheckRun ();
+        // CheckRun ();
         CheckDrop ();
     }
 
@@ -186,7 +195,11 @@ public class PlayerController : MonoBehaviour
                 case "Weapon":
                     // Add weapon right trigger action
                     if (HandObject != null)
+                    {
                         HandObject.SendMessage ("Shoot", 1f);
+                        if (EnableAuxillaryAiming)
+                            AuxillaryAim ();
+                    }
                     break;
                 default:
                     //If we don't have anything on hand, we are applying melee action
@@ -211,6 +224,9 @@ public class PlayerController : MonoBehaviour
                     // Add weapon right trigger action
                     if (HandObject != null)
                         HandObject.SendMessage ("Shoot", 0f);
+                    // Auxillary Aiming
+                    _auxillaryRotationLock = false;
+                    _weaponCD = 0f;
                     break;
                 default:
                     // If we previously started melee and released the trigger, then release the fist
@@ -222,6 +238,44 @@ public class PlayerController : MonoBehaviour
                     }
                     break;
             }
+        }
+    }
+
+    private void AuxillaryAim ()
+    {
+        // Auxillary Aiming
+        _weaponCD += Time.deltaTime;
+        if (_weaponCD <= MaxWeaponCD)
+        {
+            GameObject target = null;
+            float minAngle = 360f;
+            foreach (GameObject otherPlayer in GameManager.GM.Players)
+            {
+                if (!otherPlayer.CompareTag (tag))
+                {
+                    // If other player are within max Distance, then check for the smalliest angle player
+                    if (Vector3.Distance (otherPlayer.transform.position, gameObject.transform.position) <= _axuillaryMaxDistance)
+                    {
+                        Vector3 targetDir = otherPlayer.transform.position - transform.position;
+                        float angle = Vector3.Angle (targetDir, transform.forward);
+                        if (angle <= _auxillaryMaxAngle && angle < minAngle)
+                        {
+                            minAngle = angle;
+                            target = otherPlayer;
+                        }
+                    }
+                }
+            }
+            // Now we got the target Player, time to auxillary against it
+            if (target != null)
+            {
+                _auxillaryRotationLock = true;
+                transform.LookAt (target.transform);
+            }
+        }
+        else
+        {
+            _auxillaryRotationLock = false;
         }
     }
 
@@ -257,6 +311,7 @@ public class PlayerController : MonoBehaviour
         //      Target Position: 0 --> 180
         //      Limits: max 90 --> 121
         // Hand: Limit Max: 90 --> 0
+        if (Mathf.Approximately (1f, RightTrigger) && Mathf.Approximately (1f, LeftTrigger)) return;
 
         LeftHand.GetComponent<Fingers> ().SetTaken (!Mathf.Approximately (1f, LeftTrigger));
         //RightHand.GetComponent<Fingers>().SetTaken(LeftTrigger);
@@ -355,7 +410,8 @@ public class PlayerController : MonoBehaviour
             TurnReference.transform.eulerAngles = new Vector3 (transform.eulerAngles.x, Mathf.Atan2 (HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
             Quaternion rotation = Quaternion.LookRotation (relativePos, Vector3.up);
             Quaternion tr = Quaternion.Slerp (transform.rotation, rotation, Time.deltaTime * RotationSpeed);
-            transform.rotation = tr;
+            if (!_auxillaryRotationLock)
+                transform.rotation = tr;
         }
         else
         {

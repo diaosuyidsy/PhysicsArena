@@ -18,6 +18,7 @@ public class ResourceCollector : MonoBehaviour
 			if (other.CompareTag("Team1Resource"))
 			{
 				TeamTracker++;
+				other.tag = "Untagged";
 				print("Team 1 Score = " + TeamTracker);
 			}		
 			else if (other.CompareTag("Team2Resource"))
@@ -31,6 +32,7 @@ public class ResourceCollector : MonoBehaviour
 			if (other.CompareTag("Team2Resource"))
 			{
 				TeamTracker++;
+				other.tag = "Untagged";
 				print("Team 2 Score = " + TeamTracker);
 			}		
 			else if (other.CompareTag("Team1Resource"))

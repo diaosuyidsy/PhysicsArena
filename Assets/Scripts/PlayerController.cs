@@ -132,11 +132,15 @@ public class PlayerController : MonoBehaviour
     // This is primarily for dropping item when velocity change too much 
     private void FixedUpdate ()
     {
-        if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
-        {
+        //if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
+        //{
+        //    DropHelper ();
+        //}
+        if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
+
             DropHelper ();
-        }
-        _previousFrameVel = _rb.velocity.magnitude;
+
+        //_previousFrameVel = _rb.velocity.magnitude;
 
     }
 
@@ -701,7 +705,7 @@ public class PlayerController : MonoBehaviour
         float initLmTargetPosition = js.targetPosition;
         float inithlMax = hl.max;
         float inithlMin = hl.min;
-        Armhj.connectedMassScale = 0.2f;
+        //Armhj.connectedMassScale = 0.2f;
 
         while (elapesdTime < time)
         {

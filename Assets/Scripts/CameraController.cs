@@ -12,6 +12,8 @@ public class CameraController : MonoBehaviour
     public float CameraScaleSpeed = 1f;
     public float FOVSizeMin = 8f;
     public float FOVSizeMax = 35f;
+    public float XOffset = 0f;
+    public float ZOffset = -0.33f;
 
     private float _maxDistanceOrigin;
     private float _xDiffOrigin;
@@ -24,7 +26,7 @@ public class CameraController : MonoBehaviour
     // Use this for initialization
     void Start ()
     {
-        SetTarget ();
+        SetTarget (false);
         // Set the max Distance originally
         float maxDist = 0f;
         foreach (GameObject go in GameManager.GM.Players)
@@ -50,12 +52,12 @@ public class CameraController : MonoBehaviour
         transform.position = _smoothedPosition;
         //GetComponent<Camera> ().fieldOfView += (MaxDistance () - _maxDistanceOrigin) * CameraScaleSpeed;
         //_maxDistanceOrigin = MaxDistance ();
-        _desiredFOV = 1.34f * MaxDistance () + 3.99f;
+        _desiredFOV = 1.5f * MaxDistance () + 3.99f;
         GetComponent<Camera> ().fieldOfView = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, _desiredFOV, SmoothSpeed);
         GetComponent<Camera> ().fieldOfView = Mathf.Clamp (GetComponent<Camera> ().fieldOfView, FOVSizeMin, FOVSizeMax);
     }
 
-    void SetTarget ()
+    void SetTarget (bool withOffset = true)
     {
         // Need to set Follow Target to be average of all players
         Vector3 total = Vector3.zero;
@@ -65,6 +67,11 @@ public class CameraController : MonoBehaviour
                 total += go.transform.position;
         }
         total /= GameManager.GM.Players.Length;
+        if (withOffset)
+        {
+            total.x += XOffset;
+            total.z += ZOffset;
+        }
         FollowTarget = total;
     }
 

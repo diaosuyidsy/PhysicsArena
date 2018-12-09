@@ -506,11 +506,6 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: PlayerCanPickupTags.Array.size
-      value: 4
-      objectReference: {fileID: 0}
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -563,11 +558,6 @@ Prefab:
       propertyPath: Team1RespawnPts.Array.data[0]
       value: 
       objectReference: {fileID: 894461017}
-    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: PlayerCanPickupTags.Array.data[3]
-      value: MachineGun
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
   m_IsPrefabAsset: 0
@@ -5906,6 +5896,21 @@ Prefab:
         type: 2}
       propertyPath: m_AllowMSAA
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 114089129262350066, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 2}
+      propertyPath: XOffset
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114089129262350066, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 2}
+      propertyPath: ZOffset
+      value: -0.33
+      objectReference: {fileID: 0}
+    - target: {fileID: 114089129262350066, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 2}
+      propertyPath: FOVSizeMax
+      value: 33.4
       objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 114917404445205532, guid: f8d6c631da37749db9f9744813be0f39, type: 2}

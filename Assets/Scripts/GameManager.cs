@@ -40,8 +40,9 @@ public class GameManager : MonoBehaviour
         GameObject[] team1Players = GameObject.FindGameObjectsWithTag ("Team1");
         GameObject[] team2Players = GameObject.FindGameObjectsWithTag ("Team2");
         Players = new GameObject[team1Players.Length + team2Players.Length];
+        float length = team1Players.Length > team2Players.Length ? team1Players.Length : team2Players.Length;
         int index = 0;
-        for (int i = 0; i < team1Players.Length; i++)
+        for (int i = 0; i < length; i++)
         {
             Players[index] = team1Players[i];
             index++;

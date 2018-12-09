@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GunPositionControl : MonoBehaviour
+public class MachineGunPositionControl : MonoBehaviour
 {
     [HideInInspector]
     public GameObject Owner;
@@ -11,7 +11,7 @@ public class GunPositionControl : MonoBehaviour
     [Tooltip ("This Angle is for weapon y axis angle offset, normally it's 90f")]
     public float FaceAngleOffset = 90f;
 
-    public float VerticalOffset = 10f;
+    public float VerticalOffset = 0f;
 
     private GameObject lh;
     private GameObject rh;
@@ -24,10 +24,10 @@ public class GunPositionControl : MonoBehaviour
         {
             lh = Owner.GetComponent<PlayerController> ().LeftHand;
             rh = Owner.GetComponent<PlayerController> ().RightHand;
-            //transform.position = (lh.transform.position + rh.transform.position) / 2f;
-            targetposition = (lh.transform.position + rh.transform.position) / 2f;
-            transform.position = new Vector3 (targetposition.x, targetposition.y + VerticalOffset, targetposition.z);
-            transform.eulerAngles = new Vector3 (0f, Owner.transform.eulerAngles.y + FaceAngleOffset, DownAngle);
+            targetposition = transform.position;
+            targetposition.y = ((lh.transform.position + rh.transform.position) / 2f).y;
+            transform.position = targetposition;
+            transform.eulerAngles = new Vector3 (0f, 0f, DownAngle);
         }
     }
 

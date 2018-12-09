@@ -573,15 +573,15 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 4.7480187
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
       propertyPath: m_LocalPosition.y
-      value: 10.075973
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -11.230907
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
       propertyPath: m_LocalRotation.x
@@ -643,6 +643,16 @@ Prefab:
       propertyPath: Team2RespawnPts.Array.data[1]
       value: 
       objectReference: {fileID: 1105065864}
+    - target: {fileID: 224213177762969708, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 2}
+      propertyPath: RespawnPointHolder
+      value: 
+      objectReference: {fileID: 569421874}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
   m_IsPrefabAsset: 0
@@ -738,6 +748,11 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 12
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!4 &569421874 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4916138571872778, guid: 1d54c92011a4fa44abc8bcea479467c2,
+    type: 2}
+  m_PrefabInternal: {fileID: 528674772}
 --- !u!1 &667368563
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,7 +11,7 @@ public class CameraController : MonoBehaviour
 
     public float CameraScaleSpeed = 1f;
     public float FOVSizeMin = 8f;
-    public float FOVSizeMax = 15f;
+    public float FOVSizeMax = 35f;
 
     private float _maxDistanceOrigin;
     private float _xDiffOrigin;
@@ -48,10 +48,10 @@ public class CameraController : MonoBehaviour
         _desiredPosition = new Vector3 (FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
         _smoothedPosition = Vector3.Lerp (transform.position, _desiredPosition, SmoothSpeed);
         transform.position = _smoothedPosition;
-        _desiredFOV = GetComponent<Camera> ().fieldOfView + (MaxDistance () - _maxDistanceOrigin) * CameraScaleSpeed;
-        _smoothedFOV = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, _desiredFOV, SmoothSpeed);
-        GetComponent<Camera> ().fieldOfView = _smoothedFOV;
-        _maxDistanceOrigin = MaxDistance ();
+        //GetComponent<Camera> ().fieldOfView += (MaxDistance () - _maxDistanceOrigin) * CameraScaleSpeed;
+        //_maxDistanceOrigin = MaxDistance ();
+        _desiredFOV = 1.34f * MaxDistance () + 3.99f;
+        GetComponent<Camera> ().fieldOfView = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, _desiredFOV, SmoothSpeed);
         GetComponent<Camera> ().fieldOfView = Mathf.Clamp (GetComponent<Camera> ().fieldOfView, FOVSizeMin, FOVSizeMax);
     }
 
@@ -68,15 +68,19 @@ public class CameraController : MonoBehaviour
         FollowTarget = total;
     }
 
+    // Should get the max distance between any two players
     float MaxDistance ()
     {
         float maxDist = 0f;
-        foreach (GameObject go in GameManager.GM.Players)
+        for (int i = 0; i < GameManager.GM.Players.Length; i++)
         {
-            float temp = Vector3.Distance (go.transform.position, FollowTarget);
-            if (temp > maxDist)
+            for (int j = i + 1; j < GameManager.GM.Players.Length; j++)
             {
-                maxDist = temp;
+                float temp = Vector3.Distance (GameManager.GM.Players[i].transform.position, GameManager.GM.Players[j].transform.position);
+                if (temp > maxDist)
+                {
+                    maxDist = temp;
+                }
             }
         }
         return maxDist;

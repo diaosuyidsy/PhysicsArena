@@ -271,6 +271,11 @@ public class PlayerController : MonoBehaviour
                             AuxillaryAim ();
                     }
                     break;
+                case "Team1Resource":
+                case "Team2Resource":
+                    if (!_dropping)
+                        DropHelper ();
+                    break;
                 default:
                     //If we don't have anything on hand, we are applying melee action
                     if (attackState != State.Meleeing && normalState != State.Picking && normalState != State.Holding)

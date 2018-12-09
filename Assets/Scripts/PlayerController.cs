@@ -33,6 +33,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public float MeleeCharge = 0f;
     [HideInInspector]
+    public float DropCharge = 0f;
+    [HideInInspector]
     public bool IsPunching = false;
     [HideInInspector]
     public bool HandTaken = false;
@@ -43,11 +45,11 @@ public class PlayerController : MonoBehaviour
         Empty,
         Walking,
         Jumping,
-        Shooting,
-        Meleeing,
         Picking,
         Holding,
         Dead,
+        Shooting,
+        Meleeing,
     }
     // Normal State should include: Walking, Jumping, Picking, Holding, Dead
     private State normalState;
@@ -77,6 +79,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField]
     private float _auxillaryMaxAngle = 5f;
     private bool _auxillaryRotationLock = false;
+    private bool _dropping = false;
     #endregion
 
     #region Controller Variables
@@ -172,12 +175,45 @@ public class PlayerController : MonoBehaviour
         if (HandObject == null || normalState != State.Holding || attackState == State.Shooting)
             return;
 
-        // If taken something, and pushed Y, drop the thing
+        // If taken something, and pushed LT, drop the thing
         if (Mathf.Approximately (1f, LeftTrigger))
         {
-            normalState = State.Empty;
-            DropHelper ();
+            _dropping = true;
+            //DropHelper ();
+            StartCoroutine (PowerDrop (2f));
         }
+        else
+        {
+            if (_dropping)
+            {
+                StopAllCoroutines ();
+                JointSpring js = _chesthj.spring;
+                js.targetPosition = 10f * DropCharge;
+                DropCharge = 0f;
+                _chesthj.spring = js;
+                normalState = State.Empty;
+                _dropping = false;
+                DropHelper ();
+            }
+        }
+    }
+
+    IEnumerator PowerDrop (float time)
+    {
+        float elapsedTime = 0f;
+        JointSpring js = _chesthj.spring;
+
+        float initspringtagetPosition = js.targetPosition;
+
+        while (elapsedTime <= time)
+        {
+            DropCharge = elapsedTime / time;
+            elapsedTime += Time.deltaTime;
+            js.targetPosition = Mathf.Lerp (initspringtagetPosition, -100f, elapsedTime / time);
+            _chesthj.spring = js;
+            yield return new WaitForEndOfFrame ();
+        }
+
     }
 
     public void DropHelper ()
@@ -185,11 +221,15 @@ public class PlayerController : MonoBehaviour
         if (HandObject == null) return;
         // Drop the thing
         HandObject.SendMessage ("Drop");
+        normalState = State.Empty;
+        _dropping = false;
+        // Change to non-dropping state after a while
         HandTaken = false;
         // Return the body to normal position
         _checkArm = true;
         StopAllCoroutines ();
         ResetBody ();
+
         // Specialized checking
         if (HandObject.CompareTag ("Weapon"))
         {
@@ -200,8 +240,8 @@ public class PlayerController : MonoBehaviour
         }
         if (HandObject.CompareTag ("Team1Resource") || HandObject.CompareTag ("Team2Resource"))
         {
-            HandObject.GetComponent<Rigidbody> ().isKinematic = false;
             HandObject.layer = 0;
+            HandObject.GetComponent<Rigidbody> ().isKinematic = false;
         }
         // Nullify the holder
         HandObject = null;
@@ -222,7 +262,7 @@ public class PlayerController : MonoBehaviour
                     break;
                 case "Weapon":
                     // Add weapon right trigger action
-                    if (HandObject != null)
+                    if (HandObject != null && !_dropping)
                     {
                         attackState = State.Shooting;
                         HandObject.SendMessage ("Shoot", 1f);
@@ -232,7 +272,7 @@ public class PlayerController : MonoBehaviour
                     break;
                 default:
                     //If we don't have anything on hand, we are applying melee action
-                    if (attackState != State.Meleeing && normalState != State.Picking)
+                    if (attackState != State.Meleeing && normalState != State.Picking && normalState != State.Holding)
                     {
                         attackState = State.Meleeing;
                         _checkArm = false;
@@ -325,8 +365,8 @@ public class PlayerController : MonoBehaviour
                 tempjs.targetPosition = -5f;
                 _chesthj.spring = tempjs;
 
-                StartCoroutine (PickUpWeaponHelper (_leftArm2hj, _leftArmhj, true, 2f));
-                StartCoroutine (PickUpWeaponHelper (_rightArm2hj, _rightArmhj, false, 2f));
+                StartCoroutine (PickUpWeaponHelper (_leftArm2hj, _leftArmhj, true, 0.1f));
+                StartCoroutine (PickUpWeaponHelper (_rightArm2hj, _rightArmhj, false, 0.1f));
                 break;
             case "Throwable":
 
@@ -346,8 +386,8 @@ public class PlayerController : MonoBehaviour
         // Hand: Limit Max: 90 --> 0
         if (attackState == State.Meleeing || normalState == State.Holding) return;
 
-        LeftHand.GetComponent<Fingers> ().SetTaken (Mathf.Approximately (0f, LeftTrigger));
-        RightHand.GetComponent<Fingers> ().SetTaken (Mathf.Approximately (0f, LeftTrigger));
+        LeftHand.GetComponent<Fingers> ().SetTaken (Mathf.Approximately (0f, LeftTrigger) || _dropping);
+        RightHand.GetComponent<Fingers> ().SetTaken (Mathf.Approximately (0f, LeftTrigger) || _dropping);
 
         if (Mathf.Approximately (1f, LeftTrigger))
             normalState = State.Picking;
@@ -481,6 +521,9 @@ public class PlayerController : MonoBehaviour
         if (Mathf.Approximately (0f, LeftTrigger) && HandObject != null)
             normalState = State.Holding;
 
+        //if (Mathf.Approximately (0f, LeftTrigger) && _dropping)
+        //    _dropping = false;
+
         // For A, B, X, Y Buttons
         // RunCode is Button L Axis
         // JumpCode is Button A
@@ -583,12 +626,17 @@ public class PlayerController : MonoBehaviour
     {
         ResetBodyHelper (_leftArm2hj, _leftArmhj, true);
         ResetBodyHelper (_rightArm2hj, _rightArmhj, false);
+        JointSpring js = _chesthj.spring;
+        js.targetPosition = 0f;
+        _chesthj.spring = js;
     }
 
+    // Reset All Body
     void ResetBodyHelper (HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
     {
         JointLimits lm2 = Arm2hj.limits;
-
+        JointLimits lm = Armhj.limits;
+        JointSpring js = Armhj.spring;
         if (IsLeftHand)
         {
             lm2.max = 70f;
@@ -599,6 +647,11 @@ public class PlayerController : MonoBehaviour
             lm2.max = 90f;
             lm2.min = -75f;
         }
+        lm.min = -90f;
+        lm.max = 90f;
+        js.targetPosition = 0f;
+        Armhj.spring = js;
+        Armhj.limits = lm;
         Arm2hj.limits = lm2;
     }
 

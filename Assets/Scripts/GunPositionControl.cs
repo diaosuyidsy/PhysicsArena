@@ -22,7 +22,7 @@ public class GunPositionControl : MonoBehaviour
             GameObject rh = Owner.GetComponent<PlayerController> ().RightHand;
             //transform.position = (lh.transform.position + rh.transform.position) / 2f;
             Vector3 targetposition = (lh.transform.position + rh.transform.position) / 2f;
-            transform.position = new Vector3(targetposition.x, targetposition.y + VerticalOffset, targetposition.z);
+            transform.position = new Vector3 (targetposition.x, targetposition.y + VerticalOffset, targetposition.z);
             transform.eulerAngles = new Vector3 (0f, Owner.transform.eulerAngles.y + FaceAngleOffset, DownAngle);
         }
     }

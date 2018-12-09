@@ -23,9 +23,9 @@ public class CartButtonController : MonoBehaviour
 
     private void OnCollisionEnter (Collision collision)
     {
-        if (collision.collider.CompareTag (Team.ToString ()))
+        if (collision.transform.CompareTag (Team.ToString ()))
         {
-            collision.transform.parent.parent.parent = transform.parent.parent.parent;
+            collision.transform.parent.parent.parent = transform.parent.parent;
             if (!_pushingDown)
             {
                 _pushingDown = true;
@@ -37,7 +37,7 @@ public class CartButtonController : MonoBehaviour
 
     private void OnCollisionExit (Collision collision)
     {
-        if (collision.collider.CompareTag (Team.ToString ()))
+        if (collision.transform.CompareTag (Team.ToString ()))
         {
             collision.transform.parent.parent.parent = null;
 

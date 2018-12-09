@@ -13,15 +13,19 @@ public class GunPositionControl : MonoBehaviour
 
     public float VerticalOffset = 10f;
 
+    private GameObject lh;
+    private GameObject rh;
+    private Vector3 targetposition;
+
     // Update is called once per frame
     void Update ()
     {
         if (Owner != null)
         {
-            GameObject lh = Owner.GetComponent<PlayerController> ().LeftHand;
-            GameObject rh = Owner.GetComponent<PlayerController> ().RightHand;
+            lh = Owner.GetComponent<PlayerController> ().LeftHand;
+            rh = Owner.GetComponent<PlayerController> ().RightHand;
             //transform.position = (lh.transform.position + rh.transform.position) / 2f;
-            Vector3 targetposition = (lh.transform.position + rh.transform.position) / 2f;
+            targetposition = (lh.transform.position + rh.transform.position) / 2f;
             transform.position = new Vector3 (targetposition.x, targetposition.y + VerticalOffset, targetposition.z);
             transform.eulerAngles = new Vector3 (0f, Owner.transform.eulerAngles.y + FaceAngleOffset, DownAngle);
         }

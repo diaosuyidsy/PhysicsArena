@@ -47,6 +47,7 @@ public class PlayerController : MonoBehaviour
         Jumping,
         Picking,
         Holding,
+        MachineGuning,
         Dead,
         Shooting,
         Meleeing,
@@ -455,6 +456,8 @@ public class PlayerController : MonoBehaviour
             // Add force based on that percentage
             if (IsGrounded ())
                 _rb.AddForce (transform.forward * Thrust * normalizedInputVal);
+            else
+                _rb.AddForce (transform.forward * Thrust * normalizedInputVal * 0.5f);
             // Turn player according to the rotation of the joystick
             //transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
             float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
@@ -600,9 +603,6 @@ public class PlayerController : MonoBehaviour
         else
             lm1.max = Mathf.Approximately (TriggerValue, 1f) ? -74f : 90f;
         Arm2hj.limits = lm1;
-
-        // Arm: Connected Mass Scale 1 --> 0
-        Armhj.connectedMassScale = Mathf.Approximately (TriggerValue, 1f) ? 0f : 1f;
 
         //  Arm: Limits: -90, 90 --> 0, 121
         JointLimits lm = Armhj.limits;

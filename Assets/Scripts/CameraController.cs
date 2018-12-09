@@ -18,6 +18,8 @@ public class CameraController : MonoBehaviour
     private float _zDiffOrigin;
     private Vector3 _desiredPosition;
     private Vector3 _smoothedPosition;
+    private float _desiredFOV;
+    private float _smoothedFOV;
 
     // Use this for initialization
     void Start ()
@@ -46,7 +48,9 @@ public class CameraController : MonoBehaviour
         _desiredPosition = new Vector3 (FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
         _smoothedPosition = Vector3.Lerp (transform.position, _desiredPosition, SmoothSpeed);
         transform.position = _smoothedPosition;
-        GetComponent<Camera> ().fieldOfView += (MaxDistance () - _maxDistanceOrigin) * CameraScaleSpeed;
+        _desiredFOV = GetComponent<Camera> ().fieldOfView + (MaxDistance () - _maxDistanceOrigin) * CameraScaleSpeed;
+        _smoothedFOV = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, _desiredFOV, SmoothSpeed);
+        GetComponent<Camera> ().fieldOfView = _smoothedFOV;
         _maxDistanceOrigin = MaxDistance ();
         GetComponent<Camera> ().fieldOfView = Mathf.Clamp (GetComponent<Camera> ().fieldOfView, FOVSizeMin, FOVSizeMax);
     }

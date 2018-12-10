@@ -12,6 +12,12 @@ public class GameManager : MonoBehaviour
     public GameObject[] Players;
     public LayerMask AllPlayers;
     public Transform RespawnPointHolder;
+    public GameObject[] Team1ResourceRespawnPoints;
+    public GameObject[] Team2ResrouceRespawnPoints;
+    [HideInInspector]
+    public int Team1ResourceSpawnIndex = 0;
+    [HideInInspector]
+    public int Team2ResourceSpawnIndex = 0;
     [HideInInspector]
     public GameObject[] Team1RespawnPts;
     [HideInInspector]

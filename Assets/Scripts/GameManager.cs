@@ -10,9 +10,11 @@ public class GameManager : MonoBehaviour
     public Text Result;
     [HideInInspector]
     public GameObject[] Players;
-    public GameObject RunSandVFX;
     public LayerMask AllPlayers;
+    public Transform RespawnPointHolder;
+    [HideInInspector]
     public GameObject[] Team1RespawnPts;
+    [HideInInspector]
     public GameObject[] Team2RespawnPts;
     public float RespawnTime = 5f;
     [Tooltip ("This is CD for on drop respawn method")]
@@ -51,6 +53,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Start ()
+    {
+        // Respawn Point Holder Setup
+        Transform team1 = RespawnPointHolder.GetChild (0);
+        Transform team2 = RespawnPointHolder.GetChild (1);
+        Team1RespawnPts = new GameObject[team1.childCount];
+        Team2RespawnPts = new GameObject[team2.childCount];
+        for (int i = 0; i < team1.childCount; i++)
+        {
+            Team1RespawnPts[i] = team1.GetChild (i).gameObject;
+        }
+        for (int i = 0; i < team2.childCount; i++)
+        {
+            Team2RespawnPts[i] = team2.GetChild (i).gameObject;
+        }
+    }
     //make the space for weapon to respawn (weapon-spawner) visible in scene
     private void OnDrawGizmosSelected ()
     {

@@ -7,6 +7,8 @@ public class CarPath : MonoBehaviour
     public Transform WaypointsHolder;
     public float speed;
     public int current;
+    public float RotationSpeed = 0.01f;
+    public float maxAnglePerSecond = 10f;
 
     private int dir;
     private bool ending = false;
@@ -66,13 +68,17 @@ public class CarPath : MonoBehaviour
                 Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
                 //GetComponent<Rigidbody> ().MovePosition (pos);
                 transform.position = pos;
+                smoothRotation (target[current].transform, false);
+                //Vector3 relativePos = -target[current].position + transform.position;
+                //Quaternion wantedRotation = Quaternion.LookRotation (relativePos);
+                //transform.rotation = Quaternion.Lerp (transform.rotation, wantedRotation, RotationSpeed);
             }
             // If it became the same position, then turn toward the next target location
             else
             {
                 current++;
-                Vector3 relativePos = -target[current].position + transform.position;
-                transform.rotation = Quaternion.LookRotation (relativePos);
+
+
             }
         }
         // When Team 2 player enters trigger, move the car toward previous element in array.
@@ -91,12 +97,15 @@ public class CarPath : MonoBehaviour
                 Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
                 //GetComponent<Rigidbody> ().MovePosition (pos);
                 transform.position = pos;
+                smoothRotation (target[current].transform, true);
+
             }
             else
             {
                 current--;
-                Vector3 relativePos = target[current].position - transform.position;
-                transform.rotation = Quaternion.LookRotation (relativePos);
+                //Vector3 relativePos = target[current].position - transform.position;
+                //Quaternion wantedRotation = Quaternion.LookRotation (relativePos);
+                //transform.rotation = Quaternion.Lerp (transform.rotation, wantedRotation, RotationSpeed);
             }
         }
         else if (team1Tracker == 0 && team2Tracker == 0)
@@ -105,6 +114,26 @@ public class CarPath : MonoBehaviour
         else if (team1Tracker > 0 && team2Tracker > 0)
         {
         }
+    }
+
+    private void smoothRotation (Transform _target, bool invert)
+    {
+        // first calculate the look vector as normal
+        Vector3 targetDirection = invert ? (-_target.position + transform.position).normalized : (_target.position - transform.position).normalized;
+        Vector3 currentForward = transform.forward;
+        Vector3 newForward = Vector3.Slerp (currentForward, targetDirection, Time.deltaTime * RotationSpeed);
+
+        // now check if the new vector is rotating more than allowed
+        float angle = Vector3.Angle (currentForward, newForward);
+        float maxAngle = maxAnglePerSecond * Time.deltaTime;
+        if (angle > maxAngle)
+        {
+            // it's rotating too fast, clamp the vector
+            newForward = Vector3.Slerp (currentForward, newForward, maxAngle / angle);
+        }
+
+        // assign the new forward to the transform
+        transform.forward = newForward;
     }
 
     public void IncrementTracker (bool increment, TeamNum tn)

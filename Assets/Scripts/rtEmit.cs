@@ -28,11 +28,6 @@ public class rtEmit : MonoBehaviour
     // And it's holding down RT
     public void Shoot (float TriggerVal)
     {
-        //For inspection purpose
-        if (currentAmmo <= 0)
-        {
-            print ("NoAmmo");
-        }
 
         // If player was holding down the RT button
         // CD will add up

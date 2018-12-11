@@ -41,7 +41,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1995234145574352}
   m_LocalRotation: {x: -0.38987544, y: 0.0016464902, z: -0.00069711386, w: -0.9208659}
-  m_LocalPosition: {x: 17.81, y: 16, z: -32.1}
+  m_LocalPosition: {x: 17.81, y: 16, z: -32.85}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -108,6 +108,11 @@ MonoBehaviour:
   particleRenderers:
   - {fileID: 0}
   - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   autoupdate: 1
   blurRadius: 0.02
   thicknessCutoff: 1.2
@@ -129,7 +134,7 @@ MonoBehaviour:
   useRadialDistance: 1
   heightFog: 1
   height: 62.3
-  heightDensity: 0.271
+  heightDensity: 0.2
   startDistance: 774.5
   fogShader: {fileID: 4800000, guid: 8deace52139596940b7802d4310e1d76, type: 3}
 --- !u!114 &114089129262350066
@@ -144,12 +149,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   FollowTarget: {x: 0, y: 0, z: 0}
-  SmoothSpeed: 0.01
+  SmoothSpeed: 0.04
   CameraScaleSpeed: 1
-  FOVSizeMin: 8
+  FOVSizeMin: 10
   FOVSizeMax: 33.4
   XOffset: 0
-  ZOffset: -1.63
+  ZOffset: -0.8
 --- !u!114 &114310758247301780
 MonoBehaviour:
   m_ObjectHideFlags: 1

@@ -26,6 +26,8 @@ public class ResourceCollector : MonoBehaviour
                 TeamTracker++;
                 other.tag = "Untagged";
                 print ("Team 1 Score = " + TeamTracker);
+                if (TeamTracker == 3)
+                    GameManager.GM.GameOver (1);
             }
             else if (other.CompareTag ("Team2Resource"))
             {
@@ -40,6 +42,8 @@ public class ResourceCollector : MonoBehaviour
                 TeamTracker++;
                 other.tag = "Untagged";
                 print ("Team 2 Score = " + TeamTracker);
+                if (TeamTracker == 3)
+                    GameManager.GM.GameOver (2);
             }
             else if (other.CompareTag ("Team1Resource"))
             {

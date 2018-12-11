@@ -42,6 +42,8 @@ public class GameManager : MonoBehaviour
 
     public int weaponTracker = 2;
 
+    private bool _won = false;
+
     private void Awake ()
     {
         GM = this;
@@ -124,8 +126,11 @@ public class GameManager : MonoBehaviour
 
     public void GameOver (int winner)
     {
+        if (_won)
+            return;
         Result.text = "TEAM " + (winner == 1 ? "ONE" : "TWO") + " VICTORY";
         Result.transform.parent.gameObject.SetActive (true);
+        _won = true;
     }
 
     private void Update ()

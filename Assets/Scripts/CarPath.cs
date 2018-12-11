@@ -77,8 +77,6 @@ public class CarPath : MonoBehaviour
             else
             {
                 current++;
-
-
             }
         }
         // When Team 2 player enters trigger, move the car toward previous element in array.
@@ -107,12 +105,6 @@ public class CarPath : MonoBehaviour
                 //Quaternion wantedRotation = Quaternion.LookRotation (relativePos);
                 //transform.rotation = Quaternion.Lerp (transform.rotation, wantedRotation, RotationSpeed);
             }
-        }
-        else if (team1Tracker == 0 && team2Tracker == 0)
-        {
-        }
-        else if (team1Tracker > 0 && team2Tracker > 0)
-        {
         }
     }
 

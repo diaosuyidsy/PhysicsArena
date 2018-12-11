@@ -77,7 +77,7 @@ public class rtEmit : MonoBehaviour
         if (other.collider.CompareTag ("Ground") && currentAmmo == 0)
         {
             currentAmmo = MaxAmmo;
-            //GameManager.GM.HideWeapon (gameObject);
+            ChangeAmmoUI ();
             gameObject.SetActive (false);
         }
     }
@@ -88,6 +88,7 @@ public class rtEmit : MonoBehaviour
         if (other.CompareTag ("DeathZone"))
         {
             currentAmmo = MaxAmmo;
+            ChangeAmmoUI ();
             //GameManager.GM.HideWeapon (gameObject);
             gameObject.SetActive (false);
         }

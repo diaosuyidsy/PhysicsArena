@@ -160,13 +160,16 @@ public class PlayerController : MonoBehaviour
             go.SetActive (false);
         }
         DropHelper ();
-        GameManager.GM.SetToRespawn (gameObject);
-        StartCoroutine (respawn (GameManager.GM.RespawnTime));
+        StartCoroutine (Respawn (GameManager.GM.RespawnTime));
     }
 
-    IEnumerator respawn (float time)
+    IEnumerator Respawn (float time)
     {
+        _rb.isKinematic = true;
+        GameManager.GM.SetToRespawn (gameObject, 5f);
         yield return new WaitForSeconds (time);
+        _rb.isKinematic = false;
+        GameManager.GM.SetToRespawn (gameObject, 0f);
         foreach (GameObject go in OnDeathHidden)
         {
             go.SetActive (true);

@@ -110,17 +110,21 @@ public class GameManager : MonoBehaviour
         weaponTracker++;
     }
 
-    public void SetToRespawn (GameObject player)
+    public void SetToRespawn (GameObject player, float yOffset)
     {
         if (player.CompareTag ("Team1"))
         {
             Team1RespawnIndex = (Team1RespawnIndex + 1) % Team1RespawnPts.Length;
-            player.transform.position = Team1RespawnPts[Team1RespawnIndex].transform.position;
+            Vector3 pos = Team1RespawnPts[Team1RespawnIndex].transform.position;
+            pos.y += yOffset;
+            player.transform.position = pos;
         }
         else
         {
             Team2RespawnIndex = (Team2RespawnIndex + 1) % Team2RespawnPts.Length;
-            player.transform.position = Team2RespawnPts[Team2RespawnIndex].transform.position;
+            Vector3 pos = Team2RespawnPts[Team2RespawnIndex].transform.position;
+            pos.y += yOffset;
+            player.transform.position = pos;
         }
     }
 

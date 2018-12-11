@@ -29,7 +29,7 @@ public class rtEmit : MonoBehaviour
     public void Shoot (float TriggerVal)
     {
         //For inspection purpose
-        if (currentAmmo <= 0)
+        if (currentAmmo <= 1)
         {
             print ("NoAmmo");
         }

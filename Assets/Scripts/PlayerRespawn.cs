@@ -8,7 +8,11 @@ public class PlayerRespawn : MonoBehaviour
     {
         if (other.CompareTag ("Team1") || other.CompareTag ("Team2"))
         {
+            // Add Death VFX
+            Instantiate (VisualEffectManager.VEM.DeathVFX, other.transform.position, VisualEffectManager.VEM.DeathVFX.transform.rotation);
+            // END VFX
             other.SendMessageUpwards ("OnEnterDeathZone");
+
         }
         else if (other.CompareTag ("Team1Resource"))
         {

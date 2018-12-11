@@ -21,6 +21,7 @@ GameObject:
   - component: {fileID: 4859520026582428}
   - component: {fileID: 114862773439473196}
   - component: {fileID: 114970469853377906}
+  - component: {fileID: 114771036219341594}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -222,7 +223,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1957590250137024}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -8.79, y: 0.573, z: 0.37}
+  m_LocalPosition: {x: -8.46, y: 0.573, z: 0.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4304338437477074}
@@ -251,7 +252,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1688055851523950}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.79, y: 0.573, z: -1.03}
+  m_LocalPosition: {x: -8.78, y: 0.573, z: -0.34}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4304338437477074}
@@ -280,7 +281,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1843950751986190}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 7.579, y: 0.573, z: -1.837}
+  m_LocalPosition: {x: 7.21, y: 0.573, z: -1.65}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4145822112079452}
@@ -293,7 +294,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1424668466668684}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -8.17, y: 0.573, z: -0.31}
+  m_LocalPosition: {x: -8.04, y: 0.573, z: -0.32}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4304338437477074}
@@ -306,7 +307,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1987062962473908}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 8.091, y: 0.573, z: -2.41}
+  m_LocalPosition: {x: 8.15, y: 0.573, z: -2.07}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4145822112079452}
@@ -319,7 +320,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1154122529859378}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.865, y: 0.573, z: -1.256}
+  m_LocalPosition: {x: 7.68, y: 0.573, z: -1.21}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 4145822112079452}
@@ -403,6 +404,22 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114771036219341594
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1110226647717638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e723461c9da10034b8c5683c9bdc3421, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DeliverFoodVFX: {fileID: 1030237928468758, guid: 77e3e5a664c1a6e429fa3db19d945116,
+    type: 2}
+  DeathVFX: {fileID: 1767477589881064, guid: ec67dd92410f7b848bde3d5123e60be9, type: 2}
+  VanishVFX: {fileID: 1806593670366712, guid: 78425a18af902144996c7ee531100e1a, type: 2}
+  HitVFX: {fileID: 1231957684890354, guid: 4c2032ee4e2acfe4c99f41e052c4636b, type: 2}
 --- !u!114 &114779379661745278
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -438,6 +455,18 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 7680
   RespawnPointHolder: {fileID: 4916138571872778}
+  Team1ResourceRespawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  Team2ResrouceRespawnPoints:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  Team1ResourceSpawnIndex: 0
+  Team2ResourceSpawnIndex: 0
   Team1RespawnPts:
   - {fileID: 0}
   Team2RespawnPts: []
@@ -451,8 +480,8 @@ MonoBehaviour:
   - MachineGun
   weaponSpawnerCenter: {x: 0, y: 6.71, z: 0}
   weaponSpawnerSize: {x: 5.4, y: 0, z: 6.54}
-  WorldCenter: {x: 12.77, y: 0.42, z: -9.2}
-  WorldSize: {x: 14.78, y: 0, z: 13.17}
+  WorldCenter: {x: 18.03, y: -1.34, z: -16.6}
+  WorldSize: {x: 30.9, y: 0, z: 14.7}
   weaponTracker: 2
 --- !u!114 &114895105059311682
 MonoBehaviour:
@@ -498,8 +527,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f74465dfe022c4e478f5c3f94166f153, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Weapons: []
-  WeaponSpawnCD: 2
+  Weapons:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  WeaponSpawnCD: 8
   NextSpawnAmount: 1
 --- !u!222 &222271503796456172
 CanvasRenderer:

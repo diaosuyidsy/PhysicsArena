@@ -29,7 +29,7 @@ public class rtEmit : MonoBehaviour
     public void Shoot (float TriggerVal)
     {
         //For inspection purpose
-        if (currentAmmo <= 1)
+        if (currentAmmo <= 0)
         {
             print ("NoAmmo");
         }
@@ -78,6 +78,9 @@ public class rtEmit : MonoBehaviour
         {
             currentAmmo = MaxAmmo;
             ChangeAmmoUI ();
+            // Add Vanish VFX
+            Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            // END ADD
             gameObject.SetActive (false);
         }
     }
@@ -88,8 +91,10 @@ public class rtEmit : MonoBehaviour
         if (other.CompareTag ("DeathZone"))
         {
             currentAmmo = MaxAmmo;
+            // Add Vanish VFX
+            Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            // END ADD
             ChangeAmmoUI ();
-            //GameManager.GM.HideWeapon (gameObject);
             gameObject.SetActive (false);
         }
     }

@@ -26,13 +26,20 @@ public class ResourceCollector : MonoBehaviour
                 TeamTracker++;
                 other.tag = "Untagged";
                 print ("Team 1 Score = " + TeamTracker);
+                // Add Delivery Food VFX
+                Instantiate (VisualEffectManager.VEM.DeliverFoodVFX, other.transform.position, VisualEffectManager.VEM.DeliverFoodVFX.transform.rotation);
+                // END Add
                 if (TeamTracker == 3)
                     GameManager.GM.GameOver (1);
             }
             else if (other.CompareTag ("Team2Resource"))
             {
+                // Add Vanish VFX
+                Instantiate (VisualEffectManager.VEM.VanishVFX, other.transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+                // END ADD
                 GameManager.GM.Team2ResourceSpawnIndex = (GameManager.GM.Team2ResourceSpawnIndex + 1) % Team2ResourceSpawnPt.Length;
                 other.transform.position = Team2ResourceSpawnPt[GameManager.GM.Team2ResourceSpawnIndex].transform.position;
+
             }
         }
         else
@@ -42,11 +49,17 @@ public class ResourceCollector : MonoBehaviour
                 TeamTracker++;
                 other.tag = "Untagged";
                 print ("Team 2 Score = " + TeamTracker);
+                // Add Delivery Food VFX
+                Instantiate (VisualEffectManager.VEM.DeliverFoodVFX, other.transform.position, VisualEffectManager.VEM.DeliverFoodVFX.transform.rotation);
+                // END Add
                 if (TeamTracker == 3)
                     GameManager.GM.GameOver (2);
             }
             else if (other.CompareTag ("Team1Resource"))
             {
+                // Add Vanish VFX
+                Instantiate (VisualEffectManager.VEM.VanishVFX, other.transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+                // END ADD
                 GameManager.GM.Team1ResourceSpawnIndex = (GameManager.GM.Team1ResourceSpawnIndex + 1) % Team1ResourceSpawnPt.Length;
                 other.transform.position = Team1ResourceSpawnPt[GameManager.GM.Team1ResourceSpawnIndex].transform.position;
             }

@@ -77,7 +77,10 @@ public class rtEmit : MonoBehaviour
         if (other.collider.CompareTag ("Ground") && currentAmmo == 0)
         {
             currentAmmo = MaxAmmo;
-            //GameManager.GM.HideWeapon (gameObject);
+            ChangeAmmoUI ();
+            // Add Vanish VFX
+            Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            // END ADD
             gameObject.SetActive (false);
         }
     }
@@ -88,7 +91,10 @@ public class rtEmit : MonoBehaviour
         if (other.CompareTag ("DeathZone"))
         {
             currentAmmo = MaxAmmo;
-            //GameManager.GM.HideWeapon (gameObject);
+            // Add Vanish VFX
+            Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            // END ADD
+            ChangeAmmoUI ();
             gameObject.SetActive (false);
         }
     }

@@ -10,9 +10,17 @@ public class GameManager : MonoBehaviour
     public Text Result;
     [HideInInspector]
     public GameObject[] Players;
-    public GameObject RunSandVFX;
     public LayerMask AllPlayers;
+    public Transform RespawnPointHolder;
+    public GameObject[] Team1ResourceRespawnPoints;
+    public GameObject[] Team2ResrouceRespawnPoints;
+    [HideInInspector]
+    public int Team1ResourceSpawnIndex = 0;
+    [HideInInspector]
+    public int Team2ResourceSpawnIndex = 0;
+    [HideInInspector]
     public GameObject[] Team1RespawnPts;
+    [HideInInspector]
     public GameObject[] Team2RespawnPts;
     public float RespawnTime = 5f;
     [Tooltip ("This is CD for on drop respawn method")]
@@ -34,14 +42,17 @@ public class GameManager : MonoBehaviour
 
     public int weaponTracker = 2;
 
+    private bool _won = false;
+
     private void Awake ()
     {
         GM = this;
         GameObject[] team1Players = GameObject.FindGameObjectsWithTag ("Team1");
         GameObject[] team2Players = GameObject.FindGameObjectsWithTag ("Team2");
         Players = new GameObject[team1Players.Length + team2Players.Length];
+        float length = team1Players.Length > team2Players.Length ? team1Players.Length : team2Players.Length;
         int index = 0;
-        for (int i = 0; i < team1Players.Length; i++)
+        for (int i = 0; i < length; i++)
         {
             Players[index] = team1Players[i];
             index++;
@@ -50,6 +61,22 @@ public class GameManager : MonoBehaviour
         }
     }
 
+    private void Start ()
+    {
+        // Respawn Point Holder Setup
+        Transform team1 = RespawnPointHolder.GetChild (0);
+        Transform team2 = RespawnPointHolder.GetChild (1);
+        Team1RespawnPts = new GameObject[team1.childCount];
+        Team2RespawnPts = new GameObject[team2.childCount];
+        for (int i = 0; i < team1.childCount; i++)
+        {
+            Team1RespawnPts[i] = team1.GetChild (i).gameObject;
+        }
+        for (int i = 0; i < team2.childCount; i++)
+        {
+            Team2RespawnPts[i] = team2.GetChild (i).gameObject;
+        }
+    }
     //make the space for weapon to respawn (weapon-spawner) visible in scene
     private void OnDrawGizmosSelected ()
     {
@@ -83,24 +110,31 @@ public class GameManager : MonoBehaviour
         weaponTracker++;
     }
 
-    public void SetToRespawn (GameObject player)
+    public void SetToRespawn (GameObject player, float yOffset)
     {
         if (player.CompareTag ("Team1"))
         {
             Team1RespawnIndex = (Team1RespawnIndex + 1) % Team1RespawnPts.Length;
-            player.transform.position = Team1RespawnPts[Team1RespawnIndex].transform.position;
+            Vector3 pos = Team1RespawnPts[Team1RespawnIndex].transform.position;
+            pos.y += yOffset;
+            player.transform.position = pos;
         }
         else
         {
             Team2RespawnIndex = (Team2RespawnIndex + 1) % Team2RespawnPts.Length;
-            player.transform.position = Team2RespawnPts[Team2RespawnIndex].transform.position;
+            Vector3 pos = Team2RespawnPts[Team2RespawnIndex].transform.position;
+            pos.y += yOffset;
+            player.transform.position = pos;
         }
     }
 
     public void GameOver (int winner)
     {
+        if (_won)
+            return;
         Result.text = "TEAM " + (winner == 1 ? "ONE" : "TWO") + " VICTORY";
         Result.transform.parent.gameObject.SetActive (true);
+        _won = true;
     }
 
     private void Update ()

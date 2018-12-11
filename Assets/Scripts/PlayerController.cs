@@ -132,11 +132,15 @@ public class PlayerController : MonoBehaviour
     // This is primarily for dropping item when velocity change too much 
     private void FixedUpdate ()
     {
-        if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
-        {
+        //if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
+        //{
+        //    DropHelper ();
+        //}
+        if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
+
             DropHelper ();
-        }
-        _previousFrameVel = _rb.velocity.magnitude;
+
+        //_previousFrameVel = _rb.velocity.magnitude;
 
     }
 
@@ -156,13 +160,16 @@ public class PlayerController : MonoBehaviour
             go.SetActive (false);
         }
         DropHelper ();
-        GameManager.GM.SetToRespawn (gameObject);
-        StartCoroutine (respawn (GameManager.GM.RespawnTime));
+        StartCoroutine (Respawn (GameManager.GM.RespawnTime));
     }
 
-    IEnumerator respawn (float time)
+    IEnumerator Respawn (float time)
     {
+        _rb.isKinematic = true;
+        GameManager.GM.SetToRespawn (gameObject, 5f);
         yield return new WaitForSeconds (time);
+        _rb.isKinematic = false;
+        GameManager.GM.SetToRespawn (gameObject, 0f);
         foreach (GameObject go in OnDeathHidden)
         {
             go.SetActive (true);
@@ -425,6 +432,12 @@ public class PlayerController : MonoBehaviour
 
     public void OnMeleeHit (Vector3 force)
     {
+        // Add HIT VFX
+        //Vector3 temp = transform.position;
+        //temp.y += 1f;
+        print (Mathf.Atan2 (force.z, force.x) * Mathf.Rad2Deg);
+        Instantiate (VisualEffectManager.VEM.HitVFX, transform.position + force.normalized * 0.3f, VisualEffectManager.VEM.HitVFX.transform.rotation, transform);
+        // END VFX
         _rb.AddForce (force, ForceMode.Impulse);
     }
 
@@ -701,7 +714,7 @@ public class PlayerController : MonoBehaviour
         float initLmTargetPosition = js.targetPosition;
         float inithlMax = hl.max;
         float inithlMin = hl.min;
-        Armhj.connectedMassScale = 0.2f;
+        //Armhj.connectedMassScale = 0.2f;
 
         while (elapesdTime < time)
         {

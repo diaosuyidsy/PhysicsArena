@@ -48,7 +48,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1235767394655852
 GameObject:
   m_ObjectHideFlags: 0
@@ -883,7 +883,7 @@ MonoBehaviour:
   Speed: 30
   BackFireThrust: 3
   UpThrust: 0.5
-  MaxAmmo: 1000
+  MaxAmmo: 168
   currentAmmo: 0
   ShootMaxCD: 0.3
 --- !u!114 &114382476855287702
@@ -5078,10 +5078,9 @@ MonoBehaviour:
   numParticles: 800
   emissionMethod: 0
   speed: 0
-  lifespan: 1
+  lifespan: 0.3
   randomVelocity: 0.012
-  emitterShapes:
-  - {fileID: 114549212216446674}
+  emitterShapes: []
   life:
   - 0
   - 0

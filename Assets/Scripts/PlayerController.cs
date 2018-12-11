@@ -506,7 +506,10 @@ public class PlayerController : MonoBehaviour
             // Turn on the animator of the Leg Swing Preference
             float playerVelRot = Mathf.Atan2 (_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
 
-            LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded () && (Mathf.Abs (playerVelRot - playerRot) < 90f);
+
+
+            //LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded () && (Mathf.Abs (playerVelRot - playerRot) < 90f);
+            LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded ();
 
             RotationSpeed = Mathf.Clamp (RotationSpeed, 4f, 15f);
             Transform target = TurnReference.transform.GetChild (0);

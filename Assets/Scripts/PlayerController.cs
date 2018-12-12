@@ -389,7 +389,6 @@ public class PlayerController : MonoBehaviour
                 StartCoroutine (PickUpWeaponHelper (_rightArm2hj, _rightArmhj, false, 0.1f));
                 break;
             case "Throwable":
-
                 break;
             default:
                 break;
@@ -540,92 +539,6 @@ public class PlayerController : MonoBehaviour
         if (Mathf.Approximately (0f, LeftTrigger) && HandObject != null)
             normalState = State.Holding;
     }
-
-    //    private void CheckAllInput ()
-    //    {
-    //        // For L&R Triggers
-    //#if UNITY_EDITOR_OSX
-    //        LTStr = "Joy" + PlayerControllerNumber + "Axis5";
-    //        RTStr = "Joy" + PlayerControllerNumber + "Axis6";
-    //#endif
-
-    //#if UNITY_EDITOR_WIN
-    //        LTStr = "Joy" + PlayerControllerNumber + "Axis9";
-    //        RTStr = "Joy" + PlayerControllerNumber + "Axis10";
-    //#endif
-    //        RightTrigger = Input.GetAxis (RTStr);
-    //        RightTrigger = Mathf.Approximately (RightTrigger, 0f) || Mathf.Approximately (RightTrigger, -1f) ? 0f : 1f;
-
-    //        LeftTrigger = Input.GetAxis (LTStr);
-    //        LeftTrigger = Mathf.Approximately (LeftTrigger, 0f) || Mathf.Approximately (LeftTrigger, -1f) ? 0f : 1f;
-
-    //        // Only change to holding state when player released the LT button and holding something
-    //        if (Mathf.Approximately (0f, LeftTrigger) && HandObject != null)
-    //            normalState = State.Holding;
-
-    //        //if (Mathf.Approximately (0f, LeftTrigger) && _dropping)
-    //        //    _dropping = false;
-
-    //        // For A, B, X, Y Buttons
-    //        // RunCode is Button L Axis
-    //        // JumpCode is Button A
-    //        switch (PlayerControllerNumber)
-    //        {
-    //            case "1":
-    //#if UNITY_EDITOR_OSX
-    //                JumpCode = KeyCode.Joystick1Button16;
-    //                RunCode = KeyCode.Joystick1Button11;
-    //                YButton = KeyCode.Joystick1Button19;
-    //#endif
-    //#if UNITY_EDITOR_WIN
-    //                JumpCode = KeyCode.Joystick1Button0;
-    //                RunCode = KeyCode.Joystick1Button8;
-    //                YButton = KeyCode.Joystick1Button3;
-
-    //#endif
-    //                break;
-    //            case "2":
-    //#if UNITY_EDITOR_OSX
-    //                JumpCode = KeyCode.Joystick2Button16;
-    //                RunCode = KeyCode.Joystick2Button11;
-    //                YButton = KeyCode.Joystick2Button19;
-
-    //#endif
-    //#if UNITY_EDITOR_WIN
-    //                JumpCode = KeyCode.Joystick2Button0;
-    //                RunCode = KeyCode.Joystick2Button8;
-    //                YButton = KeyCode.Joystick2Button3;
-    //#endif
-    //                break;
-    //            case "3":
-    //#if UNITY_EDITOR_OSX
-    //                JumpCode = KeyCode.Joystick3Button16;
-    //                RunCode = KeyCode.Joystick3Button11;
-    //                YButton = KeyCode.Joystick3Button19;
-
-    //#endif
-    //#if UNITY_EDITOR_WIN
-    //                JumpCode = KeyCode.Joystick3Button0;
-    //                RunCode = KeyCode.Joystick3Button8;
-    //                YButton = KeyCode.Joystick3Button3;
-    //#endif
-    //                break;
-    //            case "4":
-    //#if UNITY_EDITOR_OSX
-    //                JumpCode = KeyCode.Joystick4Button16;
-    //                RunCode = KeyCode.Joystick4Button11;
-    //                YButton = KeyCode.Joystick4Button19;
-
-    //#endif
-    //#if UNITY_EDITOR_WIN
-    //                JumpCode = KeyCode.Joystick4Button0;
-    //                RunCode = KeyCode.Joystick4Button8;
-    //                YButton = KeyCode.Joystick4Button3;
-    //#endif
-    //                break;
-    //        }
-
-    //    }
 
     private bool IsGrounded ()
     {

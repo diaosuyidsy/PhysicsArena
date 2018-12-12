@@ -9,6 +9,7 @@ public class CarPath : MonoBehaviour
     public int current;
     public float RotationSpeed = 0.01f;
     public float maxAnglePerSecond = 10f;
+    public BombVFXController VFXController;
 
     private int dir;
     private bool ending = false;
@@ -66,16 +67,15 @@ public class CarPath : MonoBehaviour
                 dir = 1;
                 // Move car toward target location.
                 Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
-                //GetComponent<Rigidbody> ().MovePosition (pos);
                 transform.position = pos;
                 smoothRotation (target[current].transform, false);
-                //Vector3 relativePos = -target[current].position + transform.position;
-                //Quaternion wantedRotation = Quaternion.LookRotation (relativePos);
-                //transform.rotation = Quaternion.Lerp (transform.rotation, wantedRotation, RotationSpeed);
             }
             // If it became the same position, then turn toward the next target location
             else
             {
+                // Apply Bomb Visual Effect
+                VFXController.VisualEffect (current);
+                // End Apply Bomb Visual Effect
                 current++;
             }
         }
@@ -93,7 +93,6 @@ public class CarPath : MonoBehaviour
                 dir = 2;
                 // Move car toward target location.
                 Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
-                //GetComponent<Rigidbody> ().MovePosition (pos);
                 transform.position = pos;
                 smoothRotation (target[current].transform, true);
 
@@ -101,9 +100,6 @@ public class CarPath : MonoBehaviour
             else
             {
                 current--;
-                //Vector3 relativePos = target[current].position - transform.position;
-                //Quaternion wantedRotation = Quaternion.LookRotation (relativePos);
-                //transform.rotation = Quaternion.Lerp (transform.rotation, wantedRotation, RotationSpeed);
             }
         }
     }

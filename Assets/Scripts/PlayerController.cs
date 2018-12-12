@@ -442,7 +442,6 @@ public class PlayerController : MonoBehaviour
         // Add HIT VFX
         //Vector3 temp = transform.position;
         //temp.y += 1f;
-        print (Mathf.Atan2 (force.z, force.x) * Mathf.Rad2Deg);
         Instantiate (VisualEffectManager.VEM.HitVFX, transform.position + force.normalized * 0.3f, VisualEffectManager.VEM.HitVFX.transform.rotation, transform);
         // END VFX
         _rb.AddForce (force, ForceMode.Impulse);

@@ -14,6 +14,7 @@ public class CameraController : MonoBehaviour
     public float FOVSizeMax = 35f;
     public float XOffset = 0f;
     public float ZOffset = -0.33f;
+    public float WonFOVSize = 6f;
 
     private float _maxDistanceOrigin;
     private float _xDiffOrigin;
@@ -22,6 +23,7 @@ public class CameraController : MonoBehaviour
     private Vector3 _smoothedPosition;
     private float _desiredFOV;
     private float _smoothedFOV;
+    private bool _winLock = false;
 
     // Use this for initialization
     void Start ()
@@ -46,6 +48,12 @@ public class CameraController : MonoBehaviour
     // Update is called once per frame
     void Update ()
     {
+        // If player won, then do Won Logic and lock others
+        if (_winLock)
+        {
+            GetComponent<Camera> ().fieldOfView = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, WonFOVSize, SmoothSpeed);
+            return;
+        }
         SetTarget ();
         _desiredPosition = new Vector3 (FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
         _smoothedPosition = Vector3.Lerp (transform.position, _desiredPosition, SmoothSpeed);
@@ -55,6 +63,11 @@ public class CameraController : MonoBehaviour
         _desiredFOV = 1.5f * MaxDistance () + 3.99f;
         GetComponent<Camera> ().fieldOfView = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, _desiredFOV, SmoothSpeed);
         GetComponent<Camera> ().fieldOfView = Mathf.Clamp (GetComponent<Camera> ().fieldOfView, FOVSizeMin, FOVSizeMax);
+    }
+
+    public void WinCameraZoom (Transform tar)
+    {
+        FollowTarget = tar.position;
     }
 
     void SetTarget (bool withOffset = true)

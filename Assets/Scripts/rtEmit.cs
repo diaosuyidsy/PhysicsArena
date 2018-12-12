@@ -14,6 +14,7 @@ public class rtEmit : MonoBehaviour
     public int MaxAmmo = 1000;
     public int currentAmmo;
     public float ShootMaxCD = 0.3f;
+    public LayerMask OnHitDisappear;
 
     private float _shootCD = 0f;
     private GunPositionControl _gpc;
@@ -23,7 +24,6 @@ public class rtEmit : MonoBehaviour
         currentAmmo = MaxAmmo;
         _gpc = GetComponent<GunPositionControl> ();
     }
-
     // This function is called by PlayerController, when player is holding a gun
     // And it's holding down RT
     public void Shoot (float TriggerVal)
@@ -67,6 +67,7 @@ public class rtEmit : MonoBehaviour
     }
 
     // If weapon collide to the ground, and has no ammo, then despawn it
+    // And if weapon does not collide to the ground or other allowed 
     private void OnCollisionEnter (Collision other)
     {
         if (other.collider.CompareTag ("Ground") && currentAmmo == 0)
@@ -77,6 +78,10 @@ public class rtEmit : MonoBehaviour
             Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
             // END ADD
             gameObject.SetActive (false);
+        }
+        if (((1 << other.gameObject.layer) & OnHitDisappear) != 0)
+        {
+            StartCoroutine (DisappearAfterAWhile (3f));
         }
     }
 
@@ -92,6 +97,17 @@ public class rtEmit : MonoBehaviour
             ChangeAmmoUI ();
             gameObject.SetActive (false);
         }
+    }
+
+    IEnumerator DisappearAfterAWhile (float time)
+    {
+        yield return new WaitForSeconds (time);
+        currentAmmo = MaxAmmo;
+        // Add Vanish VFX
+        Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+        // END ADD
+        ChangeAmmoUI ();
+        gameObject.SetActive (false);
     }
 
 }

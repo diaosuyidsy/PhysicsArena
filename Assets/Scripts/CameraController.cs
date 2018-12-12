@@ -41,8 +41,10 @@ public class CameraController : MonoBehaviour
         }
         _maxDistanceOrigin = maxDist;
         // Set X and Z Original Difference
-        _xDiffOrigin = transform.position.x - FollowTarget.x;
+        //_xDiffOrigin = transform.position.x - FollowTarget.x;
         _zDiffOrigin = transform.position.z - FollowTarget.z;
+        _xDiffOrigin = 0f;
+        //iffOrigin = 0f;
     }
 
     // Update is called once per frame

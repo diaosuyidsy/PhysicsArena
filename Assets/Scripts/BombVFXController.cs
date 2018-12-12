@@ -17,8 +17,17 @@ public class BombVFXController : MonoBehaviour
         }
     }
 
-    public void VisualEffect (int curwp)
+    public void VisualEffect (bool on, int curwp, int MAXWP)
     {
-
+        foreach (GameObject go in BombVFXs)
+        {
+            go.GetComponent<ParticleSystem> ().Stop (true);
+        }
+        if (!on) return;
+        int amount = Mathf.Abs ((MAXWP / 2 - curwp) / 2);
+        for (int i = 0; i < amount; i++)
+        {
+            BombVFXs[i].GetComponent<ParticleSystem> ().Play (true);
+        }
     }
 }

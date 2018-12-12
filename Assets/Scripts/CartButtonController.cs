@@ -79,6 +79,7 @@ public class CartButtonController : MonoBehaviour
             yield return new WaitForEndOfFrame ();
         }
         CarScript.IncrementTracker (true, teamNum);
+        CarScript.EnableBombVFX ();
         _pushDownRan = true;
     }
 }

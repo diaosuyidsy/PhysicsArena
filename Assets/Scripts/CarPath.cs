@@ -74,7 +74,7 @@ public class CarPath : MonoBehaviour
             else
             {
                 // Apply Bomb Visual Effect
-                VFXController.VisualEffect (current);
+                VFXController.VisualEffect (true, current, WaypointsHolder.childCount);
                 // End Apply Bomb Visual Effect
                 current++;
             }
@@ -99,9 +99,23 @@ public class CarPath : MonoBehaviour
             }
             else
             {
+                // Apply Bomb Visual Effect
+                VFXController.VisualEffect (true, current, WaypointsHolder.childCount);
+                // End Apply Bomb Visual Effect
                 current--;
             }
         }
+        else
+        {
+            // Apply Bomb Visual Effect
+            VFXController.VisualEffect (false, 0, 0);
+            // End Apply Bomb Visual Effect
+        }
+    }
+
+    public void EnableBombVFX ()
+    {
+        VFXController.VisualEffect (true, current, WaypointsHolder.childCount);
     }
 
     private void smoothRotation (Transform _target, bool invert)

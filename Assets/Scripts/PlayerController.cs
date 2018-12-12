@@ -11,7 +11,10 @@ public class PlayerController : MonoBehaviour
     public float JumpForce = 300f;
     public LayerMask JumpMask;
     public float RotationSpeed = 200f;
-    public float RunSpeedMultiplier = 1f;
+    [Tooltip ("For Chicken, it should be 2, Duck, could be 1.9")]
+    public float WalkSpeed = 2f;
+    [Tooltip ("It should be the same speed, little less than Duck's normal WalkSpeed")]
+    public float PickUpSpeed = 1.8f;
     [Header ("Player Body Setting Section")]
     public GameObject HeadGunPos;
     public GameObject LegSwingReference;
@@ -118,6 +121,7 @@ public class PlayerController : MonoBehaviour
         _leftHandhj = LeftArms[2].GetComponent<HingeJoint> ();
         _rightHandhj = RightArms[2].GetComponent<HingeJoint> ();
         _freezeBody = new Vector3 (0, transform.localEulerAngles.y, 0);
+        LegSwingReference.GetComponent<Animator> ().SetFloat ("WalkSpeedMultiplier", WalkSpeed / 2f);
     }
 
     // Update is called once per frame
@@ -260,6 +264,8 @@ public class PlayerController : MonoBehaviour
         }
         // Nullify the holder
         HandObject = null;
+        // Change the speed back to normal
+        LegSwingReference.GetComponent<Animator> ().SetFloat ("WalkSpeedMultiplier", WalkSpeed / 2f);
         // Clear the right trigger register
         _rightTriggerRegister = "";
     }
@@ -373,6 +379,10 @@ public class PlayerController : MonoBehaviour
     {
         // Actual Logic Below
         _rightTriggerRegister = tag;
+        // if pick up resource, then slow down
+        if (tag == "Team1Resource" || tag == "Team2Resource")
+            LegSwingReference.GetComponent<Animator> ().SetFloat ("WalkSpeedMultiplier", PickUpSpeed / 2f);
+
         switch (tag)
         {
             case "Team1Resource":
@@ -421,19 +431,6 @@ public class PlayerController : MonoBehaviour
         tempjs.targetPosition = (Mathf.Approximately (LeftTrigger, 1f) ? 1f : 0f) * 90f;
         tempjs.targetPosition = Mathf.Clamp (tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
         _chesthj.spring = tempjs;
-    }
-
-    private void CheckRun ()
-    {
-        if (Input.GetKey (RunCode) && IsGrounded ())
-        {
-            LegSwingReference.GetComponent<Animator> ().speed = 2f;
-            _rb.AddForce (transform.forward * Thrust * RunSpeedMultiplier);
-        }
-        else
-        {
-            LegSwingReference.GetComponent<Animator> ().speed = 1.6f;
-        }
     }
 
     public void OnMeleeHit (Vector3 force)
@@ -701,3 +698,16 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 }
+
+//private void CheckRun ()
+//{
+//    if (Input.GetKey (RunCode) && IsGrounded ())
+//    {
+//        LegSwingReference.GetComponent<Animator> ().speed = 2f;
+//        _rb.AddForce (transform.forward * Thrust * RunSpeedMultiplier);
+//    }
+//    else
+//    {
+//        LegSwingReference.GetComponent<Animator> ().speed = 1.6f;
+//    }
+//}

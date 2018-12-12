@@ -32,7 +32,7 @@ public class CarPath : MonoBehaviour
     {
         if (ending)
         {
-            GameManager.GM.GameOver (winner);
+            //GameManager.GM.GameOver (winner);
             return;
         }
 
@@ -42,6 +42,7 @@ public class CarPath : MonoBehaviour
             GetComponent<Rigidbody> ().velocity = Vector3.zero;
             ending = true;
             winner = 1;
+            Camera.main.GetComponent<CameraController> ().OnWinCameraZoom (transform);
             return;
         }
 
@@ -51,6 +52,7 @@ public class CarPath : MonoBehaviour
             GetComponent<Rigidbody> ().velocity = Vector3.zero;
             ending = true;
             winner = 2;
+            Camera.main.GetComponent<CameraController> ().OnWinCameraZoom (transform);
             return;
         }
         // When Team 1 player enters trigger, move the car toward next element in an array.

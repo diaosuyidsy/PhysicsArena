@@ -53,6 +53,9 @@ public class CameraController : MonoBehaviour
         // If player won, then do Won Logic and lock others
         if (_winLock)
         {
+            _desiredPosition = new Vector3 (FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
+            _smoothedPosition = Vector3.Lerp (transform.position, _desiredPosition, SmoothSpeed);
+            transform.position = _smoothedPosition;
             GetComponent<Camera> ().fieldOfView = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, WonFOVSize, SmoothSpeed);
             return;
         }
@@ -67,8 +70,9 @@ public class CameraController : MonoBehaviour
         GetComponent<Camera> ().fieldOfView = Mathf.Clamp (GetComponent<Camera> ().fieldOfView, FOVSizeMin, FOVSizeMax);
     }
 
-    public void WinCameraZoom (Transform tar)
+    public void OnWinCameraZoom (Transform tar)
     {
+        _winLock = true;
         FollowTarget = tar.position;
     }
 

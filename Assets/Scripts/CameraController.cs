@@ -9,7 +9,6 @@ public class CameraController : MonoBehaviour
 
     public float SmoothSpeed = 0.04f;
 
-    public float CameraScaleSpeed = 1f;
     public float FOVSizeMin = 8f;
     public float FOVSizeMax = 35f;
     public float XOffset = 0f;
@@ -65,7 +64,7 @@ public class CameraController : MonoBehaviour
         transform.position = _smoothedPosition;
         //GetComponent<Camera> ().fieldOfView += (MaxDistance () - _maxDistanceOrigin) * CameraScaleSpeed;
         //_maxDistanceOrigin = MaxDistance ();
-        _desiredFOV = 1.5f * MaxDistance () + 3.99f;
+        _desiredFOV = 2f * MaxDistance () + 3.99f;
         GetComponent<Camera> ().fieldOfView = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, _desiredFOV, SmoothSpeed);
         GetComponent<Camera> ().fieldOfView = Mathf.Clamp (GetComponent<Camera> ().fieldOfView, FOVSizeMin, FOVSizeMax);
     }

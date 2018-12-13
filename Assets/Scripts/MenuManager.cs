@@ -9,6 +9,7 @@ public class MenuManager : MonoBehaviour
 {
     public Image StartImage;
     public Image IntroImage;
+    public Image GameImage;
 
     private Player _player1;
     private Player _player2;
@@ -36,6 +37,11 @@ public class MenuManager : MonoBehaviour
         temp.a = Mathf.Sin (Time.time);
         if (temp.a <= 0f) temp.a *= -1f;
         StartImage.color = temp;
+
+        Color temp2 = GameImage.color;
+        temp2.a = Mathf.Sin (Time.time);
+        if (temp2.a <= 0f) temp2.a *= -1f;
+        GameImage.color = temp2;
 
         if (!_pressedFirst && (_player1.GetButton ("Jump") ||
            _player2.GetButton ("Jump") ||
@@ -66,5 +72,6 @@ public class MenuManager : MonoBehaviour
     {
         yield return new WaitForSeconds (time);
         _allowClickTwice = true;
+        GameImage.gameObject.SetActive (true);
     }
 }

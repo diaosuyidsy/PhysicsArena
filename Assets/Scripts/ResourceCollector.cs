@@ -29,8 +29,11 @@ public class ResourceCollector : MonoBehaviour
                 // Add Delivery Food VFX
                 Instantiate (VisualEffectManager.VEM.DeliverFoodVFX, other.transform.position, VisualEffectManager.VEM.DeliverFoodVFX.transform.rotation);
                 // END Add
-                //if (TeamTracker == 3)
-                //GameManager.GM.GameOver (1);
+                if (TeamTracker == 1)
+                {
+                    GameManager.GM.GameOver (1, gameObject);
+                    Camera.main.GetComponent<CameraController> ().OnWinCameraZoom (transform);
+                }
             }
             else if (other.CompareTag ("Team2Resource"))
             {
@@ -52,8 +55,12 @@ public class ResourceCollector : MonoBehaviour
                 // Add Delivery Food VFX
                 Instantiate (VisualEffectManager.VEM.DeliverFoodVFX, other.transform.position, VisualEffectManager.VEM.DeliverFoodVFX.transform.rotation);
                 // END Add
-                //if (TeamTracker == 3)
-                //GameManager.GM.GameOver (2);
+                if (TeamTracker == 1)
+                {
+                    GameManager.GM.GameOver (2, gameObject);
+                    Camera.main.GetComponent<CameraController> ().OnWinCameraZoom (transform);
+                }
+
             }
             else if (other.CompareTag ("Team1Resource"))
             {

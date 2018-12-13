@@ -6,9 +6,9 @@ Material:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: ChickRose
-  m_Shader: {fileID: 4800000, guid: 80412fe88398cd147be3aacebe2c3fe3, type: 3}
-  m_ShaderKeywords: OUTLINES TCP2_DISABLE_WRAPPED_LIGHT TCP2_STYLIZED_FRESNEL TCP2_ZSMOOTH_ON
+  m_Name: DuckTotem
+  m_Shader: {fileID: 4800000, guid: f8d49205b3b0a644195633020367689d, type: 3}
+  m_ShaderKeywords: TCP2_DISABLE_WRAPPED_LIGHT _NORMALMAP _PARALLAXMAP
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -19,7 +19,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _BumpMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 44dac1a5acfc6284e98acff4392d516e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _DetailAlbedoMap:
@@ -39,7 +39,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 030ecdaa96f03604bb15debd34b12d5e, type: 3}
+        m_Texture: {fileID: 2800000, guid: 7525c76ed80b5fc46895173e8881037e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -47,11 +47,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _OcclusionMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: 4206e968bcded854a84ac25c58e1b457, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ParallaxMap:
-        m_Texture: {fileID: 0}
+        m_Texture: {fileID: 2800000, guid: dc99df89f9b27b543a56395115c6410c, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _Ramp:
@@ -72,9 +72,9 @@ Material:
     - _Offset1: 0
     - _Offset2: 0
     - _Outline: 1.5
-    - _Parallax: 0.02
+    - _Parallax: 0.0058
     - _RampSmooth: 0.469
-    - _RampSmoothAdd: 0.75
+    - _RampSmoothAdd: 0.719
     - _RampThreshold: 0.284
     - _RimMax: 0.85
     - _RimMin: 0.652
@@ -89,16 +89,16 @@ Material:
     - _TCP2_OUTLINE_TEXTURED: 0
     - _TCP2_RAMPTEXT: 0
     - _TCP2_SPEC_TOON: 0
-    - _TCP2_STYLIZED_FRESNEL: 1
-    - _TCP2_ZSMOOTH_ON: 1
+    - _TCP2_STYLIZED_FRESNEL: 0
+    - _TCP2_ZSMOOTH_ON: 0
     - _TexLod: 5
     - _UVSec: 0
     - _ZSmooth: 0.04
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.64584297, g: 0.60488605, b: 0.6509434, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HColor: {r: 1, g: 1, b: 1, a: 1}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 1}
     - _RimColor: {r: 0.8, g: 0.8, b: 0.8, a: 0.6}
-    - _SColor: {r: 0.78248096, g: 0.5990566, b: 1, a: 1}
+    - _SColor: {r: 0.6574425, g: 0.6, b: 1, a: 1}

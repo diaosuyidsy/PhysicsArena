@@ -9,6 +9,7 @@ public class Fingers : MonoBehaviour
     public float Force = 4000;
     public GameObject OtherHand;
     public GameObject Hip;
+    public float GunVerticalOffset = 0.087f;
     Rigidbody rb;
 
     [HideInInspector]
@@ -51,10 +52,10 @@ public class Fingers : MonoBehaviour
             {
                 // Tell the collected weapon who picked it up
                 col.collider.GetComponent<GunPositionControl> ().Owner = Hip;
-                //Destroy (col.collider.GetComponent<Rigidbody> ());
                 col.collider.GetComponent<Rigidbody> ().isKinematic = true;
-                //col.collider.isTrigger = true;
                 col.collider.gameObject.layer = gameObject.layer;
+                // Change the Gun's vertical offset according to duck or chicken
+                col.collider.GetComponent<GunPositionControl> ().VerticalOffset = GunVerticalOffset;
             }
             else
             {

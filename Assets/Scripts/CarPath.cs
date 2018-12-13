@@ -32,12 +32,14 @@ public class CarPath : MonoBehaviour
     {
         if (ending)
         {
+            Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
+            transform.position = pos;
             //GameManager.GM.GameOver (winner);
             return;
         }
 
         // When the car gets to Team 1's home, it stops and print out "Team 1 wins."
-        if (current == target.Length)
+        if (current == target.Length - 1)
         {
             GetComponent<Rigidbody> ().velocity = Vector3.zero;
             ending = true;
@@ -47,7 +49,7 @@ public class CarPath : MonoBehaviour
         }
 
         // When the car gets to Team 2's home, it stops and print out "Team 2 wins."
-        if (current == -1)
+        if (current == 0)
         {
             GetComponent<Rigidbody> ().velocity = Vector3.zero;
             ending = true;

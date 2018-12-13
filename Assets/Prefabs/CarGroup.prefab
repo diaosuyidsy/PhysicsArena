@@ -1060,7 +1060,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1296707968277556}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.8359559, y: -0.3128644, z: -0.0000000129608235}
+  m_LocalPosition: {x: -0.8359559, y: -0.374, z: -0.0000000129608235}
   m_LocalScale: {x: 1.2483, y: 1.2483, z: 1.2483}
   m_Children:
   - {fileID: 4841837771744380}
@@ -1088,7 +1088,7 @@ Transform:
   m_GameObject: {fileID: 1057320808311000}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: -0.35046345, z: -0.0000000129608235}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 1, y: 0.5, z: 1}
   m_Children: []
   m_Father: {fileID: 4615504213805332}
   m_RootOrder: 2
@@ -1473,7 +1473,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1390150625948050}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0.00012969995, y: 0.000091552734, z: -0.0016937258}
+  m_LocalPosition: {x: 0.00012969995, y: -0.07, z: -0.0016937258}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4070363678386880}
@@ -1491,7 +1491,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1349760135446612}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.8359559, y: -0.3128644, z: -0.0000000129608235}
+  m_LocalPosition: {x: 0.8359559, y: -0.374, z: -0.0000000129608235}
   m_LocalScale: {x: 1.2483, y: 1.2483, z: 1.2483}
   m_Children:
   - {fileID: 4144754781753406}
@@ -1505,7 +1505,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1729990828589302}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 14.364886, y: 10.374369, z: -9.931355}
+  m_LocalPosition: {x: 12.33, y: 9.443, z: -20.33}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children:
   - {fileID: 4867532831068842}
@@ -1741,7 +1741,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1334971795397400}
   m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 18.534775, y: -34.95237, z: 9.444519}
+  m_LocalPosition: {x: 18.534775, y: -34.84, z: 9.444519}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_Children:
   - {fileID: 4615504213805332}
@@ -1769,7 +1769,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1539751405727740}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.65522575, y: -34.95237, z: 19.57452}
+  m_LocalPosition: {x: -0.65522575, y: -34.84, z: 19.57452}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4606208218903776}
@@ -2285,7 +2285,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.49977422, y: 0.08614321, z: 0.49977422}
-  m_Center: {x: 0.000000052154064, y: 0.000000009313226, z: 0.000000014901161}
+  m_Center: {x: 0.000000052154064, y: 0.03, z: 0.000000014901161}
 --- !u!65 &65850230052967630
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -2308,8 +2308,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 1.1027908, y: 0.5134861, z: 0.6392479}
-  m_Center: {x: 0, y: -0.12487289, z: 0}
+  m_Size: {x: 0.98869586, y: 0.5134861, z: 0.6392479}
+  m_Center: {x: -0.007440092, y: -0.12487289, z: -0.000000001773856}
 --- !u!65 &65980586784807030
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -2321,7 +2321,7 @@ BoxCollider:
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.49977422, y: 0.08614321, z: 0.49977422}
-  m_Center: {x: -0.000000052154064, y: 0.000000009313226, z: 0.000000014901161}
+  m_Center: {x: -0.000000052154064, y: 0.03, z: 0.000000014901161}
 --- !u!114 &114018348328425642
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -2375,7 +2375,7 @@ MonoBehaviour:
   WaypointsHolder: {fileID: 4867532831068842}
   speed: 0.5
   current: 12
-  RotationSpeed: 1
+  RotationSpeed: 2
   maxAnglePerSecond: 10
   VFXController: {fileID: 114945893740865758}
 --- !u!114 &114945893740865758
@@ -2411,10 +2411,10 @@ CapsuleCollider:
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.31492767
-  m_Height: 1.1027917
+  m_Radius: 0.24203965
+  m_Height: 0.78917414
   m_Direction: 0
-  m_Center: {x: 5.5244705e-11, y: 0.13, z: -0.00023171311}
+  m_Center: {x: 0.010472776, y: 0.05835098, z: 0.0010073808}
 --- !u!136 &136711221101781376
 CapsuleCollider:
   m_ObjectHideFlags: 1

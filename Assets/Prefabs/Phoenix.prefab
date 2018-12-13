@@ -1500,7 +1500,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1596648263302726}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 17.66, y: 0.3, z: -17.22}
+  m_LocalPosition: {x: 19.03, y: 0.089, z: -16.78}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children:
   - {fileID: 4415517028065566}
@@ -1958,7 +1958,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.38, z: 0}
   m_Axis: {x: 0, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 1.3069814e-16, y: 0.13255525, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: 1.3069814e-16, y: 0.13255548, z: -1.1264888e-16}
   m_UseSpring: 1
   m_Spring:
     spring: 200
@@ -2026,7 +2026,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.5287781, y: -0.08308196, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: 0.5287781, y: -0.0830822, z: -1.1264888e-16}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2094,7 +2094,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.0000023841953, y: 0.0000002383221, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: -0.0000023841858, y: -9.6471386e-11, z: -1.1264888e-16}
   m_UseSpring: 1
   m_Spring:
     spring: 60
@@ -2128,7 +2128,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.5287781, y: -0.08308196, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: -0.5287781, y: -0.0830822, z: -1.1264888e-16}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2196,7 +2196,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.6340014, y: -0.02372354, z: 3.7545032e-16}
+  m_ConnectedAnchor: {x: 0.6340014, y: -0.023723302, z: 3.7545032e-16}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2264,7 +2264,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.0000023841887, y: 0.00000023838798, z: -1.1264888e-16}
+  m_ConnectedAnchor: {x: 0.0000023841858, y: -3.0596477e-11, z: -1.1264888e-16}
   m_UseSpring: 1
   m_Spring:
     spring: 60
@@ -2720,7 +2720,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8192
   RotationSpeed: 4
-  RunSpeedMultiplier: 0
+  WalkSpeed: 2
+  PickUpSpeed: 1.7
   HeadGunPos: {fileID: 1532413283199806}
   LegSwingReference: {fileID: 1694084379956174}
   Chest: {fileID: 1558221434653460}
@@ -2846,6 +2847,7 @@ MonoBehaviour:
   Force: 4000
   OtherHand: {fileID: 1710639892953262}
   Hip: {fileID: 1008863927326106}
+  GunVerticalOffset: 0.087
   taken: 0
 --- !u!114 &114187019818786086
 MonoBehaviour:
@@ -2861,6 +2863,7 @@ MonoBehaviour:
   Force: 4000
   OtherHand: {fileID: 1823864082846572}
   Hip: {fileID: 1008863927326106}
+  GunVerticalOffset: 0.087
   taken: 0
 --- !u!114 &114194299401716902
 MonoBehaviour:

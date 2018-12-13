@@ -8,6 +8,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager GM;
     public Text Result;
+    public Image EndImage;
     [HideInInspector]
     public GameObject[] Players;
     public LayerMask AllPlayers;
@@ -30,6 +31,8 @@ public class GameManager : MonoBehaviour
 
     private int Team1RespawnIndex = 0;
     private int Team2RespawnIndex = 0;
+
+    private float EndImageScale = 208f;
 
     //teleport a weapon to a random position within a given space
     public Vector3 weaponSpawnerCenter;
@@ -77,6 +80,24 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < team2.childCount; i++)
         {
             Team2RespawnPts[i] = team2.GetChild (i).gameObject;
+        }
+    }
+
+    IEnumerator EndImageShow (float time, GameObject _tar = null)
+    {
+        float elapsedTime = 0f;
+        EndImage.gameObject.SetActive (true);
+        while (elapsedTime < time)
+        {
+            elapsedTime += Time.deltaTime;
+            if (_tar != null)
+            {
+                EndImage.rectTransform.position = Camera.main.WorldToScreenPoint (_tar.transform.position);
+                Vector3 targetPosition = new Vector3 (EndImage.rectTransform.position.x, EndImage.rectTransform.position.y, 0f);
+                EndImage.rectTransform.position = Vector3.Lerp (EndImage.rectTransform.position, targetPosition, 0.5f);
+            }
+            yield return new WaitForEndOfFrame ();
+            EndImage.rectTransform.sizeDelta -= new Vector2 (EndImageScale, EndImageScale);
         }
     }
     //make the space for weapon to respawn (weapon-spawner) visible in scene
@@ -130,12 +151,13 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void GameOver (int winner)
+    public void GameOver (int winner, GameObject _tar)
     {
         if (_won)
             return;
-        Result.text = "TEAM " + (winner == 1 ? "ONE" : "TWO") + " VICTORY";
-        Result.transform.parent.gameObject.SetActive (true);
+        //Result.text = "TEAM " + (winner == 1 ? "ONE" : "TWO") + " VICTORY";
+        //Result.transform.parent.gameObject.SetActive (true);
+        StartCoroutine (EndImageShow (2f, _tar));
         _won = true;
     }
 

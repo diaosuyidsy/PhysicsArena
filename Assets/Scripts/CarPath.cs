@@ -34,7 +34,7 @@ public class CarPath : MonoBehaviour
         {
             Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
             transform.position = pos;
-            //GameManager.GM.GameOver (winner);
+            GameManager.GM.GameOver (winner, gameObject);
             return;
         }
 

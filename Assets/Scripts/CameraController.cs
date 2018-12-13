@@ -80,12 +80,16 @@ public class CameraController : MonoBehaviour
     {
         // Need to set Follow Target to be average of all players
         Vector3 total = Vector3.zero;
+        int length = 0;
         foreach (GameObject go in GameManager.GM.Players)
         {
-            if (go != null)
+            if (go.GetComponent<PlayerController> ().LegSwingReference.activeSelf)
+            {
                 total += go.transform.position;
+                length++;
+            }
         }
-        total /= GameManager.GM.Players.Length;
+        total /= length;
         if (withOffset)
         {
             total.x += XOffset;
@@ -100,8 +104,12 @@ public class CameraController : MonoBehaviour
         float maxDist = 0f;
         for (int i = 0; i < GameManager.GM.Players.Length; i++)
         {
+            if (!GameManager.GM.Players[i].GetComponent<PlayerController> ().LegSwingReference.activeSelf)
+                continue;
             for (int j = i + 1; j < GameManager.GM.Players.Length; j++)
             {
+                if (!GameManager.GM.Players[j].GetComponent<PlayerController> ().LegSwingReference.activeSelf)
+                    continue;
                 float temp = Vector3.Distance (GameManager.GM.Players[i].transform.position, GameManager.GM.Players[j].transform.position);
                 if (temp > maxDist)
                 {

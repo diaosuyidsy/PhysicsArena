@@ -244,6 +244,8 @@ public class PlayerController : MonoBehaviour
         _dropping = false;
         // Change to non-dropping state after a while
         HandTaken = false;
+        // Set Auxillary Aim to false
+        _auxillaryRotationLock = false;
         // Return the body to normal position
         _checkArm = true;
         StopAllCoroutines ();

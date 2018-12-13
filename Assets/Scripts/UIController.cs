@@ -10,6 +10,7 @@ public class UIController : MonoBehaviour
     private float yDifference;
     private Vector3 _pos;
     private Quaternion _rot;
+    public float YOffset = 0.1f;
 
     private void Start ()
     {
@@ -21,14 +22,19 @@ public class UIController : MonoBehaviour
     private void Update ()
     {
         _pos = transform.position;
-        _pos.y = transform.position.y - yDifference;
+        RaycastHit hit;
+        if (Physics.Raycast (transform.position, Vector3.down, out hit, Mathf.Infinity, UILayers))
+        {
+            _pos.y = hit.transform.position.y;
+            _pos.y += hit.collider.bounds.extents.y + YOffset;
+        }
+        else
+        {
+            _pos.y = -100f;
+        }
         UI.position = _pos;
         UI.eulerAngles = new Vector3 (90f, transform.eulerAngles.y, 0f);
-        //RaycastHit hit;
-        //if (Physics.Raycast (transform.position, Vector3.down, out hit, UILayers))
-        //{
-        //    //_pos.y =
-        //}
+
 
     }
 }

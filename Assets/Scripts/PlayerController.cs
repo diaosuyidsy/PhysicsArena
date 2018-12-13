@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
     public GameObject RightHand;
     public GameObject TurnReference;
     public GameObject[] OnDeathHidden;
+    public GameObject MeleeChargingVFX;
+    public GameObject MeleeUltimateVFX;
 
     [Header ("Auxillary Aiming Section")]
     public bool EnableAuxillaryAiming = true;
@@ -438,12 +440,15 @@ public class PlayerController : MonoBehaviour
     public void OnMeleeHit (Vector3 force)
     {
         // Add HIT VFX
-        //Vector3 temp = transform.position;
-        //temp.y += 1f;
-        //Instantiate (VisualEffectManager.VEM.HitVFX, transform.position + force.normalized * 0.3f, Quaternion.Euler (0f, Mathf.Atan2 (force.z, force.x) * Mathf.Rad2Deg - 90f, 0f));
-        Instantiate (VisualEffectManager.VEM.HitVFX, transform.position + force.normalized * 0.3f, Quaternion.Euler (0f, Vector3.Angle (Vector3.forward, force), 0f));
+        GameObject par = Instantiate (VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler (0f, 180f + Vector3.SignedAngle (Vector3.forward, new Vector3 (force.x, 0f, force.z), Vector3.up), 0f));
         // END VFX
+        ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem> ().main;
+        ParticleSystem.MainModule psmain2 = par.transform.GetChild (0).GetComponent<ParticleSystem> ().main;
+        psmain.maxParticles = (int)Mathf.Round ((9f / 51005f) * force.magnitude * force.magnitude);
+        psmain2.maxParticles = (int)Mathf.Round (12f / 255025f * force.magnitude * force.magnitude);
+
         _rb.AddForce (force, ForceMode.Impulse);
+
     }
 
     private void CheckJump ()
@@ -620,10 +625,16 @@ public class PlayerController : MonoBehaviour
         float initLmTargetPosition = js.targetPosition;
         float inithlMax = hl.max;
         float inithlMin = hl.min;
+        // VFX section
+        MeleeChargingVFX.GetComponent<ParticleSystem> ().Play ();
+        // VFX END
 
         while (elapesdTime < time)
         {
             elapesdTime += Time.deltaTime;
+            // VFX Section
+            MeleeChargingVFX.transform.localScale = new Vector3 (0.8f * (elapesdTime / time), 0.8f * (elapesdTime / time), 0.8f * (elapesdTime / time));
+            // VFX END
             MeleeCharge = elapesdTime / time;
             lm2.max = Mathf.Lerp (initLm2Max, 4f, elapesdTime / time);
             lm2.min = Mathf.Lerp (initLm2Min, -17f, elapesdTime / time);
@@ -636,6 +647,10 @@ public class PlayerController : MonoBehaviour
             Handhj.limits = hl;
             yield return new WaitForEndOfFrame ();
         }
+        // VFX Section: Charged, Ult now
+        MeleeChargingVFX.GetComponent<ParticleSystem> ().Stop ();
+        MeleeUltimateVFX.GetComponent<ParticleSystem> ().Play ();
+        // END
     }
 
     IEnumerator MeleePunchHelper (HingeJoint Armhj, HingeJoint Handhj, float time)
@@ -644,7 +659,9 @@ public class PlayerController : MonoBehaviour
         IsPunching = true;
         JointLimits hl = Handhj.limits;
         JointSpring js = Armhj.spring;
-
+        // VFX Section
+        MeleeChargingVFX.GetComponent<ParticleSystem> ().Stop ();
+        // END
         float initLmTargetPosition = js.targetPosition;
         float inithlMax = hl.max;
         float inithlMin = hl.min;
@@ -662,6 +679,9 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForEndOfFrame ();
         }
         yield return new WaitForSeconds (0.1f);
+        // VFX Section
+        MeleeUltimateVFX.GetComponent<ParticleSystem> ().Stop ();
+        //VFX END
         _checkArm = true;
         Armhj.connectedMassScale = 1f;
         ResetBody ();

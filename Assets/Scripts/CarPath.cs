@@ -35,6 +35,14 @@ public class CarPath : MonoBehaviour
             Vector3 pos = Vector3.MoveTowards (transform.position, target[current].position, speed * Time.deltaTime);
             transform.position = pos;
             GameManager.GM.GameOver (winner, gameObject);
+            if (winner == 2)
+            {
+                GameManager.GM.TeamRed1Explosion.SetActive (true);
+            }
+            else
+            {
+                GameManager.GM.TeamBlue2Explosion.SetActive (true);
+            }
             return;
         }
 

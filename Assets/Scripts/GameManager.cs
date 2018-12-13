@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
     public float WeaponRespawnTime = 2f;
     public float DropWeaponVelocityThreshold = 2f;
     public string[] PlayerCanPickupTags;
+    public GameObject TeamRed1Explosion;
+    public GameObject TeamBlue2Explosion;
 
     private int Team1RespawnIndex = 0;
     private int Team2RespawnIndex = 0;

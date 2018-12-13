@@ -19,7 +19,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4907585657222842}
-  - component: {fileID: 65573318503140256}
+  - component: {fileID: 135660938038817052}
   - component: {fileID: 136054681442327468}
   - component: {fileID: 54368059083684778}
   - component: {fileID: 114048781729507990}
@@ -2606,18 +2606,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.32743454, y: 0.3121755, z: 0.6866579}
   m_Center: {x: -0.33628273, y: -0.03821218, z: 0.01910615}
---- !u!65 &65573318503140256
-BoxCollider:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1008863927326106}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Size: {x: 1.1073432, y: 0.54504704, z: 1.2428899}
-  m_Center: {x: 0.0012438297, y: -0.1085099, z: -0.0024784803}
 --- !u!65 &65623175307880950
 BoxCollider:
   m_ObjectHideFlags: 1
@@ -2795,7 +2783,7 @@ MonoBehaviour:
   material: {fileID: 0}
   phase: 0
   thickness: 0
-  unityCollider: {fileID: 65573318503140256}
+  unityCollider: {fileID: 135660938038817052}
   useDistanceFields: 0
   distanceField: {fileID: 0}
 --- !u!114 &114083074940529468
@@ -3096,7 +3084,7 @@ MonoBehaviour:
   UILayers:
     serializedVersion: 2
     m_Bits: 8192
-  YOffset: 0.1
+  YOffset: 0.02
 --- !u!114 &114605703508075218
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3371,6 +3359,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Hip: {fileID: 114048781729507990}
   WalkThrust: 50
+--- !u!135 &135660938038817052
+SphereCollider:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1008863927326106}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.64
+  m_Center: {x: 0, y: 0.19, z: 0}
 --- !u!135 &135996764236503258
 SphereCollider:
   m_ObjectHideFlags: 1

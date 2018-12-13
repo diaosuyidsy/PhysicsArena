@@ -29,7 +29,6 @@ public class PlayerController : MonoBehaviour
     public GameObject[] OnDeathHidden;
     public GameObject MeleeChargingVFX;
     public GameObject MeleeUltimateVFX;
-    public GameObject MeleeTrailVFX;
 
     [Header ("Auxillary Aiming Section")]
     public bool EnableAuxillaryAiming = true;
@@ -662,7 +661,6 @@ public class PlayerController : MonoBehaviour
         JointSpring js = Armhj.spring;
         // VFX Section
         MeleeChargingVFX.GetComponent<ParticleSystem> ().Stop ();
-        if (!Mathf.Approximately (1f, MeleeCharge)) MeleeTrailVFX.GetComponent<ParticleSystem> ().Play ();
         // END
         float initLmTargetPosition = js.targetPosition;
         float inithlMax = hl.max;
@@ -683,7 +681,6 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds (0.1f);
         // VFX Section
         MeleeUltimateVFX.GetComponent<ParticleSystem> ().Stop ();
-        MeleeTrailVFX.GetComponent<ParticleSystem> ().Stop ();
         //VFX END
         _checkArm = true;
         Armhj.connectedMassScale = 1f;

@@ -10,6 +10,7 @@ public class MenuManager : MonoBehaviour
     public Image StartImage;
     public Image IntroImage;
     public Image GameImage;
+    public Image WinImage;
 
     private Player _player1;
     private Player _player2;
@@ -18,7 +19,10 @@ public class MenuManager : MonoBehaviour
     private Player _player5;
     private Player _player6;
     private bool _pressedFirst = false;
+    private bool _pressedSecond = false;
     private bool _allowClickTwice = false;
+    private bool _allowClickThrice = false;
+
 
     private void Awake ()
     {
@@ -54,15 +58,32 @@ public class MenuManager : MonoBehaviour
             _pressedFirst = true;
             print ("Pressed Once");
             IntroImage.gameObject.SetActive (true);
-            StartCoroutine (AllowClickTwice (4f));
+            StartCoroutine (AllowClickTwice (5f));
         }
-        if (_allowClickTwice && (_player1.GetButton ("Jump") ||
+        if (!_pressedSecond && _allowClickTwice && (_player1.GetButton ("Jump") ||
            _player2.GetButton ("Jump") ||
            _player3.GetButton ("Jump") ||
            _player4.GetButton ("Jump") ||
            _player5.GetButton ("Jump") ||
            _player6.GetButton ("Jump"))
            )
+        {
+            _pressedSecond = true;
+            WinImage.gameObject.SetActive (true);
+            StartCoroutine (AllowClickThrice (3f));
+        }
+
+        if (_allowClickThrice && (_player1.GetButton ("Jump") ||
+           _player2.GetButton ("Jump") ||
+           _player3.GetButton ("Jump") ||
+           _player4.GetButton ("Jump") ||
+           _player5.GetButton ("Jump") ||
+           _player6.GetButton ("Jump"))
+           )
+        {
+            SceneManager.LoadScene (1);
+        }
+        if (Input.GetKeyDown (KeyCode.Space))
         {
             SceneManager.LoadScene (1);
         }
@@ -73,5 +94,11 @@ public class MenuManager : MonoBehaviour
         yield return new WaitForSeconds (time);
         _allowClickTwice = true;
         GameImage.gameObject.SetActive (true);
+    }
+
+    IEnumerator AllowClickThrice (float time)
+    {
+        yield return new WaitForSeconds (time);
+        _allowClickThrice = true;
     }
 }

@@ -197,9 +197,9 @@ public class GameManager : MonoBehaviour
 
 #endif
 #if UNITY_EDITOR_WIN
-        if (Input.GetKeyDown (KeyCode.Joystick1Button6))
+        if (Input.GetKeyDown (KeyCode.Space))
         {
-            SceneManager.LoadScene (SceneManager.GetActiveScene ().name);
+            SceneManager.LoadScene (0);
         }
 #endif
 

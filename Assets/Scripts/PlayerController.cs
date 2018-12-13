@@ -437,13 +437,17 @@ public class PlayerController : MonoBehaviour
 
     public void OnMeleeHit (Vector3 force)
     {
+        //+ force.normalized * 0.3f
         // Add HIT VFX
-        //Vector3 temp = transform.position;
-        //temp.y += 1f;
-        //Instantiate (VisualEffectManager.VEM.HitVFX, transform.position + force.normalized * 0.3f, Quaternion.Euler (0f, Mathf.Atan2 (force.z, force.x) * Mathf.Rad2Deg - 90f, 0f));
-        Instantiate (VisualEffectManager.VEM.HitVFX, transform.position + force.normalized * 0.3f, Quaternion.Euler (0f, Vector3.Angle (Vector3.forward, force), 0f));
+        GameObject par = Instantiate (VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler (0f, 180f + Vector3.SignedAngle (Vector3.forward, new Vector3 (force.x, 0f, force.z), Vector3.up), 0f));
         // END VFX
+        ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem> ().main;
+        ParticleSystem.MainModule psmain2 = par.transform.GetChild (0).GetComponent<ParticleSystem> ().main;
+        psmain.maxParticles = (int)Mathf.Round ((9f / 51005f) * force.magnitude * force.magnitude);
+        psmain2.maxParticles = (int)Mathf.Round (12f / 255025f * force.magnitude * force.magnitude);
+
         _rb.AddForce (force, ForceMode.Impulse);
+
     }
 
     private void CheckJump ()

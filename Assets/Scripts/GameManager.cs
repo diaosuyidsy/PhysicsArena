@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using Rewired;
+
 
 public class GameManager : MonoBehaviour
 {
@@ -48,6 +50,8 @@ public class GameManager : MonoBehaviour
     public int weaponTracker = 2;
 
     private bool _won = false;
+    private Player _player;
+
 
     private void Awake ()
     {
@@ -66,6 +70,8 @@ public class GameManager : MonoBehaviour
             Players[index] = go;
             index++;
         }
+        _player = ReInput.players.GetPlayer (0);
+
     }
 
     private void Start ()
@@ -189,19 +195,23 @@ public class GameManager : MonoBehaviour
     void CheckRestart ()
     {
 
-#if UNITY_EDITOR_OSX
-        if (Input.GetKeyDown(KeyCode.Joystick1Button10))
-        {
-            SceneManager.LoadScene("MasterScene");
-        }
+        //#if UNITY_EDITOR_OSX
+        //        if (Input.GetKeyDown(KeyCode.Joystick1Button10))
+        //        {
+        //            SceneManager.LoadScene("MasterScene");
+        //        }
 
-#endif
-#if UNITY_EDITOR_WIN
-        if (Input.GetKeyDown (KeyCode.Space))
+        //#endif
+        //#if UNITY_EDITOR_WIN
+        //        if (Input.GetKeyDown (KeyCode.Space))
+        //        {
+        //            SceneManager.LoadScene (1);
+        //        }
+        //#endif
+        if (_player.GetButtonDown ("Restart"))
         {
             SceneManager.LoadScene (0);
         }
-#endif
 
     }
 }

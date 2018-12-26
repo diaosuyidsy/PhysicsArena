@@ -307,7 +307,7 @@ public class PlayerController : MonoBehaviour
                         attackState = State.Meleeing;
                         _checkArm = false;
                         StopAllCoroutines ();
-                        StartCoroutine (MeleeClockFistHelper (_rightArm2hj, _rightArmhj, _rightHandhj, 1f));
+                        StartCoroutine (MeleeClockFistHelper (_rightArm2hj, _rightArmhj, _rightHandhj, 1f, _leftArmhj));
                     }
                     break;
             }
@@ -333,8 +333,10 @@ public class PlayerController : MonoBehaviour
                     if (attackState == State.Meleeing)
                     {
                         attackState = State.Empty;
+                        // This is add a push force when melee
+                        //_rb.AddForce (transform.forward * Thrust * MeleeCharge * 3f, ForceMode.Impulse);
                         StopAllCoroutines ();
-                        StartCoroutine (MeleePunchHelper (_rightArmhj, _rightHandhj, 0.2f));
+                        StartCoroutine (MeleePunchHelper (_rightArmhj, _rightHandhj, 0.2f, _leftArmhj));
                     }
                     break;
             }
@@ -612,19 +614,21 @@ public class PlayerController : MonoBehaviour
         Arm2hj.limits = lm2;
     }
 
-    IEnumerator MeleeClockFistHelper (HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time)
+    IEnumerator MeleeClockFistHelper (HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftArmhj)
     {
         IsPunching = false;
         float elapesdTime = 0f;
         JointLimits lm2 = Arm2hj.limits;
         JointLimits hl = Handhj.limits;
         JointSpring js = Armhj.spring;
+        JointSpring ljs = LeftArmhj.spring;
 
         float initLm2Max = lm2.max;
         float initLm2Min = lm2.min;
         float initLmTargetPosition = js.targetPosition;
         float inithlMax = hl.max;
         float inithlMin = hl.min;
+        float initLATargetPosition = ljs.targetPosition;
         // VFX section
         MeleeChargingVFX.GetComponent<ParticleSystem> ().Play ();
         // VFX END
@@ -632,18 +636,23 @@ public class PlayerController : MonoBehaviour
         while (elapesdTime < time)
         {
             elapesdTime += Time.deltaTime;
-            // VFX Section
-            MeleeChargingVFX.transform.localScale = new Vector3 (0.8f * (elapesdTime / time), 0.8f * (elapesdTime / time), 0.8f * (elapesdTime / time));
-            // VFX END
             MeleeCharge = elapesdTime / time;
-            lm2.max = Mathf.Lerp (initLm2Max, 4f, elapesdTime / time);
-            lm2.min = Mathf.Lerp (initLm2Min, -17f, elapesdTime / time);
 
-            js.targetPosition = Mathf.Lerp (initLmTargetPosition, -85f, elapesdTime / time);
-            hl.max = Mathf.Lerp (inithlMax, 130f, elapesdTime / time);
-            hl.min = Mathf.Lerp (inithlMin, 128f, elapesdTime / time);
+            // VFX Section
+            MeleeChargingVFX.transform.localScale = new Vector3 (0.8f * MeleeCharge, 0.8f * MeleeCharge, 0.8f * MeleeCharge);
+            // VFX END
+            lm2.max = Mathf.Lerp (initLm2Max, 4f, MeleeCharge);
+            lm2.min = Mathf.Lerp (initLm2Min, -17f, MeleeCharge);
+
+            ljs.targetPosition = Mathf.Lerp (initLATargetPosition, 80f, MeleeCharge);
+            js.targetPosition = Mathf.Lerp (initLmTargetPosition, -85f, MeleeCharge);
+
+            hl.max = Mathf.Lerp (inithlMax, 130f, MeleeCharge);
+            hl.min = Mathf.Lerp (inithlMin, 128f, MeleeCharge);
+
             Arm2hj.limits = lm2;
             Armhj.spring = js;
+            LeftArmhj.spring = ljs;
             Handhj.limits = hl;
             yield return new WaitForEndOfFrame ();
         }
@@ -653,16 +662,18 @@ public class PlayerController : MonoBehaviour
         // END
     }
 
-    IEnumerator MeleePunchHelper (HingeJoint Armhj, HingeJoint Handhj, float time)
+    IEnumerator MeleePunchHelper (HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftHandhj)
     {
         float elapesdTime = 0f;
         IsPunching = true;
         JointLimits hl = Handhj.limits;
         JointSpring js = Armhj.spring;
+        JointSpring ljs = LeftHandhj.spring;
         // VFX Section
         MeleeChargingVFX.GetComponent<ParticleSystem> ().Stop ();
         // END
         float initLmTargetPosition = js.targetPosition;
+        float initLATargetPosition = ljs.targetPosition;
         float inithlMax = hl.max;
         float inithlMin = hl.min;
         //Armhj.connectedMassScale = 0.2f;
@@ -670,10 +681,11 @@ public class PlayerController : MonoBehaviour
         while (elapesdTime < time)
         {
             elapesdTime += Time.deltaTime;
-
+            ljs.targetPosition = Mathf.Lerp (initLATargetPosition, -120f, elapesdTime / time);
             js.targetPosition = Mathf.Lerp (initLmTargetPosition, 180f, elapesdTime / time);
             hl.max = Mathf.Lerp (inithlMax, 12f, elapesdTime / time);
             hl.min = Mathf.Lerp (inithlMin, -2.8f, elapesdTime / time);
+            LeftHandhj.spring = ljs;
             Armhj.spring = js;
             Handhj.limits = hl;
             yield return new WaitForEndOfFrame ();

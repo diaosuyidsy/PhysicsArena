@@ -25,14 +25,14 @@ public class CameraController : MonoBehaviour
     private bool _winLock = false;
 
     // Use this for initialization
-    void Start ()
+    void Start()
     {
-        SetTarget (false);
+        SetTarget(false);
         // Set the max Distance originally
         float maxDist = 0f;
         foreach (GameObject go in GameManager.GM.Players)
         {
-            float temp = Vector3.Distance (go.transform.position, FollowTarget);
+            float temp = Vector3.Distance(go.transform.position, FollowTarget);
             if (temp > maxDist)
             {
                 maxDist = temp;
@@ -47,42 +47,48 @@ public class CameraController : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update ()
+    void Update()
     {
         // If player won, then do Won Logic and lock others
         if (_winLock)
         {
-            _desiredPosition = new Vector3 (FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
-            _smoothedPosition = Vector3.Lerp (transform.position, _desiredPosition, SmoothSpeed);
+            _desiredPosition = new Vector3(FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
+            _smoothedPosition = Vector3.Lerp(transform.position, _desiredPosition, SmoothSpeed);
             transform.position = _smoothedPosition;
-            GetComponent<Camera> ().fieldOfView = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, WonFOVSize, SmoothSpeed);
+            GetComponent<Camera>().fieldOfView = Mathf.Lerp(GetComponent<Camera>().fieldOfView, WonFOVSize, SmoothSpeed);
             return;
         }
-        SetTarget ();
-        _desiredPosition = new Vector3 (FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
-        _smoothedPosition = Vector3.Lerp (transform.position, _desiredPosition, SmoothSpeed);
+        SetTarget();
+        if (FollowTarget == Vector3.zero) return;
+        _desiredPosition = new Vector3(FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
+        _smoothedPosition = Vector3.Lerp(transform.position, _desiredPosition, SmoothSpeed);
         transform.position = _smoothedPosition;
         //GetComponent<Camera> ().fieldOfView += (MaxDistance () - _maxDistanceOrigin) * CameraScaleSpeed;
         //_maxDistanceOrigin = MaxDistance ();
-        _desiredFOV = 2f * MaxDistance () + 3.99f;
-        GetComponent<Camera> ().fieldOfView = Mathf.Lerp (GetComponent<Camera> ().fieldOfView, _desiredFOV, SmoothSpeed);
-        GetComponent<Camera> ().fieldOfView = Mathf.Clamp (GetComponent<Camera> ().fieldOfView, FOVSizeMin, FOVSizeMax);
+        _desiredFOV = 2f * MaxDistance() + 3.99f;
+        GetComponent<Camera>().fieldOfView = Mathf.Lerp(GetComponent<Camera>().fieldOfView, _desiredFOV, SmoothSpeed);
+        GetComponent<Camera>().fieldOfView = Mathf.Clamp(GetComponent<Camera>().fieldOfView, FOVSizeMin, FOVSizeMax);
     }
 
-    public void OnWinCameraZoom (Transform tar)
+    public void OnWinCameraZoom(Transform tar)
     {
         _winLock = true;
         FollowTarget = tar.position;
     }
 
-    void SetTarget (bool withOffset = true)
+    void SetTarget(bool withOffset = true)
     {
         // Need to set Follow Target to be average of all players
         Vector3 total = Vector3.zero;
         int length = 0;
+        if (GameManager.GM.Players.Length == 0)
+        {
+            FollowTarget = Vector3.zero;
+            return;
+        }
         foreach (GameObject go in GameManager.GM.Players)
         {
-            if (go.GetComponent<PlayerController> ().LegSwingReference.activeSelf)
+            if (go.GetComponent<PlayerController>().LegSwingReference.activeSelf)
             {
                 total += go.transform.position;
                 length++;
@@ -98,18 +104,18 @@ public class CameraController : MonoBehaviour
     }
 
     // Should get the max distance between any two players
-    float MaxDistance ()
+    float MaxDistance()
     {
         float maxDist = 0f;
         for (int i = 0; i < GameManager.GM.Players.Length; i++)
         {
-            if (!GameManager.GM.Players[i].GetComponent<PlayerController> ().LegSwingReference.activeSelf)
+            if (!GameManager.GM.Players[i].GetComponent<PlayerController>().LegSwingReference.activeSelf)
                 continue;
             for (int j = i + 1; j < GameManager.GM.Players.Length; j++)
             {
-                if (!GameManager.GM.Players[j].GetComponent<PlayerController> ().LegSwingReference.activeSelf)
+                if (!GameManager.GM.Players[j].GetComponent<PlayerController>().LegSwingReference.activeSelf)
                     continue;
-                float temp = Vector3.Distance (GameManager.GM.Players[i].transform.position, GameManager.GM.Players[j].transform.position);
+                float temp = Vector3.Distance(GameManager.GM.Players[i].transform.position, GameManager.GM.Players[j].transform.position);
                 if (temp > maxDist)
                 {
                     maxDist = temp;

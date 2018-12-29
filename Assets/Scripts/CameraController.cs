@@ -32,6 +32,7 @@ public class CameraController : MonoBehaviour
         float maxDist = 0f;
         foreach (GameObject go in GameManager.GM.Players)
         {
+            if (go == null) continue;
             float temp = Vector3.Distance(go.transform.position, FollowTarget);
             if (temp > maxDist)
             {
@@ -41,7 +42,7 @@ public class CameraController : MonoBehaviour
         _maxDistanceOrigin = maxDist;
         // Set X and Z Original Difference
         //_xDiffOrigin = transform.position.x - FollowTarget.x;
-        _zDiffOrigin = transform.position.z - FollowTarget.z;
+        _zDiffOrigin = transform.position.z - GameManager.GM.APlayers[0].transform.position.z;
         _xDiffOrigin = 0f;
         //iffOrigin = 0f;
     }
@@ -81,20 +82,21 @@ public class CameraController : MonoBehaviour
         // Need to set Follow Target to be average of all players
         Vector3 total = Vector3.zero;
         int length = 0;
-        if (GameManager.GM.Players.Length == 0)
+        if (GameManager.GM.Players.Count == 0)
         {
-            FollowTarget = Vector3.zero;
+            FollowTarget = total;
             return;
         }
+
         foreach (GameObject go in GameManager.GM.Players)
         {
-            if (go.GetComponent<PlayerController>().LegSwingReference.activeSelf)
+            if (go != null && go.GetComponent<PlayerController>().LegSwingReference.activeSelf)
             {
                 total += go.transform.position;
                 length++;
             }
         }
-        total /= length;
+        total /= (length == 0 ? 1 : length);
         if (withOffset)
         {
             total.x += XOffset;
@@ -107,11 +109,11 @@ public class CameraController : MonoBehaviour
     float MaxDistance()
     {
         float maxDist = 0f;
-        for (int i = 0; i < GameManager.GM.Players.Length; i++)
+        for (int i = 0; i < GameManager.GM.Players.Count; i++)
         {
             if (!GameManager.GM.Players[i].GetComponent<PlayerController>().LegSwingReference.activeSelf)
                 continue;
-            for (int j = i + 1; j < GameManager.GM.Players.Length; j++)
+            for (int j = i + 1; j < GameManager.GM.Players.Count; j++)
             {
                 if (!GameManager.GM.Players[j].GetComponent<PlayerController>().LegSwingReference.activeSelf)
                     continue;

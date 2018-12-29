@@ -11,7 +11,10 @@ public class GameManager : MonoBehaviour
     public static GameManager GM;
     public Text Result;
     public Image EndImage;
-    public GameObject[] Players;
+    [HideInInspector]
+    public List<GameObject> Players;
+    [Tooltip("Need to fill all six Beforehand")]
+    public GameObject[] APlayers;
     public LayerMask AllPlayers;
     public Transform RespawnPointHolder;
     public GameObject[] Team1ResourceRespawnPoints;
@@ -55,7 +58,8 @@ public class GameManager : MonoBehaviour
     private void Awake()
     {
         GM = this;
-        GameObject[] team1Players = GameObject.FindGameObjectsWithTag("Team1");
+        Players = new List<GameObject>();
+        /* GameObject[] team1Players = GameObject.FindGameObjectsWithTag("Team1");
         GameObject[] team2Players = GameObject.FindGameObjectsWithTag("Team2");
         Players = new GameObject[team1Players.Length + team2Players.Length];
         int index = 0;
@@ -68,7 +72,7 @@ public class GameManager : MonoBehaviour
         {
             Players[index] = go;
             index++;
-        }
+        } */
         _player = ReInput.players.GetPlayer(0);
 
     }

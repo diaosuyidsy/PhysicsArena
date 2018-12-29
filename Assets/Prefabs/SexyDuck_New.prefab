@@ -51,7 +51,7 @@ GameObject:
   - component: {fileID: 4036182442386276}
   - component: {fileID: 198397189692208846}
   - component: {fileID: 199662992843277514}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -196,7 +196,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4450705629301936}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Character3_Reference
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -213,7 +213,7 @@ GameObject:
   - component: {fileID: 4168259399145944}
   - component: {fileID: 198972516120133370}
   - component: {fileID: 199437544416264070}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MagicNova
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -352,7 +352,7 @@ GameObject:
   - component: {fileID: 4724691894893048}
   - component: {fileID: 198258615632709292}
   - component: {fileID: 199970451763285576}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: GlowTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -367,7 +367,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4613913468557614}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: TurnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -449,7 +449,7 @@ GameObject:
   - component: {fileID: 4646017273862914}
   - component: {fileID: 198321964600859946}
   - component: {fileID: 199486320914169636}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: Glow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -481,7 +481,7 @@ GameObject:
   - component: {fileID: 4264245477688694}
   - component: {fileID: 198489380280045384}
   - component: {fileID: 199731517609977758}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: BlueUlt
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -588,7 +588,7 @@ GameObject:
   - component: {fileID: 4226295687047314}
   - component: {fileID: 198267665118209516}
   - component: {fileID: 199049024633474426}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: BlueCharge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -834,7 +834,7 @@ GameObject:
   - component: {fileID: 4659793478767732}
   - component: {fileID: 198016925792418430}
   - component: {fileID: 199418141342931538}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: MagicChargeOrbs
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -956,7 +956,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4063707307073594}
   - component: {fileID: 114564218228732002}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: TurningReference
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1003,7 +1003,7 @@ GameObject:
   - component: {fileID: 4856586578083314}
   - component: {fileID: 198413667677413862}
   - component: {fileID: 199590049230786096}
-  m_Layer: 0
+  m_Layer: 12
   m_Name: SparkleTrail
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1136,7 +1136,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1235554838514240}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 18.15, y: 0.768, z: -17.27}
+  m_LocalPosition: {x: 18.429, y: 0.768, z: -19.138}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children:
   - {fileID: 4248074756002880}
@@ -2513,9 +2513,9 @@ HingeJoint:
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
   m_ConnectedAnchor: {x: 0.6247003, y: 0.00002534805, z: 0}
-  m_UseSpring: 0
+  m_UseSpring: 1
   m_Spring:
-    spring: 0
+    spring: 100
     damper: 0
     targetPosition: 0
   m_UseMotor: 0
@@ -2683,9 +2683,9 @@ HingeJoint:
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
   m_ConnectedAnchor: {x: -0.6247003, y: 0.000008087617, z: 0}
-  m_UseSpring: 0
+  m_UseSpring: 1
   m_Spring:
-    spring: 0
+    spring: 100
     damper: 0
     targetPosition: 0
   m_UseMotor: 0
@@ -3040,7 +3040,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b8dbe361d31b48559f82cae547cd64e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerControllerNumber: 0
+  PlayerControllerNumber: 3
   Thrust: 100
   JumpForce: 60
   JumpMask:

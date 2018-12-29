@@ -4,24 +4,24 @@ using Rewired;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header ("Player Basic Control Section")]
-    [Tooltip ("Enter 1 Digit 1-4")]
-    public int PlayerControllerNumber;
+    [Header("Player Basic Control Section")]
+    //[Tooltip("Enter 1 Digit 1-4")]
+    //public int PlayerControllerNumber;
     public float Thrust = 300f;
     public float JumpForce = 300f;
     public LayerMask JumpMask;
     public float RotationSpeed = 200f;
-    [Tooltip ("For Chicken, it should be 2, Duck, could be 1.9")]
+    [Tooltip("For Chicken, it should be 2, Duck, could be 1.9")]
     public float WalkSpeed = 2f;
-    [Tooltip ("It should be the same speed, little less than Duck's normal WalkSpeed")]
+    [Tooltip("It should be the same speed, little less than Duck's normal WalkSpeed")]
     public float PickUpSpeed = 1.8f;
-    [Header ("Player Body Setting Section")]
+    [Header("Player Body Setting Section")]
     public GameObject HeadGunPos;
     public GameObject LegSwingReference;
     public GameObject Chest;
-    [Tooltip ("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
+    [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
     public GameObject[] LeftArms;
-    [Tooltip ("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
+    [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
     public GameObject[] RightArms;
     public GameObject LeftHand;
     public GameObject RightHand;
@@ -30,7 +30,7 @@ public class PlayerController : MonoBehaviour
     public GameObject MeleeChargingVFX;
     public GameObject MeleeUltimateVFX;
 
-    [Header ("Auxillary Aiming Section")]
+    [Header("Auxillary Aiming Section")]
     public bool EnableAuxillaryAiming = true;
     public float MaxWeaponCD = 0.3f;
 
@@ -101,49 +101,54 @@ public class PlayerController : MonoBehaviour
     private float LeftTrigger;
     #endregion
 
-    [Header ("Debug Section: Don't Ever Touch")]
+    [Header("Debug Section: Don't Ever Touch")]
     #region Debug Toggle
     public bool debugT_CheckArm = true;
     #endregion
 
-    private void Awake ()
+    private void Awake()
     {
-        _player = ReInput.players.GetPlayer (PlayerControllerNumber);
+        //_player = ReInput.players.GetPlayer(PlayerControllerNumber);
     }
 
-    private void Start ()
+    public void Init(int controllerNumber)
     {
-        _rb = GetComponent<Rigidbody> ();
-        _distToGround = GetComponent<CapsuleCollider> ().bounds.extents.y;
-        _chesthj = Chest.GetComponent<HingeJoint> ();
-        _leftArm2hj = LeftArms[0].GetComponent<HingeJoint> ();
-        _rightArm2hj = RightArms[0].GetComponent<HingeJoint> ();
-        _leftArmhj = LeftArms[1].GetComponent<HingeJoint> ();
-        _rightArmhj = RightArms[1].GetComponent<HingeJoint> ();
-        _leftHandhj = LeftArms[2].GetComponent<HingeJoint> ();
-        _rightHandhj = RightArms[2].GetComponent<HingeJoint> ();
-        _freezeBody = new Vector3 (0, transform.localEulerAngles.y, 0);
-        LegSwingReference.GetComponent<Animator> ().SetFloat ("WalkSpeedMultiplier", WalkSpeed / 2f);
+        _player = ReInput.players.GetPlayer(controllerNumber);
+    }
+
+    private void Start()
+    {
+        _rb = GetComponent<Rigidbody>();
+        _distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
+        _chesthj = Chest.GetComponent<HingeJoint>();
+        _leftArm2hj = LeftArms[0].GetComponent<HingeJoint>();
+        _rightArm2hj = RightArms[0].GetComponent<HingeJoint>();
+        _leftArmhj = LeftArms[1].GetComponent<HingeJoint>();
+        _rightArmhj = RightArms[1].GetComponent<HingeJoint>();
+        _leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
+        _rightHandhj = RightArms[2].GetComponent<HingeJoint>();
+        _freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
+        LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", WalkSpeed / 2f);
     }
 
     // Update is called once per frame
-    void Update ()
+    void Update()
     {
         if (!_canControl)
             return;
 
-        CheckRewiredInput ();
-        CheckMovement ();
-        CheckJump ();
+        CheckRewiredInput();
+        CheckMovement();
+        CheckJump();
         if (_checkArm && debugT_CheckArm)
-            CheckArm ();
-        CheckFire ();
+            CheckArm();
+        CheckFire();
         // CheckRun ();
-        CheckDrop ();
+        CheckDrop();
     }
 
     // This is primarily for dropping item when velocity change too much 
-    private void FixedUpdate ()
+    private void FixedUpdate()
     {
         //if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
         //{
@@ -151,75 +156,75 @@ public class PlayerController : MonoBehaviour
         //}
         if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
 
-            DropHelper ();
+            DropHelper();
 
         //_previousFrameVel = _rb.velocity.magnitude;
 
     }
 
     // Late Update is for standing the character
-    private void LateUpdate ()
+    private void LateUpdate()
     {
         _freezeBody.y = transform.localEulerAngles.y;
         transform.localEulerAngles = _freezeBody;
     }
 
     // OnEnterDeathZone controls the behavior how player reacts when it dies
-    public void OnEnterDeathZone ()
+    public void OnEnterDeathZone()
     {
         _canControl = false;
         foreach (GameObject go in OnDeathHidden)
         {
-            go.SetActive (false);
+            go.SetActive(false);
         }
-        DropHelper ();
-        StartCoroutine (Respawn (GameManager.GM.RespawnTime));
+        DropHelper();
+        StartCoroutine(Respawn(GameManager.GM.RespawnTime));
     }
 
-    IEnumerator Respawn (float time)
+    IEnumerator Respawn(float time)
     {
         _rb.isKinematic = true;
-        GameManager.GM.SetToRespawn (gameObject, 5f);
-        yield return new WaitForSeconds (time);
+        GameManager.GM.SetToRespawn(gameObject, 5f);
+        yield return new WaitForSeconds(time);
         _rb.isKinematic = false;
-        GameManager.GM.SetToRespawn (gameObject, 0f);
+        GameManager.GM.SetToRespawn(gameObject, 0f);
         foreach (GameObject go in OnDeathHidden)
         {
-            go.SetActive (true);
+            go.SetActive(true);
         }
         _canControl = true;
     }
 
-    private void CheckDrop ()
+    private void CheckDrop()
     {
         // Drop Only happens when player is holding something
         if (HandObject == null || normalState != State.Holding || attackState == State.Shooting)
             return;
 
         // If taken something, and pushed LT, drop the thing
-        if (Mathf.Approximately (1f, LeftTrigger))
+        if (Mathf.Approximately(1f, LeftTrigger))
         {
             _dropping = true;
             //DropHelper ();
-            StartCoroutine (PowerDrop (2f));
+            StartCoroutine(PowerDrop(2f));
         }
         else
         {
             if (_dropping)
             {
-                StopAllCoroutines ();
+                StopAllCoroutines();
                 JointSpring js = _chesthj.spring;
                 js.targetPosition = 10f * DropCharge;
                 DropCharge = 0f;
                 _chesthj.spring = js;
                 normalState = State.Empty;
                 _dropping = false;
-                DropHelper ();
+                DropHelper();
             }
         }
     }
 
-    IEnumerator PowerDrop (float time)
+    IEnumerator PowerDrop(float time)
     {
         float elapsedTime = 0f;
         JointSpring js = _chesthj.spring;
@@ -230,18 +235,18 @@ public class PlayerController : MonoBehaviour
         {
             DropCharge = elapsedTime / time;
             elapsedTime += Time.deltaTime;
-            js.targetPosition = Mathf.Lerp (initspringtagetPosition, -100f, elapsedTime / time);
+            js.targetPosition = Mathf.Lerp(initspringtagetPosition, -100f, elapsedTime / time);
             _chesthj.spring = js;
-            yield return new WaitForEndOfFrame ();
+            yield return new WaitForEndOfFrame();
         }
 
     }
 
-    public void DropHelper ()
+    public void DropHelper()
     {
         if (HandObject == null) return;
         // Drop the thing
-        HandObject.SendMessage ("Drop");
+        HandObject.SendMessage("Drop");
         normalState = State.Empty;
         _dropping = false;
         // Change to non-dropping state after a while
@@ -250,55 +255,55 @@ public class PlayerController : MonoBehaviour
         _auxillaryRotationLock = false;
         // Return the body to normal position
         _checkArm = true;
-        StopAllCoroutines ();
-        ResetBody ();
+        StopAllCoroutines();
+        ResetBody();
 
         // Specialized checking
-        if (HandObject.CompareTag ("Weapon"))
+        if (HandObject.CompareTag("Weapon"))
         {
-            HandObject.GetComponent<Rigidbody> ().isKinematic = false;
+            HandObject.GetComponent<Rigidbody>().isKinematic = false;
             HandObject.layer = 0;
             // Stop the shooting
-            HandObject.SendMessage ("Shoot", 0f);
+            HandObject.SendMessage("Shoot", 0f);
         }
-        if (HandObject.CompareTag ("Team1Resource") || HandObject.CompareTag ("Team2Resource"))
+        if (HandObject.CompareTag("Team1Resource") || HandObject.CompareTag("Team2Resource"))
         {
             HandObject.layer = 0;
-            HandObject.GetComponent<Rigidbody> ().isKinematic = false;
+            HandObject.GetComponent<Rigidbody>().isKinematic = false;
         }
         // Nullify the holder
         HandObject = null;
         // Change the speed back to normal
-        LegSwingReference.GetComponent<Animator> ().SetFloat ("WalkSpeedMultiplier", WalkSpeed / 2f);
+        LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", WalkSpeed / 2f);
         // Clear the right trigger register
         _rightTriggerRegister = "";
     }
 
-    public void CheckFire ()
+    public void CheckFire()
     {
-        if (Mathf.Approximately (RightTrigger, 1f))
+        if (Mathf.Approximately(RightTrigger, 1f))
         {
             // Means we want to fire
             switch (_rightTriggerRegister)
             {
                 case "Throwable":
-                    LeftHand.GetComponent<Fingers> ().Throw ();
-                    RightHand.GetComponent<Fingers> ().Throw ();
+                    LeftHand.GetComponent<Fingers>().Throw();
+                    RightHand.GetComponent<Fingers>().Throw();
                     break;
                 case "Weapon":
                     // Add weapon right trigger action
                     if (HandObject != null && !_dropping)
                     {
                         attackState = State.Shooting;
-                        HandObject.SendMessage ("Shoot", 1f);
+                        HandObject.SendMessage("Shoot", 1f);
                         if (EnableAuxillaryAiming)
-                            AuxillaryAim ();
+                            AuxillaryAim();
                     }
                     break;
                 case "Team1Resource":
                 case "Team2Resource":
                     if (!_dropping)
-                        DropHelper ();
+                        DropHelper();
                     break;
                 default:
                     //If we don't have anything on hand, we are applying melee action
@@ -306,8 +311,8 @@ public class PlayerController : MonoBehaviour
                     {
                         attackState = State.Meleeing;
                         _checkArm = false;
-                        StopAllCoroutines ();
-                        StartCoroutine (MeleeClockFistHelper (_rightArm2hj, _rightArmhj, _rightHandhj, 1f, _leftArmhj));
+                        StopAllCoroutines();
+                        StartCoroutine(MeleeClockFistHelper(_rightArm2hj, _rightArmhj, _rightHandhj, 1f, _leftArmhj));
                     }
                     break;
             }
@@ -323,7 +328,7 @@ public class PlayerController : MonoBehaviour
                     attackState = State.Empty;
                     // Add weapon right trigger action
                     if (HandObject != null)
-                        HandObject.SendMessage ("Shoot", 0f);
+                        HandObject.SendMessage("Shoot", 0f);
                     // Auxillary Aiming
                     _auxillaryRotationLock = false;
                     _weaponCD = 0f;
@@ -335,15 +340,15 @@ public class PlayerController : MonoBehaviour
                         attackState = State.Empty;
                         // This is add a push force when melee
                         //_rb.AddForce (transform.forward * Thrust * MeleeCharge * 3f, ForceMode.Impulse);
-                        StopAllCoroutines ();
-                        StartCoroutine (MeleePunchHelper (_rightArmhj, _rightHandhj, 0.2f, _leftArmhj));
+                        StopAllCoroutines();
+                        StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, 0.2f, _leftArmhj));
                     }
                     break;
             }
         }
     }
 
-    private void AuxillaryAim ()
+    private void AuxillaryAim()
     {
         // Auxillary Aiming
         _weaponCD += Time.deltaTime;
@@ -353,13 +358,13 @@ public class PlayerController : MonoBehaviour
             float minAngle = 360f;
             foreach (GameObject otherPlayer in GameManager.GM.Players)
             {
-                if (!otherPlayer.CompareTag (tag))
+                if (otherPlayer != null && !otherPlayer.CompareTag(tag))
                 {
                     // If other player are within max Distance, then check for the smalliest angle player
-                    if (Vector3.Distance (otherPlayer.transform.position, gameObject.transform.position) <= _axuillaryMaxDistance)
+                    if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= _axuillaryMaxDistance)
                     {
                         Vector3 targetDir = otherPlayer.transform.position - transform.position;
-                        float angle = Vector3.Angle (targetDir, transform.forward);
+                        float angle = Vector3.Angle(targetDir, transform.forward);
                         if (angle <= _auxillaryMaxAngle && angle < minAngle)
                         {
                             minAngle = angle;
@@ -372,7 +377,7 @@ public class PlayerController : MonoBehaviour
             if (target != null)
             {
                 _auxillaryRotationLock = true;
-                transform.LookAt (target.transform);
+                transform.LookAt(target.transform);
             }
         }
         else
@@ -381,13 +386,13 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void OnPickUpItem (string tag)
+    public void OnPickUpItem(string tag)
     {
         // Actual Logic Below
         _rightTriggerRegister = tag;
         // if pick up resource, then slow down
         if (tag == "Team1Resource" || tag == "Team2Resource")
-            LegSwingReference.GetComponent<Animator> ().SetFloat ("WalkSpeedMultiplier", PickUpSpeed / 2f);
+            LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", PickUpSpeed / 2f);
 
         switch (tag)
         {
@@ -401,8 +406,8 @@ public class PlayerController : MonoBehaviour
                 tempjs.targetPosition = -5f;
                 _chesthj.spring = tempjs;
 
-                StartCoroutine (PickUpWeaponHelper (_leftArm2hj, _leftArmhj, true, 0.1f));
-                StartCoroutine (PickUpWeaponHelper (_rightArm2hj, _rightArmhj, false, 0.1f));
+                StartCoroutine(PickUpWeaponHelper(_leftArm2hj, _leftArmhj, true, 0.1f));
+                StartCoroutine(PickUpWeaponHelper(_rightArm2hj, _rightArmhj, false, 0.1f));
                 break;
             case "Throwable":
                 break;
@@ -411,7 +416,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private void CheckArm ()
+    private void CheckArm()
     {
         // Arm2: right max: 90 --> -74
         //       left min: -75 --> 69
@@ -421,78 +426,78 @@ public class PlayerController : MonoBehaviour
         // Hand: Limit Max: 90 --> 0
         if (attackState == State.Meleeing || normalState == State.Holding) return;
 
-        LeftHand.GetComponent<Fingers> ().SetTaken (Mathf.Approximately (0f, LeftTrigger) || _dropping);
-        RightHand.GetComponent<Fingers> ().SetTaken (Mathf.Approximately (0f, LeftTrigger) || _dropping);
+        LeftHand.GetComponent<Fingers>().SetTaken(Mathf.Approximately(0f, LeftTrigger) || _dropping);
+        RightHand.GetComponent<Fingers>().SetTaken(Mathf.Approximately(0f, LeftTrigger) || _dropping);
 
-        if (Mathf.Approximately (1f, LeftTrigger))
+        if (Mathf.Approximately(1f, LeftTrigger))
             normalState = State.Picking;
         else
             normalState = State.Empty;
 
-        CheckArmHelper (LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
-        CheckArmHelper (LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
+        CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
+        CheckArmHelper(LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
 
         // Bend the body all together
         JointSpring tempjs = _chesthj.spring;
-        tempjs.targetPosition = (Mathf.Approximately (LeftTrigger, 1f) ? 1f : 0f) * 90f;
-        tempjs.targetPosition = Mathf.Clamp (tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
+        tempjs.targetPosition = (Mathf.Approximately(LeftTrigger, 1f) ? 1f : 0f) * 90f;
+        tempjs.targetPosition = Mathf.Clamp(tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
         _chesthj.spring = tempjs;
     }
 
-    public void OnMeleeHit (Vector3 force)
+    public void OnMeleeHit(Vector3 force)
     {
         // Add HIT VFX
-        GameObject par = Instantiate (VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler (0f, 180f + Vector3.SignedAngle (Vector3.forward, new Vector3 (force.x, 0f, force.z), Vector3.up), 0f));
+        GameObject par = Instantiate(VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
         // END VFX
-        ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem> ().main;
-        ParticleSystem.MainModule psmain2 = par.transform.GetChild (0).GetComponent<ParticleSystem> ().main;
-        psmain.maxParticles = (int)Mathf.Round ((9f / 51005f) * force.magnitude * force.magnitude);
-        psmain2.maxParticles = (int)Mathf.Round (12f / 255025f * force.magnitude * force.magnitude);
+        ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem>().main;
+        ParticleSystem.MainModule psmain2 = par.transform.GetChild(0).GetComponent<ParticleSystem>().main;
+        psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
+        psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
 
-        _rb.AddForce (force, ForceMode.Impulse);
+        _rb.AddForce(force, ForceMode.Impulse);
 
     }
 
-    private void CheckJump ()
+    private void CheckJump()
     {
-        if (_player.GetButton ("Jump") && IsGrounded ())
+        if (_player.GetButton("Jump") && IsGrounded())
         {
-            _rb.AddForce (new Vector3 (0, JumpForce, 0), ForceMode.Impulse);
+            _rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
         }
     }
 
-    public void ApplyWalkForce (float _force)
+    public void ApplyWalkForce(float _force)
     {
         //string HLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis1";
         //string VLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis2";
-        float HLAxis = _player.GetAxis ("Move Horizontal");
-        float VLAxis = _player.GetAxis ("Move Vertical");
+        float HLAxis = _player.GetAxis("Move Horizontal");
+        float VLAxis = _player.GetAxis("Move Vertical");
 
-        if (IsGrounded () && (!Mathf.Approximately (HLAxis, 0f) || !Mathf.Approximately (VLAxis, 0f)))
-            _rb.AddForce (transform.forward * _force, ForceMode.Impulse);
+        if (IsGrounded() && (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f)))
+            _rb.AddForce(transform.forward * _force, ForceMode.Impulse);
     }
 
-    private void CheckMovement ()
+    private void CheckMovement()
     {
         //string HLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis1";
         //string VLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis2";
-        float HLAxis = _player.GetAxis ("Move Horizontal");
-        float VLAxis = _player.GetAxis ("Move Vertical");
+        float HLAxis = _player.GetAxis("Move Horizontal");
+        float VLAxis = _player.GetAxis("Move Vertical");
 
-        if (!Mathf.Approximately (HLAxis, 0f) || !Mathf.Approximately (VLAxis, 0f))
+        if (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f))
         {
             // Get the percent of input force player put in
-            float normalizedInputVal = Mathf.Sqrt (Mathf.Pow (HLAxis, 2f) + Mathf.Pow (VLAxis, 2f)) / Mathf.Sqrt (2);
+            float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
             // Add force based on that percentage
-            if (IsGrounded ())
-                _rb.AddForce (transform.forward * Thrust * normalizedInputVal);
+            if (IsGrounded())
+                _rb.AddForce(transform.forward * Thrust * normalizedInputVal);
             else
-                _rb.AddForce (transform.forward * Thrust * normalizedInputVal * 0.5f);
+                _rb.AddForce(transform.forward * Thrust * normalizedInputVal * 0.5f);
             // Turn player according to the rotation of the joystick
             //transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
             float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
-            float controllerRot = Mathf.Atan2 (HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
-            if (!(Mathf.Abs (playerRot - controllerRot) < 20f))
+            float controllerRot = Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
+            if (!(Mathf.Abs(playerRot - controllerRot) < 20f))
             {
                 //float mirrorAngle = playerRot > 0f ? (playerRot - 180f) : (playerRot + 180f);
                 //float rotation = controllerRot - playerRot > 0f ? 1f : -1f;
@@ -509,64 +514,64 @@ public class PlayerController : MonoBehaviour
             // Check if player's speed is not within x degree of the controller angle
             // Then disable the animator if so
             // Turn on the animator of the Leg Swing Preference
-            float playerVelRot = Mathf.Atan2 (_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
+            float playerVelRot = Mathf.Atan2(_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
 
 
 
             //LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded () && (Mathf.Abs (playerVelRot - playerRot) < 90f);
-            LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded ();
+            LegSwingReference.GetComponent<Animator>().enabled = IsGrounded();
 
-            RotationSpeed = Mathf.Clamp (RotationSpeed, 4f, 15f);
-            Transform target = TurnReference.transform.GetChild (0);
+            RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
+            Transform target = TurnReference.transform.GetChild(0);
             Vector3 relativePos = target.position - transform.position;
 
-            TurnReference.transform.eulerAngles = new Vector3 (transform.eulerAngles.x, Mathf.Atan2 (HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
-            Quaternion rotation = Quaternion.LookRotation (relativePos, Vector3.up);
-            Quaternion tr = Quaternion.Slerp (transform.rotation, rotation, Time.deltaTime * RotationSpeed);
+            TurnReference.transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
+            Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+            Quaternion tr = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * RotationSpeed);
             if (!_auxillaryRotationLock)
                 transform.rotation = tr;
         }
         else
         {
-            LegSwingReference.GetComponent<Animator> ().enabled = false;
+            LegSwingReference.GetComponent<Animator>().enabled = false;
             LegSwingReference.transform.eulerAngles = Vector3.zero;
         }
     }
 
     #region Helper Functions
 
-    private void CheckRewiredInput ()
+    private void CheckRewiredInput()
     {
-        LeftTrigger = _player.GetAxis ("Left Trigger");
-        RightTrigger = _player.GetAxis ("Right Trigger");
+        LeftTrigger = _player.GetAxis("Left Trigger");
+        RightTrigger = _player.GetAxis("Right Trigger");
 
-        LeftTrigger = Mathf.Approximately (LeftTrigger, 0f) || Mathf.Approximately (LeftTrigger, -1f) ? 0f : 1f;
-        RightTrigger = Mathf.Approximately (RightTrigger, 0f) || Mathf.Approximately (RightTrigger, -1f) ? 0f : 1f;
+        LeftTrigger = Mathf.Approximately(LeftTrigger, 0f) || Mathf.Approximately(LeftTrigger, -1f) ? 0f : 1f;
+        RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
 
-        if (Mathf.Approximately (0f, LeftTrigger) && HandObject != null)
+        if (Mathf.Approximately(0f, LeftTrigger) && HandObject != null)
             normalState = State.Holding;
     }
 
-    private bool IsGrounded ()
+    private bool IsGrounded()
     {
-        return Physics.Raycast (transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask);
+        return Physics.Raycast(transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask);
     }
 
-    private void CheckArmHelper (float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+    private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
     {
         // Arm2: right max: 90 --> -74
         //       left min: -75 --> 69        
         JointLimits lm1 = Arm2hj.limits;
         if (IsLeftHand)
-            lm1.min = Mathf.Approximately (TriggerValue, 1f) ? 69f : -75f;
+            lm1.min = Mathf.Approximately(TriggerValue, 1f) ? 69f : -75f;
         else
-            lm1.max = Mathf.Approximately (TriggerValue, 1f) ? -74f : 90f;
+            lm1.max = Mathf.Approximately(TriggerValue, 1f) ? -74f : 90f;
         Arm2hj.limits = lm1;
 
         //  Arm: Limits: -90, 90 --> 0, 121
         JointLimits lm = Armhj.limits;
-        lm.max = Mathf.Approximately (TriggerValue, 1f) ? 121f : 90f;
-        lm.min = Mathf.Approximately (TriggerValue, 1f) ? 0f : -90f;
+        lm.max = Mathf.Approximately(TriggerValue, 1f) ? 121f : 90f;
+        lm.min = Mathf.Approximately(TriggerValue, 1f) ? 0f : -90f;
         Armhj.limits = lm;
 
         // Arm: Target Position: 0 --> 180
@@ -581,17 +586,17 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    void ResetBody ()
+    void ResetBody()
     {
-        ResetBodyHelper (_leftArm2hj, _leftArmhj, true);
-        ResetBodyHelper (_rightArm2hj, _rightArmhj, false);
+        ResetBodyHelper(_leftArm2hj, _leftArmhj, true);
+        ResetBodyHelper(_rightArm2hj, _rightArmhj, false);
         JointSpring js = _chesthj.spring;
         js.targetPosition = 0f;
         _chesthj.spring = js;
     }
 
     // Reset All Body
-    void ResetBodyHelper (HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
+    void ResetBodyHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
     {
         JointLimits lm2 = Arm2hj.limits;
         JointLimits lm = Armhj.limits;
@@ -614,7 +619,7 @@ public class PlayerController : MonoBehaviour
         Arm2hj.limits = lm2;
     }
 
-    IEnumerator MeleeClockFistHelper (HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftArmhj)
+    IEnumerator MeleeClockFistHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftArmhj)
     {
         IsPunching = false;
         float elapesdTime = 0f;
@@ -630,7 +635,7 @@ public class PlayerController : MonoBehaviour
         float inithlMin = hl.min;
         float initLATargetPosition = ljs.targetPosition;
         // VFX section
-        MeleeChargingVFX.GetComponent<ParticleSystem> ().Play ();
+        MeleeChargingVFX.GetComponent<ParticleSystem>().Play();
         // VFX END
 
         while (elapesdTime < time)
@@ -639,30 +644,30 @@ public class PlayerController : MonoBehaviour
             MeleeCharge = elapesdTime / time;
 
             // VFX Section
-            MeleeChargingVFX.transform.localScale = new Vector3 (0.8f * MeleeCharge, 0.8f * MeleeCharge, 0.8f * MeleeCharge);
+            MeleeChargingVFX.transform.localScale = new Vector3(0.8f * MeleeCharge, 0.8f * MeleeCharge, 0.8f * MeleeCharge);
             // VFX END
-            lm2.max = Mathf.Lerp (initLm2Max, 4f, MeleeCharge);
-            lm2.min = Mathf.Lerp (initLm2Min, -17f, MeleeCharge);
+            lm2.max = Mathf.Lerp(initLm2Max, 4f, MeleeCharge);
+            lm2.min = Mathf.Lerp(initLm2Min, -17f, MeleeCharge);
 
-            ljs.targetPosition = Mathf.Lerp (initLATargetPosition, 80f, MeleeCharge);
-            js.targetPosition = Mathf.Lerp (initLmTargetPosition, -85f, MeleeCharge);
+            ljs.targetPosition = Mathf.Lerp(initLATargetPosition, 80f, MeleeCharge);
+            js.targetPosition = Mathf.Lerp(initLmTargetPosition, -85f, MeleeCharge);
 
-            hl.max = Mathf.Lerp (inithlMax, 130f, MeleeCharge);
-            hl.min = Mathf.Lerp (inithlMin, 128f, MeleeCharge);
+            hl.max = Mathf.Lerp(inithlMax, 130f, MeleeCharge);
+            hl.min = Mathf.Lerp(inithlMin, 128f, MeleeCharge);
 
             Arm2hj.limits = lm2;
             Armhj.spring = js;
             LeftArmhj.spring = ljs;
             Handhj.limits = hl;
-            yield return new WaitForEndOfFrame ();
+            yield return new WaitForEndOfFrame();
         }
         // VFX Section: Charged, Ult now
-        MeleeChargingVFX.GetComponent<ParticleSystem> ().Stop ();
-        MeleeUltimateVFX.GetComponent<ParticleSystem> ().Play ();
+        MeleeChargingVFX.GetComponent<ParticleSystem>().Stop();
+        MeleeUltimateVFX.GetComponent<ParticleSystem>().Play();
         // END
     }
 
-    IEnumerator MeleePunchHelper (HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftHandhj)
+    IEnumerator MeleePunchHelper(HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftHandhj)
     {
         float elapesdTime = 0f;
         IsPunching = true;
@@ -670,7 +675,7 @@ public class PlayerController : MonoBehaviour
         JointSpring js = Armhj.spring;
         JointSpring ljs = LeftHandhj.spring;
         // VFX Section
-        MeleeChargingVFX.GetComponent<ParticleSystem> ().Stop ();
+        MeleeChargingVFX.GetComponent<ParticleSystem>().Stop();
         // END
         float initLmTargetPosition = js.targetPosition;
         float initLATargetPosition = ljs.targetPosition;
@@ -681,27 +686,27 @@ public class PlayerController : MonoBehaviour
         while (elapesdTime < time)
         {
             elapesdTime += Time.deltaTime;
-            ljs.targetPosition = Mathf.Lerp (initLATargetPosition, -120f, elapesdTime / time);
-            js.targetPosition = Mathf.Lerp (initLmTargetPosition, 180f, elapesdTime / time);
-            hl.max = Mathf.Lerp (inithlMax, 12f, elapesdTime / time);
-            hl.min = Mathf.Lerp (inithlMin, -2.8f, elapesdTime / time);
+            ljs.targetPosition = Mathf.Lerp(initLATargetPosition, -120f, elapesdTime / time);
+            js.targetPosition = Mathf.Lerp(initLmTargetPosition, 180f, elapesdTime / time);
+            hl.max = Mathf.Lerp(inithlMax, 12f, elapesdTime / time);
+            hl.min = Mathf.Lerp(inithlMin, -2.8f, elapesdTime / time);
             LeftHandhj.spring = ljs;
             Armhj.spring = js;
             Handhj.limits = hl;
-            yield return new WaitForEndOfFrame ();
+            yield return new WaitForEndOfFrame();
         }
-        yield return new WaitForSeconds (0.1f);
+        yield return new WaitForSeconds(0.1f);
         // VFX Section
-        MeleeUltimateVFX.GetComponent<ParticleSystem> ().Stop ();
+        MeleeUltimateVFX.GetComponent<ParticleSystem>().Stop();
         //VFX END
         _checkArm = true;
         Armhj.connectedMassScale = 1f;
-        ResetBody ();
+        ResetBody();
         IsPunching = false;
         MeleeCharge = 0f;
     }
 
-    IEnumerator PickUpWeaponHelper (HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
+    IEnumerator PickUpWeaponHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
     {
         float elapesdTime = 0f;
         JointLimits lm2 = Arm2hj.limits;
@@ -716,18 +721,18 @@ public class PlayerController : MonoBehaviour
             elapesdTime += Time.deltaTime;
             if (IsLeftHand)
             {
-                lm2.max = Mathf.Lerp (initLm2LeftMax, 103f, elapesdTime / time);
-                lm2.min = Mathf.Lerp (initLm2LeftMin, 95f, elapesdTime / time);
+                lm2.max = Mathf.Lerp(initLm2LeftMax, 103f, elapesdTime / time);
+                lm2.min = Mathf.Lerp(initLm2LeftMin, 95f, elapesdTime / time);
             }
             else
             {
-                lm2.max = Mathf.Lerp (initLm2LeftMax, -88f, elapesdTime / time);
-                lm2.min = Mathf.Lerp (initLm2LeftMin, -98f, elapesdTime / time);
+                lm2.max = Mathf.Lerp(initLm2LeftMax, -88f, elapesdTime / time);
+                lm2.min = Mathf.Lerp(initLm2LeftMin, -98f, elapesdTime / time);
             }
-            lm.max = Mathf.Lerp (initLmMax, 180f, elapesdTime / time);
+            lm.max = Mathf.Lerp(initLmMax, 180f, elapesdTime / time);
             Arm2hj.limits = lm2;
             Armhj.limits = lm;
-            yield return new WaitForEndOfFrame ();
+            yield return new WaitForEndOfFrame();
         }
         Armhj.connectedMassScale = 1f;
     }

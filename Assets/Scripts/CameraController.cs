@@ -60,7 +60,10 @@ public class CameraController : MonoBehaviour
             return;
         }
         SetTarget();
-        if (FollowTarget == Vector3.zero) return;
+        if (FollowTarget == Vector3.zero || FollowTarget == new Vector3(XOffset, 0f, ZOffset))
+        {
+            return;
+        }
         _desiredPosition = new Vector3(FollowTarget.x + _xDiffOrigin, transform.position.y, FollowTarget.z + _zDiffOrigin);
         _smoothedPosition = Vector3.Lerp(transform.position, _desiredPosition, SmoothSpeed);
         transform.position = _smoothedPosition;

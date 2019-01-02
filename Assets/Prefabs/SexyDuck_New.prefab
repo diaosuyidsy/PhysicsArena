@@ -3040,9 +3040,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b8dbe361d31b48559f82cae547cd64e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerControllerNumber: 3
   Thrust: 100
-  JumpForce: 60
+  JumpForce: 300
   JumpMask:
     serializedVersion: 2
     m_Bits: 8192
@@ -3077,6 +3076,7 @@ MonoBehaviour:
   DropCharge: 0
   IsPunching: 0
   HandTaken: 0
+  IsOnGround: 0
   _axuillaryMaxDistance: 50
   _auxillaryMaxAngle: 10
   debugT_CheckArm: 1

@@ -462,7 +462,7 @@ public class PlayerController : MonoBehaviour
 
     private void CheckJump()
     {
-        if (_player.GetButton("Jump") && IsGrounded())
+        if (_player.GetButtonDown("Jump") && IsGrounded())
         {
             _rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
         }
@@ -557,12 +557,8 @@ public class PlayerController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        return IsOnGround;
-        //return Physics.Raycast(transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask) ||
-        //    Physics.Raycast(transform.position + new Vector3(0.3f, 0f), -Vector3.up, _distToGround + 0.2f, JumpMask) ||
-        //    Physics.Raycast(transform.position + new Vector3(-0.3f, 0f), -Vector3.up, _distToGround + 0.2f, JumpMask) ||
-        //    Physics.Raycast(transform.position + new Vector3(0f, 0f, 0.3f), -Vector3.up, _distToGround + 0.2f, JumpMask) ||
-        //    Physics.Raycast(transform.position + new Vector3(0f, 0f, -0.3f), -Vector3.up, _distToGround + 0.2f, JumpMask);
+        RaycastHit hit;
+        return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, JumpMask);
     }
 
     private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)

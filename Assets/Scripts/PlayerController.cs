@@ -44,6 +44,8 @@ public class PlayerController : MonoBehaviour
     public bool IsPunching = false;
     [HideInInspector]
     public bool HandTaken = false;
+    [HideInInspector]
+    public bool IsOnGround = false;
 
     #region States
     private enum State
@@ -542,6 +544,7 @@ public class PlayerController : MonoBehaviour
 
     private void CheckRewiredInput()
     {
+        if (_player == null) return;
         LeftTrigger = _player.GetAxis("Left Trigger");
         RightTrigger = _player.GetAxis("Right Trigger");
 
@@ -554,7 +557,12 @@ public class PlayerController : MonoBehaviour
 
     private bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask);
+        return IsOnGround;
+        //return Physics.Raycast(transform.position, -Vector3.up, _distToGround + 0.2f, JumpMask) ||
+        //    Physics.Raycast(transform.position + new Vector3(0.3f, 0f), -Vector3.up, _distToGround + 0.2f, JumpMask) ||
+        //    Physics.Raycast(transform.position + new Vector3(-0.3f, 0f), -Vector3.up, _distToGround + 0.2f, JumpMask) ||
+        //    Physics.Raycast(transform.position + new Vector3(0f, 0f, 0.3f), -Vector3.up, _distToGround + 0.2f, JumpMask) ||
+        //    Physics.Raycast(transform.position + new Vector3(0f, 0f, -0.3f), -Vector3.up, _distToGround + 0.2f, JumpMask);
     }
 
     private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)

@@ -19,20 +19,20 @@ public class rtEmit : MonoBehaviour
     private float _shootCD = 0f;
     private GunPositionControl _gpc;
 
-    private void Start ()
+    private void Start()
     {
         currentAmmo = MaxAmmo;
-        _gpc = GetComponent<GunPositionControl> ();
+        _gpc = GetComponent<GunPositionControl>();
     }
     // This function is called by PlayerController, when player is holding a gun
     // And it's holding down RT
-    public void Shoot (float TriggerVal)
+    public void Shoot(float TriggerVal)
     {
 
         // If player was holding down the RT button
         // CD will add up
         // If CD >= MaxCD, nothing works, only releasing the RT will replenish the CD
-        if (Mathf.Approximately (TriggerVal, 1f))
+        if (Mathf.Approximately(TriggerVal, 1f))
         {
             _shootCD += Time.deltaTime;
             if (_shootCD >= ShootMaxCD)
@@ -42,7 +42,7 @@ public class rtEmit : MonoBehaviour
             }
         }
 
-        if (Mathf.Approximately (TriggerVal, 0f) || currentAmmo <= 0)
+        if (Mathf.Approximately(TriggerVal, 0f) || currentAmmo <= 0)
         {
             // Need to reset shoot CD if player has released RT
             _shootCD = 0f;
@@ -52,62 +52,67 @@ public class rtEmit : MonoBehaviour
         WaterBall.speed = Speed;
         if (_gpc != null)
         {
-            _gpc.Owner.GetComponent<Rigidbody> ().AddForce (-_gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
-            _gpc.Owner.GetComponent<Rigidbody> ().AddForce (_gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
+            _gpc.Owner.GetComponent<Rigidbody>().AddForce(-_gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
+            _gpc.Owner.GetComponent<Rigidbody>().AddForce(_gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
         }
         currentAmmo--;
+        if (currentAmmo <= 0)
+        {
+            // If no ammo left, then drop the weapon
+            _gpc.Owner.GetComponent<PlayerController>().DropHelper();
+        }
         // If we changed ammo, then need to change UI as well
-        ChangeAmmoUI ();
+        ChangeAmmoUI();
     }
 
-    private void ChangeAmmoUI ()
+    private void ChangeAmmoUI()
     {
         float scaleY = currentAmmo * 1.0f / MaxAmmo;
-        WaterUI.transform.localScale = new Vector3 (1f, scaleY, 1f);
+        WaterUI.transform.localScale = new Vector3(1f, scaleY, 1f);
     }
 
     // If weapon collide to the ground, and has no ammo, then despawn it
     // And if weapon does not collide to the ground or other allowed 
-    private void OnCollisionEnter (Collision other)
+    private void OnCollisionEnter(Collision other)
     {
-        if (other.collider.CompareTag ("Ground") && currentAmmo == 0)
+        if (other.collider.CompareTag("Ground") && currentAmmo == 0)
         {
             currentAmmo = MaxAmmo;
-            ChangeAmmoUI ();
+            ChangeAmmoUI();
             // Add Vanish VFX
-            Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
             // END ADD
-            gameObject.SetActive (false);
+            gameObject.SetActive(false);
         }
         if (((1 << other.gameObject.layer) & OnHitDisappear) != 0)
         {
-            StartCoroutine (DisappearAfterAWhile (3f));
+            StartCoroutine(DisappearAfterAWhile(3f));
         }
     }
 
     // If the weapon is taken down the death zone, then despawn it
-    private void OnTriggerEnter (Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag ("DeathZone"))
+        if (other.CompareTag("DeathZone"))
         {
             currentAmmo = MaxAmmo;
             // Add Vanish VFX
-            Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
             // END ADD
-            ChangeAmmoUI ();
-            gameObject.SetActive (false);
+            ChangeAmmoUI();
+            gameObject.SetActive(false);
         }
     }
 
-    IEnumerator DisappearAfterAWhile (float time)
+    IEnumerator DisappearAfterAWhile(float time)
     {
-        yield return new WaitForSeconds (time);
+        yield return new WaitForSeconds(time);
         currentAmmo = MaxAmmo;
         // Add Vanish VFX
-        Instantiate (VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
         // END ADD
-        ChangeAmmoUI ();
-        gameObject.SetActive (false);
+        ChangeAmmoUI();
+        gameObject.SetActive(false);
     }
 
 }

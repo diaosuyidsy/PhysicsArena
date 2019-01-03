@@ -16,7 +16,6 @@ public class PlayerController : MonoBehaviour
     [Tooltip("It should be the same speed, little less than Duck's normal WalkSpeed")]
     public float PickUpSpeed = 1.8f;
     [Header("Player Body Setting Section")]
-    public GameObject HeadGunPos;
     public GameObject LegSwingReference;
     public GameObject Chest;
     [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]

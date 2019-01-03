@@ -267,6 +267,11 @@ public class PlayerController : MonoBehaviour
             // Stop the shooting
             HandObject.SendMessage("Shoot", 0f);
         }
+        if (HandObject.CompareTag("WoodStamp"))
+        {
+            HandObject.GetComponent<Rigidbody>().isKinematic = false;
+            HandObject.layer = 0;
+        }
         if (HandObject.CompareTag("Team1Resource") || HandObject.CompareTag("Team2Resource"))
         {
             HandObject.layer = 0;
@@ -301,6 +306,18 @@ public class PlayerController : MonoBehaviour
                             AuxillaryAim();
                     }
                     break;
+                case "WoodStamp":
+                    if (HandObject != null && !_dropping)
+                    {
+                        attackState = State.Shooting;
+                        HandObject.SendMessage("Stamp");
+                        if (EnableAuxillaryAiming) AuxillaryAim();
+                        // Bend the body
+                        JointSpring tempjs = _chesthj.spring;
+                        tempjs.targetPosition = 40f;
+                        _chesthj.spring = tempjs;
+                    }
+                    break;
                 case "Team1Resource":
                 case "Team2Resource":
                     if (!_dropping)
@@ -333,6 +350,13 @@ public class PlayerController : MonoBehaviour
                     // Auxillary Aiming
                     _auxillaryRotationLock = false;
                     _weaponCD = 0f;
+                    break;
+                case "WoodStamp":
+                    attackState = State.Empty;
+                    // Bend the body back
+                    JointSpring tempjs = _chesthj.spring;
+                    tempjs.targetPosition = -5f;
+                    _chesthj.spring = tempjs;
                     break;
                 default:
                     // If we previously started melee and released the trigger, then release the fist
@@ -399,6 +423,7 @@ public class PlayerController : MonoBehaviour
         {
             case "Team1Resource":
             case "Team2Resource":
+            case "WoodStamp":
             case "Weapon":
                 _checkArm = false;
 

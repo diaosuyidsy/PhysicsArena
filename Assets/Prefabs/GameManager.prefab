@@ -22,6 +22,7 @@ GameObject:
   - component: {fileID: 114862773439473196}
   - component: {fileID: 114970469853377906}
   - component: {fileID: 114771036219341594}
+  - component: {fileID: 114718219955697686}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -448,6 +449,17 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
+--- !u!114 &114718219955697686
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1110226647717638}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a8ec5e9df92613643857896f13da77bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114771036219341594
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -496,6 +508,13 @@ MonoBehaviour:
   Players:
   - {fileID: 0}
   - {fileID: 0}
+  APlayers:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
   AllPlayers:
     serializedVersion: 2
     m_Bits: 105984
@@ -522,7 +541,9 @@ MonoBehaviour:
   - Weapon
   - Team1Resource
   - Team2Resource
-  - MachineGun
+  - WoodStamp
+  TeamRed1Explosion: {fileID: 0}
+  TeamBlue2Explosion: {fileID: 0}
   weaponSpawnerCenter: {x: 0, y: 6.71, z: 0}
   weaponSpawnerSize: {x: 5.4, y: 0, z: 6.54}
   WorldCenter: {x: 18.03, y: -1.34, z: -16.6}

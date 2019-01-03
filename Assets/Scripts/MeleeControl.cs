@@ -7,7 +7,7 @@ public class MeleeControl : MonoBehaviour
     public float Thrust = 100f;
     public PlayerController pc;
 
-    private void OnCollisionEnter (Collision collision)
+    private void OnCollisionEnter(Collision collision)
     {
         if (GameManager.GM.AllPlayers != (GameManager.GM.AllPlayers | (1 << collision.collider.gameObject.layer)))
             return;
@@ -15,7 +15,9 @@ public class MeleeControl : MonoBehaviour
         if (pc != null && pc.IsPunching)
         {
             pc.IsPunching = false;
-            collision.collider.SendMessageUpwards ("OnMeleeHit", transform.forward * Thrust * pc.MeleeCharge);
+            float velocityAddon = transform.GetComponent<Rigidbody>().velocity.magnitude * 1.5f;
+            velocityAddon = velocityAddon > 1.4f ? 1.4f : velocityAddon;
+            collision.collider.SendMessageUpwards("OnMeleeHit", transform.forward * Thrust * pc.MeleeCharge * velocityAddon);
         }
     }
 }

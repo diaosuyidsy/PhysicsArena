@@ -196,7 +196,7 @@ public class PlayerController : MonoBehaviour
             return;
 
         // If taken something, and pushed LT, drop the thing
-        if (Mathf.Approximately(1f, LeftTrigger))
+        if (_player.GetButton("Left Trigger"))
         {
             _dropping = true;
             //DropHelper ();
@@ -281,7 +281,8 @@ public class PlayerController : MonoBehaviour
 
     public void CheckFire()
     {
-        if (Mathf.Approximately(RightTrigger, 1f))
+        //if (Mathf.Approximately(RightTrigger, 1f))
+        if (_player.GetButton("Right Trigger"))
         {
             // Means we want to fire
             switch (_rightTriggerRegister)
@@ -449,20 +450,24 @@ public class PlayerController : MonoBehaviour
         // Hand: Limit Max: 90 --> 0
         if (attackState == State.Meleeing || normalState == State.Holding) return;
 
-        LeftHand.GetComponent<Fingers>().SetTaken(Mathf.Approximately(0f, LeftTrigger) || _dropping);
-        RightHand.GetComponent<Fingers>().SetTaken(Mathf.Approximately(0f, LeftTrigger) || _dropping);
+        bool LTPushDown = _player.GetButton("Left Trigger");
+        bool LTLiftUp = _player.GetButtonUp("Left Trigger");
+        //LeftHand.GetComponent<Fingers>().SetTaken(Mathf.Approximately(0f, LeftTrigger) || _dropping);
+        //RightHand.GetComponent<Fingers>().SetTaken(Mathf.Approximately(0f, LeftTrigger) || _dropping);
+        LeftHand.GetComponent<Fingers>().SetTaken(!LTPushDown || _dropping);
+        RightHand.GetComponent<Fingers>().SetTaken(!LTPushDown || _dropping);
 
-        if (Mathf.Approximately(1f, LeftTrigger))
+        if (LTPushDown)
             normalState = State.Picking;
         else
             normalState = State.Empty;
 
-        CheckArmHelper(LeftTrigger, _leftArm2hj, _leftArmhj, _leftHandhj, true);
-        CheckArmHelper(LeftTrigger, _rightArm2hj, _rightArmhj, _rightHandhj, false);
+        CheckArmHelper(LTPushDown, _leftArm2hj, _leftArmhj, _leftHandhj, true);
+        CheckArmHelper(LTPushDown, _rightArm2hj, _rightArmhj, _rightHandhj, false);
 
         // Bend the body all together
         JointSpring tempjs = _chesthj.spring;
-        tempjs.targetPosition = (Mathf.Approximately(LeftTrigger, 1f) ? 1f : 0f) * 90f;
+        tempjs.targetPosition = (LTPushDown ? 1f : 0f) * 90f;
         tempjs.targetPosition = Mathf.Clamp(tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
         _chesthj.spring = tempjs;
     }
@@ -566,13 +571,13 @@ public class PlayerController : MonoBehaviour
     private void CheckRewiredInput()
     {
         if (_player == null) return;
-        LeftTrigger = _player.GetAxis("Left Trigger");
-        RightTrigger = _player.GetAxis("Right Trigger");
+        //LeftTrigger = _player.GetAxis("Left Trigger");
+        //RightTrigger = _player.GetAxis("Right Trigger");
 
-        LeftTrigger = Mathf.Approximately(LeftTrigger, 0f) || Mathf.Approximately(LeftTrigger, -1f) ? 0f : 1f;
-        RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
+        //LeftTrigger = Mathf.Approximately(LeftTrigger, 0f) || Mathf.Approximately(LeftTrigger, -1f) ? 0f : 1f;
+        //RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
 
-        if (Mathf.Approximately(0f, LeftTrigger) && HandObject != null)
+        if (!_player.GetButton("Left Trigger") && HandObject != null)
             normalState = State.Holding;
     }
 
@@ -582,31 +587,60 @@ public class PlayerController : MonoBehaviour
         return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, JumpMask);
     }
 
-    private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+    //private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+    //{
+    //    // Arm2: right max: 90 --> -74
+    //    //       left min: -75 --> 69        
+    //    JointLimits lm1 = Arm2hj.limits;
+    //    if (IsLeftHand)
+    //        lm1.min = Mathf.Approximately(TriggerValue, 1f) ? 69f : -75f;
+    //    else
+    //        lm1.max = Mathf.Approximately(TriggerValue, 1f) ? -74f : 90f;
+    //    Arm2hj.limits = lm1;
+
+    //    //  Arm: Limits: -90, 90 --> 0, 121
+    //    JointLimits lm = Armhj.limits;
+    //    lm.max = Mathf.Approximately(TriggerValue, 1f) ? 121f : 90f;
+    //    lm.min = Mathf.Approximately(TriggerValue, 1f) ? 0f : -90f;
+    //    Armhj.limits = lm;
+
+    //    // Arm: Target Position: 0 --> 180
+    //    JointSpring js = Armhj.spring;
+    //    js.targetPosition = 180f * TriggerValue;
+    //    Armhj.spring = js;
+
+    //    // Hand: Limit Max: 90 --> 0
+    //    JointLimits tlm = Handhj.limits;
+    //    tlm.max = 90f * (1f - TriggerValue);
+    //    Handhj.limits = tlm;
+
+    //}
+
+    private void CheckArmHelper(bool down, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
     {
         // Arm2: right max: 90 --> -74
         //       left min: -75 --> 69        
         JointLimits lm1 = Arm2hj.limits;
         if (IsLeftHand)
-            lm1.min = Mathf.Approximately(TriggerValue, 1f) ? 69f : -75f;
+            lm1.min = down ? 69f : -75f;
         else
-            lm1.max = Mathf.Approximately(TriggerValue, 1f) ? -74f : 90f;
+            lm1.max = down ? -74f : 90f;
         Arm2hj.limits = lm1;
 
         //  Arm: Limits: -90, 90 --> 0, 121
         JointLimits lm = Armhj.limits;
-        lm.max = Mathf.Approximately(TriggerValue, 1f) ? 121f : 90f;
-        lm.min = Mathf.Approximately(TriggerValue, 1f) ? 0f : -90f;
+        lm.max = down ? 121f : 90f;
+        lm.min = down ? 0f : -90f;
         Armhj.limits = lm;
 
         // Arm: Target Position: 0 --> 180
         JointSpring js = Armhj.spring;
-        js.targetPosition = 180f * TriggerValue;
+        js.targetPosition = down ? 180f : 0f;
         Armhj.spring = js;
 
         // Hand: Limit Max: 90 --> 0
         JointLimits tlm = Handhj.limits;
-        tlm.max = 90f * (1f - TriggerValue);
+        tlm.max = down ? 0f : 90f;
         Handhj.limits = tlm;
 
     }

@@ -78,7 +78,6 @@ public class PlayerController : MonoBehaviour
     private HingeJoint _rightHandhj;
     private bool _checkArm = true;
     private string _rightTriggerRegister = "";
-    private bool _startMelee = false;
     private bool _canControl = true;
     private Vector3 _freezeBody;
     private float _previousFrameVel = 0f;
@@ -92,12 +91,6 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region Controller Variables
-    private KeyCode JumpCode;
-    private KeyCode RunCode;
-    private KeyCode YButton;
-    private string RTStr;
-    private string LTStr;
-    //private bool CanDrop = false;
     private float RightTrigger;
     private float LeftTrigger;
     #endregion
@@ -248,6 +241,7 @@ public class PlayerController : MonoBehaviour
         if (HandObject == null) return;
         // Drop the thing
         HandObject.SendMessage("Drop");
+        _auxillaryRotationLock = false;
         normalState = State.Empty;
         _dropping = false;
         // Change to non-dropping state after a while
@@ -307,7 +301,7 @@ public class PlayerController : MonoBehaviour
                     }
                     break;
                 case "WoodStamp":
-                    if (HandObject != null && !_dropping)
+                    if (HandObject != null && !_dropping && attackState != State.Shooting)
                     {
                         attackState = State.Shooting;
                         HandObject.SendMessage("Stamp", true);

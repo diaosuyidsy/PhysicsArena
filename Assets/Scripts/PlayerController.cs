@@ -310,7 +310,7 @@ public class PlayerController : MonoBehaviour
                     if (HandObject != null && !_dropping)
                     {
                         attackState = State.Shooting;
-                        HandObject.SendMessage("Stamp");
+                        HandObject.SendMessage("Stamp", true);
                         if (EnableAuxillaryAiming) AuxillaryAim();
                         // Bend the body
                         JointSpring tempjs = _chesthj.spring;
@@ -353,6 +353,9 @@ public class PlayerController : MonoBehaviour
                     break;
                 case "WoodStamp":
                     attackState = State.Empty;
+                    HandObject.SendMessage("Stamp", false);
+                    _auxillaryRotationLock = false;
+
                     // Bend the body back
                     JointSpring tempjs = _chesthj.spring;
                     tempjs.targetPosition = -5f;
@@ -544,8 +547,8 @@ public class PlayerController : MonoBehaviour
 
 
 
-            //LegSwingReference.GetComponent<Animator> ().enabled = IsGrounded () && (Mathf.Abs (playerVelRot - playerRot) < 90f);
-            LegSwingReference.GetComponent<Animator>().enabled = IsGrounded();
+            //LegSwingReference.GetComponent<Animator>().enabled = IsGrounded();
+            LegSwingReference.GetComponent<Animator>().enabled = true;
 
             RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
             Transform target = TurnReference.transform.GetChild(0);

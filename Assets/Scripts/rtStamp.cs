@@ -6,13 +6,19 @@ public class rtStamp : MonoBehaviour
 {
     public float Thrust = 300f;
 
-    [HideInInspector]
-    public bool Charged = false;
-    private bool stampedSomeone = false;
+    private bool Charged = false;
+    // stampedSomeone == int
+    private bool stampedSomeone = true;
 
-    public void Stamp()
+    public void Stamp(bool hold)
     {
-        if (!Charged) return;
+        if (!hold)
+        {
+            Charged = true;
+            stampedSomeone = true;
+            return;
+        }
+        if (hold && !Charged) return;
         Charged = false;
         stampedSomeone = false;
     }
@@ -25,11 +31,10 @@ public class rtStamp : MonoBehaviour
             return;
         if (stampedSomeone) return;
         stampedSomeone = true;
-        print("collided");
         // Else perform similar logic as the melee
         float velocityAddon = transform.GetComponent<Rigidbody>().velocity.magnitude * 1.5f;
         velocityAddon = velocityAddon > 1.4f ? 1.4f : velocityAddon;
-        other.SendMessageUpwards("OnMeleeHit", transform.forward * Thrust);
+        other.SendMessageUpwards("OnMeleeHit", -transform.right * Thrust);
     }
 
 }

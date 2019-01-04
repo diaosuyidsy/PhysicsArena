@@ -29,7 +29,7 @@ GameObject:
   - component: {fileID: 114528081043153620}
   m_Layer: 0
   m_Name: WoodStamp
-  m_TagString: Weapon
+  m_TagString: WoodStamp
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -142,8 +142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8614273be2f87bd448238cfe96e242a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Thrust: 300
-  Stamping: 0
+  Thrust: 800
 --- !u!135 &135031803362208342
 SphereCollider:
   m_ObjectHideFlags: 1
@@ -154,7 +153,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.1
+  m_Radius: 0.15
   m_Center: {x: 0.43, y: 0, z: 0}
 --- !u!135 &135853902625566808
 SphereCollider:
@@ -166,5 +165,5 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.1
+  m_Radius: 0.15
   m_Center: {x: -0.43, y: 0, z: 0}

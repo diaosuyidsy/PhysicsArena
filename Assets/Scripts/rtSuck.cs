@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class rtSuck : MonoBehaviour
 {
-    public float MaxBallTravelTime = 1f;
+    public float MaxBallTravelTime = 4f;
     public float BallTravelSpeed = 3f;
 
     private float _ballTraveledTime = 0f;
@@ -35,6 +35,14 @@ public class rtSuck : MonoBehaviour
         if (_ballState == State.Out)
         {
             _suckBall.transform.position += Time.deltaTime * _suckBall.transform.right * BallTravelSpeed;
+            _ballTraveledTime += Time.deltaTime;
+            if (_ballTraveledTime >= MaxBallTravelTime)
+            {
+                _ballTraveledTime = 0f;
+                _charged = false;
+                _ballState = State.Suck;
+                StartCoroutine(sucking(0.5f));
+            }
         }
     }
 
@@ -82,6 +90,7 @@ public class rtSuck : MonoBehaviour
         yield return new WaitForSeconds(time);
         // After time, disable the suckball and return it to the original position,
         // reset ballstate;
+        _ballTraveledTime = 0f;
         _suckBall.transform.parent = transform;
         _suckBall.transform.localPosition = Vector3.zero;
         _suckBall.transform.localEulerAngles = Vector3.zero;

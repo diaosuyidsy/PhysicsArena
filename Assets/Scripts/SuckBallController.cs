@@ -29,6 +29,7 @@ public class SuckBallController : MonoBehaviour
         if (go.CompareTag(_opponentTeamTag) && other.GetType() == typeof(CapsuleCollider))
         {
             // Add a linerenderer to the in range players and configure the linerenderer properly
+            if (go.GetComponent<LineRenderer>() != null) return;
             LineRenderer lr = go.AddComponent<LineRenderer>();
             lr.material = new Material(Shader.Find("Sprites/Default"));
             lr.widthMultiplier = 0.02f;

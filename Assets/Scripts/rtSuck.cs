@@ -6,6 +6,7 @@ public class rtSuck : MonoBehaviour
 {
     public float MaxBallTravelTime = 4f;
     public float BallTravelSpeed = 3f;
+    public float SuckStrength = 350f;
 
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
@@ -85,7 +86,7 @@ public class rtSuck : MonoBehaviour
         // First prototype: let's try adding a force to every object
         foreach (GameObject go in gos)
         {
-            go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position - go.transform.position).normalized * 15000f);
+            go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
         }
         yield return new WaitForSeconds(time);
         // After time, disable the suckball and return it to the original position,

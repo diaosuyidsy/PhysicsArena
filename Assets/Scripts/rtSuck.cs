@@ -10,11 +10,13 @@ public class rtSuck : MonoBehaviour
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
     private bool _charged = false;
+    private Vector3 _suckBallInitialScale;
+
     private enum State
     {
         In,
         Out,
-        Suck
+        Suck,
     }
 
     private State _ballState;
@@ -25,6 +27,7 @@ public class rtSuck : MonoBehaviour
         _ballState = State.In;
         _suckBall = transform.GetChild(0).gameObject;
         _sbc = _suckBall.GetComponent<SuckBallController>();
+        _suckBallInitialScale = new Vector3(_suckBall.transform.localScale.x, _suckBall.transform.localScale.y, _suckBall.transform.localScale.z);
     }
 
     private void Update()
@@ -53,6 +56,7 @@ public class rtSuck : MonoBehaviour
                     {
                         _charged = false;
                         _ballState = State.Suck;
+                        StartCoroutine(sucking(0.5f));
                     }
                     break;
             }
@@ -65,5 +69,31 @@ public class rtSuck : MonoBehaviour
                 _charged = true;
             }
         }
+    }
+
+    IEnumerator sucking(float time)
+    {
+        List<GameObject> gos = _sbc.InRangePlayers;
+        // First prototype: let's try adding a force to every object
+        foreach (GameObject go in gos)
+        {
+            go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position - go.transform.position).normalized * 15000f);
+        }
+        yield return new WaitForSeconds(time);
+        // After time, disable the suckball and return it to the original position,
+        // reset ballstate;
+        _suckBall.transform.parent = transform;
+        _suckBall.transform.localPosition = Vector3.zero;
+        _suckBall.transform.localEulerAngles = Vector3.zero;
+        _suckBall.transform.localScale = _suckBallInitialScale;
+        _suckBall.SetActive(false);
+        _ballState = State.In;
+        // Need a little clean up the line renderer and stuff
+        _sbc.CleanUpAll();
+    }
+
+    public bool isSucking()
+    {
+        return _ballState == State.Suck;
     }
 }

@@ -1241,26 +1241,6 @@ Prefab:
       propertyPath: m_RootOrder
       value: 25
       objectReference: {fileID: 0}
-    - target: {fileID: 114970469853377906, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: Weapons.Array.data[0]
-      value: 
-      objectReference: {fileID: 1794027881}
-    - target: {fileID: 114970469853377906, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: Weapons.Array.data[1]
-      value: 
-      objectReference: {fileID: 2100711374}
-    - target: {fileID: 114970469853377906, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: Weapons.Array.data[2]
-      value: 
-      objectReference: {fileID: 201442044}
-    - target: {fileID: 114970469853377906, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 2}
-      propertyPath: Weapons.Array.data[3]
-      value: 
-      objectReference: {fileID: 834787725}
     - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
         type: 2}
       propertyPath: APlayers.Array.data[0]
@@ -1341,6 +1321,26 @@ Prefab:
       propertyPath: TeamBlue2Explosion
       value: 
       objectReference: {fileID: 577636238}
+    - target: {fileID: 114970469853377906, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 2}
+      propertyPath: Weapons.Array.data[0]
+      value: 
+      objectReference: {fileID: 1794027881}
+    - target: {fileID: 114970469853377906, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 2}
+      propertyPath: Weapons.Array.data[1]
+      value: 
+      objectReference: {fileID: 2100711374}
+    - target: {fileID: 114970469853377906, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 2}
+      propertyPath: Weapons.Array.data[2]
+      value: 
+      objectReference: {fileID: 201442044}
+    - target: {fileID: 114970469853377906, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 2}
+      propertyPath: Weapons.Array.data[3]
+      value: 
+      objectReference: {fileID: 834787725}
     - target: {fileID: 224213177762969708, guid: 1d54c92011a4fa44abc8bcea479467c2,
         type: 2}
       propertyPath: m_LocalPosition.z
@@ -3285,13 +3285,14 @@ GameObject:
   - component: {fileID: 1172315961}
   - component: {fileID: 1172315960}
   - component: {fileID: 1172315963}
+  - component: {fileID: 1172315964}
   m_Layer: 0
   m_Name: SuckBall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1172315959
 Transform:
   m_ObjectHideFlags: 0
@@ -3315,7 +3316,7 @@ SphereCollider:
   m_IsTrigger: 1
   m_Enabled: 1
   serializedVersion: 2
-  m_Radius: 0.5
+  m_Radius: 4.8
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &1172315961
 MeshRenderer:
@@ -3374,6 +3375,17 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!114 &1172315964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1172315958}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fef31e07391c124988755d75ccc7eeb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1181028671
 GameObject:
   m_ObjectHideFlags: 0
@@ -3734,6 +3746,15 @@ Prefab:
         type: 2}
       propertyPath: DownAngle
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1796921918725778, guid: f65ad8785f7d754419b9a41cf6cf609f, type: 2}
+      propertyPath: m_TagString
+      value: SuckGun
+      objectReference: {fileID: 0}
+    - target: {fileID: 114016967052434790, guid: f65ad8785f7d754419b9a41cf6cf609f,
+        type: 2}
+      propertyPath: FaceAngleOffset
+      value: -90
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f65ad8785f7d754419b9a41cf6cf609f, type: 2}
@@ -5054,6 +5075,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 25c0e9812cb92d74e990e97ed055ce99, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MaxBallTravelTime: 1
+  BallTravelSpeed: 3
 --- !u!1001 &1837968496
 Prefab:
   m_ObjectHideFlags: 0

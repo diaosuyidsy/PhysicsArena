@@ -48,24 +48,24 @@ public class Fingers : MonoBehaviour
             GetComponentInParent<PlayerController>().HandObject = col.gameObject;
 
             // If it's a weapon, apply it to specific position
-            if (col.collider.CompareTag("Weapon") || col.collider.CompareTag("Team1Resource") || col.collider.CompareTag("Team2Resource")
-                || col.collider.CompareTag("WoodStamp"))
-            {
-                // Tell the collected weapon who picked it up
-                col.collider.GetComponent<GunPositionControl>().Owner = Hip;
-                col.collider.GetComponent<Rigidbody>().isKinematic = true;
-                col.collider.gameObject.layer = gameObject.layer;
-                // Change the Gun's vertical offset according to duck or chicken
-                col.collider.GetComponent<GunPositionControl>().VerticalOffset = GunVerticalOffset;
-            }
-            else
-            {
-                // If picked up a stone or something, add a spring joint to it
-                SpringJoint sp = gameObject.AddComponent<SpringJoint>();
-                sp.connectedBody = col.rigidbody;
-                sp.spring = 12000;
-                sp.breakForce = Force;
-            }
+            //if (col.collider.CompareTag("Weapon") || col.collider.CompareTag("Team1Resource") || col.collider.CompareTag("Team2Resource")
+            //    || col.collider.CompareTag("WoodStamp"))
+            //{
+            // Tell the collected weapon who picked it up
+            col.collider.GetComponent<GunPositionControl>().Owner = Hip;
+            col.collider.GetComponent<Rigidbody>().isKinematic = true;
+            col.collider.gameObject.layer = gameObject.layer;
+            // Change the Gun's vertical offset according to duck or chicken
+            col.collider.GetComponent<GunPositionControl>().VerticalOffset = GunVerticalOffset;
+            //}
+            //else
+            //{
+            //    // If picked up a stone or something, add a spring joint to it
+            //    SpringJoint sp = gameObject.AddComponent<SpringJoint>();
+            //    sp.connectedBody = col.rigidbody;
+            //    sp.spring = 12000;
+            //    sp.breakForce = Force;
+            //}
             PickUpItem(col.collider.tag);
             taken = true;
         }

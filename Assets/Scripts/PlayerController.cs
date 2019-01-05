@@ -252,24 +252,18 @@ public class PlayerController : MonoBehaviour
         _checkArm = true;
         StopAllCoroutines();
         ResetBody();
-
+        // These two are necessary for all objects
+        HandObject.GetComponent<Rigidbody>().isKinematic = false;
+        HandObject.layer = 0;
         // Specialized checking
         if (HandObject.CompareTag("Weapon"))
         {
-            HandObject.GetComponent<Rigidbody>().isKinematic = false;
-            HandObject.layer = 0;
             // Stop the shooting
             HandObject.SendMessage("Shoot", 0f);
         }
-        if (HandObject.CompareTag("WoodStamp"))
+        if (HandObject.CompareTag("SuckGun"))
         {
-            HandObject.GetComponent<Rigidbody>().isKinematic = false;
-            HandObject.layer = 0;
-        }
-        if (HandObject.CompareTag("Team1Resource") || HandObject.CompareTag("Team2Resource"))
-        {
-            HandObject.layer = 0;
-            HandObject.GetComponent<Rigidbody>().isKinematic = false;
+
         }
         // Nullify the holder
         HandObject = null;
@@ -311,6 +305,12 @@ public class PlayerController : MonoBehaviour
                         JointSpring tempjs = _chesthj.spring;
                         tempjs.targetPosition = 40f;
                         _chesthj.spring = tempjs;
+                    }
+                    break;
+                case "SuckGun":
+                    if (HandObject != null && !_dropping)
+                    {
+                        HandObject.SendMessage("Suck", true);
                     }
                     break;
                 case "Team1Resource":
@@ -355,6 +355,10 @@ public class PlayerController : MonoBehaviour
                     JointSpring tempjs = _chesthj.spring;
                     tempjs.targetPosition = -5f;
                     _chesthj.spring = tempjs;
+                    break;
+                case "SuckGun":
+                    if (HandObject != null)
+                        HandObject.SendMessage("Suck", false);
                     break;
                 default:
                     // If we previously started melee and released the trigger, then release the fist
@@ -422,6 +426,7 @@ public class PlayerController : MonoBehaviour
             case "Team1Resource":
             case "Team2Resource":
             case "WoodStamp":
+            case "SuckGun":
             case "Weapon":
                 _checkArm = false;
 

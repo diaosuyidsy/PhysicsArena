@@ -89,6 +89,8 @@ public class rtSuck : MonoBehaviour
             go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
         }
         yield return new WaitForSeconds(time);
+        // Second prototype, doesn't work
+        //yield return StartCoroutine(Congregate(time, gos));
         // After time, disable the suckball and return it to the original position,
         // reset ballstate;
         _ballTraveledTime = 0f;
@@ -105,5 +107,39 @@ public class rtSuck : MonoBehaviour
     public bool isSucking()
     {
         return _ballState == State.Suck;
+    }
+
+    // Second Prototype: try set rigidybody speed = 0, move position, set gravity = 0, doesn't work
+    IEnumerator Congregate(float time, List<GameObject> gos)
+    {
+        foreach (GameObject go in gos)
+        {
+            // First set up go
+            go.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            go.GetComponent<Rigidbody>().useGravity = false;
+            // Need to reset them at the end
+        }
+
+        float elapsedTime = 0f;
+        //float distance = (_suckBall.transform.position - go.transform.position).magnitude;
+
+
+        while (elapsedTime < time)
+        {
+            foreach (GameObject go in gos)
+            {
+                Vector3 nextPosition = go.transform.position + (_suckBall.transform.position - go.transform.position).normalized;
+                go.GetComponent<Rigidbody>().MovePosition(nextPosition);
+            }
+
+            elapsedTime += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+
+        // Reset at the end
+        foreach (GameObject go in gos)
+        {
+            go.GetComponent<Rigidbody>().useGravity = true;
+        }
     }
 }

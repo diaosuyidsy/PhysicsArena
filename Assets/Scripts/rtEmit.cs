@@ -8,6 +8,7 @@ public class rtEmit : MonoBehaviour
 {
     public ObiEmitter WaterBall;
     public GameObject WaterUI;
+    public GameObject GunUI;
     public float Speed;
     public float BackFireThrust;
     public float UpThrust = 1f;
@@ -28,7 +29,7 @@ public class rtEmit : MonoBehaviour
     // And it's holding down RT
     public void Shoot(float TriggerVal)
     {
-
+        GunUI.SetActive(true);
         // If player was holding down the RT button
         // CD will add up
         // If CD >= MaxCD, nothing works, only releasing the RT will replenish the CD
@@ -65,6 +66,12 @@ public class rtEmit : MonoBehaviour
         ChangeAmmoUI();
     }
 
+    //when gun leaves hands, UI disappears.
+    private void KillUI()
+    {
+        GunUI.SetActive(false);
+    }
+    
     private void ChangeAmmoUI()
     {
         float scaleY = currentAmmo * 1.0f / MaxAmmo;

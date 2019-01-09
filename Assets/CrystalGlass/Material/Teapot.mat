@@ -2,75 +2,57 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 3
+  serializedVersion: 6
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_Name: Teapot
   m_Shader: {fileID: 4800000, guid: d9fdefb8ea5524543a71133b2b83e36b, type: 3}
-  m_ShaderKeywords: []
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
   m_SavedProperties:
-    serializedVersion: 2
+    serializedVersion: 3
     m_TexEnvs:
-      data:
-        first:
-          name: _MainTex
-        second:
-          m_Texture: {fileID: 0}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _NormalMap
-        second:
-          m_Texture: {fileID: 2800000, guid: 9b6026b6b11694e47ac76876de9ea595, type: 3}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _EnvTex
-        second:
-          m_Texture: {fileID: 8900000, guid: 54c6ff9181b913e4589613781e59af0d, type: 3}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _NormalTex
-        second:
-          m_Texture: {fileID: 2800000, guid: 1f4a2874911a29f4d8931c7dfaf062f3, type: 3}
-          m_Scale: {x: 3, y: 3}
-          m_Offset: {x: 0, y: 0}
-      data:
-        first:
-          name: _RainbowTex
-        second:
-          m_Texture: {fileID: 2800000, guid: 63eff70c04348b346b6099117c165e8f, type: 3}
-          m_Scale: {x: 1, y: 1}
-          m_Offset: {x: 0, y: 0}
+    - _EnvTex:
+        m_Texture: {fileID: 8900000, guid: 54c6ff9181b913e4589613781e59af0d, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 2800000, guid: 9b6026b6b11694e47ac76876de9ea595, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalTex:
+        m_Texture: {fileID: 2800000, guid: 1f4a2874911a29f4d8931c7dfaf062f3, type: 3}
+        m_Scale: {x: 3, y: 3}
+        m_Offset: {x: 0, y: 0}
+    - _RainbowTex:
+        m_Texture: {fileID: 2800000, guid: 63eff70c04348b346b6099117c165e8f, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SparkleNoiseTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     m_Floats:
-      data:
-        first:
-          name: _IOR
-        second: -.904464304
-      data:
-        first:
-          name: _IOROffset
-        second: .00892857183
-      data:
-        first:
-          name: _FresnelPower
-        second: 1.54999995
-      data:
-        first:
-          name: _FresnelAlpha
-        second: .785714269
-      data:
-        first:
-          name: _RainbowInten
-        second: .5
+    - _FresnelAlpha: 0.78571427
+    - _FresnelPower: 1.55
+    - _IOR: -0.9044643
+    - _IOROffset: 0.008928572
+    - _Lod: 0
+    - _RainbowInten: 0.5
+    - _SparkleAnimSpeed: 0
+    - _SparklePower: 1024
+    - _Transparency: 1
     m_Colors:
-      data:
-        first:
-          name: _Color
-        second: {r: .800000012, g: .800000012, b: .800000012, a: 1}
+    - _Color: {r: 0.8, g: 0.8, b: 0.8, a: 1}
+    - _FresnelColor1: {r: 1, g: 1, b: 1, a: 1}
+    - _FresnelColor2: {r: 1, g: 1, b: 1, a: 1}

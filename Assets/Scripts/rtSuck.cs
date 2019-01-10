@@ -35,7 +35,7 @@ public class rtSuck : MonoBehaviour
     {
         if (_ballState == State.Out)
         {
-            _suckBall.transform.position += Time.deltaTime * _suckBall.transform.right * BallTravelSpeed;
+            _suckBall.transform.position += Time.deltaTime * -1f * _suckBall.transform.right * BallTravelSpeed;
             _ballTraveledTime += Time.deltaTime;
             if (_ballTraveledTime >= MaxBallTravelTime)
             {
@@ -95,7 +95,7 @@ public class rtSuck : MonoBehaviour
         // reset ballstate;
         _ballTraveledTime = 0f;
         _suckBall.transform.parent = transform;
-        _suckBall.transform.localPosition = Vector3.zero;
+        _suckBall.transform.localPosition = new Vector3(-0.468f, 0f);
         _suckBall.transform.localEulerAngles = Vector3.zero;
         _suckBall.transform.localScale = _suckBallInitialScale;
         _suckBall.SetActive(false);

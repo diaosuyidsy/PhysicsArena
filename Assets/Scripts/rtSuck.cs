@@ -35,7 +35,7 @@ public class rtSuck : MonoBehaviour
     {
         if (_ballState == State.Out)
         {
-            _suckBall.transform.position += Time.deltaTime * _suckBall.transform.right * BallTravelSpeed;
+            _suckBall.transform.position += Time.deltaTime * -1f * _suckBall.transform.right * BallTravelSpeed;
             _ballTraveledTime += Time.deltaTime;
             if (_ballTraveledTime >= MaxBallTravelTime)
             {
@@ -89,11 +89,13 @@ public class rtSuck : MonoBehaviour
             go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
         }
         yield return new WaitForSeconds(time);
+        // Second prototype, doesn't work
+        //yield return StartCoroutine(Congregate(time, gos));
         // After time, disable the suckball and return it to the original position,
         // reset ballstate;
         _ballTraveledTime = 0f;
         _suckBall.transform.parent = transform;
-        _suckBall.transform.localPosition = Vector3.zero;
+        _suckBall.transform.localPosition = new Vector3(-0.468f, 0f);
         _suckBall.transform.localEulerAngles = Vector3.zero;
         _suckBall.transform.localScale = _suckBallInitialScale;
         _suckBall.SetActive(false);
@@ -105,5 +107,39 @@ public class rtSuck : MonoBehaviour
     public bool isSucking()
     {
         return _ballState == State.Suck;
+    }
+
+    // Second Prototype: try set rigidybody speed = 0, move position, set gravity = 0, doesn't work
+    IEnumerator Congregate(float time, List<GameObject> gos)
+    {
+        foreach (GameObject go in gos)
+        {
+            // First set up go
+            go.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            go.GetComponent<Rigidbody>().useGravity = false;
+            // Need to reset them at the end
+        }
+
+        float elapsedTime = 0f;
+        //float distance = (_suckBall.transform.position - go.transform.position).magnitude;
+
+
+        while (elapsedTime < time)
+        {
+            foreach (GameObject go in gos)
+            {
+                Vector3 nextPosition = go.transform.position + (_suckBall.transform.position - go.transform.position).normalized;
+                go.GetComponent<Rigidbody>().MovePosition(nextPosition);
+            }
+
+            elapsedTime += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+
+        // Reset at the end
+        foreach (GameObject go in gos)
+        {
+            go.GetComponent<Rigidbody>().useGravity = true;
+        }
     }
 }

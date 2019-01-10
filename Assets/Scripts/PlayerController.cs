@@ -15,6 +15,13 @@ public class PlayerController : MonoBehaviour
     public float WalkSpeed = 2f;
     [Tooltip("It should be the same speed, little less than Duck's normal WalkSpeed")]
     public float PickUpSpeed = 1.8f;
+    [HideInInspector]
+    public float MaxBlockCD = 1f;
+    [HideInInspector]
+    public float BlockRegenInterval = 3f;
+    // How many regen per time.deltatime
+    [HideInInspector]
+    public float BlockRegen = 1 / 120f;
     [Header("Player Body Setting Section")]
     public GameObject LegSwingReference;
     public GameObject Chest;
@@ -58,10 +65,11 @@ public class PlayerController : MonoBehaviour
         Dead,
         Shooting,
         Meleeing,
+        Blocking,
     }
     // Normal State should include: Walking, Jumping, Picking, Holding, Dead
     private State normalState;
-    // Attack State Should include: Shooting, Meleeing
+    // Attack State Should include: Shooting, Meleeing, Blocking
     private State attackState;
     #endregion
 
@@ -88,22 +96,14 @@ public class PlayerController : MonoBehaviour
     private float _auxillaryMaxAngle = 5f;
     private bool _auxillaryRotationLock = false;
     private bool _dropping = false;
-    #endregion
-
-    #region Controller Variables
-    private float RightTrigger;
-    private float LeftTrigger;
+    private float _blockCharge = 0f;
+    private bool _blockCanRegen = false;
     #endregion
 
     [Header("Debug Section: Don't Ever Touch")]
     #region Debug Toggle
     public bool debugT_CheckArm = true;
     #endregion
-
-    private void Awake()
-    {
-        //_player = ReInput.players.GetPlayer(PlayerControllerNumber);
-    }
 
     public void Init(int controllerNumber)
     {
@@ -137,8 +137,8 @@ public class PlayerController : MonoBehaviour
         if (_checkArm && debugT_CheckArm)
             CheckArm();
         CheckFire();
-        // CheckRun ();
         CheckDrop();
+        CheckBlock();
     }
 
     // This is primarily for dropping item when velocity change too much 
@@ -375,6 +375,50 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void CheckBlock()
+    {
+        print(_blockCharge);
+        // When player released the button, should skip blockregeninterval seconds before it can regen
+        if (_player.GetButtonUp("Block"))
+        {
+            StopCoroutine("blockRegen");
+            StartCoroutine("blockRegen");
+            ResetBody();
+            attackState = State.Empty;
+        }
+
+        if (!_player.GetButton("Block") && _blockCanRegen)
+        {
+            _blockCharge -= Time.deltaTime;
+            if (_blockCharge <= 0f) _blockCanRegen = false;
+        }
+
+        if (_blockCharge > MaxBlockCD)
+        {
+            attackState = State.Empty;
+            ResetBody();
+            return;
+        }
+
+        // if Player hold the button, check if player could block then block
+        if (_player.GetButton("Block"))
+        {
+            attackState = State.Blocking;
+            _blockCanRegen = false;
+            BlockHelper(_leftArmhj, _leftHandhj);
+            BlockHelper(_rightArmhj, _rightHandhj);
+            _blockCharge += Time.deltaTime;
+        }
+    }
+
+    IEnumerator blockRegen()
+    {
+        _blockCanRegen = false;
+        yield return new WaitForSeconds(BlockRegenInterval);
+        print("Block can now regen");
+        _blockCanRegen = true;
+    }
+
     private void AuxillaryAim()
     {
         // Auxillary Aiming
@@ -477,7 +521,8 @@ public class PlayerController : MonoBehaviour
         _chesthj.spring = tempjs;
     }
 
-    public void OnMeleeHit(Vector3 force)
+    // If sender is not null, meaning the hit could be blocked
+    public void OnMeleeHit(Vector3 force, GameObject sender = null)
     {
         // Add HIT VFX
         GameObject par = Instantiate(VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
@@ -487,7 +532,14 @@ public class PlayerController : MonoBehaviour
         psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
         psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
 
-        _rb.AddForce(force, ForceMode.Impulse);
+        if (sender != null && attackState == State.Blocking)
+        {
+            sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * -3f);
+        }
+        else
+        {
+            _rb.AddForce(force, ForceMode.Impulse);
+        }
 
     }
 
@@ -652,19 +704,20 @@ public class PlayerController : MonoBehaviour
 
     void ResetBody()
     {
-        ResetBodyHelper(_leftArm2hj, _leftArmhj, true);
-        ResetBodyHelper(_rightArm2hj, _rightArmhj, false);
+        ResetBodyHelper(_leftArm2hj, _leftArmhj, _leftHandhj, true);
+        ResetBodyHelper(_rightArm2hj, _rightArmhj, _rightHandhj, false);
         JointSpring js = _chesthj.spring;
         js.targetPosition = 0f;
         _chesthj.spring = js;
     }
 
     // Reset All Body
-    void ResetBodyHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand)
+    void ResetBodyHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
     {
         JointLimits lm2 = Arm2hj.limits;
         JointLimits lm = Armhj.limits;
         JointSpring js = Armhj.spring;
+        JointSpring hjs = Handhj.spring;
         if (IsLeftHand)
         {
             lm2.max = 70f;
@@ -678,9 +731,22 @@ public class PlayerController : MonoBehaviour
         lm.min = -90f;
         lm.max = 90f;
         js.targetPosition = 0f;
+        hjs.targetPosition = 0f;
+        Handhj.spring = hjs;
         Armhj.spring = js;
         Armhj.limits = lm;
         Arm2hj.limits = lm2;
+    }
+
+    private void BlockHelper(HingeJoint Armhj, HingeJoint Handhj)
+    {
+        JointSpring ajs = Armhj.spring;
+        ajs.targetPosition = 100f;
+        Armhj.spring = ajs;
+
+        JointSpring hjs = Handhj.spring;
+        hjs.targetPosition = 120f;
+        Handhj.spring = hjs;
     }
 
     IEnumerator MeleeClockFistHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftArmhj)

@@ -377,6 +377,7 @@ public class PlayerController : MonoBehaviour
 
     public void CheckBlock()
     {
+        print(_blockCharge);
         // When player released the button, should skip blockregeninterval seconds before it can regen
         if (_player.GetButtonUp("Block"))
         {
@@ -386,7 +387,7 @@ public class PlayerController : MonoBehaviour
             attackState = State.Empty;
         }
 
-        if (_player.GetButton("Block") && _blockCanRegen)
+        if (!_player.GetButton("Block") && _blockCanRegen)
         {
             _blockCharge -= Time.deltaTime;
             if (_blockCharge <= 0f) _blockCanRegen = false;
@@ -395,6 +396,7 @@ public class PlayerController : MonoBehaviour
         if (_blockCharge > MaxBlockCD)
         {
             attackState = State.Empty;
+            ResetBody();
             return;
         }
 
@@ -532,7 +534,7 @@ public class PlayerController : MonoBehaviour
 
         if (sender != null && attackState == State.Blocking)
         {
-            sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * 3f);
+            sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * -3f);
         }
         else
         {

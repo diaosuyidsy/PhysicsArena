@@ -100,6 +100,12 @@ public class PlayerController : MonoBehaviour
     private bool _blockCanRegen = false;
     #endregion
 
+    #region Private Timer Variable
+    // Linked to BlockRegenInterval
+    private float timer_blockregen = 0f;
+    private bool starttimer_blockregen = false;
+    #endregion
+
     [Header("Debug Section: Don't Ever Touch")]
     #region Debug Toggle
     public bool debugT_CheckArm = true;
@@ -128,6 +134,7 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        RunTimer();
         if (!_canControl)
             return;
 
@@ -320,7 +327,7 @@ public class PlayerController : MonoBehaviour
                     break;
                 default:
                     //If we don't have anything on hand, we are applying melee action
-                    if (attackState != State.Meleeing && normalState != State.Picking && normalState != State.Holding)
+                    if (attackState != State.Meleeing && attackState != State.Blocking && normalState != State.Picking && normalState != State.Holding)
                     {
                         attackState = State.Meleeing;
                         _checkArm = false;
@@ -375,17 +382,52 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    //public void CheckBlock()
+    //{
+    //    print("Attack State: " + attackState);
+    //    print("Normal State: " + normalState);
+    //    print(_blockCharge);
+    //    if (attackState == State.Meleeing || attackState == State.Shooting || normalState == State.Picking || normalState == State.Holding
+    //        || normalState == State.Dead) return;
+    //    // When player released the button, should skip blockregeninterval seconds before it can regen
+    //    if (_player.GetButtonUp("Block"))
+    //    {
+    //        StopCoroutine("blockRegen");
+    //        StartCoroutine("blockRegen");
+    //        ResetBody();
+    //        attackState = State.Empty;
+    //    }
+
+    //    if (!_player.GetButton("Block") && _blockCanRegen)
+    //    {
+    //        _blockCharge -= Time.deltaTime;
+    //        if (_blockCharge <= 0f) _blockCanRegen = false;
+    //    }
+
+    //    if (_blockCharge > MaxBlockCD)
+    //    {
+    //        if (attackState == State.Blocking)
+    //            attackState = State.Empty;
+    //        ResetBody();
+    //        return;
+    //    }
+
+    //    // if Player hold the button, check if player could block then block
+    //    if (_player.GetButton("Block"))
+    //    {
+    //        attackState = State.Blocking;
+    //        _blockCanRegen = false;
+    //        BlockHelper(_leftArmhj, _leftHandhj);
+    //        BlockHelper(_rightArmhj, _rightHandhj);
+    //        _blockCharge += Time.deltaTime;
+    //    }
+    //}
+
     public void CheckBlock()
     {
-        print(_blockCharge);
-        // When player released the button, should skip blockregeninterval seconds before it can regen
-        if (_player.GetButtonUp("Block"))
-        {
-            StopCoroutine("blockRegen");
-            StartCoroutine("blockRegen");
-            ResetBody();
-            attackState = State.Empty;
-        }
+        ConsoleProDebug.Watch("Attack State", attackState.ToString());
+        ConsoleProDebug.Watch("Normal State", normalState.ToString());
+        ConsoleProDebug.Watch("Block Charge", _blockCharge.ToString());
 
         if (!_player.GetButton("Block") && _blockCanRegen)
         {
@@ -393,30 +435,55 @@ public class PlayerController : MonoBehaviour
             if (_blockCharge <= 0f) _blockCanRegen = false;
         }
 
-        if (_blockCharge > MaxBlockCD)
+        if (attackState == State.Meleeing || attackState == State.Shooting || normalState == State.Picking || normalState == State.Holding
+            || normalState == State.Dead) return;
+
+        if (_player.GetButtonDown("Block") && _blockCharge <= MaxBlockCD)
         {
-            attackState = State.Empty;
-            ResetBody();
-            return;
+            attackState = State.Blocking;
         }
 
         // if Player hold the button, check if player could block then block
-        if (_player.GetButton("Block"))
+        if (_player.GetButton("Block") && attackState == State.Blocking)
         {
-            attackState = State.Blocking;
             _blockCanRegen = false;
             BlockHelper(_leftArmhj, _leftHandhj);
             BlockHelper(_rightArmhj, _rightHandhj);
             _blockCharge += Time.deltaTime;
+            if (_blockCharge > MaxBlockCD)
+            {
+                attackState = State.Empty;
+                starttimer_blockregen = true;
+                timer_blockregen = 0f;
+                ResetBody();
+            }
+        }
+
+        // When player released the button, should skip blockregeninterval seconds before it can regen
+        if (_player.GetButtonUp("Block") && _blockCharge <= MaxBlockCD)
+        {
+            starttimer_blockregen = true;
+            timer_blockregen = 0f;
+            ResetBody();
+            attackState = State.Empty;
         }
     }
 
-    IEnumerator blockRegen()
+    // All timers should be contained in this function
+    // And this function could not be stopped by universal stop sign _canControlCharacter
+    private void RunTimer()
     {
-        _blockCanRegen = false;
-        yield return new WaitForSeconds(BlockRegenInterval);
-        print("Block can now regen");
-        _blockCanRegen = true;
+        if (starttimer_blockregen)
+        {
+            timer_blockregen += Time.deltaTime;
+            if (timer_blockregen > BlockRegenInterval)
+            {
+                starttimer_blockregen = false;
+                timer_blockregen = 0f;
+                _blockCanRegen = true;
+                print("Block Can now regen");
+            }
+        }
     }
 
     private void AuxillaryAim()

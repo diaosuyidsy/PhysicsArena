@@ -134,6 +134,10 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        // Debug Watcher
+        ConsoleProDebug.Watch("Attack State", attackState.ToString());
+        ConsoleProDebug.Watch("Normal State", normalState.ToString());
+        // Debug End
         RunTimer();
         if (!_canControl)
             return;
@@ -267,6 +271,8 @@ public class PlayerController : MonoBehaviour
         {
             // Stop the shooting
             HandObject.SendMessage("Shoot", 0f);
+            // Disable the UI
+            HandObject.SendMessage("KillUI");
         }
         if (HandObject.CompareTag("SuckGun"))
         {
@@ -382,52 +388,8 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    //public void CheckBlock()
-    //{
-    //    print("Attack State: " + attackState);
-    //    print("Normal State: " + normalState);
-    //    print(_blockCharge);
-    //    if (attackState == State.Meleeing || attackState == State.Shooting || normalState == State.Picking || normalState == State.Holding
-    //        || normalState == State.Dead) return;
-    //    // When player released the button, should skip blockregeninterval seconds before it can regen
-    //    if (_player.GetButtonUp("Block"))
-    //    {
-    //        StopCoroutine("blockRegen");
-    //        StartCoroutine("blockRegen");
-    //        ResetBody();
-    //        attackState = State.Empty;
-    //    }
-
-    //    if (!_player.GetButton("Block") && _blockCanRegen)
-    //    {
-    //        _blockCharge -= Time.deltaTime;
-    //        if (_blockCharge <= 0f) _blockCanRegen = false;
-    //    }
-
-    //    if (_blockCharge > MaxBlockCD)
-    //    {
-    //        if (attackState == State.Blocking)
-    //            attackState = State.Empty;
-    //        ResetBody();
-    //        return;
-    //    }
-
-    //    // if Player hold the button, check if player could block then block
-    //    if (_player.GetButton("Block"))
-    //    {
-    //        attackState = State.Blocking;
-    //        _blockCanRegen = false;
-    //        BlockHelper(_leftArmhj, _leftHandhj);
-    //        BlockHelper(_rightArmhj, _rightHandhj);
-    //        _blockCharge += Time.deltaTime;
-    //    }
-    //}
-
     public void CheckBlock()
     {
-        ConsoleProDebug.Watch("Attack State", attackState.ToString());
-        ConsoleProDebug.Watch("Normal State", normalState.ToString());
-        ConsoleProDebug.Watch("Block Charge", _blockCharge.ToString());
 
         if (!_player.GetButton("Block") && _blockCanRegen)
         {
@@ -599,9 +561,9 @@ public class PlayerController : MonoBehaviour
         psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
         psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
 
-        if (sender != null && attackState == State.Blocking)
+        if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 120f))
         {
-            sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * -3f);
+            sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * -2f);
         }
         else
         {
@@ -692,6 +654,12 @@ public class PlayerController : MonoBehaviour
 
     #region Helper Functions
 
+    // Checks if Vector3 A and Vector3 B are within degree
+    // Only smaller than 180 degrees checking
+    private bool AngleWithin(Vector3 A, Vector3 B, float degree)
+    {
+        return Vector3.Angle(A, B) > degree;
+    }
     private void CheckRewiredInput()
     {
         if (_player == null) return;
@@ -710,35 +678,6 @@ public class PlayerController : MonoBehaviour
         RaycastHit hit;
         return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, JumpMask);
     }
-
-    //private void CheckArmHelper(float TriggerValue, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
-    //{
-    //    // Arm2: right max: 90 --> -74
-    //    //       left min: -75 --> 69        
-    //    JointLimits lm1 = Arm2hj.limits;
-    //    if (IsLeftHand)
-    //        lm1.min = Mathf.Approximately(TriggerValue, 1f) ? 69f : -75f;
-    //    else
-    //        lm1.max = Mathf.Approximately(TriggerValue, 1f) ? -74f : 90f;
-    //    Arm2hj.limits = lm1;
-
-    //    //  Arm: Limits: -90, 90 --> 0, 121
-    //    JointLimits lm = Armhj.limits;
-    //    lm.max = Mathf.Approximately(TriggerValue, 1f) ? 121f : 90f;
-    //    lm.min = Mathf.Approximately(TriggerValue, 1f) ? 0f : -90f;
-    //    Armhj.limits = lm;
-
-    //    // Arm: Target Position: 0 --> 180
-    //    JointSpring js = Armhj.spring;
-    //    js.targetPosition = 180f * TriggerValue;
-    //    Armhj.spring = js;
-
-    //    // Hand: Limit Max: 90 --> 0
-    //    JointLimits tlm = Handhj.limits;
-    //    tlm.max = 90f * (1f - TriggerValue);
-    //    Handhj.limits = tlm;
-
-    //}
 
     private void CheckArmHelper(bool down, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
     {

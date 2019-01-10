@@ -67,11 +67,11 @@ public class rtEmit : MonoBehaviour
     }
 
     //when gun leaves hands, UI disappears.
-    private void KillUI()
+    public void KillUI()
     {
         GunUI.SetActive(false);
     }
-    
+
     private void ChangeAmmoUI()
     {
         float scaleY = currentAmmo * 1.0f / MaxAmmo;

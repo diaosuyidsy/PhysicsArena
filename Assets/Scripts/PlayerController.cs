@@ -288,7 +288,35 @@ public class PlayerController : MonoBehaviour
 
     public void CheckFire()
     {
-        //if (Mathf.Approximately(RightTrigger, 1f))
+        // If player push the button down
+        if (_player.GetButtonDown("Right Trigger"))
+        {
+            switch (_rightTriggerRegister)
+            {
+                case "Hook":
+                    if (HandObject != null && !_dropping)
+                    {
+                        HandObject.SendMessage("Hook", true);
+                    }
+                    break;
+            }
+        }
+
+        // If player lift the button up
+        if (_player.GetButtonUp("Right Trigger"))
+        {
+            switch (_rightTriggerRegister)
+            {
+                case "Hook":
+                    if (HandObject != null && !_dropping)
+                    {
+                        HandObject.SendMessage("Hook", false);
+                    }
+                    break;
+            }
+        }
+
+        // If players are holding the Right Trigger button
         if (_player.GetButton("Right Trigger"))
         {
             // Means we want to fire
@@ -511,6 +539,17 @@ public class PlayerController : MonoBehaviour
                 StartCoroutine(PickUpWeaponHelper(_leftArm2hj, _leftArmhj, true, 0.1f));
                 StartCoroutine(PickUpWeaponHelper(_rightArm2hj, _rightArmhj, false, 0.1f));
                 break;
+            case "Hook":
+                _checkArm = false;
+
+                // Bend the body back
+                JointSpring tempjs1 = _chesthj.spring;
+                tempjs1.targetPosition = -5f;
+                _chesthj.spring = tempjs1;
+
+                StartCoroutine(PickUpWeaponHalfHelper(_leftArmhj, 0.1f));
+                StartCoroutine(PickUpWeaponHalfHelper(_rightArmhj, 0.1f));
+                break;
             case "Throwable":
                 break;
             default:
@@ -530,8 +569,7 @@ public class PlayerController : MonoBehaviour
 
         bool LTPushDown = _player.GetButton("Left Trigger");
         bool LTLiftUp = _player.GetButtonUp("Left Trigger");
-        //LeftHand.GetComponent<Fingers>().SetTaken(Mathf.Approximately(0f, LeftTrigger) || _dropping);
-        //RightHand.GetComponent<Fingers>().SetTaken(Mathf.Approximately(0f, LeftTrigger) || _dropping);
+
         LeftHand.GetComponent<Fingers>().SetTaken(!LTPushDown || _dropping);
         RightHand.GetComponent<Fingers>().SetTaken(!LTPushDown || _dropping);
 
@@ -871,6 +909,21 @@ public class PlayerController : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         Armhj.connectedMassScale = 1f;
+    }
+
+    IEnumerator PickUpWeaponHalfHelper(HingeJoint Armhj, float time)
+    {
+        float elapesdTime = 0f;
+        JointSpring js = Armhj.spring;
+        float initArmTargetPosition = js.targetPosition;
+
+        while (elapesdTime < time)
+        {
+            elapesdTime += Time.deltaTime;
+            js.targetPosition = Mathf.Lerp(initArmTargetPosition, 90f, elapesdTime / time);
+            Armhj.spring = js;
+            yield return new WaitForEndOfFrame();
+        }
     }
     #endregion
 }

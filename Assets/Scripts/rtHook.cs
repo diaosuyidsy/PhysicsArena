@@ -12,6 +12,7 @@ public class rtHook : MonoBehaviour
     private Vector3 _hookinitlocalScale;
     private GameObject _hookmax;
     private Vector3 _hookmaxPos = Vector3.zero;
+    private HookControl _hc;
 
     private enum State
     {
@@ -25,6 +26,7 @@ public class rtHook : MonoBehaviour
     private void Start()
     {
         _hook = transform.GetChild(0).gameObject;
+        _hc = _hook.GetComponent<HookControl>();
         _hookinitlocalPos = new Vector3(_hook.transform.localPosition.x, _hook.transform.localPosition.y, _hook.transform.localPosition.z);
         _hookinitlocalScale = new Vector3(_hook.transform.localScale.x, _hook.transform.localScale.y, _hook.transform.localScale.z);
         _hookmax = transform.GetChild(1).gameObject;
@@ -54,6 +56,7 @@ public class rtHook : MonoBehaviour
             if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.1f)
             {
                 _hookState = State.Empty;
+                _hc.CanHook = false;
                 _hook.transform.parent = transform;
                 _hook.transform.localScale = _hookinitlocalScale;
                 _hook.transform.localEulerAngles = Vector3.zero;
@@ -73,6 +76,8 @@ public class rtHook : MonoBehaviour
             {
                 // Then we could fire the hook
                 _hookState = State.FlyingOut;
+                // Tell the hook that it can now hook players
+                _hc.CanHook = true;
                 // Record where the hook should go to in world position
                 _hookmaxPos = new Vector3(_hookmax.transform.position.x, _hookmax.transform.position.y, _hookmax.transform.position.z);
                 // Also need to make hook out of parent

@@ -6,7 +6,7 @@ public class rtSuck : MonoBehaviour
 {
     public float MaxBallTravelTime = 4f;
     public float BallTravelSpeed = 3f;
-    public float SuckStrength = 350f;
+    //public float SuckStrength = 350f;
 
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
@@ -65,7 +65,7 @@ public class rtSuck : MonoBehaviour
                     {
                         _charged = false;
                         _ballState = State.Suck;
-                        StartCoroutine(sucking(0.5f));
+                        StartCoroutine(sucking(0.1f));
                     }
                     break;
             }
@@ -84,13 +84,13 @@ public class rtSuck : MonoBehaviour
     {
         List<GameObject> gos = _sbc.InRangePlayers;
         // First prototype: let's try adding a force to every object
-        foreach (GameObject go in gos)
-        {
-            go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
-        }
-        yield return new WaitForSeconds(time);
-        // Second prototype, doesn't work
-        //yield return StartCoroutine(Congregate(time, gos));
+        //foreach (GameObject go in gos)
+        //{
+        //    go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
+        //}
+        //yield return new WaitForSeconds(time);
+        //Second prototype
+        yield return StartCoroutine(Congregate(time, gos));
         // After time, disable the suckball and return it to the original position,
         // reset ballstate;
         _ballTraveledTime = 0f;
@@ -112,34 +112,52 @@ public class rtSuck : MonoBehaviour
     // Second Prototype: try set rigidybody speed = 0, move position, set gravity = 0, doesn't work
     IEnumerator Congregate(float time, List<GameObject> gos)
     {
+        yield return new WaitForSeconds(0.3f);
         foreach (GameObject go in gos)
         {
             // First set up go
-            go.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            go.GetComponent<Rigidbody>().useGravity = false;
+            //go.GetComponent<Rigidbody>().velocity = Vector3.zero;
+            //go.GetComponent<Rigidbody>().useGravity = false;
+            foreach (var rb in go.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.velocity = Vector3.zero;
+                rb.useGravity = false;
+                rb.isKinematic = true;
+            }
             // Need to reset them at the end
         }
 
         float elapsedTime = 0f;
-        //float distance = (_suckBall.transform.position - go.transform.position).magnitude;
-
 
         while (elapsedTime < time)
         {
             foreach (GameObject go in gos)
             {
-                Vector3 nextPosition = go.transform.position + (_suckBall.transform.position - go.transform.position).normalized;
-                go.GetComponent<Rigidbody>().MovePosition(nextPosition);
+                float distance = (_suckBall.transform.position - go.transform.position).magnitude;
+                Vector3 addpos = _suckBall.transform.position - go.transform.position;
+
+                //Vector3 translation = addpos * Time.deltaTime / (time - elapsedTime * 0.2f); Corret Way of this
+                Vector3 translation = addpos * Time.deltaTime / time;
+                // Second method for moving object
+                go.transform.Translate(translation, Space.World);
             }
 
-            elapsedTime += Time.fixedDeltaTime;
-            yield return new WaitForFixedUpdate();
+            //elapsedTime += Time.fixedDeltaTime;
+            //yield return new WaitForFixedUpdate();
+            elapsedTime += Time.deltaTime;
+            yield return new WaitForEndOfFrame();
         }
 
         // Reset at the end
         foreach (GameObject go in gos)
         {
-            go.GetComponent<Rigidbody>().useGravity = true;
+            //go.GetComponent<Rigidbody>().useGravity = true;
+            foreach (var rb in go.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.velocity = Vector3.zero;
+                rb.useGravity = true;
+                rb.isKinematic = false;
+            }
         }
     }
 }

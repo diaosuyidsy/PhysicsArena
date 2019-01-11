@@ -47,6 +47,10 @@ public class rtHook : MonoBehaviour
         {
             Vector3 nextpos = (transform.position - _hook.transform.position).normalized;
             _hook.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
+            if (Hooked != null)
+            {
+                Hooked.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
+            }
             if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.1f)
             {
                 _hookState = State.Empty;
@@ -54,6 +58,8 @@ public class rtHook : MonoBehaviour
                 _hook.transform.localScale = _hookinitlocalScale;
                 _hook.transform.localEulerAngles = Vector3.zero;
                 _hook.transform.localPosition = _hookinitlocalPos;
+                // Need to set hooked's rigidbody back
+                Hooked = null;
             }
         }
     }
@@ -79,7 +85,7 @@ public class rtHook : MonoBehaviour
     {
         _hookState = State.OnTarget;
         Hooked = hit;
-        StartCoroutine(hookhelper(0.5f));
+        StartCoroutine(hookhelper(0.25f));
     }
 
     IEnumerator hookhelper(float time)

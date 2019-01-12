@@ -5,6 +5,7 @@ using UnityEngine;
 public class rtHook : MonoBehaviour
 {
     public float HookSpeed = 5f;
+    [HideInInspector]
     public GameObject Hooked = null;
 
     private GameObject _hook;
@@ -13,6 +14,11 @@ public class rtHook : MonoBehaviour
     private GameObject _hookmax;
     private Vector3 _hookmaxPos = Vector3.zero;
     private HookControl _hc;
+    private LineRenderer _lr;
+    private Transform _hookstartpoint;
+    private Transform _hookendpoint;
+    [HideInInspector]
+    public bool CanCarryBack = true;
 
     private enum State
     {
@@ -23,19 +29,24 @@ public class rtHook : MonoBehaviour
     }
     private State _hookState;
 
-    private void Start()
+    private void Awake()
     {
         _hook = transform.GetChild(0).gameObject;
+        _hookstartpoint = _hook.transform.GetChild(0);
+        _hookendpoint = transform.GetChild(2);
         _hc = _hook.GetComponent<HookControl>();
         _hookinitlocalPos = new Vector3(_hook.transform.localPosition.x, _hook.transform.localPosition.y, _hook.transform.localPosition.z);
         _hookinitlocalScale = new Vector3(_hook.transform.localScale.x, _hook.transform.localScale.y, _hook.transform.localScale.z);
         _hookmax = transform.GetChild(1).gameObject;
         _hookState = State.Empty;
+        _lr = GetComponent<LineRenderer>();
     }
 
     private void Update()
     {
-        ConsoleProDebug.Watch("Hook State", _hookState.ToString());
+        _lr.SetPosition(0, _hookendpoint.position);
+        _lr.SetPosition(1, _hookstartpoint.position);
+        ConsoleProDebug.Watch("Can Carry Back", CanCarryBack.ToString());
         if (_hookState == State.FlyingOut)
         {
             Vector3 nextpos = (_hookmaxPos - _hook.transform.position).normalized;
@@ -49,7 +60,7 @@ public class rtHook : MonoBehaviour
         {
             Vector3 nextpos = (transform.position - _hook.transform.position).normalized;
             _hook.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
-            if (Hooked != null)
+            if (Hooked != null && CanCarryBack)
             {
                 Hooked.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
             }
@@ -62,6 +73,14 @@ public class rtHook : MonoBehaviour
                 _hook.transform.localEulerAngles = Vector3.zero;
                 _hook.transform.localPosition = _hookinitlocalPos;
                 // Need to set hooked's rigidbody back
+                if (Hooked != null)
+                {
+                    foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+                    {
+                        rb.isKinematic = false;
+                    }
+                }
+
                 Hooked = null;
             }
         }
@@ -77,6 +96,7 @@ public class rtHook : MonoBehaviour
                 // Then we could fire the hook
                 _hookState = State.FlyingOut;
                 // Tell the hook that it can now hook players
+                CanCarryBack = true;
                 _hc.CanHook = true;
                 // Record where the hook should go to in world position
                 _hookmaxPos = new Vector3(_hookmax.transform.position.x, _hookmax.transform.position.y, _hookmax.transform.position.z);
@@ -90,6 +110,10 @@ public class rtHook : MonoBehaviour
     {
         _hookState = State.OnTarget;
         Hooked = hit;
+        foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+        }
         StartCoroutine(hookhelper(0.25f));
     }
 

@@ -114,7 +114,6 @@ public class PlayerController : MonoBehaviour
     public void Init(int controllerNumber)
     {
         _player = ReInput.players.GetPlayer(controllerNumber);
-        _player.SetVibration(1, 10f, 2f);
     }
 
     private void Start()
@@ -198,7 +197,6 @@ public class PlayerController : MonoBehaviour
         {
             go.SetActive(true);
         }
-        _player.SetVibration(0, 1f, 2f);
         _canControl = true;
     }
 

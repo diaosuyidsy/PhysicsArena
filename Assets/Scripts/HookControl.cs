@@ -17,6 +17,7 @@ public class HookControl : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (_gpc.Owner == null) return;
         if (other.gameObject.layer == _gpc.Owner.layer)
         {
             _rth.CanCarryBack = false;

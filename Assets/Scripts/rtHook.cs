@@ -7,6 +7,8 @@ public class rtHook : MonoBehaviour
     public float HookSpeed = 5f;
     [HideInInspector]
     public GameObject Hooked = null;
+    [HideInInspector]
+    public bool HookCanBend = true;
 
     private GameObject _hook;
     private Vector3 _hookinitlocalPos;
@@ -46,7 +48,7 @@ public class rtHook : MonoBehaviour
     {
         _lr.SetPosition(0, _hookendpoint.position);
         _lr.SetPosition(1, _hookstartpoint.position);
-        ConsoleProDebug.Watch("Can Carry Back", CanCarryBack.ToString());
+
         if (_hookState == State.FlyingOut)
         {
             Vector3 nextpos = (_hookmaxPos - _hook.transform.position).normalized;
@@ -56,15 +58,33 @@ public class rtHook : MonoBehaviour
                 _hookState = State.FlyingIn;
             }
         }
+
         if (_hookState == State.FlyingIn)
         {
             Vector3 nextpos = (transform.position - _hook.transform.position).normalized;
+            if (HookCanBend && Hooked != null)
+            {
+                Vector3 vec2 = transform.right;
+                Vector3 finalVec = nextpos - vec2;
+                nextpos = (nextpos + finalVec * 10f).normalized;
+            }
             _hook.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
             if (Hooked != null && CanCarryBack)
             {
                 Hooked.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
             }
-            if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.1f)
+            if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.6f)
+            {
+                if (Hooked != null)
+                {
+                    foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+                    {
+                        rb.isKinematic = false;
+                    }
+                }
+                Hooked = null;
+            }
+            if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.4f)
             {
                 _hookState = State.Empty;
                 _hc.CanHook = false;

@@ -122,4 +122,31 @@ public class rtHook : MonoBehaviour
         yield return new WaitForSeconds(time);
         _hookState = State.FlyingIn;
     }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("DeathZone"))
+        {
+            // Add Vanish VFX
+            Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            // END ADD
+            _hookState = State.Empty;
+            _hc.CanHook = false;
+            _hook.transform.parent = transform;
+            _hook.transform.localScale = _hookinitlocalScale;
+            _hook.transform.localEulerAngles = Vector3.zero;
+            _hook.transform.localPosition = _hookinitlocalPos;
+            // Need to set hooked's rigidbody back
+            if (Hooked != null)
+            {
+                foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+                {
+                    rb.isKinematic = false;
+                }
+            }
+
+            Hooked = null;
+            gameObject.SetActive(false);
+        }
+    }
 }

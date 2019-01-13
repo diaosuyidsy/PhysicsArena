@@ -213,7 +213,7 @@ public class GameManager : MonoBehaviour
         //#endif
         if (_player.GetButtonDown("Restart"))
         {
-            SceneManager.LoadScene(0);
+            SceneManager.LoadScene("Suyi");
         }
 
     }

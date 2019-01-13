@@ -160,4 +160,23 @@ public class rtSuck : MonoBehaviour
             }
         }
     }
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("DeathZone"))
+        {
+            // Add Vanish VFX
+            Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            // END ADD
+            _ballTraveledTime = 0f;
+            _suckBall.transform.parent = transform;
+            _suckBall.transform.localPosition = new Vector3(-0.468f, 0f);
+            _suckBall.transform.localEulerAngles = Vector3.zero;
+            _suckBall.transform.localScale = _suckBallInitialScale;
+            _suckBall.SetActive(false);
+            _ballState = State.In;
+            // Need a little clean up the line renderer and stuff
+            _sbc.CleanUpAll();
+            gameObject.SetActive(false);
+        }
+    }
 }

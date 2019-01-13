@@ -114,6 +114,7 @@ public class PlayerController : MonoBehaviour
     public void Init(int controllerNumber)
     {
         _player = ReInput.players.GetPlayer(controllerNumber);
+        _player.SetVibration(1, 10f, 2f);
     }
 
     private void Start()
@@ -197,6 +198,7 @@ public class PlayerController : MonoBehaviour
         {
             go.SetActive(true);
         }
+        _player.SetVibration(0, 1f, 2f);
         _canControl = true;
     }
 
@@ -252,13 +254,10 @@ public class PlayerController : MonoBehaviour
         if (HandObject == null) return;
         // Drop the thing
         HandObject.SendMessage("Drop");
-        _auxillaryRotationLock = false;
         normalState = State.Empty;
         _dropping = false;
         // Change to non-dropping state after a while
         HandTaken = false;
-        // Set Auxillary Aim to false
-        _auxillaryRotationLock = false;
         // Return the body to normal position
         _checkArm = true;
         StopAllCoroutines();
@@ -284,6 +283,8 @@ public class PlayerController : MonoBehaviour
         LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", WalkSpeed / 2f);
         // Clear the right trigger register
         _rightTriggerRegister = "";
+        // Set Auxillary Aim to false
+        _auxillaryRotationLock = false;
     }
 
     public void CheckFire()
@@ -411,6 +412,8 @@ public class PlayerController : MonoBehaviour
                         StopAllCoroutines();
                         StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, 0.2f, _leftArmhj));
                     }
+                    _auxillaryRotationLock = false;
+
                     break;
             }
         }

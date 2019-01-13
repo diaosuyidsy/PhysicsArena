@@ -614,7 +614,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1599903023049768
 GameObject:
   m_ObjectHideFlags: 1
@@ -1845,7 +1845,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1596648263302726}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 18.434, y: 0.177, z: -16.861}
+  m_LocalPosition: {x: 17.483, y: 1.054, z: -16.861}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_Children:
   - {fileID: 4415517028065566}
@@ -2431,7 +2431,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0.02, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.43247595, y: 0.019777128, z: -0.0126944715}
+  m_ConnectedAnchor: {x: -0.43247595, y: 0.019777367, z: -0.0126944715}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2533,7 +2533,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.18, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.22846222, y: -0.19434118, z: -0.0076065063}
+  m_ConnectedAnchor: {x: 0.22846222, y: -0.19434142, z: -0.0076065063}
   m_UseSpring: 1
   m_Spring:
     spring: 500
@@ -2601,7 +2601,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.18, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.22846222, y: -0.19434118, z: -0.0076065063}
+  m_ConnectedAnchor: {x: -0.22846222, y: -0.19434142, z: -0.0076065063}
   m_UseSpring: 1
   m_Spring:
     spring: 500
@@ -2703,7 +2703,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.34, z: 0}
   m_Axis: {x: -1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.031051705, y: -1.075199, z: 0.006536299}
+  m_ConnectedAnchor: {x: -0.031051705, y: -1.0751988, z: 0.006536299}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2737,7 +2737,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.63852495, y: -0.023741955, z: -5.638523e-16}
+  m_ConnectedAnchor: {x: -0.63852495, y: -0.023742193, z: -5.638523e-16}
   m_UseSpring: 1
   m_Spring:
     spring: 100
@@ -2771,7 +2771,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.01, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.4319342, y: -0.010693901, z: -0.012693011}
+  m_ConnectedAnchor: {x: 0.4319342, y: -0.010693663, z: -0.012693011}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -2839,7 +2839,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.34, z: 0}
   m_Axis: {x: -1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.031051924, y: -1.075199, z: 0.0065334016}
+  m_ConnectedAnchor: {x: 0.031051924, y: -1.0751988, z: 0.0065334016}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -3080,7 +3080,9 @@ MonoBehaviour:
   RotationSpeed: 4
   WalkSpeed: 2
   PickUpSpeed: 2.2
-  HeadGunPos: {fileID: 1532413283199806}
+  MaxBlockCD: 1
+  BlockRegenInterval: 3
+  BlockRegen: 0.008333334
   LegSwingReference: {fileID: 1694084379956174}
   Chest: {fileID: 1558221434653460}
   LeftArms:

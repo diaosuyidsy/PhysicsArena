@@ -35,6 +35,12 @@ public class GameManager : MonoBehaviour
     public GameObject TeamRed1Explosion;
     public GameObject TeamBlue2Explosion;
 
+    #region Stats Variable
+    public Dictionary<string, int> SuicideRecord;
+    public Dictionary<string, int> KillRecord;
+    public Dictionary<string, int> TeammateMurderRecord;
+    #endregion
+
     private int Team1RespawnIndex = 0;
     private int Team2RespawnIndex = 0;
 
@@ -59,6 +65,9 @@ public class GameManager : MonoBehaviour
     {
         GM = this;
         Players = new List<GameObject>();
+        SuicideRecord = new Dictionary<string, int>();
+        KillRecord = new Dictionary<string, int>();
+        TeammateMurderRecord = new Dictionary<string, int>();
         /* GameObject[] team1Players = GameObject.FindGameObjectsWithTag("Team1");
         GameObject[] team2Players = GameObject.FindGameObjectsWithTag("Team2");
         Players = new GameObject[team1Players.Length + team2Players.Length];
@@ -197,20 +206,6 @@ public class GameManager : MonoBehaviour
 
     void CheckRestart()
     {
-
-        //#if UNITY_EDITOR_OSX
-        //        if (Input.GetKeyDown(KeyCode.Joystick1Button10))
-        //        {
-        //            SceneManager.LoadScene("MasterScene");
-        //        }
-
-        //#endif
-        //#if UNITY_EDITOR_WIN
-        //        if (Input.GetKeyDown (KeyCode.Space))
-        //        {
-        //            SceneManager.LoadScene (1);
-        //        }
-        //#endif
         if (_player.GetButtonDown("Restart"))
         {
             SceneManager.LoadScene("Suyi");

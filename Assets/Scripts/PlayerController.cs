@@ -53,6 +53,12 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public bool IsOnGround = false;
 
+    #region Statistics Variables
+    [HideInInspector]
+    public int PlayerNumber;
+    public GameObject EnemyWhoHitPlayer;
+    #endregion
+
     #region States
     private enum State
     {
@@ -104,6 +110,9 @@ public class PlayerController : MonoBehaviour
     // Linked to BlockRegenInterval
     private float timer_blockregen = 0f;
     private bool starttimer_blockregen = false;
+    // Linked to Statistics
+    private float timer_hitMarkerStayTime = 0f;
+    private bool starttimer_hitmakrer = false;
     #endregion
 
     [Header("Debug Section: Don't Ever Touch")]
@@ -113,6 +122,7 @@ public class PlayerController : MonoBehaviour
 
     public void Init(int controllerNumber)
     {
+        PlayerNumber = controllerNumber;
         _player = ReInput.players.GetPlayer(controllerNumber);
     }
 
@@ -175,6 +185,7 @@ public class PlayerController : MonoBehaviour
     }
 
     // OnEnterDeathZone controls the behavior how player reacts when it dies
+    // It's called immediately after player enters death zone
     public void OnEnterDeathZone()
     {
         _canControl = false;
@@ -183,7 +194,65 @@ public class PlayerController : MonoBehaviour
             go.SetActive(false);
         }
         DropHelper();
+        StatsAfterDeath();
         StartCoroutine(Respawn(GameManager.GM.RespawnTime));
+    }
+
+    private void StatsAfterDeath()
+    {
+        // First we need to record who killed the player
+        // If no one killed him, then he commited suicide
+        if (EnemyWhoHitPlayer == null)
+        {
+            string thisPlayer = "Player" + PlayerNumber;
+            // Record Commited suicide
+            if (GameManager.GM.SuicideRecord.ContainsKey(thisPlayer))
+            {
+                GameManager.GM.SuicideRecord[thisPlayer]++;
+            }
+            else
+            {
+                GameManager.GM.SuicideRecord.Add(thisPlayer, 1);
+            }
+            print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[thisPlayer] + " Times");
+        }
+        else
+        {
+            if (!EnemyWhoHitPlayer.CompareTag(tag))
+            {
+                // Record Enemy Killed another player
+                string killer = "Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
+                if (GameManager.GM.KillRecord.ContainsKey(killer))
+                {
+                    GameManager.GM.KillRecord[killer]++;
+                }
+                else
+                {
+                    GameManager.GM.KillRecord.Add(killer, 1);
+                }
+                print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
+                    " and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
+            }
+            else
+            {
+                string muderer = "Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
+                if (GameManager.GM.TeammateMurderRecord.ContainsKey(muderer))
+                {
+                    GameManager.GM.TeammateMurderRecord[muderer]++;
+                }
+                else
+                {
+                    GameManager.GM.TeammateMurderRecord.Add(muderer, 1);
+                }
+                print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
+                    " and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");
+            }
+
+        }
+        // Need to clean up the marker and stuff
+        EnemyWhoHitPlayer = null;
+        timer_hitMarkerStayTime = 0f;
+        starttimer_hitmakrer = false;
     }
 
     IEnumerator Respawn(float time)
@@ -472,7 +541,18 @@ public class PlayerController : MonoBehaviour
                 starttimer_blockregen = false;
                 timer_blockregen = 0f;
                 _blockCanRegen = true;
-                print("Block Can now regen");
+            }
+        }
+        // This is for hit statistics
+        // Player hitter marker only stays on a the player for no more than 2s
+        if (starttimer_hitmakrer)
+        {
+            timer_hitMarkerStayTime += Time.deltaTime;
+            if (timer_hitMarkerStayTime > 3f)
+            {
+                starttimer_hitmakrer = false;
+                timer_hitMarkerStayTime = 0f;
+                EnemyWhoHitPlayer = null;
             }
         }
     }
@@ -592,23 +672,30 @@ public class PlayerController : MonoBehaviour
     // If sender is not null, meaning the hit could be blocked
     public void OnMeleeHit(Vector3 force, GameObject sender = null)
     {
-        // Add HIT VFX
-        GameObject par = Instantiate(VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
-        // END VFX
-        ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem>().main;
-        ParticleSystem.MainModule psmain2 = par.transform.GetChild(0).GetComponent<ParticleSystem>().main;
-        psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
-        psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
-
         if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 120f))
         {
             sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * -2f);
         }
         else
         {
+            // Add HIT VFX
+            GameObject par = Instantiate(VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
+            // END VFX
+            ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem>().main;
+            ParticleSystem.MainModule psmain2 = par.transform.GetChild(0).GetComponent<ParticleSystem>().main;
+            psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
+            psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
             _rb.AddForce(force, ForceMode.Impulse);
         }
 
+    }
+
+    // This function is used for marking and statistics
+    public void Mark(GameObject enforcer)
+    {
+        EnemyWhoHitPlayer = enforcer;
+        timer_hitMarkerStayTime = 0f;
+        starttimer_hitmakrer = true;
     }
 
     private void CheckJump()

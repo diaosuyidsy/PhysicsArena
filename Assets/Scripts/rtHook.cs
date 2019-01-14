@@ -123,6 +123,37 @@ public class rtHook : MonoBehaviour
                 // Also need to make hook out of parent
                 _hook.transform.parent = null;
             }
+            //if (_hookState == State.FlyingIn && Hooked != null)
+            //{
+            //    foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+            //    {
+            //        rb.isKinematic = false;
+            //    }
+            //    Vector3 force = (transform.position - _hook.transform.position).normalized;
+            //    Vector3 vec2 = transform.right;
+            //    Vector3 finalVec = force - vec2;
+            //    force = (force + finalVec * 10f).normalized;
+
+            //    Hooked.GetComponent<Rigidbody>().AddForce(force * 450f, ForceMode.Impulse);
+            //    Hooked = null;
+            //}
+        }
+        else
+        {
+            if (_hookState == State.FlyingIn && Hooked != null)
+            {
+                foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+                {
+                    rb.isKinematic = false;
+                }
+                Vector3 force = (transform.position - _hook.transform.position).normalized;
+                Vector3 vec2 = transform.right;
+                Vector3 finalVec = force - vec2;
+                force = (force + finalVec * 10f).normalized;
+
+                Hooked.GetComponent<Rigidbody>().AddForce(force * 450f, ForceMode.Impulse);
+                Hooked = null;
+            }
         }
     }
 
@@ -130,6 +161,9 @@ public class rtHook : MonoBehaviour
     {
         _hookState = State.OnTarget;
         Hooked = hit;
+        //Statistics
+        Hooked.GetComponent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
+        //End
         foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
         {
             rb.isKinematic = true;

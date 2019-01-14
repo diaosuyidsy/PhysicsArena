@@ -6,7 +6,7 @@ public class rtSuck : MonoBehaviour
 {
     public float MaxBallTravelTime = 4f;
     public float BallTravelSpeed = 3f;
-    //public float SuckStrength = 350f;
+    public float SuckStrength = 350f;
 
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
@@ -22,12 +22,14 @@ public class rtSuck : MonoBehaviour
 
     private State _ballState;
     private SuckBallController _sbc;
+    private GunPositionControl _gpc;
 
     private void Start()
     {
         _ballState = State.In;
         _suckBall = transform.GetChild(0).gameObject;
         _sbc = _suckBall.GetComponent<SuckBallController>();
+        _gpc = GetComponent<GunPositionControl>();
         _suckBallInitialScale = new Vector3(_suckBall.transform.localScale.x, _suckBall.transform.localScale.y, _suckBall.transform.localScale.z);
     }
 
@@ -84,13 +86,16 @@ public class rtSuck : MonoBehaviour
     {
         List<GameObject> gos = _sbc.InRangePlayers;
         // First prototype: let's try adding a force to every object
-        //foreach (GameObject go in gos)
-        //{
-        //    go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
-        //}
-        //yield return new WaitForSeconds(time);
-        //Second prototype
-        yield return StartCoroutine(Congregate(time, gos));
+        yield return new WaitForSeconds(time);
+
+        foreach (GameObject go in gos)
+        {
+            go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
+            go.GetComponent<PlayerController>().Mark(_gpc.Owner);
+        }
+        yield return new WaitForSeconds(0.3f);
+        ////Second prototype
+        //yield return StartCoroutine(Congregate(time, gos));
         // After time, disable the suckball and return it to the original position,
         // reset ballstate;
         _ballTraveledTime = 0f;
@@ -110,56 +115,56 @@ public class rtSuck : MonoBehaviour
     }
 
     // Second Prototype: try set rigidybody speed = 0, move position, set gravity = 0, doesn't work
-    IEnumerator Congregate(float time, List<GameObject> gos)
-    {
-        yield return new WaitForSeconds(0.3f);
-        foreach (GameObject go in gos)
-        {
-            // First set up go
-            //go.GetComponent<Rigidbody>().velocity = Vector3.zero;
-            //go.GetComponent<Rigidbody>().useGravity = false;
-            foreach (var rb in go.GetComponentsInChildren<Rigidbody>())
-            {
-                rb.velocity = Vector3.zero;
-                rb.useGravity = false;
-                rb.isKinematic = true;
-            }
-            // Need to reset them at the end
-        }
+    //IEnumerator Congregate(float time, List<GameObject> gos)
+    //{
+    //    yield return new WaitForSeconds(0.3f);
+    //    foreach (GameObject go in gos)
+    //    {
+    //        // First set up go
+    //        //go.GetComponent<Rigidbody>().velocity = Vector3.zero;
+    //        //go.GetComponent<Rigidbody>().useGravity = false;
+    //        foreach (var rb in go.GetComponentsInChildren<Rigidbody>())
+    //        {
+    //            rb.velocity = Vector3.zero;
+    //            rb.useGravity = false;
+    //            rb.isKinematic = true;
+    //        }
+    //        // Need to reset them at the end
+    //    }
 
-        float elapsedTime = 0f;
+    //    float elapsedTime = 0f;
 
-        while (elapsedTime < time)
-        {
-            foreach (GameObject go in gos)
-            {
-                float distance = (_suckBall.transform.position - go.transform.position).magnitude;
-                Vector3 addpos = _suckBall.transform.position - go.transform.position;
+    //    while (elapsedTime < time)
+    //    {
+    //        foreach (GameObject go in gos)
+    //        {
+    //            float distance = (_suckBall.transform.position - go.transform.position).magnitude;
+    //            Vector3 addpos = _suckBall.transform.position - go.transform.position;
 
-                //Vector3 translation = addpos * Time.deltaTime / (time - elapsedTime * 0.2f); Corret Way of this
-                Vector3 translation = addpos * Time.deltaTime / time;
-                // Second method for moving object
-                go.transform.Translate(translation, Space.World);
-            }
+    //            //Vector3 translation = addpos * Time.deltaTime / (time - elapsedTime * 0.2f); Corret Way of this
+    //            Vector3 translation = addpos * Time.deltaTime / time;
+    //            // Second method for moving object
+    //            go.transform.Translate(translation, Space.World);
+    //        }
 
-            //elapsedTime += Time.fixedDeltaTime;
-            //yield return new WaitForFixedUpdate();
-            elapsedTime += Time.deltaTime;
-            yield return new WaitForEndOfFrame();
-        }
+    //        //elapsedTime += Time.fixedDeltaTime;
+    //        //yield return new WaitForFixedUpdate();
+    //        elapsedTime += Time.deltaTime;
+    //        yield return new WaitForEndOfFrame();
+    //    }
 
-        // Reset at the end
-        foreach (GameObject go in gos)
-        {
-            //go.GetComponent<Rigidbody>().useGravity = true;
-            foreach (var rb in go.GetComponentsInChildren<Rigidbody>())
-            {
-                rb.velocity = Vector3.zero;
-                rb.useGravity = true;
-                rb.isKinematic = false;
-            }
-        }
-    }
+    //    // Reset at the end
+    //    foreach (GameObject go in gos)
+    //    {
+    //        //go.GetComponent<Rigidbody>().useGravity = true;
+    //        foreach (var rb in go.GetComponentsInChildren<Rigidbody>())
+    //        {
+    //            rb.velocity = Vector3.zero;
+    //            rb.useGravity = true;
+    //            rb.isKinematic = false;
+    //        }
+    //    }
+    //}
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("DeathZone"))

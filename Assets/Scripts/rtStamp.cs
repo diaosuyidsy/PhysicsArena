@@ -35,7 +35,6 @@ public class rtStamp : MonoBehaviour
         float velocityAddon = transform.GetComponent<Rigidbody>().velocity.magnitude * 1.5f;
         velocityAddon = velocityAddon > 1.4f ? 1.4f : velocityAddon;
         other.GetComponentInParent<PlayerController>().OnMeleeHit(-transform.right * Thrust);
-        //other.SendMessageUpwards("OnMeleeHit", -transform.right * Thrust);
     }
 
 }

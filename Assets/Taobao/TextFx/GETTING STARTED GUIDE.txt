@@ -1,0 +1,282 @@
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TextFx Unity Plugin v3.x- developed by Fenderrio
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%% Getting Started with Unity GUI TextFx %%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	TextFx comes with support for Unity's excellent built-in GUI system (I refer to it as "UGUI").
+	It works by overriding the functionality of the UI Text components.
+
+	Create a New TextFxUGUI instance
+	++++++++++++++++++++++++++++++++
+
+		- Add a TextFxUGUI instance in exactly the same way you'd add a UGUI Text element to your canvas:
+		- 		GameObject -> UI -> TextFx Text
+		- This will create a TextFxUGUI component in your UGUI canvas as you'd expect Text to.
+		- Click the "Open Animation Editor" button at the top of the TextFxUGUI inspector panel to open the TextFx Editor panel
+		- Play around with adding Intro, Main and Outro animation phases with the Quick Setup editor, or get straight into the creating your own totally bespoke animations in the Full Editor!
+		
+	Convert an existing UI Text
+	+++++++++++++++++++++++++++
+
+		- You can easily convert any existing UI Text component into an equivalent TextFxUGUI component by using the TextFx conversion shortcut menu item
+		- Just select your UI Text object in the editor, and go to:
+		- 		Tools -> TextFx -> "Convert UGUI Text to TextFx"
+		- This will keep your text exactly as it is, but setup it up as a TextFxUGUI instance instead!
+		
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%% Getting Started with NGUI TextFx %%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	TextFx includes support for overriding NGUI UILabel components
+	It is known to support all versions of NGUI since NGUI v3.7.2, but likely works with earlier versions as well, they just haven't been tested yet.
+	
+	Prerequisites
+	+++++++++++++
+
+		- You will need to have a supported version of NGUI (v3.7.2+) included in your Unity project.
+		- TextFx should automatically detect the presence of the NGUI plugin, and add a new scripting define symbol ('NGUI') for all available target platforms in your project Player settings.
+			* This is needed to enable the required scripts.
+
+
+	Create a New TextFxNGUI instance
+	++++++++++++++++++++++++++++++++
+	
+		- Add a TextFxNGUI instance in exactly the same way you'd add an NGUI UILabel component to your NGUI setup
+		- 		NGUI -> Create -> TextFx Label
+		- This will create a TextFxNGUI component in your NGUI gui setup as you'd expect a UILabel to.
+		- Click the "Open Animation Editor" button at the top of the TextFxNGUI inspector panel to open the TextFx Editor panel
+		- Play around with adding Intro, Main and Outro animation phases with the Quick Setup editor, or get straight into the creating your own totally bespoke animations in the Full Editor!
+		
+	Convert an existing NGUI UI Label
+	+++++++++++++++++++++++++++++++++
+
+		- You can easily convert any existing NGUI UI Label component into an equivalent TextFxNGUI component by using the TextFx conversion shortcut menu item
+		- Just select your NGUI UI Label object in the editor, and go to:
+		- 		Tools -> TextFx -> "Convert NGUI Text to TextFx"
+		- This will keep your text exactly as it is, but setup it up as a TextFxNGUI instance instead!
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%% Getting Started with Text Mesh Pro TextFx %%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	TextFx includes support for overriding Text Mesh Pro components
+	
+	Prerequisites
+	+++++++++++++
+
+		- You will need to have a version of the TextMeshPro plugin included in your Unity project.
+		- TextFx should automatically detect the presence of the TMP plugin, and add a new scripting define symbol ('TMP') for all available target platforms in your project Player settings.
+			* This is needed to enable the required scripts.
+	
+	
+	Create a New TextFxTMP instance
+	++++++++++++++++++++++++++++++++
+	
+		- Add a TextFxTMP instance in exactly the same way you'd add a normal Text Mesh Pro component to your scene
+		- 		'GameObject -> 3D Object -> TextMeshPro TextFx'     or
+		-		'GameObject -> UI -> TextMeshPro TextFx'
+
+		- This will create a TextFxTMP component in your scene identical in appearance to the standard TMP objects.
+		- Click the "Open Animation Editor" button at the top of the TextFxTMP inspector panel to open the TextFx Editor panel
+		- Play around with adding Intro, Main and Outro animation phases with the Quick Setup editor, or get straight into the creating your own totally bespoke animations in the Full Editor!
+		
+	Convert an existing TextMeshPro object in a TextFx version
+	+++++++++++++++++++++++++++++++++
+
+		- You can easily convert any existing TextMeshPro component into an equivalent TextFxTMP component by using the TextFx conversion shortcut menu item
+		- Just select your TextMeshPro object in the scene heirarchy, and go to:
+		- 		Tools -> TextFx -> "Convert TMP Text to TextFx"
+		- This will keep your text exactly as it is, but setup it up as a TextFxTMP instance instead!
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%% Setting up a TextFx Native Instance %%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	TextFx 3.x has it's own text rendering system included as well!
+	This is useful for setting up text animations which are unrestricted by any GUI rendering system. It's more like the old Unity 3D Text, except with awesome animations!
+	
+	Create a New TextFxNative instance
+	++++++++++++++++++++++++++++++++
+	
+		- Add a TextFxNGUI instance to your scene using the following menu item shortcut
+		- 		GameObject -> TextFx -> Text
+		- This will create a TextFxNative component in your scene.
+		- Position it whereever you like!
+		- Click the "Open Animation Editor" button at the top of the TextFxNative inspector panel to open the TextFx Editor panel
+		- Play around with adding Intro, Main and Outro animation phases with the Quick Setup editor, or get straight into the creating your own totally bespoke animations in the Full Editor!
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%% Scripting with TextFx Animations %%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	Scripting with TextFx animations is easy!
+		- Add the TextFx namespace to your script
+		-		"using TextFx;"
+		- Get a reference to your animation class (TextFxNative, TextFxUGUI, TextFxNGUI)
+		- All key method calls are accessible through the AnimationManager property.
+				* effect.AnimationManager.PlayAnimation();
+		 		* effect.AnimationManager.ResetAnimation();
+		 		* effect.AnimationManager.ContinuePastBreak();
+		 		* effect.AnimationManager.ContinuePastLoop();
+		- See http://www.codeimmunity.co.uk/TextFx/scripting_reference.php for a list of the other script Methods and Properties available.
+			Note: EffectManager is the legacy name for the newer TextFxAnimationManager.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%% Quick Setup TextFx Editor %%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	 - Open the animation editor panel by either:
+	 	* Clicking the "Open Animation Editor" button at the top of the inspector panel of any TextFx object
+	 	* Window -> TextFx -> Animation Editor
+	 - By Default the Quick Setup panel is selected.
+	 - Play around with the Intro, Main and Outro drop downs in order to select different animations to apply.
+	 - Play button is at the top of the Animation Editor window!
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%% Full TextFx Editor %%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+	- Open the animation editor panel by either:
+	 	* Clicking the "Open Animation Editor" button at the bottom of the inspector panel of any TextFx object
+	 	* Window -> TextFx -> Animation Editor
+	 - Use the tabs near the top of the panel to select "Full Editor"
+	 - Here you are exposed to the bare bones of the animation editor, set free to create whatever you like!
+	 - A good tip for learning what it all does is to import anims in the Quick Setup editor and then look at how it all works in the Full Editor. Maybe make modifications from there!
+	 - See the online docs for more info on what it all means:
+	 	http://www.codeimmunity.co.uk/TextFx/creating_an_animation.php
+
+
+
+
+
+%%%%%% Thanks For Buying TextFx %%%%%%
+
+Thank you for purchasing TextFx!
+To report any bugs, request any support, or give a feature suggestion, please send an email to fenderrio@gmail.com
+
+
+
+%%%%%% Support %%%%%%
+
+Twitter: 			@fenderrio
+Support Website: 	http://www.codeimmunity.com/TextFx
+Support Email:		fenderrio@gmail.com
+
+
+
+%%%%%% ChangeLog %%%%%%
+
+11/10/2018 v3.2.16
++ Fixed build errors for Unity 2018.1+
+
+07/08/2018 v3.2.15
++ Improved logic for checking for supported third-party assets (ngui, TMP, playmaker). Now works with TMP imported via the new Unity package manager system.
++ Handling some deprecated unity API methods/properties
+
+04/06/2018 v3.2.14
++ Tidied up support for third-party assets (ngui, tmp, playmaker etc), by removing need for UnityPackages, and instead auto-detecting the plugins and enabling via Scripting Define Symbols
++ Few small bug fixs
+
+13/11/2017 v3.2.13
++ Added support for latest Text Mesh Pro package.
+
+28/12/2016 v3.2.12
++ Handling editor warnings relating to changes in the Unity ParticleSystem API since Unity 5.5
++ Removed UGUI backwards support, as it was causing compile errors in Unity 5.5.0
+
+
+30/10/2016 v3.2.11
++ Handling editor warnings about deprecated ParticleEmitter components in Unity 5.4+
+
+24/07/2016 v3.2.10
++ Fixed prefab bug causing changes not to be recognised
++ Improved TextMeshPro 'Convert to TextFx' menuitem functionality
+
+07/07/2016 v3.2.9
++ Added support for Text Mesh Pro
++ Added support for positioning TextFx text on a curve
++ Optimised animation logic
++ Removed legacy content folder
++ Fixed some bugs
+
+14/05/2016 v3.2.8
++ Fixed Demo Scene incorrectly reporting Unity 5.3+ as incompatible
+
+17/02/2016 v3.2.7
++ Added new Demo scene utilising latest TextFx anims and functionality.
++ Added some new Quick Setup animations.
++ Improved inspector tools panel.
++ Fixed bugs.
+
+07/01/2016 v3.2.6
++ Fixed in-editor update tool
++ Fixed TextFxNative unresponsive inspector panel bug
+
+23/11/2015 v3.2.5
++ UGUI Mesh Effects added; drop shadow and outlines.
++ Playmaker TextFx v3.0+ actions added as UnityPackage.
+
+13/11/2015 v3.2.4
++ Fixed some bugs; SetText() issue showing text in default state instead of its current state, and an issue with playing the same effect twice.
+
+05/11/2015 v3.2.3
++ Added support for NGUI gradient, drop shadow and outline effects. Note: You'll need to reimport 'TextFx/3rd Party Asset Support/TextFxNGUI.unitypackage' to see changes!
+
+22/10/2015 v3.2.2
++ TextFxUGUI fix for Unity 5.2.2 and beyond
+
+19/10/2015 v3.2.1
++ Added fix for latest Unity 5.2.1 PATCH releases. See instructions above.
++ Fixed bug with prefabs not keeping local scene changes at runtime.
++ Fixed bug with deactivated objects while playing effects.
+
+11/09/2015 v3.2
++ Fixed TextFxUGUI compatibility with Unity Editor v5.2
+
+06/09/2015 v3.1
++ Fixed scripting pause functionality
++ Fixed some NGUI & UGUI implementation bugs (Remember to re-import the TextFxNGUI.unitypackage in '3rd Party Assets Support' to get these fixes when updating)
++ Fixed hard-coded folder hierarchy dependency; now able to move root TextFx folder without it breaking!
+
+24/06/2015 v3.05
++ Fixed dynamic font related jumbled text bugs
++ Fixed and improved the functionality of SetText()
++ Re-exposed legacy OnFinish option field in editor panel
++ Fixed legacy Animate Per option.
++ Fixed TextFxNative alignment bug. Thanks to Lawrence Bishop for helping with this!
+
+
+19/05/2015 v3.01
++ Fixed build errors caused by class being included in editor-only code section
++ Fixed a data reference serialisation bug causing Text colour data to be lost in editor occasionally
++ Populated TextFxNGUI & TextFxUGUI's SetText() interface methods.
+
+
+06/05/2015 v3.0
++ Added support for TextFx animations on NGUI's UILabel instances
++ Added support for TextFx animations on UGUI's Text instances
++ Added Quick Setup animation editor for easy setup and tweaking of some core animations
+
+
+
+%%%%%% Credits %%%%%%
+
+https://www.assetstore.unity3d.com/#/content/5788 	- Boomlagoon JSON; a great light-weight free JSON library used for the Import/Export functionality
+http://www.freesfx.co.uk    						- sound effects used in demo scenes
+http://www.1001freefonts.com/  						- fonts used in demo scenes

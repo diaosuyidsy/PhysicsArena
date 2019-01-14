@@ -18,6 +18,7 @@ public class MeleeControl : MonoBehaviour
             float velocityAddon = transform.GetComponent<Rigidbody>().velocity.magnitude * 1.5f;
             velocityAddon = velocityAddon > 1.4f ? 1.4f : velocityAddon;
             collision.collider.GetComponentInParent<PlayerController>().OnMeleeHit(transform.forward * Thrust * pc.MeleeCharge * velocityAddon, pc.gameObject);
+            collision.collider.GetComponentInParent<PlayerController>().Mark(pc.gameObject);
         }
     }
 }

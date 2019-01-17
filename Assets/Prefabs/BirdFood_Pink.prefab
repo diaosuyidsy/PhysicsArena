@@ -24,9 +24,10 @@ GameObject:
   - component: {fileID: 54576304729107240}
   - component: {fileID: 65968432936572096}
   - component: {fileID: 114456263922335804}
+  - component: {fileID: 114341152802089534}
   m_Layer: 0
   m_Name: BirdFood_Pink
-  m_TagString: Team2Resource
+  m_TagString: Team1Resource
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -38,7 +39,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1101020832636924}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.287, z: -0.07}
+  m_LocalPosition: {x: 24.507, y: 0.324, z: -16.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -113,6 +114,17 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.28955817, y: 0.11216251, z: 0.2277019}
   m_Center: {x: 0.010000005, y: 0, z: 0}
+--- !u!114 &114341152802089534
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1101020832636924}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 003c73b39cecef24e94c8add1a53f2e2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &114456263922335804
 MonoBehaviour:
   m_ObjectHideFlags: 1

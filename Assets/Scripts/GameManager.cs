@@ -39,6 +39,9 @@ public class GameManager : MonoBehaviour
     public Dictionary<string, int> SuicideRecord;
     public Dictionary<string, int> KillRecord;
     public Dictionary<string, int> TeammateMurderRecord;
+    public List<float> CartTime;
+    public List<int> BlockTimes;
+    public List<int> FoodScoreTimes;
     #endregion
 
     private int Team1RespawnIndex = 0;
@@ -68,6 +71,9 @@ public class GameManager : MonoBehaviour
         SuicideRecord = new Dictionary<string, int>();
         KillRecord = new Dictionary<string, int>();
         TeammateMurderRecord = new Dictionary<string, int>();
+        CartTime = new List<float>(new float[] { 0f, 0f, 0f, 0f, 0f, 0f }); // Initialize The cart time to be 6 zeroes
+        BlockTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 }); // Initialize the block time to be 6 zeroes
+        FoodScoreTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 }); // Initalize the Food Score time to be 6 zeroes
         /* GameObject[] team1Players = GameObject.FindGameObjectsWithTag("Team1");
         GameObject[] team2Players = GameObject.FindGameObjectsWithTag("Team2");
         Players = new GameObject[team1Players.Length + team2Players.Length];
@@ -183,6 +189,26 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
+        //// Debug for on cart time statistics
+        //ConsoleProDebug.Watch("Player 0 On Cart Time", CartTime[0].ToString());
+        //ConsoleProDebug.Watch("Player 1 On Cart Time", CartTime[1].ToString());
+        //ConsoleProDebug.Watch("Player 2 On Cart Time", CartTime[2].ToString());
+        //ConsoleProDebug.Watch("Player 3 On Cart Time", CartTime[3].ToString());
+        //ConsoleProDebug.Watch("Player 4 On Cart Time", CartTime[4].ToString());
+        //ConsoleProDebug.Watch("Player 5 On Cart Time", CartTime[5].ToString());
+        //ConsoleProDebug.Watch("Player 0 Block Times", BlockTimes[0].ToString());
+        //ConsoleProDebug.Watch("Player 1 Block Times", BlockTimes[1].ToString());
+        //ConsoleProDebug.Watch("Player 2 Block Times", BlockTimes[2].ToString());
+        //ConsoleProDebug.Watch("Player 3 Block Times", BlockTimes[3].ToString());
+        //ConsoleProDebug.Watch("Player 4 Block Times", BlockTimes[4].ToString());
+        //ConsoleProDebug.Watch("Player 5 Block Times", BlockTimes[5].ToString());
+        ConsoleProDebug.Watch("Player 0 Carry Food Times", FoodScoreTimes[0].ToString());
+        ConsoleProDebug.Watch("Player 1 Carry Food Times", FoodScoreTimes[1].ToString());
+        ConsoleProDebug.Watch("Player 2 Carry Food Times", FoodScoreTimes[2].ToString());
+        ConsoleProDebug.Watch("Player 3 Carry Food Times", FoodScoreTimes[3].ToString());
+        ConsoleProDebug.Watch("Player 4 Carry Food Times", FoodScoreTimes[4].ToString());
+        ConsoleProDebug.Watch("Player 5 Carry Food Times", FoodScoreTimes[5].ToString());
+        //// Debug End
         CheckRestart();
         SetWeaponSpawn();
     }

@@ -50,7 +50,11 @@ public class rtEmit : MonoBehaviour
             WaterBall.speed = 0f;
             return;
         }
+        // This means we are actually shooting water
         WaterBall.speed = Speed;
+        // Statistics: Here we are using raycast for players hit
+        _detectPlayer();
+        // Statistics: End
         if (_gpc != null)
         {
             _gpc.Owner.GetComponent<Rigidbody>().AddForce(-_gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
@@ -70,6 +74,18 @@ public class rtEmit : MonoBehaviour
     public void KillUI()
     {
         GunUI.SetActive(false);
+    }
+
+    private void _detectPlayer()
+    {
+        // This layermask means we are only looking for Player1Body - Player6Body
+        int layermask = (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15) | (1 << 16);
+        RaycastHit hit;
+        if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
+        {
+            print("Hit: " + hit.transform.name);
+            hit.transform.GetComponentInParent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
+        }
     }
 
     private void ChangeAmmoUI()

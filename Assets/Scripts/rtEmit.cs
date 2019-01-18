@@ -54,6 +54,8 @@ public class rtEmit : MonoBehaviour
         WaterBall.speed = Speed;
         // Statistics: Here we are using raycast for players hit
         _detectPlayer();
+        // As long as player are actively spraying, should add that time to the record
+        _addToSprayTime();
         // Statistics: End
         if (_gpc != null)
         {
@@ -86,6 +88,12 @@ public class rtEmit : MonoBehaviour
             print("Hit: " + hit.transform.name);
             hit.transform.GetComponentInParent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
         }
+    }
+
+    private void _addToSprayTime()
+    {
+        int playerNumber = _gpc.Owner.GetComponent<PlayerController>().PlayerNumber;
+        GameManager.GM.WaterGunUseTime[playerNumber] += Time.deltaTime;
     }
 
     private void ChangeAmmoUI()

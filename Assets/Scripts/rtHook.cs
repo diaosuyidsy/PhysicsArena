@@ -122,6 +122,9 @@ public class rtHook : MonoBehaviour
                 _hookmaxPos = new Vector3(_hookmax.transform.position.x, _hookmax.transform.position.y, _hookmax.transform.position.z);
                 // Also need to make hook out of parent
                 _hook.transform.parent = null;
+                // Statistics: Record the player has used the hook one time
+                _addToHookTime();
+                // End Statistics
             }
             //if (_hookState == State.FlyingIn && Hooked != null)
             //{
@@ -157,12 +160,25 @@ public class rtHook : MonoBehaviour
         }
     }
 
+    private void _addToHookTime()
+    {
+        int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
+        GameManager.GM.HookGunUseTimes[playernum]++;
+    }
+
+    private void _addToHookSuccessTime()
+    {
+        int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
+        GameManager.GM.HookGunSuccessTimes[playernum]++;
+    }
+
     public void HookOnHit(GameObject hit)
     {
         _hookState = State.OnTarget;
         Hooked = hit;
         //Statistics
         Hooked.GetComponent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
+        _addToHookSuccessTime();
         //End
         foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
         {

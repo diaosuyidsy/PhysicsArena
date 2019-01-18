@@ -42,6 +42,10 @@ public class GameManager : MonoBehaviour
     public List<float> CartTime;
     public List<int> BlockTimes;
     public List<int> FoodScoreTimes;
+    public List<float> WaterGunUseTime;
+    public List<int> HookGunUseTimes;
+    public List<int> HookGunSuccessTimes;
+    public List<int> SuckedPlayersTimes;
     #endregion
 
     private int Team1RespawnIndex = 0;
@@ -74,20 +78,10 @@ public class GameManager : MonoBehaviour
         CartTime = new List<float>(new float[] { 0f, 0f, 0f, 0f, 0f, 0f }); // Initialize The cart time to be 6 zeroes
         BlockTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 }); // Initialize the block time to be 6 zeroes
         FoodScoreTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 }); // Initalize the Food Score time to be 6 zeroes
-        /* GameObject[] team1Players = GameObject.FindGameObjectsWithTag("Team1");
-        GameObject[] team2Players = GameObject.FindGameObjectsWithTag("Team2");
-        Players = new GameObject[team1Players.Length + team2Players.Length];
-        int index = 0;
-        foreach (GameObject go in team1Players)
-        {
-            Players[index] = go;
-            index++;
-        }
-        foreach (GameObject go in team2Players)
-        {
-            Players[index] = go;
-            index++;
-        } */
+        WaterGunUseTime = new List<float>(new float[] { 0f, 0f, 0f, 0f, 0f, 0f });
+        HookGunUseTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, });
+        HookGunSuccessTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, });
+        SuckedPlayersTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
         _player = ReInput.players.GetPlayer(0);
 
     }
@@ -202,12 +196,36 @@ public class GameManager : MonoBehaviour
         //ConsoleProDebug.Watch("Player 3 Block Times", BlockTimes[3].ToString());
         //ConsoleProDebug.Watch("Player 4 Block Times", BlockTimes[4].ToString());
         //ConsoleProDebug.Watch("Player 5 Block Times", BlockTimes[5].ToString());
-        ConsoleProDebug.Watch("Player 0 Carry Food Times", FoodScoreTimes[0].ToString());
-        ConsoleProDebug.Watch("Player 1 Carry Food Times", FoodScoreTimes[1].ToString());
-        ConsoleProDebug.Watch("Player 2 Carry Food Times", FoodScoreTimes[2].ToString());
-        ConsoleProDebug.Watch("Player 3 Carry Food Times", FoodScoreTimes[3].ToString());
-        ConsoleProDebug.Watch("Player 4 Carry Food Times", FoodScoreTimes[4].ToString());
-        ConsoleProDebug.Watch("Player 5 Carry Food Times", FoodScoreTimes[5].ToString());
+        //ConsoleProDebug.Watch("Player 0 Carry Food Times", FoodScoreTimes[0].ToString());
+        //ConsoleProDebug.Watch("Player 1 Carry Food Times", FoodScoreTimes[1].ToString());
+        //ConsoleProDebug.Watch("Player 2 Carry Food Times", FoodScoreTimes[2].ToString());
+        //ConsoleProDebug.Watch("Player 3 Carry Food Times", FoodScoreTimes[3].ToString());
+        //ConsoleProDebug.Watch("Player 4 Carry Food Times", FoodScoreTimes[4].ToString());
+        //ConsoleProDebug.Watch("Player 5 Carry Food Times", FoodScoreTimes[5].ToString());
+        //ConsoleProDebug.Watch("Player 0 Water Gun Spray Time", WaterGunUseTime[0].ToString());
+        //ConsoleProDebug.Watch("Player 1 Water Gun Spray Time", WaterGunUseTime[1].ToString());
+        //ConsoleProDebug.Watch("Player 2 Water Gun Spray Time", WaterGunUseTime[2].ToString());
+        //ConsoleProDebug.Watch("Player 3 Water Gun Spray Time", WaterGunUseTime[3].ToString());
+        //ConsoleProDebug.Watch("Player 4 Water Gun Spray Time", WaterGunUseTime[4].ToString());
+        //ConsoleProDebug.Watch("Player 5 Water Gun Spray Time", WaterGunUseTime[5].ToString());
+        ConsoleProDebug.Watch("Player 0 Hooked Time", HookGunUseTimes[0].ToString());
+        ConsoleProDebug.Watch("Player 1 Hooked Time", HookGunUseTimes[1].ToString());
+        ConsoleProDebug.Watch("Player 2 Hooked Time", HookGunUseTimes[2].ToString());
+        ConsoleProDebug.Watch("Player 3 Hooked Time", HookGunUseTimes[3].ToString());
+        ConsoleProDebug.Watch("Player 4 Hooked Time", HookGunUseTimes[4].ToString());
+        ConsoleProDebug.Watch("Player 5 Hooked Time", HookGunUseTimes[5].ToString());
+        ConsoleProDebug.Watch("Player 0 Hooked Success Time", HookGunSuccessTimes[0].ToString());
+        ConsoleProDebug.Watch("Player 1 Hooked Success Time", HookGunSuccessTimes[1].ToString());
+        ConsoleProDebug.Watch("Player 2 Hooked Success Time", HookGunSuccessTimes[2].ToString());
+        ConsoleProDebug.Watch("Player 3 Hooked Success Time", HookGunSuccessTimes[3].ToString());
+        ConsoleProDebug.Watch("Player 4 Hooked Success Time", HookGunSuccessTimes[4].ToString());
+        ConsoleProDebug.Watch("Player 5 Hooked Success Time", HookGunSuccessTimes[5].ToString());
+        //ConsoleProDebug.Watch("Player 0 Suck Time", SuckedPlayersTimes[0].ToString());
+        //ConsoleProDebug.Watch("Player 1 Suck Time", SuckedPlayersTimes[1].ToString());
+        //ConsoleProDebug.Watch("Player 2 Suck Time", SuckedPlayersTimes[2].ToString());
+        //ConsoleProDebug.Watch("Player 3 Suck Time", SuckedPlayersTimes[3].ToString());
+        //ConsoleProDebug.Watch("Player 4 Suck Time", SuckedPlayersTimes[4].ToString());
+        //ConsoleProDebug.Watch("Player 5 Suck Time", SuckedPlayersTimes[5].ToString());
         //// Debug End
         CheckRestart();
         SetWeaponSpawn();

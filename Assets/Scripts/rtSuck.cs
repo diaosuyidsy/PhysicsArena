@@ -91,7 +91,11 @@ public class rtSuck : MonoBehaviour
         foreach (GameObject go in gos)
         {
             go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
+            // Statistics: Add kill marker
             go.GetComponent<PlayerController>().Mark(_gpc.Owner);
+            // Statistics: Add every player he sucked into statistics
+            _addToSuckedTimes();
+            // End Statistics
         }
         yield return new WaitForSeconds(0.3f);
         ////Second prototype
@@ -183,5 +187,11 @@ public class rtSuck : MonoBehaviour
             _sbc.CleanUpAll();
             gameObject.SetActive(false);
         }
+    }
+
+    private void _addToSuckedTimes()
+    {
+        int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
+        GameManager.GM.SuckedPlayersTimes[playernum]++;
     }
 }

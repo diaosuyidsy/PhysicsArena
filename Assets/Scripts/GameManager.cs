@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     public string[] PlayerCanPickupTags;
     public GameObject TeamRed1Explosion;
     public GameObject TeamBlue2Explosion;
+    public Color EndGameBackgroundImageColor;
 
     #region Stats Variable
     public Dictionary<string, int> SuicideRecord;
@@ -118,6 +119,28 @@ public class GameManager : MonoBehaviour
             }
             yield return new WaitForEndOfFrame();
             EndImage.rectTransform.sizeDelta -= new Vector2(EndImageScale, EndImageScale);
+        }
+
+        // Now the Image is focused on the winning objective
+        yield return new WaitForSeconds(3f);
+        // TODO: The transition from focusing to completely black
+        // Now the screen should be entirely black
+        yield return StartCoroutine(StartTransitionColor(5f));
+
+    }
+    IEnumerator StartTransitionColor(float time)
+    {
+        float elapsedTime = 0f;
+        Image tempImage = transform.GetChild(0).GetChild(0).GetComponent<Image>();
+        transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
+        EndImage.gameObject.SetActive(false);
+        Color initialColor = tempImage.color;
+
+        while (elapsedTime < time)
+        {
+            elapsedTime += Time.deltaTime;
+            tempImage.color = Color.Lerp(initialColor, EndGameBackgroundImageColor, elapsedTime / time);
+            yield return new WaitForEndOfFrame();
         }
     }
     //make the space for weapon to respawn (weapon-spawner) visible in scene
@@ -220,12 +243,12 @@ public class GameManager : MonoBehaviour
         ConsoleProDebug.Watch("Player 3 Hooked Success Time", HookGunSuccessTimes[3].ToString());
         ConsoleProDebug.Watch("Player 4 Hooked Success Time", HookGunSuccessTimes[4].ToString());
         ConsoleProDebug.Watch("Player 5 Hooked Success Time", HookGunSuccessTimes[5].ToString());
-        //ConsoleProDebug.Watch("Player 0 Suck Time", SuckedPlayersTimes[0].ToString());
-        //ConsoleProDebug.Watch("Player 1 Suck Time", SuckedPlayersTimes[1].ToString());
-        //ConsoleProDebug.Watch("Player 2 Suck Time", SuckedPlayersTimes[2].ToString());
-        //ConsoleProDebug.Watch("Player 3 Suck Time", SuckedPlayersTimes[3].ToString());
-        //ConsoleProDebug.Watch("Player 4 Suck Time", SuckedPlayersTimes[4].ToString());
-        //ConsoleProDebug.Watch("Player 5 Suck Time", SuckedPlayersTimes[5].ToString());
+        ConsoleProDebug.Watch("Player 0 Suck Time", SuckedPlayersTimes[0].ToString());
+        ConsoleProDebug.Watch("Player 1 Suck Time", SuckedPlayersTimes[1].ToString());
+        ConsoleProDebug.Watch("Player 2 Suck Time", SuckedPlayersTimes[2].ToString());
+        ConsoleProDebug.Watch("Player 3 Suck Time", SuckedPlayersTimes[3].ToString());
+        ConsoleProDebug.Watch("Player 4 Suck Time", SuckedPlayersTimes[4].ToString());
+        ConsoleProDebug.Watch("Player 5 Suck Time", SuckedPlayersTimes[5].ToString());
         //// Debug End
         CheckRestart();
         SetWeaponSpawn();

@@ -4266,6 +4266,11 @@ Prefab:
       propertyPath: Weapons.Array.data[5]
       value: 
       objectReference: {fileID: 284515211}
+    - target: {fileID: 224213177762969708, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 2}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 2}
   m_IsPrefabAsset: 0
@@ -5491,6 +5496,18 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 1995234145574352, guid: f8d6c631da37749db9f9744813be0f39,
     type: 2}
   m_PrefabInternal: {fileID: 2030870283}
+--- !u!114 &2030870285
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 2030870284}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 066f9c6860c70e541a19f69172c364d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  length: 0.9
 --- !u!82 &2030870287
 AudioSource:
   m_ObjectHideFlags: 0

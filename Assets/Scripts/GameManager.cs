@@ -117,6 +117,11 @@ public class GameManager : MonoBehaviour
 
     IEnumerator EndImageShow(float time, GameObject _tar = null)
     {
+        Vector3 _tarPos = Vector3.zero;
+        if (_tar != null)
+        {
+            _tarPos = new Vector3(_tar.transform.position.x, _tar.transform.position.y, _tar.transform.position.z);
+        }
         float elapsedTime = 0f;
         float screenWidth = Screen.width;
         float screenHeight = Screen.height;
@@ -126,7 +131,7 @@ public class GameManager : MonoBehaviour
         // Set up CenterPosition
         if (_tar != null)
         {
-            targetPosition = Camera.main.WorldToScreenPoint(_tar.transform.position);
+            targetPosition = Camera.main.WorldToScreenPoint(_tarPos);
             targetPosition.y = screenHeight - targetPosition.y;
             _dcfx.CenterPosition = targetPosition;
         }
@@ -141,7 +146,7 @@ public class GameManager : MonoBehaviour
             elapsedTime += Time.deltaTime;
             if (_tar != null)
             {
-                targetPosition = Camera.main.WorldToScreenPoint(_tar.transform.position);
+                targetPosition = Camera.main.WorldToScreenPoint(_tarPos);
                 targetPosition.y = screenHeight - targetPosition.y;
                 _dcfx.CenterPosition = Vector2.Lerp(_dcfx.CenterPosition, targetPosition, elapsedTime / time);
             }

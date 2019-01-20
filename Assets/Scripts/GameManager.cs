@@ -67,6 +67,7 @@ public class GameManager : MonoBehaviour
 
     private bool _won = false;
     private Player _player;
+    private DarkCornerEffect _dcfx;
 
 
     private void Awake()
@@ -84,7 +85,7 @@ public class GameManager : MonoBehaviour
         HookGunSuccessTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, });
         SuckedPlayersTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
         _player = ReInput.players.GetPlayer(0);
-
+        _dcfx = Camera.main.GetComponent<DarkCornerEffect>();
     }
 
     private void Start()
@@ -104,30 +105,83 @@ public class GameManager : MonoBehaviour
         }
     }
 
+
     IEnumerator EndImageShow(float time, GameObject _tar = null)
     {
         float elapsedTime = 0f;
-        EndImage.gameObject.SetActive(true);
+        float screenWidth = Screen.width;
+        float screenHeight = Screen.height;
+
+        Vector2 targetPosition = Vector2.zero;
+
+        // Set up CenterPosition
+        if (_tar != null)
+        {
+            targetPosition = Camera.main.WorldToScreenPoint(_tar.transform.position);
+            targetPosition.y = screenHeight - targetPosition.y;
+            _dcfx.CenterPosition = targetPosition;
+        }
+
+        float maxLength = getMaxLength(targetPosition);
+        _dcfx.enabled = true;
+        _dcfx.Length = maxLength;
+        float deltaLength = maxLength * 0.55f / time;
+
         while (elapsedTime < time)
         {
             elapsedTime += Time.deltaTime;
             if (_tar != null)
             {
-                EndImage.rectTransform.position = Camera.main.WorldToScreenPoint(_tar.transform.position);
-                Vector3 targetPosition = new Vector3(EndImage.rectTransform.position.x, EndImage.rectTransform.position.y, 0f);
-                EndImage.rectTransform.position = Vector3.Lerp(EndImage.rectTransform.position, targetPosition, 0.5f);
+                targetPosition = Camera.main.WorldToScreenPoint(_tar.transform.position);
+                targetPosition.y = screenHeight - targetPosition.y;
+                _dcfx.CenterPosition = Vector2.Lerp(_dcfx.CenterPosition, targetPosition, elapsedTime / time);
             }
+            _dcfx.Length -= Time.deltaTime * deltaLength;
             yield return new WaitForEndOfFrame();
-            EndImage.rectTransform.sizeDelta -= new Vector2(EndImageScale, EndImageScale);
         }
 
         // Now the Image is focused on the winning objective
         yield return new WaitForSeconds(3f);
         // TODO: The transition from focusing to completely black
+        elapsedTime = 0f;
+        deltaLength = maxLength * 0.45f / 1f;
+        while (elapsedTime < 1f)
+        {
+            elapsedTime += Time.deltaTime;
+            _dcfx.Length -= Time.deltaTime * deltaLength;
+            yield return new WaitForEndOfFrame();
+        }
         // Now the screen should be entirely black
+        // And we need to disable the screen dark corner effect
+        _dcfx.enabled = false;
         yield return StartCoroutine(StartTransitionColor(5f));
 
     }
+
+    // This function takes the center position on sreen
+    // and calculates the maximum length of its position to the four corners
+    private float getMaxLength(Vector2 centerposition)
+    {
+        Vector2[] screenVertices = new Vector2[]
+        {
+            new Vector2(0f, 0f),
+            new Vector2(Screen.width, 0f),
+            new Vector2(Screen.width, Screen.height),
+            new Vector2(0f, Screen.height),
+        };
+
+        float maxLength = 0f;
+        for (int i = 0; i < 4; i++)
+        {
+            float length = Vector2.Distance(centerposition, screenVertices[i]);
+            if (length > maxLength)
+            {
+                maxLength = length;
+            }
+        }
+        return maxLength;
+    }
+
     IEnumerator StartTransitionColor(float time)
     {
         float elapsedTime = 0f;
@@ -200,7 +254,7 @@ public class GameManager : MonoBehaviour
             return;
         //Result.text = "TEAM " + (winner == 1 ? "ONE" : "TWO") + " VICTORY";
         //Result.transform.parent.gameObject.SetActive (true);
-        StartCoroutine(EndImageShow(2f, _tar));
+        StartCoroutine(EndImageShow(3f, _tar));
         _won = true;
     }
 
@@ -231,24 +285,24 @@ public class GameManager : MonoBehaviour
         //ConsoleProDebug.Watch("Player 3 Water Gun Spray Time", WaterGunUseTime[3].ToString());
         //ConsoleProDebug.Watch("Player 4 Water Gun Spray Time", WaterGunUseTime[4].ToString());
         //ConsoleProDebug.Watch("Player 5 Water Gun Spray Time", WaterGunUseTime[5].ToString());
-        ConsoleProDebug.Watch("Player 0 Hooked Time", HookGunUseTimes[0].ToString());
-        ConsoleProDebug.Watch("Player 1 Hooked Time", HookGunUseTimes[1].ToString());
-        ConsoleProDebug.Watch("Player 2 Hooked Time", HookGunUseTimes[2].ToString());
-        ConsoleProDebug.Watch("Player 3 Hooked Time", HookGunUseTimes[3].ToString());
-        ConsoleProDebug.Watch("Player 4 Hooked Time", HookGunUseTimes[4].ToString());
-        ConsoleProDebug.Watch("Player 5 Hooked Time", HookGunUseTimes[5].ToString());
-        ConsoleProDebug.Watch("Player 0 Hooked Success Time", HookGunSuccessTimes[0].ToString());
-        ConsoleProDebug.Watch("Player 1 Hooked Success Time", HookGunSuccessTimes[1].ToString());
-        ConsoleProDebug.Watch("Player 2 Hooked Success Time", HookGunSuccessTimes[2].ToString());
-        ConsoleProDebug.Watch("Player 3 Hooked Success Time", HookGunSuccessTimes[3].ToString());
-        ConsoleProDebug.Watch("Player 4 Hooked Success Time", HookGunSuccessTimes[4].ToString());
-        ConsoleProDebug.Watch("Player 5 Hooked Success Time", HookGunSuccessTimes[5].ToString());
-        ConsoleProDebug.Watch("Player 0 Suck Time", SuckedPlayersTimes[0].ToString());
-        ConsoleProDebug.Watch("Player 1 Suck Time", SuckedPlayersTimes[1].ToString());
-        ConsoleProDebug.Watch("Player 2 Suck Time", SuckedPlayersTimes[2].ToString());
-        ConsoleProDebug.Watch("Player 3 Suck Time", SuckedPlayersTimes[3].ToString());
-        ConsoleProDebug.Watch("Player 4 Suck Time", SuckedPlayersTimes[4].ToString());
-        ConsoleProDebug.Watch("Player 5 Suck Time", SuckedPlayersTimes[5].ToString());
+        //ConsoleProDebug.Watch("Player 0 Hooked Time", HookGunUseTimes[0].ToString());
+        //ConsoleProDebug.Watch("Player 1 Hooked Time", HookGunUseTimes[1].ToString());
+        //ConsoleProDebug.Watch("Player 2 Hooked Time", HookGunUseTimes[2].ToString());
+        //ConsoleProDebug.Watch("Player 3 Hooked Time", HookGunUseTimes[3].ToString());
+        //ConsoleProDebug.Watch("Player 4 Hooked Time", HookGunUseTimes[4].ToString());
+        //ConsoleProDebug.Watch("Player 5 Hooked Time", HookGunUseTimes[5].ToString());
+        //ConsoleProDebug.Watch("Player 0 Hooked Success Time", HookGunSuccessTimes[0].ToString());
+        //ConsoleProDebug.Watch("Player 1 Hooked Success Time", HookGunSuccessTimes[1].ToString());
+        //ConsoleProDebug.Watch("Player 2 Hooked Success Time", HookGunSuccessTimes[2].ToString());
+        //ConsoleProDebug.Watch("Player 3 Hooked Success Time", HookGunSuccessTimes[3].ToString());
+        //ConsoleProDebug.Watch("Player 4 Hooked Success Time", HookGunSuccessTimes[4].ToString());
+        //ConsoleProDebug.Watch("Player 5 Hooked Success Time", HookGunSuccessTimes[5].ToString());
+        //ConsoleProDebug.Watch("Player 0 Suck Time", SuckedPlayersTimes[0].ToString());
+        //ConsoleProDebug.Watch("Player 1 Suck Time", SuckedPlayersTimes[1].ToString());
+        //ConsoleProDebug.Watch("Player 2 Suck Time", SuckedPlayersTimes[2].ToString());
+        //ConsoleProDebug.Watch("Player 3 Suck Time", SuckedPlayersTimes[3].ToString());
+        //ConsoleProDebug.Watch("Player 4 Suck Time", SuckedPlayersTimes[4].ToString());
+        //ConsoleProDebug.Watch("Player 5 Suck Time", SuckedPlayersTimes[5].ToString());
         //// Debug End
         CheckRestart();
         SetWeaponSpawn();

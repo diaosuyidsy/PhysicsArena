@@ -25,11 +25,12 @@
 					float2 uv : TEXCOORD0;
 				};
 
-				struct v2f
-				{
-					float2 uv : TEXCOORD0;
-					float4 vertex : SV_POSITION;
-				};
+
+		struct v2f
+		{
+			float2 uv : TEXCOORD0;
+			float4 vertex : SV_POSITION;
+		};
 
 		v2f vert(appdata v)
 		{
@@ -47,11 +48,10 @@
 		{
 			float4 c = tex2D(_MainTex, i.uv);
 			// Calculate distance between i and centerpoint
-			float curDistance = distance(_CenterPoint.xyz, i.uv);
+			float curDistance = distance(_CenterPoint.xy, i.vertex.xy);
 			// Calculate the changefactor in according to the distance
 			//float changeFactor = saturate(curDistance - _dcLength);
 			float changeFactor = sign(curDistance - _dcLength);
-			//float lum = c.r*.3 + c.g*.59 + c.b*.11;
 			float3 b = float3(0, 0, 0);
 
 			float4 result = c;

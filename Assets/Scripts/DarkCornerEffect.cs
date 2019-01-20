@@ -6,18 +6,21 @@ using UnityEngine;
 public class DarkCornerEffect : MonoBehaviour
 {
 
-    public float length;
-    private Material material;
+    public float Length;
+    public Vector2 CenterPosition;
+
+    private Material _material;
 
     private void Awake()
     {
-        material = new Material(Shader.Find("Hidden/DCEffect"));
+        _material = new Material(Shader.Find("Hidden/DCEffect"));
     }
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        material.SetFloat("_dcLength", length);
-        Graphics.Blit(source, destination, material);
+        _material.SetFloat("_dcLength", Length);
+        _material.SetVector("_CenterPoint", CenterPosition);
+        Graphics.Blit(source, destination, _material);
 
     }
 }

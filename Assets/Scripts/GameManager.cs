@@ -9,8 +9,7 @@ using Rewired;
 public class GameManager : MonoBehaviour
 {
     public static GameManager GM;
-    public Text Result;
-    public Image EndImage;
+    public Image EndImageBackground;
     [HideInInspector]
     public List<GameObject> Players;
     [Tooltip("Need to fill all six Beforehand")]
@@ -37,15 +36,25 @@ public class GameManager : MonoBehaviour
     public Color EndGameBackgroundImageColor;
 
     #region Stats Variable
+    [HideInInspector]
     public Dictionary<string, int> SuicideRecord;
+    [HideInInspector]
     public Dictionary<string, int> KillRecord;
+    [HideInInspector]
     public Dictionary<string, int> TeammateMurderRecord;
+    [HideInInspector]
     public List<float> CartTime;
+    [HideInInspector]
     public List<int> BlockTimes;
+    [HideInInspector]
     public List<int> FoodScoreTimes;
+    [HideInInspector]
     public List<float> WaterGunUseTime;
+    [HideInInspector]
     public List<int> HookGunUseTimes;
+    [HideInInspector]
     public List<int> HookGunSuccessTimes;
+    [HideInInspector]
     public List<int> SuckedPlayersTimes;
     #endregion
 
@@ -185,15 +194,13 @@ public class GameManager : MonoBehaviour
     IEnumerator StartTransitionColor(float time)
     {
         float elapsedTime = 0f;
-        Image tempImage = transform.GetChild(0).GetChild(0).GetComponent<Image>();
-        transform.GetChild(0).GetChild(0).gameObject.SetActive(true);
-        EndImage.gameObject.SetActive(false);
-        Color initialColor = tempImage.color;
+        EndImageBackground.gameObject.SetActive(true);
+        Color initialColor = EndImageBackground.color;
 
         while (elapsedTime < time)
         {
             elapsedTime += Time.deltaTime;
-            tempImage.color = Color.Lerp(initialColor, EndGameBackgroundImageColor, elapsedTime / time);
+            EndImageBackground.color = Color.Lerp(initialColor, EndGameBackgroundImageColor, elapsedTime / time);
             yield return new WaitForEndOfFrame();
         }
     }
@@ -252,8 +259,6 @@ public class GameManager : MonoBehaviour
     {
         if (_won)
             return;
-        //Result.text = "TEAM " + (winner == 1 ? "ONE" : "TWO") + " VICTORY";
-        //Result.transform.parent.gameObject.SetActive (true);
         StartCoroutine(EndImageShow(3f, _tar));
         _won = true;
     }

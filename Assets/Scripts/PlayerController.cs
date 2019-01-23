@@ -200,45 +200,45 @@ public class PlayerController : MonoBehaviour
         // If no one killed him, then he commited suicide
         if (EnemyWhoHitPlayer == null)
         {
-            string thisPlayer = "Player" + PlayerNumber;
-            // Record Commited suicide
-            if (GameManager.GM.SuicideRecord.ContainsKey(thisPlayer))
+            if (PlayerNumber < GameManager.GM.SuicideRecord.Count)
             {
-                GameManager.GM.SuicideRecord[thisPlayer]++;
+                GameManager.GM.SuicideRecord[PlayerNumber]++;
             }
             else
             {
-                GameManager.GM.SuicideRecord.Add(thisPlayer, 1);
+                Debug.LogError("Something is wrong with the controller number");
             }
-            print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[thisPlayer] + " Times");
+
+            print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[PlayerNumber] + " Times");
         }
         else
         {
             if (!EnemyWhoHitPlayer.CompareTag(tag))
             {
                 // Record Enemy Killed another player
-                string killer = "Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
-                if (GameManager.GM.KillRecord.ContainsKey(killer))
+                int killer = EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
+
+                if (PlayerNumber < GameManager.GM.KillRecord.Count)
                 {
                     GameManager.GM.KillRecord[killer]++;
                 }
                 else
                 {
-                    GameManager.GM.KillRecord.Add(killer, 1);
+                    Debug.LogError("Something is wrong with the controller number");
                 }
                 print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
                     " and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
             }
             else
             {
-                string muderer = "Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
-                if (GameManager.GM.TeammateMurderRecord.ContainsKey(muderer))
+                int muderer = EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
+                if (PlayerNumber < GameManager.GM.TeammateMurderRecord.Count)
                 {
                     GameManager.GM.TeammateMurderRecord[muderer]++;
                 }
                 else
                 {
-                    GameManager.GM.TeammateMurderRecord.Add(muderer, 1);
+                    Debug.LogError("Something is wrong with the controller number");
                 }
                 print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
                     " and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");

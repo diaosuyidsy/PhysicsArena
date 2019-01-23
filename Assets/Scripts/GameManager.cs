@@ -37,11 +37,11 @@ public class GameManager : MonoBehaviour
 
     #region Stats Variable
     [HideInInspector]
-    public Dictionary<string, int> SuicideRecord;
+    public List<int> SuicideRecord;
     [HideInInspector]
-    public Dictionary<string, int> KillRecord;
+    public List<int> KillRecord;
     [HideInInspector]
-    public Dictionary<string, int> TeammateMurderRecord;
+    public List<int> TeammateMurderRecord;
     [HideInInspector]
     public List<float> CartTime;
     [HideInInspector]
@@ -83,9 +83,9 @@ public class GameManager : MonoBehaviour
     {
         GM = this;
         Players = new List<GameObject>();
-        SuicideRecord = new Dictionary<string, int>();
-        KillRecord = new Dictionary<string, int>();
-        TeammateMurderRecord = new Dictionary<string, int>();
+        SuicideRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
+        KillRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
+        TeammateMurderRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
         CartTime = new List<float>(new float[] { 0f, 0f, 0f, 0f, 0f, 0f }); // Initialize The cart time to be 6 zeroes
         BlockTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 }); // Initialize the block time to be 6 zeroes
         FoodScoreTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 }); // Initalize the Food Score time to be 6 zeroes

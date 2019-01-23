@@ -144,10 +144,6 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Debug Watcher
-        ConsoleProDebug.Watch("Attack State", attackState.ToString());
-        ConsoleProDebug.Watch("Normal State", normalState.ToString());
-        // Debug End
         RunTimer();
         if (!_canControl)
             return;
@@ -340,9 +336,9 @@ public class PlayerController : MonoBehaviour
             // Disable the UI
             HandObject.SendMessage("KillUI");
         }
-        if (HandObject.CompareTag("SuckGun"))
+        if (HandObject.CompareTag("Team1Resource") || HandObject.CompareTag("Team2Resource"))
         {
-
+            HandObject.SendMessage("RegisterLastHolder", PlayerNumber);
         }
         // Nullify the holder
         HandObject = null;
@@ -672,11 +668,24 @@ public class PlayerController : MonoBehaviour
     // If sender is not null, meaning the hit could be blocked
     public void OnMeleeHit(Vector3 force, GameObject sender = null)
     {
+        // First check if the player could block the attack
         if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 120f))
         {
             sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * -2f);
+            // Statistics: Block Success
+            if (PlayerNumber < GameManager.GM.BlockTimes.Count)
+            {
+                GameManager.GM.BlockTimes[PlayerNumber]++;
+            }
+            else
+            {
+                Debug.LogError("Something is wrong with the controller number");
+            }
+            // Statistics: Kill
+            sender.GetComponentInParent<PlayerController>().Mark(gameObject);
+            // End Statistics
         }
-        else
+        else // Player is hit cause he could not block
         {
             // Add HIT VFX
             GameObject par = Instantiate(VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));

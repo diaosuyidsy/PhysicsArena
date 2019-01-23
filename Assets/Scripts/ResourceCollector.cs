@@ -26,6 +26,17 @@ public class ResourceCollector : MonoBehaviour
                 TeamTracker++;
                 other.tag = "Untagged";
                 print("Team 1 Score = " + TeamTracker);
+                // Statistics: Add the dropper to the stats record
+                int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
+                if (GameManager.GM.FoodScoreTimes.Count > lastholder)
+                {
+                    GameManager.GM.FoodScoreTimes[lastholder]++;
+                }
+                else
+                {
+                    Debug.LogError("There is something wrong with the food collector statistics");
+                }
+                // Statistics End
                 // Add Delivery Food VFX
                 Instantiate(VisualEffectManager.VEM.DeliverFoodVFX, other.transform.position, VisualEffectManager.VEM.DeliverFoodVFX.transform.rotation);
                 // END Add
@@ -52,6 +63,17 @@ public class ResourceCollector : MonoBehaviour
                 TeamTracker++;
                 other.tag = "Untagged";
                 print("Team 2 Score = " + TeamTracker);
+                // Statistics: Add the dropper to the stats record
+                int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
+                if (GameManager.GM.FoodScoreTimes.Count > lastholder)
+                {
+                    GameManager.GM.FoodScoreTimes[lastholder]++;
+                }
+                else
+                {
+                    Debug.LogError("There is something wrong with the food collector statistics");
+                }
+                // Statistics End
                 // Add Delivery Food VFX
                 Instantiate(VisualEffectManager.VEM.DeliverFoodVFX, other.transform.position, VisualEffectManager.VEM.DeliverFoodVFX.transform.rotation);
                 // END Add

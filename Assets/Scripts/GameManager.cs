@@ -34,6 +34,8 @@ public class GameManager : MonoBehaviour
     public GameObject TeamRed1Explosion;
     public GameObject TeamBlue2Explosion;
     public Color EndGameBackgroundImageColor;
+    [HideInInspector]
+    public int Winner;
 
     #region Stats Variable
     [HideInInspector]
@@ -264,6 +266,7 @@ public class GameManager : MonoBehaviour
     {
         if (_won)
             return;
+        Winner = winner;
         StartCoroutine(EndImageShow(3f, _tar));
         _won = true;
     }

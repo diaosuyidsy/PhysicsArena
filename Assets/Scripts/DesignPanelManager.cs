@@ -1,7 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine.UI;
+﻿using UnityEngine.UI;
 using UnityEngine;
+using System.IO;
 
 public class DesignPanelManager : MonoBehaviour
 {
@@ -17,11 +16,16 @@ public class DesignPanelManager : MonoBehaviour
     private void Awake()
     {
         DPM = this;
-        Setup();
     }
-
-    private void Setup()
+    private void OnApplicationQuit()
     {
-    }
+        string path = "Assets/Resources/DesignNumber.txt";
+        StreamWriter sw = new StreamWriter(path, false);
+        sw.WriteLine("Melee Charge: " + (MeleeChargeToggle.isOn ? "ON" : "OFF"));
+        sw.WriteLine("Melee Double Arm Mode: " + (MeleeChargeToggle.isOn ? "ON" : "OFF"));
+        sw.WriteLine("Melee Alternate Schema: " + (MeleeChargeToggle.isOn ? "ON" : "OFF"));
+        sw.WriteLine("Melee Charge: " + (MeleeChargeToggle.isOn ? "ON" : "OFF"));
 
+        sw.Close();
+    }
 }

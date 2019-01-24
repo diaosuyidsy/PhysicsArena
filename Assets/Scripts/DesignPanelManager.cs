@@ -7,15 +7,12 @@ public class DesignPanelManager : MonoBehaviour
 {
     public static DesignPanelManager DPM;
 
-    public Text HookSpeedText;
-    public Slider HookSpeedSlider;
     public GameObject HookGunPrefab;
     public Toggle MeleeChargeToggle;
     public Toggle MeleeDoubleArmToggle;
     public Toggle MeleeAlternateSchemaToggle;
-
-    [HideInInspector]
-    public float HookSpeed;
+    public Slider HookGunAuxillaryAimSlider;
+    public Slider BlockAngleSlider;
 
     private void Awake()
     {
@@ -25,11 +22,6 @@ public class DesignPanelManager : MonoBehaviour
 
     private void Setup()
     {
-        rtHook rth = HookGunPrefab.GetComponent<rtHook>();
-        HookSpeed = rth.HookSpeed;
-        HookSpeedText.text = HookSpeed.ToString();
-        HookSpeedSlider.value = 0.5f;
-        rth.HookSpeed = 10f;
     }
 
 }

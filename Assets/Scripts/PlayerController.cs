@@ -360,7 +360,7 @@ public class PlayerController : MonoBehaviour
                 case "Hook":
                     if (HandObject != null && !_dropping)
                     {
-                        AuxillaryAimOnce();
+                        AuxillaryAimOnce(DesignPanelManager.DPM.HookGunAuxillaryAimSlider.value);
                         HandObject.SendMessage("Hook", true);
                     }
                     break;
@@ -608,7 +608,7 @@ public class PlayerController : MonoBehaviour
             _auxillaryRotationLock = false;
         }
     }
-    private void AuxillaryAimOnce()
+    private void AuxillaryAimOnce(float maxangle)
     {
         GameObject target = null;
         float minAngle = 360f;
@@ -621,7 +621,7 @@ public class PlayerController : MonoBehaviour
                 {
                     Vector3 targetDir = otherPlayer.transform.position - transform.position;
                     float angle = Vector3.Angle(targetDir, transform.forward);
-                    if (angle <= 30f && angle < minAngle)
+                    if (angle <= maxangle && angle < minAngle)
                     {
                         minAngle = angle;
                         target = otherPlayer;
@@ -717,7 +717,7 @@ public class PlayerController : MonoBehaviour
     public void OnMeleeHit(Vector3 force, GameObject sender = null)
     {
         // First check if the player could block the attack
-        if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 120f))
+        if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - DesignPanelManager.DPM.BlockAngleSlider.value))
         {
             sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * -2f);
             // Statistics: Block Success

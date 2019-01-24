@@ -271,6 +271,12 @@ public class GameManager : MonoBehaviour
         _won = true;
     }
 
+    // This function is used for testing purposes only
+    public void ForceGameOver(int winner)
+    {
+        GameOver(winner, APlayers[winner - 1]);
+    }
+
     private void Update()
     {
         //// Debug for on cart time statistics

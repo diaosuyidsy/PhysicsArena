@@ -722,7 +722,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!1 &1616821926377846
 GameObject:
   m_ObjectHideFlags: 1
@@ -2279,10 +2279,10 @@ HingeJoint:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1140468392654790}
   m_ConnectedBody: {fileID: 54362127366195118}
-  m_Anchor: {x: 0.04, y: 0, z: 0}
+  m_Anchor: {x: -0.05, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.14767534, y: -0.0000043261034, z: 0}
+  m_ConnectedAnchor: {x: -0.23767549, y: 0.0000107763635, z: 0}
   m_UseSpring: 1
   m_Spring:
     spring: 100
@@ -2483,10 +2483,10 @@ HingeJoint:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1472041671428054}
   m_ConnectedBody: {fileID: 54440331071401766}
-  m_Anchor: {x: 0, y: 0, z: 0}
+  m_Anchor: {x: 0.05, y: 0, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.18767434, y: 0.0000075715216, z: 0}
+  m_ConnectedAnchor: {x: 0.23767549, y: 0.000033913413, z: 0}
   m_UseSpring: 1
   m_Spring:
     spring: 100
@@ -3373,12 +3373,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Thrust: 100
-  JumpForce: 300
+  JumpForce: 230
   JumpMask:
     serializedVersion: 2
     m_Bits: 8192
   RotationSpeed: 4
-  WalkSpeed: 2
+  WalkSpeed: 1.8
   PickUpSpeed: 2.2
   MaxBlockCD: 1
   BlockRegenInterval: 3
@@ -3411,6 +3411,8 @@ MonoBehaviour:
   IsPunching: 0
   HandTaken: 0
   IsOnGround: 0
+  PlayerNumber: 0
+  EnemyWhoHitPlayer: {fileID: 0}
   _axuillaryMaxDistance: 50
   _auxillaryMaxAngle: 10
   debugT_CheckArm: 1

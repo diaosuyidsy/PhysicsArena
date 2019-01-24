@@ -360,6 +360,7 @@ public class PlayerController : MonoBehaviour
                 case "Hook":
                     if (HandObject != null && !_dropping)
                     {
+                        AuxillaryAimOnce();
                         HandObject.SendMessage("Hook", true);
                     }
                     break;
@@ -430,7 +431,15 @@ public class PlayerController : MonoBehaviour
                         attackState = State.Meleeing;
                         _checkArm = false;
                         StopAllCoroutines();
-                        StartCoroutine(MeleeClockFistHelper(_rightArm2hj, _rightArmhj, _rightHandhj, 1f, _leftArmhj));
+                        if (DesignPanelManager.DPM.MeleeDoubleArmToggle.isOn)
+                        {
+                            StartCoroutine(MeleeClockFistHelper(_leftArm2hj, _leftArmhj, _leftHandhj, 1f));
+                        }
+                        else
+                        {
+                            StartCoroutine(MeleeClockFistLeftHandHelper(1f, _leftArmhj));
+                        }
+                        StartCoroutine(MeleeClockFistHelper(_rightArm2hj, _rightArmhj, _rightHandhj, 1f));
                     }
                     break;
             }
@@ -471,9 +480,18 @@ public class PlayerController : MonoBehaviour
                     {
                         attackState = State.Empty;
                         // This is add a push force when melee
-                        //_rb.AddForce (transform.forward * Thrust * MeleeCharge * 3f, ForceMode.Impulse);
+                        if (DesignPanelManager.DPM.MeleeChargeToggle.isOn)
+                            _rb.AddForce(transform.forward * Thrust * MeleeCharge * 2f, ForceMode.Impulse);
                         StopAllCoroutines();
-                        StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, 0.2f, _leftArmhj));
+                        if (DesignPanelManager.DPM.MeleeDoubleArmToggle.isOn)
+                        {
+                            StartCoroutine(MeleePunchHelper(_leftArmhj, _leftHandhj, 0.2f));
+                        }
+                        else
+                        {
+                            StartCoroutine(MeleePunchLeftHandHelper(0.2f, _leftArmhj));
+                        }
+                        StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, 0.2f));
                     }
                     _auxillaryRotationLock = false;
 
@@ -590,7 +608,33 @@ public class PlayerController : MonoBehaviour
             _auxillaryRotationLock = false;
         }
     }
-
+    private void AuxillaryAimOnce()
+    {
+        GameObject target = null;
+        float minAngle = 360f;
+        foreach (GameObject otherPlayer in GameManager.GM.Players)
+        {
+            if (otherPlayer != null && !otherPlayer.CompareTag(tag))
+            {
+                // If other player are within max Distance, then check for the smalliest angle player
+                if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= _axuillaryMaxDistance)
+                {
+                    Vector3 targetDir = otherPlayer.transform.position - transform.position;
+                    float angle = Vector3.Angle(targetDir, transform.forward);
+                    if (angle <= 60f && angle < minAngle)
+                    {
+                        minAngle = angle;
+                        target = otherPlayer;
+                    }
+                }
+            }
+        }
+        // Now we got the target Player, time to auxillary against it
+        if (target != null)
+        {
+            transform.LookAt(target.transform);
+        }
+    }
     public void OnPickUpItem(string tag)
     {
         // Actual Logic Below
@@ -890,23 +934,60 @@ public class PlayerController : MonoBehaviour
         Handhj.spring = hjs;
     }
 
-    IEnumerator MeleeClockFistHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftArmhj)
+    private void MeleeAlternateSchemaHelper()
+    {
+        if (!IsPunching) return;
+        RaycastHit hit;
+        // This Layermask get all player's layer except this player's
+        int layermask = GameManager.GM.AllPlayers ^ (1 << gameObject.layer);
+        //if (Physics.CapsuleCast(transform.position, transform.position - transform.forward * 3f, 0.5f, transform.forward, out hit, 0.05f, layermask))
+        if (Physics.SphereCast(transform.position, 0.3f, transform.forward, out hit, 0.05f, layermask))
+        {
+            print(hit.transform.tag);
+            print(hit.transform.name);
+            IsPunching = false;
+            float velocityAddon = transform.GetComponent<Rigidbody>().velocity.magnitude;
+            velocityAddon = Mathf.Clamp(velocityAddon, 1f, 1.6f);
+            foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.velocity = Vector3.zero;
+            }
+            hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(transform.forward * 500f * MeleeCharge * velocityAddon, gameObject);
+            hit.transform.GetComponentInParent<PlayerController>().Mark(gameObject);
+
+        }
+    }
+
+    IEnumerator MeleeClockFistLeftHandHelper(float time, HingeJoint LeftArmhj)
+    {
+        float elapsedTime = 0f;
+        JointSpring ljs = LeftArmhj.spring;
+        float initLATargetPosition = ljs.targetPosition;
+        while (elapsedTime < time)
+        {
+            elapsedTime += Time.deltaTime;
+            ljs.targetPosition = Mathf.Lerp(initLATargetPosition, 80f, MeleeCharge);
+            LeftArmhj.spring = ljs;
+            yield return new WaitForEndOfFrame();
+        }
+    }
+
+    IEnumerator MeleeClockFistHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time)
     {
         IsPunching = false;
         float elapesdTime = 0f;
         JointLimits lm2 = Arm2hj.limits;
         JointLimits hl = Handhj.limits;
         JointSpring js = Armhj.spring;
-        JointSpring ljs = LeftArmhj.spring;
 
         float initLm2Max = lm2.max;
         float initLm2Min = lm2.min;
         float initLmTargetPosition = js.targetPosition;
         float inithlMax = hl.max;
         float inithlMin = hl.min;
-        float initLATargetPosition = ljs.targetPosition;
         // VFX section
         MeleeChargingVFX.GetComponent<ParticleSystem>().Play();
+        MeleeUltimateVFX.GetComponent<ParticleSystem>().Stop();
         // VFX END
 
         while (elapesdTime < time)
@@ -920,7 +1001,6 @@ public class PlayerController : MonoBehaviour
             lm2.max = Mathf.Lerp(initLm2Max, 4f, MeleeCharge);
             lm2.min = Mathf.Lerp(initLm2Min, -17f, MeleeCharge);
 
-            ljs.targetPosition = Mathf.Lerp(initLATargetPosition, 80f, MeleeCharge);
             js.targetPosition = Mathf.Lerp(initLmTargetPosition, -85f, MeleeCharge);
 
             hl.max = Mathf.Lerp(inithlMax, 130f, MeleeCharge);
@@ -928,7 +1008,6 @@ public class PlayerController : MonoBehaviour
 
             Arm2hj.limits = lm2;
             Armhj.spring = js;
-            LeftArmhj.spring = ljs;
             Handhj.limits = hl;
             yield return new WaitForEndOfFrame();
         }
@@ -937,19 +1016,31 @@ public class PlayerController : MonoBehaviour
         MeleeUltimateVFX.GetComponent<ParticleSystem>().Play();
         // END
     }
+    IEnumerator MeleePunchLeftHandHelper(float time, HingeJoint LeftHandhj)
+    {
+        float elapsedTime = 0f;
+        JointSpring ljs = LeftHandhj.spring;
+        float initLATargetPosition = ljs.targetPosition;
 
-    IEnumerator MeleePunchHelper(HingeJoint Armhj, HingeJoint Handhj, float time, HingeJoint LeftHandhj)
+        while (elapsedTime < time)
+        {
+            elapsedTime += Time.deltaTime;
+            ljs.targetPosition = Mathf.Lerp(initLATargetPosition, -120f, elapsedTime / time);
+            LeftHandhj.spring = ljs;
+
+            yield return new WaitForEndOfFrame();
+        }
+    }
+    IEnumerator MeleePunchHelper(HingeJoint Armhj, HingeJoint Handhj, float time)
     {
         float elapesdTime = 0f;
         IsPunching = true;
         JointLimits hl = Handhj.limits;
         JointSpring js = Armhj.spring;
-        JointSpring ljs = LeftHandhj.spring;
         // VFX Section
         MeleeChargingVFX.GetComponent<ParticleSystem>().Stop();
         // END
         float initLmTargetPosition = js.targetPosition;
-        float initLATargetPosition = ljs.targetPosition;
         float inithlMax = hl.max;
         float inithlMin = hl.min;
         //Armhj.connectedMassScale = 0.2f;
@@ -957,13 +1048,19 @@ public class PlayerController : MonoBehaviour
         while (elapesdTime < time)
         {
             elapesdTime += Time.deltaTime;
-            ljs.targetPosition = Mathf.Lerp(initLATargetPosition, -120f, elapesdTime / time);
             js.targetPosition = Mathf.Lerp(initLmTargetPosition, 180f, elapesdTime / time);
             hl.max = Mathf.Lerp(inithlMax, 12f, elapesdTime / time);
             hl.min = Mathf.Lerp(inithlMin, -2.8f, elapesdTime / time);
-            LeftHandhj.spring = ljs;
             Armhj.spring = js;
             Handhj.limits = hl;
+            if (time / 2f - elapesdTime <= 0f)
+            {
+                if (DesignPanelManager.DPM.MeleeAlternateSchemaToggle.isOn)
+                {
+                    MeleeAlternateSchemaHelper();
+                }
+            }
+
             yield return new WaitForEndOfFrame();
         }
         yield return new WaitForSeconds(0.1f);

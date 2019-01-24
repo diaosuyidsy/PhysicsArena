@@ -10,6 +10,9 @@ public class DesignPanelManager : MonoBehaviour
     public Text HookSpeedText;
     public Slider HookSpeedSlider;
     public GameObject HookGunPrefab;
+    public Toggle MeleeChargeToggle;
+    public Toggle MeleeDoubleArmToggle;
+    public Toggle MeleeAlternateSchemaToggle;
 
     [HideInInspector]
     public float HookSpeed;

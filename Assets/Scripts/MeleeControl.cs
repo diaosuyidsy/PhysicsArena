@@ -9,6 +9,10 @@ public class MeleeControl : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
+        if (DesignPanelManager.DPM.MeleeAlternateSchemaToggle.isOn)
+        {
+            return;
+        }
         if (GameManager.GM.AllPlayers != (GameManager.GM.AllPlayers | (1 << collision.collider.gameObject.layer)))
             return;
 

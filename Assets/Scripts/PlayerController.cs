@@ -621,7 +621,7 @@ public class PlayerController : MonoBehaviour
                 {
                     Vector3 targetDir = otherPlayer.transform.position - transform.position;
                     float angle = Vector3.Angle(targetDir, transform.forward);
-                    if (angle <= 60f && angle < minAngle)
+                    if (angle <= 30f && angle < minAngle)
                     {
                         minAngle = angle;
                         target = otherPlayer;
@@ -633,6 +633,10 @@ public class PlayerController : MonoBehaviour
         if (target != null)
         {
             transform.LookAt(target.transform);
+            if (HandObject != null)
+            {
+                HandObject.transform.eulerAngles = transform.eulerAngles + new Vector3(0f, 90f, 0f);
+            }
         }
     }
     public void OnPickUpItem(string tag)

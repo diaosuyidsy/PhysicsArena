@@ -191,9 +191,13 @@ public class GameManager : MonoBehaviour
 
         GetComponent<Scoreboard>().DisplayKiller();
 
-        yield return new WaitForSeconds(7.5f);
+        yield return new WaitForSeconds(9f);
 
         GetComponent<Scoreboard>().DisplaySuicider();
+        
+        yield return new WaitForSeconds(9f);
+        
+        GetComponent<Scoreboard>().DisplayTMKiller();
 
     }
 

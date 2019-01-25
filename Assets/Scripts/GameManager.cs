@@ -58,6 +58,8 @@ public class GameManager : MonoBehaviour
     public List<int> HookGunSuccessTimes;
     [HideInInspector]
     public List<int> SuckedPlayersTimes;
+    [HideInInspector]
+    public PlayerInformation[] PlayersInformation;
     #endregion
 
     private int Team1RespawnIndex = 0;
@@ -95,6 +97,7 @@ public class GameManager : MonoBehaviour
         HookGunUseTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, });
         HookGunSuccessTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, });
         SuckedPlayersTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
+        PlayersInformation = new PlayerInformation[6];
         _player = ReInput.players.GetPlayer(0);
         _dcfx = Camera.main.GetComponent<DarkCornerEffect>();
     }
@@ -114,8 +117,19 @@ public class GameManager : MonoBehaviour
         {
             Team2RespawnPts[i] = team2.GetChild(i).gameObject;
         }
+        _fillPlayerInformation();
     }
 
+    // This function is only for UI testing purposes
+    private void _fillPlayerInformation()
+    {
+        PlayersInformation[0] = new PlayerInformation("Yellow", Color.yellow);
+        PlayersInformation[1] = new PlayerInformation("Pink", Color.red);
+        PlayersInformation[2] = new PlayerInformation("Orange", Color.magenta);
+        PlayersInformation[3] = new PlayerInformation("Blue", Color.blue);
+        PlayersInformation[4] = new PlayerInformation("Green", Color.green);
+        PlayersInformation[5] = new PlayerInformation("Purple", Color.cyan);
+    }
 
     IEnumerator EndImageShow(float time, GameObject _tar = null)
     {
@@ -159,7 +173,7 @@ public class GameManager : MonoBehaviour
         // Now the Image is focused on the winning objective
         // And displaying the winning party
         GetComponent<Scoreboard>().DisplayWinner();
-        
+
         yield return new WaitForSeconds(3f);
         // TODO: The transition from focusing to completely black
         elapsedTime = 0f;
@@ -174,11 +188,11 @@ public class GameManager : MonoBehaviour
         // And we need to disable the screen dark corner effect
         _dcfx.enabled = false;
         yield return StartCoroutine(StartTransitionColor(3f));
-        
+
         GetComponent<Scoreboard>().DisplayKiller();
-        
+
         yield return new WaitForSeconds(7.5f);
-        
+
         GetComponent<Scoreboard>().DisplaySuicider();
 
     }
@@ -360,5 +374,23 @@ public class GameManager : MonoBehaviour
             SceneManager.LoadScene("Suyi");
         }
 
+    }
+}
+
+public sealed class PlayerInformation
+{
+    public string PlayerName;
+    public Color PlayerColor;
+
+    public PlayerInformation()
+    {
+        PlayerName = "";
+        PlayerColor = Color.white;
+    }
+
+    public PlayerInformation(string name, Color color)
+    {
+        PlayerName = name;
+        PlayerColor = color;
     }
 }

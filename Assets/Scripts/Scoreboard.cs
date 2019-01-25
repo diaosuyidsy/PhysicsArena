@@ -9,23 +9,38 @@ using GUIText = Rewired.Internal.GUIText;
 
 public class Scoreboard : MonoBehaviour
 {
+	[Header("Winner")]
 	public GameObject ChickensWin;
 	public GameObject DucksWin;
+
+	[Header("Time")] 
+	public float TextToName = 2f;
+	public float NameToRecord = 1.5f;
 	
+	[Header("Best Killer")]
 	public GameObject MostKills;
 	public GameObject MostKillsNameGM;
-	public TextFxUGUI MostKillNameFx;
-	public GameObject KillRecord;
-	public TextFxUGUI KillRecordFx;
+	public TextFxUGUI MostKillsNameFX;
+	public GameObject KillRecordGM;
+	public TextFxUGUI KillRecordFX;
 	
+	[Header("Best Suicider")]
 	public GameObject MostSuicide;
-	public TextFxUGUI MostSuicideNameFx;
 	public GameObject MostSuicideNameGM;
-	public GameObject SuicideRecord;
-	public TextFxUGUI SuicideRecordFx;
+	public TextFxUGUI MostSuicideNameFX;
+	public GameObject SuicideRecordGM;	
+	public TextFxUGUI SuicideRecordFX;
+
+	[Header("Best Teammate-Killer")]
+	public GameObject TMKiller;
+	public GameObject TMKillerNameGM;
+	public TextFxUGUI TMKillerNameFX;
+	public GameObject TMKillerRecordGM;
+	public TextFxUGUI TMKillerRecordFX;
 	
 	private int MostKillPlayer;
 	private int MostSuicidePlayer;
+	private int MostTMQPlayer;
 
 	public void DisplayWinner()
 	{
@@ -46,9 +61,9 @@ public class Scoreboard : MonoBehaviour
 		StartCoroutine(ShowKillerName());
 	}
 
-	public IEnumerator ShowKillerName()
+	IEnumerator ShowKillerName()
 	{
-		yield return new WaitForSeconds(2f);
+		yield return new WaitForSeconds(TextToName);
 		
 		// Find player with most kills.
 		var maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
@@ -61,18 +76,16 @@ public class Scoreboard : MonoBehaviour
 				break;
 			}
 		}
-		
-		//MostKillsName.text = GameManager.GM.PlayersInformation[MostKillPlayer].PlayerName;
 
-		MostKillNameFx.SetText(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerName);
-		MostKillNameFx.SetColour(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerColor);
+		MostKillsNameFX.SetText(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerName);
+		MostKillsNameFX.SetColour(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerColor);
 		
 		MostKillsNameGM.SetActive(true);
 		
-		yield return new WaitForSeconds(1.5f);
+		yield return new WaitForSeconds(NameToRecord);
 		
-		KillRecordFx.SetText("who killed " + GameManager.GM.KillRecord[MostKillPlayer] + " other birdies");
-		KillRecord.SetActive(true);
+		KillRecordFX.SetText("who killed " + GameManager.GM.KillRecord[MostKillPlayer] + " other birdies");
+		KillRecordGM.SetActive(true);
 	}
 	
 
@@ -85,7 +98,7 @@ public class Scoreboard : MonoBehaviour
 
 	IEnumerator ShowSuiciderName()
 	{
-		yield return new WaitForSeconds(2f);
+		yield return new WaitForSeconds(TextToName);
 		
 		var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
 		for (int tracker = 0; tracker < 6; tracker++)
@@ -98,14 +111,46 @@ public class Scoreboard : MonoBehaviour
 
 		}
 		
-		MostSuicideNameFx.SetText(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerName);
-		MostSuicideNameFx.SetColour(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerColor);
+		MostSuicideNameFX.SetText(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerName);
+		MostSuicideNameFX.SetColour(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerColor);
 		
 		MostSuicideNameGM.SetActive(true);
 		
-		yield return new WaitForSeconds(1.5f);
+		yield return new WaitForSeconds(NameToRecord);
 		
-		SuicideRecordFx.SetText("who killed themselves for " + GameManager.GM.SuicideRecord[MostSuicidePlayer] + " times!");
-		SuicideRecord.SetActive(true);
+		SuicideRecordFX.SetText("who killed themselves for " + GameManager.GM.SuicideRecord[MostSuicidePlayer] + " times!");
+		SuicideRecordGM.SetActive(true);
+	}
+
+	public void DisplayTMKiller()
+	{
+		TMKiller.SetActive(true);
+
+		StartCoroutine(ShowTMKillerName());
+	}
+
+	IEnumerator ShowTMKillerName()
+	{
+		yield return new WaitForSeconds(TextToName);
+		
+		var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
+		for (int tracker = 0; tracker < 6; tracker++)
+		{
+			if (GameManager.GM.TeammateMurderRecord[tracker] == maxTMQValue)
+			{
+				MostTMQPlayer = tracker;
+				break;
+			}
+		}
+		
+		TMKillerNameFX.SetText(GameManager.GM.PlayersInformation[MostTMQPlayer].PlayerName);
+		TMKillerNameFX.SetColour(GameManager.GM.PlayersInformation[MostTMQPlayer].PlayerColor);
+		
+		TMKillerNameGM.SetActive(true);
+		
+		yield return new WaitForSeconds(NameToRecord);
+		
+		TMKillerRecordFX.SetText("who killed their teammates for " + GameManager.GM.SuicideRecord[MostSuicidePlayer] + " times!");
+		TMKillerRecordGM.SetActive(true);
 	}
 }

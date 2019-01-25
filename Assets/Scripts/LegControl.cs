@@ -13,7 +13,8 @@ public class LegControl : MonoBehaviour
         if (_walked)
             return;
         _walked = true;
-        Hip.ApplyWalkForce(WalkThrust);
+        if (Hip.GetCanControl())
+            Hip.ApplyWalkForce(WalkThrust);
     }
 
     private void OnCollisionExit(Collision collision)

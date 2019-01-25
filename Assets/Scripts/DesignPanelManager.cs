@@ -29,7 +29,7 @@ public class DesignPanelManager : MonoBehaviour
         sw.WriteLine("Melee Alternate Schema: " + (MeleeAlternateSchemaToggle.isOn ? "ON" : "OFF"));
         sw.WriteLine("Hook Gunxillary Aim Angle: " + HookGunAuxillaryAimSlider.value);
         sw.WriteLine("Block Angle: " + BlockAngleSlider.value);
-
+        sw.WriteLine("Hook Release instant Back: " + (HookAlternateSchemaToggle.isOn ? "ON" : "OFF"));
         sw.Close();
     }
 }

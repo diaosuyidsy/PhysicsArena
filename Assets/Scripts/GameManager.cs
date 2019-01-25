@@ -141,7 +141,7 @@ public class GameManager : MonoBehaviour
         float maxLength = getMaxLength(targetPosition);
         _dcfx.enabled = true;
         _dcfx.Length = maxLength;
-        float deltaLength = maxLength * 0.55f / time;
+        float deltaLength = maxLength * 0.75f / time;
 
         while (elapsedTime < time)
         {
@@ -157,6 +157,9 @@ public class GameManager : MonoBehaviour
         }
 
         // Now the Image is focused on the winning objective
+        // And displaying the winning party
+        GetComponent<Scoreboard>().DisplayWinner();
+        
         yield return new WaitForSeconds(3f);
         // TODO: The transition from focusing to completely black
         elapsedTime = 0f;
@@ -170,7 +173,13 @@ public class GameManager : MonoBehaviour
         // Now the screen should be entirely black
         // And we need to disable the screen dark corner effect
         _dcfx.enabled = false;
-        yield return StartCoroutine(StartTransitionColor(5f));
+        yield return StartCoroutine(StartTransitionColor(3f));
+        
+        GetComponent<Scoreboard>().DisplayKiller();
+        
+        yield return new WaitForSeconds(7.5f);
+        
+        GetComponent<Scoreboard>().DisplaySuicider();
 
     }
 

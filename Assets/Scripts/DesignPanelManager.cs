@@ -13,6 +13,7 @@ public class DesignPanelManager : MonoBehaviour
     public Toggle MeleeAlternateSchemaToggle;
     public Slider HookGunAuxillaryAimSlider;
     public Slider BlockAngleSlider;
+    public Toggle HookAlternateSchemaToggle;
 
     private void Awake()
     {

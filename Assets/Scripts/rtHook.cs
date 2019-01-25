@@ -157,6 +157,13 @@ public class rtHook : MonoBehaviour
                 Hooked.GetComponent<Rigidbody>().AddForce(force * 450f, ForceMode.Impulse);
                 Hooked = null;
             }
+            if (DesignPanelManager.DPM.HookAlternateSchemaToggle.isOn)
+            {
+                if (_hookState == State.FlyingOut)
+                {
+                    _hookState = State.FlyingIn;
+                }
+            }
         }
     }
 

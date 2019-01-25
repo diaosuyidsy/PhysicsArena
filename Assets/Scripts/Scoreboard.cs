@@ -5,19 +5,24 @@ using UnityEngine;
 using UnityEngine.UI;
 using TextFx;
 using Unity.Collections;
+using GUIText = Rewired.Internal.GUIText;
 
 public class Scoreboard : MonoBehaviour
 {
 	public GameObject ChickensWin;
 	public GameObject DucksWin;
+	
 	public GameObject MostKills;
-	public Text MostKillsName;
 	public GameObject MostKillsNameGM;
+	public TextFxUGUI MostKillNameFx;
 	public GameObject KillRecord;
+	public TextFxUGUI KillRecordFx;
+	
 	public GameObject MostSuicide;
-	public Text MostSuicideName;
+	public TextFxUGUI MostSuicideNameFx;
 	public GameObject MostSuicideNameGM;
 	public GameObject SuicideRecord;
+	public TextFxUGUI SuicideRecordFx;
 	
 	private int MostKillPlayer;
 	private int MostSuicidePlayer;
@@ -57,35 +62,16 @@ public class Scoreboard : MonoBehaviour
 			}
 		}
 		
-		if (MostKillPlayer == 0)
-		{
-			MostKillsName.text = "Player 0";
-		}
-		else if (MostKillPlayer == 1)
-		{
-			MostKillsName.text = "Player 1";
-		}
-		else if (MostKillPlayer == 2)
-		{
-			MostKillsName.text = "Player 2";
-		}
-		else if (MostKillPlayer == 3)
-		{
-			MostKillsName.text = "Player 3";
-		}
-		else if (MostKillPlayer == 4)
-		{
-			MostKillsName.text = "Player 4";
-		}
-		else if (MostKillPlayer == 5)
-		{
-			MostKillsName.text = "Player 5";
-		}
+		//MostKillsName.text = GameManager.GM.PlayersInformation[MostKillPlayer].PlayerName;
+
+		MostKillNameFx.SetText(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerName);
+		MostKillNameFx.SetColour(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerColor);
 		
 		MostKillsNameGM.SetActive(true);
 		
 		yield return new WaitForSeconds(1.5f);
 		
+		KillRecordFx.SetText("who killed " + GameManager.GM.KillRecord[MostKillPlayer] + " other birdies");
 		KillRecord.SetActive(true);
 	}
 	
@@ -111,31 +97,15 @@ public class Scoreboard : MonoBehaviour
 			}
 
 		}
-		if (MostSuicidePlayer == 0)
-		{
-			MostSuicideName.text = "Player 0";
-		}
-		else if (MostSuicidePlayer == 1)
-		{
-			MostSuicideName.text = "Player 1";
-		}
-		else if (MostSuicidePlayer == 2)
-		{
-			MostSuicideName.text = "Player 2";
-		}
-		else if (MostSuicidePlayer == 3)
-		{
-			MostSuicideName.text = "Player 3";
-		}
-		else if (MostSuicidePlayer == 4)
-		{
-			MostSuicideName.text = "Player 4";
-		}
-		else if (MostSuicidePlayer == 5)
-		{
-			MostSuicideName.text = "Player 5";
-		}
+		
+		MostSuicideNameFx.SetText(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerName);
+		MostSuicideNameFx.SetColour(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerColor);
 		
 		MostSuicideNameGM.SetActive(true);
+		
+		yield return new WaitForSeconds(1.5f);
+		
+		SuicideRecordFx.SetText("who killed themselves for " + GameManager.GM.SuicideRecord[MostSuicidePlayer] + " times!");
+		SuicideRecord.SetActive(true);
 	}
 }

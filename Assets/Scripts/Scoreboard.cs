@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Rewired;
 using UnityEngine;
 using UnityEngine.UI;
+using TextFx;
+using Unity.Collections;
 
 public class Scoreboard : MonoBehaviour
 {
@@ -10,45 +12,51 @@ public class Scoreboard : MonoBehaviour
 	public GameObject DucksWin;
 	public GameObject MostKills;
 	public Text MostKillsName;
+	public GameObject MostKillsNameGM;
+	public GameObject KillRecord;
 	public GameObject MostSuicide;
 	public Text MostSuicideName;
+	public GameObject MostSuicideNameGM;
+	public GameObject SuicideRecord;
+	
 	private int MostKillPlayer;
 	private int MostSuicidePlayer;
 
-	public void Update()
+	public void DisplayWinner()
 	{
-		//if (GameManager.GM.Winner == 1)
-		//{
-		//	ChickensWin.SetActive(true);
-		//}
-		//else
-		//{
-		//	DucksWin.SetActive(true);
-		//}
-		
-		MostKills.SetActive(true);
-		
-		DisplayKillerName();
-		
-		MostSuicide.SetActive(true);
-		
-		DisplaySuiciderName();
-			
+		if (GameManager.GM.Winner == 1)
+		{
+			ChickensWin.SetActive(true);
+		}
+		else
+		{
+			DucksWin.SetActive(true);
+		}			
 	}
-	private void DisplayKillerName()
+
+	public void DisplayKiller()
 	{
+		MostKills.SetActive(true);
+
+		StartCoroutine(ShowKillerName());
+	}
+
+	public IEnumerator ShowKillerName()
+	{
+		yield return new WaitForSeconds(2f);
+		
+		// Find player with most kills.
 		var maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
+
 		for (int tracker = 0; tracker < 6; tracker++)
 		{
 			if (GameManager.GM.KillRecord[tracker] == maxKillValue)
 			{
 				MostKillPlayer = tracker;
-			}
-			else
-			{
-				MostKillPlayer = MostKillPlayer + 1;
+				break;
 			}
 		}
+		
 		if (MostKillPlayer == 0)
 		{
 			MostKillsName.text = "Player 0";
@@ -73,21 +81,35 @@ public class Scoreboard : MonoBehaviour
 		{
 			MostKillsName.text = "Player 5";
 		}
+		
+		MostKillsNameGM.SetActive(true);
+		
+		yield return new WaitForSeconds(1.5f);
+		
+		KillRecord.SetActive(true);
+	}
+	
+
+	public void DisplaySuicider()
+	{
+		MostSuicide.SetActive(true);
+
+		StartCoroutine(ShowSuiciderName());
 	}
 
-	private void DisplaySuiciderName()
+	IEnumerator ShowSuiciderName()
 	{
+		yield return new WaitForSeconds(2f);
+		
 		var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
 		for (int tracker = 0; tracker < 6; tracker++)
 		{
 			if (GameManager.GM.SuicideRecord[tracker] == maxSuicideValue)
 			{
 				MostSuicidePlayer = tracker;
+				break;
 			}
-			else
-			{
-				MostSuicidePlayer = MostSuicidePlayer + 1;
-			}
+
 		}
 		if (MostSuicidePlayer == 0)
 		{
@@ -113,5 +135,7 @@ public class Scoreboard : MonoBehaviour
 		{
 			MostSuicideName.text = "Player 5";
 		}
+		
+		MostSuicideNameGM.SetActive(true);
 	}
 }

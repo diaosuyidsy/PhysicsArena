@@ -722,7 +722,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!1 &1616821926377846
 GameObject:
   m_ObjectHideFlags: 1
@@ -1605,13 +1605,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1606629450697680}
-  m_LocalRotation: {x: 0.38268343, y: -0, z: -0, w: 0.92387956}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 1.3733864, y: 1.8782501, z: -0.05092621}
   m_LocalScale: {x: 0.074719995, y: 0.25, z: 0.066479996}
   m_Children: []
   m_Father: {fileID: 4258873899518940}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &4771606826960670
 Transform:
   m_ObjectHideFlags: 1
@@ -3411,6 +3411,7 @@ MonoBehaviour:
   IsPunching: 0
   HandTaken: 0
   IsOnGround: 0
+  IsOccupied: 0
   PlayerNumber: 0
   EnemyWhoHitPlayer: {fileID: 0}
   _axuillaryMaxDistance: 50

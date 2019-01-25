@@ -13,7 +13,7 @@ public class LegControl : MonoBehaviour
         if (_walked)
             return;
         _walked = true;
-        if (Hip.GetCanControl())
+        if (Hip.IsOccupied)
             Hip.ApplyWalkForce(WalkThrust);
     }
 

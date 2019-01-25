@@ -52,6 +52,8 @@ public class PlayerController : MonoBehaviour
     public bool HandTaken = false;
     [HideInInspector]
     public bool IsOnGround = false;
+    [HideInInspector]
+    public bool IsOccupied = false;
 
     #region Statistics Variables
     [HideInInspector]
@@ -92,7 +94,7 @@ public class PlayerController : MonoBehaviour
     private HingeJoint _rightHandhj;
     private bool _checkArm = true;
     private string _rightTriggerRegister = "";
-    private bool _canControl = false;
+    private bool _canControl = true;
     private Vector3 _freezeBody;
     private float _previousFrameVel = 0f;
     private float _weaponCD;
@@ -124,7 +126,7 @@ public class PlayerController : MonoBehaviour
     {
         PlayerNumber = controllerNumber;
         _player = ReInput.players.GetPlayer(controllerNumber);
-        _canControl = true;
+        IsOccupied = true;
     }
 
     private void Start()
@@ -146,7 +148,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         RunTimer();
-        if (!_canControl)
+        if (!_canControl || !IsOccupied)
             return;
 
         CheckRewiredInput();
@@ -1123,11 +1125,6 @@ public class PlayerController : MonoBehaviour
             Armhj.spring = js;
             yield return new WaitForEndOfFrame();
         }
-    }
-
-    public bool GetCanControl()
-    {
-        return _canControl;
     }
     #endregion
 }

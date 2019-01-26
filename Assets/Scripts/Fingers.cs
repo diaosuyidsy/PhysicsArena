@@ -40,7 +40,7 @@ public class Fingers : MonoBehaviour
         if (GameManager.GM.AllPlayers == (GameManager.GM.AllPlayers | (1 << col.collider.gameObject.layer)) || !_playercanpickuptags.Contains(col.collider.tag))
             return;
 
-        if (!taken)
+        if (!taken && col.collider.GetComponent<GunPositionControl>().CanBePickedUp)
         {
             // Tell other necessary components that it has taken something
             OtherHand.GetComponent<Fingers>().taken = true;

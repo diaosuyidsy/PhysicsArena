@@ -65,6 +65,7 @@ public class rtEmit : MonoBehaviour
         currentAmmo--;
         if (currentAmmo <= 0)
         {
+            _gpc.CanBePickedUp = false;
             // If no ammo left, then drop the weapon
             _gpc.Owner.GetComponent<PlayerController>().DropHelper();
             _shootCD = 0f;
@@ -121,6 +122,16 @@ public class rtEmit : MonoBehaviour
         {
             StartCoroutine(DisappearAfterAWhile(3f));
         }
+    }
+
+    private void VanishAfterUse()
+    {
+        currentAmmo = MaxAmmo;
+        ChangeAmmoUI();
+        // Add Vanish VFX
+        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+        // END ADD
+        gameObject.SetActive(false);
     }
 
     // If the weapon is taken down the death zone, then despawn it

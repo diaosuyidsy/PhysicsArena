@@ -36,6 +36,8 @@ public class GameManager : MonoBehaviour
     public Color EndGameBackgroundImageColor;
     [HideInInspector]
     public int Winner;
+    [HideInInspector]
+    public int SuckGunTutorialTimes = 6;
 
     #region Stats Variable
     [HideInInspector]
@@ -117,6 +119,7 @@ public class GameManager : MonoBehaviour
         {
             Team2RespawnPts[i] = team2.GetChild(i).gameObject;
         }
+        SuckGunTutorialTimes = 4;
         //_fillPlayerInformation();
     }
 

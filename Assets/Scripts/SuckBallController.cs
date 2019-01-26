@@ -39,7 +39,13 @@ public class SuckBallController : MonoBehaviour
             lr.numCapVertices = 90;
             lr.useWorldSpace = true;
             lr.startColor = Color.yellow;
-            RTText.SetActive(true);
+            if (GameManager.GM.SuckGunTutorialTimes > 0)
+            {
+                RTText.SetActive(true);
+                print("Minus Minus");
+                print(GameManager.GM.SuckGunTutorialTimes);
+                GameManager.GM.SuckGunTutorialTimes--;
+            }
             // Add the gameobject to the list of InRangePlayers
             InRangePlayers.Add(go);
         }

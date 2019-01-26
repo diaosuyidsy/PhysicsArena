@@ -167,6 +167,7 @@ public class rtHook : MonoBehaviour
         // We have now used up the hook
         if (_curHookTimesLeft <= 0)
         {
+            _gpc.CanBePickedUp = false;
             _gpc.Owner.GetComponent<PlayerController>().DropHelper();
         }
     }
@@ -218,6 +219,15 @@ public class rtHook : MonoBehaviour
         {
             StartCoroutine(DisappearAfterAWhile(3f));
         }
+    }
+
+    private void VanishAfterUse()
+    {
+        _curHookTimesLeft = MaxHookTimes;
+        // Add Vanish VFX
+        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+        // END ADD
+        gameObject.SetActive(false);
     }
 
     private void OnTriggerEnter(Collider other)

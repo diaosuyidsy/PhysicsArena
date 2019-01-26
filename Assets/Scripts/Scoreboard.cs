@@ -150,7 +150,7 @@ public class Scoreboard : MonoBehaviour
 		
 		yield return new WaitForSeconds(NameToRecord);
 		
-		TMKillerRecordFX.SetText("who killed their teammates for " + GameManager.GM.SuicideRecord[MostSuicidePlayer] + " times!");
+		TMKillerRecordFX.SetText("who killed their teammates for " + GameManager.GM.TeammateMurderRecord[MostTMQPlayer] + " times!");
 		TMKillerRecordGM.SetActive(true);
 	}
 }

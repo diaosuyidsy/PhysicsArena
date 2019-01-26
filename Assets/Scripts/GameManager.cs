@@ -117,7 +117,7 @@ public class GameManager : MonoBehaviour
         {
             Team2RespawnPts[i] = team2.GetChild(i).gameObject;
         }
-        _fillPlayerInformation();
+        //_fillPlayerInformation();
     }
 
     // This function is only for UI testing purposes

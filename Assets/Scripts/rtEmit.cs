@@ -43,7 +43,7 @@ public class rtEmit : MonoBehaviour
             }
         }
 
-        if (Mathf.Approximately(TriggerVal, 0f) || currentAmmo <= 0)
+        if (Mathf.Approximately(TriggerVal, 0f))
         {
             // Need to reset shoot CD if player has released RT
             _shootCD = 0f;
@@ -67,6 +67,8 @@ public class rtEmit : MonoBehaviour
         {
             // If no ammo left, then drop the weapon
             _gpc.Owner.GetComponent<PlayerController>().DropHelper();
+            _shootCD = 0f;
+            WaterBall.speed = 0f;
         }
         // If we changed ammo, then need to change UI as well
         ChangeAmmoUI();

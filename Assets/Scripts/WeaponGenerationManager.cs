@@ -36,20 +36,20 @@ public class WeaponGenerationManager : MonoBehaviour
         // If next weapon in array is deactivated
         // Then move it to the current random spawn location
         // Then activate it
-        //while (_nextspawnamount > 0)
-        //{
-        //    System.Random rand = new System.Random();
-        //    int rannum = rand.Next(0, Weapons.Length);
-        //    GameObject weapon = Weapons[rannum];
-        //    if (!weapon.activeSelf)
-        //    {
-        //        GameManager.GM.MoveWeaponToSpawnArea(weapon);
-        //        weapon.SetActive(true);
-        //        _nextspawnamount--;
-        //    }
-        //}
-        foreach (GameObject weapon in Weapons)
+        // First we need to shuffle the array
+        System.Random rng = new System.Random();
+        for (int i = Weapons.Length - 1; i > 0; i--)
         {
+            int j = rng.Next(0, i + 1);
+
+            GameObject temp = Weapons[i];
+            Weapons[i] = Weapons[j];
+            Weapons[j] = temp;
+        }
+        // Then search through it
+        for (int i = 0; i < Weapons.Length; i++)
+        {
+            GameObject weapon = Weapons[i];
             if (!weapon.activeSelf && _nextspawnamount > 0)
             {
                 GameManager.GM.MoveWeaponToSpawnArea(weapon);

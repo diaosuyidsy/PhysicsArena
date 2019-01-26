@@ -15,6 +15,7 @@ public class DesignPanelManager : MonoBehaviour
     public Slider BlockAngleSlider;
     public Toggle HookAlternateSchemaToggle;
     public Slider BlockMultiplierSlider;
+    public Slider PickUpRunMultiplierSlider;
 
     private void Awake()
     {
@@ -32,6 +33,7 @@ public class DesignPanelManager : MonoBehaviour
         sw.WriteLine("Block Angle: " + BlockAngleSlider.value);
         sw.WriteLine("Hook Release instant Back: " + (HookAlternateSchemaToggle.isOn ? "ON" : "OFF"));
         sw.WriteLine("Block Return Multiplier: " + BlockMultiplierSlider.value);
+        sw.WriteLine("Pick Up Run Multiplier: " + PickUpRunMultiplierSlider.value);
         sw.Close();
     }
 }

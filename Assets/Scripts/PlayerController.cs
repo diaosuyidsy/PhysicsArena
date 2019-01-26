@@ -658,7 +658,7 @@ public class PlayerController : MonoBehaviour
         _rightTriggerRegister = tag;
         // if pick up resource, then slow down
         if (tag == "Team1Resource" || tag == "Team2Resource")
-            LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", PickUpSpeed / 2f);
+            LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", DesignPanelManager.DPM.PickUpRunMultiplierSlider.value);
 
         switch (tag)
         {

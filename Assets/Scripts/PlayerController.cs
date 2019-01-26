@@ -722,7 +722,7 @@ public class PlayerController : MonoBehaviour
         // First check if the player could block the attack
         if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - DesignPanelManager.DPM.BlockAngleSlider.value))
         {
-            sender.GetComponentInParent<PlayerController>().OnMeleeHit(force * -1f);
+            sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * DesignPanelManager.DPM.BlockMultiplierSlider.value);
             // Statistics: Block Success
             if (PlayerNumber < GameManager.GM.BlockTimes.Count)
             {

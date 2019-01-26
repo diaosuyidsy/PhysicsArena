@@ -15,4 +15,9 @@ public class TextController : MonoBehaviour
         _text.text = Mathf.FloorToInt(number).ToString();
     }
 
+    public void UpdateFloatText(float number)
+    {
+        _text.text = number.ToString("F1");
+    }
+
 }

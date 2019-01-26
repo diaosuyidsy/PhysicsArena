@@ -14,6 +14,7 @@ public class DesignPanelManager : MonoBehaviour
     public Slider HookGunAuxillaryAimSlider;
     public Slider BlockAngleSlider;
     public Toggle HookAlternateSchemaToggle;
+    public Slider BlockMultiplierSlider;
 
     private void Awake()
     {
@@ -30,6 +31,7 @@ public class DesignPanelManager : MonoBehaviour
         sw.WriteLine("Hook Gunxillary Aim Angle: " + HookGunAuxillaryAimSlider.value);
         sw.WriteLine("Block Angle: " + BlockAngleSlider.value);
         sw.WriteLine("Hook Release instant Back: " + (HookAlternateSchemaToggle.isOn ? "ON" : "OFF"));
+        sw.WriteLine("Block Return Multiplier: " + BlockMultiplierSlider.value);
         sw.Close();
     }
 }

@@ -7,6 +7,8 @@ public class SuckBallController : MonoBehaviour
     [HideInInspector]
     public List<GameObject> InRangePlayers;
 
+    public GameObject RTText;
+
     private GunPositionControl _gpc;
     private rtSuck _rts;
     private string _opponentTeamTag = "";
@@ -37,6 +39,7 @@ public class SuckBallController : MonoBehaviour
             lr.numCapVertices = 90;
             lr.useWorldSpace = true;
             lr.startColor = Color.yellow;
+            RTText.SetActive(true);
             // Add the gameobject to the list of InRangePlayers
             InRangePlayers.Add(go);
         }
@@ -57,6 +60,7 @@ public class SuckBallController : MonoBehaviour
         if (other.CompareTag(_opponentTeamTag) && other.GetType() == typeof(CapsuleCollider) && !_rts.isSucking())
         {
             Destroy(other.gameObject.GetComponent<LineRenderer>());
+            RTText.SetActive(false);
             // Delete the gameobject from the list in range players
             foreach (GameObject go in InRangePlayers)
             {

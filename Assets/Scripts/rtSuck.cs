@@ -7,11 +7,14 @@ public class rtSuck : MonoBehaviour
     public float MaxBallTravelTime = 4f;
     public float BallTravelSpeed = 3f;
     public float SuckStrength = 350f;
+    [HideInInspector]
+    public int SuckGunMaxUseTimes = 15;
 
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
     private bool _charged = false;
     private Vector3 _suckBallInitialScale;
+    private int _suckGunLeftTimes;
 
     private enum State
     {
@@ -31,6 +34,7 @@ public class rtSuck : MonoBehaviour
         _sbc = _suckBall.GetComponent<SuckBallController>();
         _gpc = GetComponent<GunPositionControl>();
         _suckBallInitialScale = new Vector3(_suckBall.transform.localScale.x, _suckBall.transform.localScale.y, _suckBall.transform.localScale.z);
+        _suckGunLeftTimes = SuckGunMaxUseTimes;
     }
 
     private void Update()
@@ -66,6 +70,7 @@ public class rtSuck : MonoBehaviour
                     if (_charged)
                     {
                         _charged = false;
+                        _sbc.RTText.SetActive(false);
                         _ballState = State.Suck;
                         StartCoroutine(sucking(0.1f));
                     }
@@ -111,6 +116,7 @@ public class rtSuck : MonoBehaviour
         _ballState = State.In;
         // Need a little clean up the line renderer and stuff
         _sbc.CleanUpAll();
+        _suckGunUsedOnce();
     }
 
     public bool isSucking()
@@ -118,6 +124,15 @@ public class rtSuck : MonoBehaviour
         return _ballState == State.Suck;
     }
 
+    private void _suckGunUsedOnce()
+    {
+        _suckGunLeftTimes--;
+        if (_suckGunLeftTimes <= 0)
+        {
+            _gpc.CanBePickedUp = false;
+            _gpc.Owner.GetComponent<PlayerController>().DropHelper();
+        }
+    }
     // Second Prototype: try set rigidybody speed = 0, move position, set gravity = 0, doesn't work
     //IEnumerator Congregate(float time, List<GameObject> gos)
     //{
@@ -189,9 +204,44 @@ public class rtSuck : MonoBehaviour
         }
     }
 
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.collider.CompareTag("Ground") && _suckGunLeftTimes <= 0)
+        {
+            _suckGunLeftTimes = SuckGunMaxUseTimes;
+            // Add Vanish VFX
+            Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            // END ADD
+            gameObject.SetActive(false);
+        }
+        if (((1 << other.gameObject.layer) & (1 << 14)) != 0)
+        {
+            StartCoroutine(DisappearAfterAWhile(3f));
+        }
+    }
+
+    private void VanishAfterUsed()
+    {
+        _suckGunLeftTimes = SuckGunMaxUseTimes;
+        // Add Vanish VFX
+        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+        // END ADD
+        gameObject.SetActive(false);
+    }
+
     private void _addToSuckedTimes()
     {
         int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
         GameManager.GM.SuckedPlayersTimes[playernum]++;
+    }
+
+    IEnumerator DisappearAfterAWhile(float time)
+    {
+        yield return new WaitForSeconds(time);
+        _suckGunLeftTimes = SuckGunMaxUseTimes;
+        // Add Vanish VFX
+        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+        // END ADD
+        gameObject.SetActive(false);
     }
 }

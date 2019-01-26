@@ -367,6 +367,12 @@ public class PlayerController : MonoBehaviour
                         HandObject.SendMessage("Hook", true);
                     }
                     break;
+                case "SuckGun":
+                    if (HandObject != null && !_dropping)
+                    {
+                        HandObject.SendMessage("Suck", true);
+                    }
+                    break;
             }
         }
 
@@ -380,6 +386,10 @@ public class PlayerController : MonoBehaviour
                     {
                         HandObject.SendMessage("Hook", false);
                     }
+                    break;
+                case "SuckGun":
+                    if (HandObject != null)
+                        HandObject.SendMessage("Suck", false);
                     break;
             }
         }
@@ -416,12 +426,12 @@ public class PlayerController : MonoBehaviour
                         _chesthj.spring = tempjs;
                     }
                     break;
-                case "SuckGun":
-                    if (HandObject != null && !_dropping)
-                    {
-                        HandObject.SendMessage("Suck", true);
-                    }
-                    break;
+                //case "SuckGun":
+                //    if (HandObject != null && !_dropping)
+                //    {
+                //        HandObject.SendMessage("Suck", true);
+                //    }
+                //    break;
                 case "Team1Resource":
                 case "Team2Resource":
                     if (!_dropping)
@@ -473,10 +483,10 @@ public class PlayerController : MonoBehaviour
                     tempjs.targetPosition = -5f;
                     _chesthj.spring = tempjs;
                     break;
-                case "SuckGun":
-                    if (HandObject != null)
-                        HandObject.SendMessage("Suck", false);
-                    break;
+                //case "SuckGun":
+                //    if (HandObject != null)
+                //        HandObject.SendMessage("Suck", false);
+                //    break;
                 default:
                     // If we previously started melee and released the trigger, then release the fist
                     if (attackState == State.Meleeing)
@@ -648,7 +658,7 @@ public class PlayerController : MonoBehaviour
         _rightTriggerRegister = tag;
         // if pick up resource, then slow down
         if (tag == "Team1Resource" || tag == "Team2Resource")
-            LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", PickUpSpeed / 2f);
+            LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", DesignPanelManager.DPM.PickUpRunMultiplierSlider.value);
 
         switch (tag)
         {

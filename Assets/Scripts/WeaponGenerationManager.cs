@@ -7,6 +7,8 @@ public class WeaponGenerationManager : MonoBehaviour
 {
     public static WeaponGenerationManager WGM;
 
+    public GameObject WeaponsHolder;
+    [HideInInspector]
     public GameObject[] Weapons;
     public float WeaponSpawnCD = 10f;
     public int NextSpawnAmount;
@@ -22,9 +24,11 @@ public class WeaponGenerationManager : MonoBehaviour
     private void Start()
     {
         _nextspawnamount = NextSpawnAmount;
-        foreach (GameObject weapon in Weapons)
+        Weapons = new GameObject[WeaponsHolder.transform.childCount];
+        for (int i = 0; i < Weapons.Length; i++)
         {
-            weapon.SetActive(false);
+            Weapons[i] = WeaponsHolder.transform.GetChild(i).gameObject;
+            Weapons[i].SetActive(false);
         }
 
         // We need to invoke weapon generation from the start

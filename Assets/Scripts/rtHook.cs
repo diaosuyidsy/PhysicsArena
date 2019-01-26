@@ -9,6 +9,8 @@ public class rtHook : MonoBehaviour
     public GameObject Hooked = null;
     [HideInInspector]
     public bool HookCanBend = true;
+    [HideInInspector]
+    public int MaxHookTimes = 15;
 
     private GameObject _hook;
     private Vector3 _hookinitlocalPos;
@@ -19,6 +21,8 @@ public class rtHook : MonoBehaviour
     private LineRenderer _lr;
     private Transform _hookstartpoint;
     private Transform _hookendpoint;
+    private int _curHookTimesLeft = 15;
+    private GunPositionControl _gpc;
     [HideInInspector]
     public bool CanCarryBack = true;
 
@@ -42,6 +46,7 @@ public class rtHook : MonoBehaviour
         _hookmax = transform.GetChild(1).gameObject;
         _hookState = State.Empty;
         _lr = GetComponent<LineRenderer>();
+        _gpc = GetComponent<GunPositionControl>();
     }
 
     private void Update()
@@ -87,6 +92,8 @@ public class rtHook : MonoBehaviour
             if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.4f)
             {
                 _hookState = State.Empty;
+                // Add once to Hook Used Times
+                _hookUsedOnce();
                 _hc.CanHook = false;
                 _hook.transform.parent = transform;
                 _hook.transform.localScale = _hookinitlocalScale;
@@ -122,24 +129,11 @@ public class rtHook : MonoBehaviour
                 _hookmaxPos = new Vector3(_hookmax.transform.position.x, _hookmax.transform.position.y, _hookmax.transform.position.z);
                 // Also need to make hook out of parent
                 _hook.transform.parent = null;
+
                 // Statistics: Record the player has used the hook one time
                 _addToHookTime();
                 // End Statistics
             }
-            //if (_hookState == State.FlyingIn && Hooked != null)
-            //{
-            //    foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
-            //    {
-            //        rb.isKinematic = false;
-            //    }
-            //    Vector3 force = (transform.position - _hook.transform.position).normalized;
-            //    Vector3 vec2 = transform.right;
-            //    Vector3 finalVec = force - vec2;
-            //    force = (force + finalVec * 10f).normalized;
-
-            //    Hooked.GetComponent<Rigidbody>().AddForce(force * 450f, ForceMode.Impulse);
-            //    Hooked = null;
-            //}
         }
         else
         {
@@ -164,6 +158,17 @@ public class rtHook : MonoBehaviour
                     _hookState = State.FlyingIn;
                 }
             }
+        }
+    }
+
+    private void _hookUsedOnce()
+    {
+        _curHookTimesLeft--;
+        // We have now used up the hook
+        if (_curHookTimesLeft <= 0)
+        {
+            _gpc.CanBePickedUp = false;
+            _gpc.Owner.GetComponent<PlayerController>().DropHelper();
         }
     }
 
@@ -200,6 +205,31 @@ public class rtHook : MonoBehaviour
         _hookState = State.FlyingIn;
     }
 
+    private void OnCollisionEnter(Collision other)
+    {
+        if (other.collider.CompareTag("Ground") && _curHookTimesLeft <= 0)
+        {
+            _curHookTimesLeft = MaxHookTimes;
+            // Add Vanish VFX
+            Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+            // END ADD
+            gameObject.SetActive(false);
+        }
+        if (((1 << other.gameObject.layer) & (1 << 14)) != 0)
+        {
+            StartCoroutine(DisappearAfterAWhile(3f));
+        }
+    }
+
+    private void VanishAfterUse()
+    {
+        _curHookTimesLeft = MaxHookTimes;
+        // Add Vanish VFX
+        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+        // END ADD
+        gameObject.SetActive(false);
+    }
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("DeathZone"))
@@ -225,5 +255,15 @@ public class rtHook : MonoBehaviour
             Hooked = null;
             gameObject.SetActive(false);
         }
+    }
+
+    IEnumerator DisappearAfterAWhile(float time)
+    {
+        yield return new WaitForSeconds(time);
+        _curHookTimesLeft = MaxHookTimes;
+        // Add Vanish VFX
+        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
+        // END ADD
+        gameObject.SetActive(false);
     }
 }

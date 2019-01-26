@@ -123,12 +123,16 @@ public class GameManager : MonoBehaviour
     // This function is only for UI testing purposes
     private void _fillPlayerInformation()
     {
-        PlayersInformation[0] = new PlayerInformation("Yellow", Color.yellow);
-        PlayersInformation[1] = new PlayerInformation("Pink", Color.red);
-        PlayersInformation[2] = new PlayerInformation("Orange", Color.magenta);
-        PlayersInformation[3] = new PlayerInformation("Blue", Color.blue);
-        PlayersInformation[4] = new PlayerInformation("Green", Color.green);
-        PlayersInformation[5] = new PlayerInformation("Purple", Color.cyan);
+        //PlayersInformation[0] = new PlayerInformation("Yellow", Color.yellow);
+        //PlayersInformation[1] = new PlayerInformation("Pink", Color.red);
+        //PlayersInformation[2] = new PlayerInformation("Orange", Color.magenta);
+        //PlayersInformation[3] = new PlayerInformation("Blue", Color.blue);
+        //PlayersInformation[4] = new PlayerInformation("Green", Color.green);
+        //PlayersInformation[5] = new PlayerInformation("Purple", Color.cyan);
+        for (int i = 0; i < 6; i++)
+        {
+            PlayersInformation[i] = CanvasController.CC.FinalInformation[i];
+        }
     }
 
     IEnumerator EndImageShow(float time, GameObject _tar = null)

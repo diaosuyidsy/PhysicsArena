@@ -66,6 +66,7 @@ public class rtSuck : MonoBehaviour
                     if (_charged)
                     {
                         _charged = false;
+                        _sbc.RTText.SetActive(false);
                         _ballState = State.Suck;
                         StartCoroutine(sucking(0.1f));
                     }

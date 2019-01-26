@@ -5,9 +5,16 @@ using Rewired;
 
 public class CanvasController : MonoBehaviour
 {
+    public static CanvasController CC = null;
     public RectTransform[] Characters;
     public GameObject[] CharactersInTeam;
     public GameObject[] PlayerSlots;
+    [Header("Character Information: Align with Image")]
+    public Color[] CharacterColors;
+    public string[] CharacterNames;
+    // Final Information is what is kept to the playing scene
+    [HideInInspector]
+    public PlayerInformation[] FinalInformation;
     [HideInInspector]
     public List<bool> CharacterSlotsTaken;
     [HideInInspector]
@@ -20,11 +27,21 @@ public class CanvasController : MonoBehaviour
     // Use this for initialization
     private void Awake()
     {
+        if (CC == null)
+            CC = this;
+        DontDestroyOnLoad(gameObject);
         CharacterSlotsTaken = new List<bool>(new bool[] { false, false, false, false, false, false });
         _playersMoveCharged = new bool[] { true, true, true, true, true, true };
         PlayerHoveringSlots = new int[] { 0, 0, 0, 0, 0, 0 };
+        FinalInformation = new PlayerInformation[6];
+        for (int i = 0; i < 6; i++) FinalInformation[i] = new PlayerInformation();
         PlayersLockedIn = new bool[6];
         _players = new Player[6];
+
+    }
+
+    private void Start()
+    {
         for (int i = 0; i < 6; i++)
         {
             _players[i] = ReInput.players.GetPlayer(i);
@@ -40,6 +57,15 @@ public class CanvasController : MonoBehaviour
             CheckInput(i);
             CheckSelectionInput(i);
         }
+        ConsoleProDebug.Watch("Player 0's Selection Information", FinalInformation[0].PlayerName + " , " + FinalInformation[0].PlayerColor.ToString());
+        ConsoleProDebug.Watch("Player 1's Selection Information", FinalInformation[1].PlayerName + " , " + FinalInformation[1].PlayerColor.ToString());
+        ConsoleProDebug.Watch("Player 2's Selection Information", FinalInformation[2].PlayerName + " , " + FinalInformation[2].PlayerColor.ToString());
+        ConsoleProDebug.Watch("Player 3's Selection Information", FinalInformation[3].PlayerName + " , " + FinalInformation[3].PlayerColor.ToString());
+        ConsoleProDebug.Watch("Player 4's Selection Information", FinalInformation[4].PlayerName + " , " + FinalInformation[4].PlayerColor.ToString());
+        ConsoleProDebug.Watch("Player 5's Selection Information", FinalInformation[5].PlayerName + " , " + FinalInformation[5].PlayerColor.ToString());
+
+
+
     }
 
     private void CheckSelectionInput(int playernumber)
@@ -54,10 +80,18 @@ public class CanvasController : MonoBehaviour
                 CharacterSlotsTaken[curPlayerSelectionIndex] = true;
                 // Select the thing
                 CharactersInTeam[curPlayerSelectionIndex].GetComponentInChildren<Image>().color = Color.white;
+                // Record the information
+                RecordSelectionInformation(playernumber, curPlayerSelectionIndex);
                 // Lock the Player so they cannot make anymore choices
                 PlayersLockedIn[playernumber] = true;
             }
         }
+    }
+
+    private void RecordSelectionInformation(int playerNumber, int characterSlotNumber)
+    {
+        FinalInformation[playerNumber].PlayerName = CharacterNames[characterSlotNumber];
+        FinalInformation[playerNumber].PlayerColor = CharacterColors[characterSlotNumber];
     }
 
     // This function checks player input

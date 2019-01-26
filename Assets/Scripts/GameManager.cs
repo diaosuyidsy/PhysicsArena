@@ -187,6 +187,8 @@ public class GameManager : MonoBehaviour
         // Now the screen should be entirely black
         // And we need to disable the screen dark corner effect
         _dcfx.enabled = false;
+        // And here we need to let player be able to restart
+        GetComponent<InputController>().CanRestart();
         yield return StartCoroutine(StartTransitionColor(3f));
 
         GetComponent<Scoreboard>().DisplayKiller();
@@ -194,9 +196,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(9f);
 
         GetComponent<Scoreboard>().DisplaySuicider();
-        
+
         yield return new WaitForSeconds(9f);
-        
+
         GetComponent<Scoreboard>().DisplayTMKiller();
 
     }

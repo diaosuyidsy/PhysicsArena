@@ -1,13 +1,19 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using Rewired;
+using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class InputController : MonoBehaviour
 {
+    public GameObject RestartText;
     private Player[] _players;
     private bool[] _enteredGame;
     private int playerNum = 0;
+    private bool _canRestart = false;
+    private float _timeForBlink = 0f;
+    private Text _restartText1;
+    private Text _restartText2;
+    private float[] _playerHoldRestart;
 
     private void Awake()
     {
@@ -17,6 +23,10 @@ public class InputController : MonoBehaviour
         {
             _players[i] = ReInput.players.GetPlayer(i);
         }
+        _restartText1 = RestartText.GetComponent<Text>();
+        _restartText2 = RestartText.transform.GetChild(0).GetComponent<Text>();
+        RestartText.SetActive(false);
+        _playerHoldRestart = new float[6];
     }
 
     private void Update()
@@ -29,6 +39,12 @@ public class InputController : MonoBehaviour
                 EnterGame(i);
             }
         }
+        if (_canRestart)
+        {
+            // Update Alpha Value of the Restart Text
+            _updateAlpha();
+            _holdToRestart();
+        }
     }
 
     private void EnterGame(int playerID)
@@ -39,5 +55,44 @@ public class InputController : MonoBehaviour
         if (GameManager.GM.Players.Count <= playerNum) GameManager.GM.Players.Add(curPlayer);
         GameManager.GM.Players[playerNum] = curPlayer;
         playerNum++;
+    }
+
+    private void _holdToRestart()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (ReInput.players.GetPlayer(i).GetButton("Jump"))
+            {
+                _playerHoldRestart[i] += Time.deltaTime;
+                print(_playerHoldRestart[i]);
+                if (Mathf.Abs(_playerHoldRestart[i] - 1f) < 0.2f)
+                {
+                    SceneManager.LoadScene("2DStartScene");
+                }
+            }
+            else
+            {
+                _playerHoldRestart[i] = 0f;
+            }
+        }
+    }
+
+    private void _updateAlpha()
+    {
+        float BlinkAlpha = (0.5f + 0.5f * Mathf.Cos(_timeForBlink));
+        Color textColor1 = _restartText1.color;
+        Color textColor2 = _restartText2.color;
+        textColor1.a = BlinkAlpha;
+        textColor2.a = BlinkAlpha;
+        _restartText1.color = textColor1;
+        _restartText2.color = textColor2;
+        _timeForBlink += Time.deltaTime * 2f;
+    }
+
+    // This function is called from GameManager EndGame
+    public void CanRestart()
+    {
+        _canRestart = true;
+        RestartText.SetActive(true);
     }
 }

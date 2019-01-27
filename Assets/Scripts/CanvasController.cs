@@ -29,6 +29,9 @@ public class CanvasController : MonoBehaviour
     private Player[] _players;
     private bool[] _playersMoveCharged;
     private int _playersLockedInCount = 0;
+    private bool _chickenSelected = false;
+    private bool _duckSelected = false;
+
     // Use this for initialization
     private void Awake()
     {
@@ -97,7 +100,7 @@ public class CanvasController : MonoBehaviour
     private void OnPlayerSelection()
     {
         _playersLockedInCount++;
-        if (_playersLockedInCount >= ReInput.controllers.joystickCount)
+        if (_playersLockedInCount >= ReInput.controllers.joystickCount && ReInput.controllers.joystickCount > 1)
         {
             // Meaning We are ready to start
             StartCountDown.SetActive(true);
@@ -122,9 +125,9 @@ public class CanvasController : MonoBehaviour
         {
             text.text = "0";
         }
-        yield return new WaitForSeconds(1f);
-        StartCountDown.SetActive(false);
         SceneManager.LoadScene(1);
+        yield return new WaitForSeconds(1f);
+        //StartCountDown.SetActive(false);
     }
 
     private void RecordSelectionInformation(int playerNumber, int characterSlotNumber)

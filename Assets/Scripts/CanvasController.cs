@@ -8,6 +8,7 @@ public class CanvasController : MonoBehaviour
     public static CanvasController CC = null;
     public RectTransform[] Characters;
     public GameObject[] GreyCharacters;
+    public GameObject[] PureGreyBackgrounds;
     public GameObject[] PlayerSlots;
     [Header("Character Information: Align with Image")]
     public Color[] CharacterColors;
@@ -63,9 +64,6 @@ public class CanvasController : MonoBehaviour
         ConsoleProDebug.Watch("Player 3's Selection Information", FinalInformation[3].PlayerName + " , " + FinalInformation[3].PlayerColor.ToString());
         ConsoleProDebug.Watch("Player 4's Selection Information", FinalInformation[4].PlayerName + " , " + FinalInformation[4].PlayerColor.ToString());
         ConsoleProDebug.Watch("Player 5's Selection Information", FinalInformation[5].PlayerName + " , " + FinalInformation[5].PlayerColor.ToString());
-
-
-
     }
 
     private void CheckSelectionInput(int playernumber)
@@ -104,7 +102,11 @@ public class CanvasController : MonoBehaviour
         if ((Mathf.Abs(horizontal) - 0.9f > 0f) && _playersMoveCharged[playernumber])
         {
             _playersMoveCharged[playernumber] = false;
+            // Change Grey Background Image
+            PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(true);
             PlayerHoveringSlots[playernumber] = nmod(PlayerHoveringSlots[playernumber] + (horizontal > 0f ? 1 : -1), 6);
+            PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(false);
+
             _changeMember(PlayerHoveringSlots[playernumber], playernumber);
         }
         else if (Mathf.Approximately(horizontal, 0f))

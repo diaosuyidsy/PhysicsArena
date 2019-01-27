@@ -7,7 +7,7 @@ public class CanvasController : MonoBehaviour
 {
     public static CanvasController CC = null;
     public RectTransform[] Characters;
-    public GameObject[] CharactersInTeam;
+    public GameObject[] GreyCharacters;
     public GameObject[] PlayerSlots;
     [Header("Character Information: Align with Image")]
     public Color[] CharacterColors;
@@ -79,7 +79,7 @@ public class CanvasController : MonoBehaviour
                 // Take up the slot
                 CharacterSlotsTaken[curPlayerSelectionIndex] = true;
                 // Select the thing
-                CharactersInTeam[curPlayerSelectionIndex].GetComponentInChildren<Image>().color = Color.white;
+                GreyCharacters[curPlayerSelectionIndex].SetActive(false);
                 // Record the information
                 RecordSelectionInformation(playernumber, curPlayerSelectionIndex);
                 // Lock the Player so they cannot make anymore choices
@@ -99,12 +99,12 @@ public class CanvasController : MonoBehaviour
     private void CheckInput(int playernumber)
     {
         float horizontal = _players[playernumber].GetAxis("Move Horizontal");
-        float vertical = _players[playernumber].GetAxis("Move Vertical");
+        //float vertical = _players[playernumber].GetAxis("Move Vertical");
         // If player Moved Horizontally then do something
         if ((Mathf.Abs(horizontal) - 0.9f > 0f) && _playersMoveCharged[playernumber])
         {
             _playersMoveCharged[playernumber] = false;
-            PlayerHoveringSlots[playernumber] = truncate(PlayerHoveringSlots[playernumber], (horizontal > 0f ? 1 : -1));
+            PlayerHoveringSlots[playernumber] = nmod(PlayerHoveringSlots[playernumber] + (horizontal > 0f ? 1 : -1), 6);
             _changeMember(PlayerHoveringSlots[playernumber], playernumber);
         }
         else if (Mathf.Approximately(horizontal, 0f))
@@ -112,17 +112,17 @@ public class CanvasController : MonoBehaviour
             _playersMoveCharged[playernumber] = true;
         }
 
-        // If player moved vertically then do something
-        if ((Mathf.Abs(vertical) - 0.9f > 0f) && _playersMoveCharged[playernumber])
-        {
-            _playersMoveCharged[playernumber] = false;
-            PlayerHoveringSlots[playernumber] = truncate(PlayerHoveringSlots[playernumber], (vertical > 0f ? 3 : -3));
-            _changeMember(PlayerHoveringSlots[playernumber], playernumber);
-        }
-        else if (Mathf.Approximately(vertical, 0f))
-        {
-            _playersMoveCharged[playernumber] = true;
-        }
+        //// If player moved vertically then do something
+        //if ((Mathf.Abs(vertical) - 0.9f > 0f) && _playersMoveCharged[playernumber])
+        //{
+        //    _playersMoveCharged[playernumber] = false;
+        //    PlayerHoveringSlots[playernumber] = truncate(PlayerHoveringSlots[playernumber], (vertical > 0f ? 3 : -3));
+        //    _changeMember(PlayerHoveringSlots[playernumber], playernumber);
+        //}
+        //else if (Mathf.Approximately(vertical, 0f))
+        //{
+        //    _playersMoveCharged[playernumber] = true;
+        //}
     }
 
     private void OnHover(int playernumber)
@@ -150,6 +150,11 @@ public class CanvasController : MonoBehaviour
         PlayerSlots[playernumber].transform.parent.GetComponent<RadicalLayout>().StartAngle -= 25f;
         PlayerSlots[playernumber].transform.parent.GetComponent<RadicalLayout>().MaxAngle += 50f;
 
+    }
+
+    private int nmod(int x, int m)
+    {
+        return (x % m + m) % m;
     }
 
     private int truncate(int a, int b)

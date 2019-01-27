@@ -14,6 +14,8 @@ public class InputController : MonoBehaviour
     private Text _restartText1;
     private Text _restartText2;
     private float[] _playerHoldRestart;
+    private int _chickenCounter = 0;
+    private int _duckCounter = 3;
 
     private void Awake()
     {
@@ -49,12 +51,31 @@ public class InputController : MonoBehaviour
 
     private void EnterGame(int playerID)
     {
-        GameObject curPlayer = GameManager.GM.APlayers[playerNum];
+        GameObject curPlayer = _getCharacter(playerID);
         curPlayer.GetComponent<PlayerController>().Init(playerID);
         curPlayer.transform.parent.parent.gameObject.SetActive(true);
         if (GameManager.GM.Players.Count <= playerNum) GameManager.GM.Players.Add(curPlayer);
         GameManager.GM.Players[playerNum] = curPlayer;
         playerNum++;
+    }
+
+    private GameObject _getCharacter(int playerNum)
+    {
+        GameObject chara = null;
+        string characterName = GameManager.GM.PlayersInformation[playerNum].PlayerName;
+        // On the Chicken Team
+        if (characterName == "Yellow" || characterName == "Pink" || characterName == "Orange")
+        {
+            chara = GameManager.GM.APlayers[_chickenCounter++];
+        }
+        else
+        {
+            // On the Duck Team
+            chara = GameManager.GM.APlayers[_duckCounter++];
+        }
+        // Decorate the character
+        chara.transform.GetChild(2).GetComponent<SkinnedMeshRenderer>().material = GameManager.GM.NameToMaterialsDict[characterName];
+        return chara.GetComponentInChildren<PlayerController>().gameObject;
     }
 
     private void _holdToRestart()

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Rewired;
+using UnityEngine.SceneManagement;
 
 public class CanvasController : MonoBehaviour
 {
@@ -13,6 +15,7 @@ public class CanvasController : MonoBehaviour
     [Header("Character Information: Align with Image")]
     public Color[] CharacterColors;
     public string[] CharacterNames;
+    public GameObject StartCountDown;
     // Final Information is what is kept to the playing scene
     [HideInInspector]
     public PlayerInformation[] FinalInformation;
@@ -25,6 +28,7 @@ public class CanvasController : MonoBehaviour
 
     private Player[] _players;
     private bool[] _playersMoveCharged;
+    private int _playersLockedInCount = 0;
     // Use this for initialization
     private void Awake()
     {
@@ -47,6 +51,7 @@ public class CanvasController : MonoBehaviour
         {
             _players[i] = ReInput.players.GetPlayer(i);
         }
+        StartCountDown.SetActive(false);
     }
 
     private void Update()
@@ -58,12 +63,13 @@ public class CanvasController : MonoBehaviour
             CheckInput(i);
             CheckSelectionInput(i);
         }
-        ConsoleProDebug.Watch("Player 0's Selection Information", FinalInformation[0].PlayerName + " , " + FinalInformation[0].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 1's Selection Information", FinalInformation[1].PlayerName + " , " + FinalInformation[1].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 2's Selection Information", FinalInformation[2].PlayerName + " , " + FinalInformation[2].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 3's Selection Information", FinalInformation[3].PlayerName + " , " + FinalInformation[3].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 4's Selection Information", FinalInformation[4].PlayerName + " , " + FinalInformation[4].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 5's Selection Information", FinalInformation[5].PlayerName + " , " + FinalInformation[5].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 0's Selection Information", FinalInformation[0].PlayerName + " , " + FinalInformation[0].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 1's Selection Information", FinalInformation[1].PlayerName + " , " + FinalInformation[1].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 2's Selection Information", FinalInformation[2].PlayerName + " , " + FinalInformation[2].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 3's Selection Information", FinalInformation[3].PlayerName + " , " + FinalInformation[3].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 4's Selection Information", FinalInformation[4].PlayerName + " , " + FinalInformation[4].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 5's Selection Information", FinalInformation[5].PlayerName + " , " + FinalInformation[5].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Max Joysticks Count", ReInput.controllers.joystickCount.ToString());
     }
 
     private void CheckSelectionInput(int playernumber)
@@ -82,8 +88,43 @@ public class CanvasController : MonoBehaviour
                 RecordSelectionInformation(playernumber, curPlayerSelectionIndex);
                 // Lock the Player so they cannot make anymore choices
                 PlayersLockedIn[playernumber] = true;
+                // Add to player selection count
+                OnPlayerSelection();
             }
         }
+    }
+
+    private void OnPlayerSelection()
+    {
+        _playersLockedInCount++;
+        if (_playersLockedInCount >= ReInput.controllers.joystickCount)
+        {
+            // Meaning We are ready to start
+            StartCountDown.SetActive(true);
+            StartCoroutine(ChangeNumber());
+        }
+    }
+
+    IEnumerator ChangeNumber()
+    {
+        yield return new WaitForSeconds(1f);
+        foreach (var text in StartCountDown.GetComponentsInChildren<Text>())
+        {
+            text.text = "2";
+        }
+        yield return new WaitForSeconds(1f);
+        foreach (var text in StartCountDown.GetComponentsInChildren<Text>())
+        {
+            text.text = "1";
+        }
+        yield return new WaitForSeconds(1f);
+        foreach (var text in StartCountDown.GetComponentsInChildren<Text>())
+        {
+            text.text = "0";
+        }
+        yield return new WaitForSeconds(1f);
+        StartCountDown.SetActive(false);
+        SceneManager.LoadScene(1);
     }
 
     private void RecordSelectionInformation(int playerNumber, int characterSlotNumber)

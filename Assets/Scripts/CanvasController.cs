@@ -1,17 +1,21 @@
 ﻿using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 using Rewired;
+using UnityEngine.SceneManagement;
 
 public class CanvasController : MonoBehaviour
 {
     public static CanvasController CC = null;
     public RectTransform[] Characters;
-    public GameObject[] CharactersInTeam;
+    public GameObject[] GreyCharacters;
+    public GameObject[] PureGreyBackgrounds;
     public GameObject[] PlayerSlots;
     [Header("Character Information: Align with Image")]
     public Color[] CharacterColors;
     public string[] CharacterNames;
+    public GameObject StartCountDown;
     // Final Information is what is kept to the playing scene
     [HideInInspector]
     public PlayerInformation[] FinalInformation;
@@ -24,6 +28,7 @@ public class CanvasController : MonoBehaviour
 
     private Player[] _players;
     private bool[] _playersMoveCharged;
+    private int _playersLockedInCount = 0;
     // Use this for initialization
     private void Awake()
     {
@@ -32,7 +37,7 @@ public class CanvasController : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         CharacterSlotsTaken = new List<bool>(new bool[] { false, false, false, false, false, false });
         _playersMoveCharged = new bool[] { true, true, true, true, true, true };
-        PlayerHoveringSlots = new int[] { 0, 0, 0, 0, 0, 0 };
+        PlayerHoveringSlots = new int[] { -1, -1, -1, -1, -1, -1 };
         FinalInformation = new PlayerInformation[6];
         for (int i = 0; i < 6; i++) FinalInformation[i] = new PlayerInformation();
         PlayersLockedIn = new bool[6];
@@ -46,6 +51,7 @@ public class CanvasController : MonoBehaviour
         {
             _players[i] = ReInput.players.GetPlayer(i);
         }
+        StartCountDown.SetActive(false);
     }
 
     private void Update()
@@ -57,15 +63,13 @@ public class CanvasController : MonoBehaviour
             CheckInput(i);
             CheckSelectionInput(i);
         }
-        ConsoleProDebug.Watch("Player 0's Selection Information", FinalInformation[0].PlayerName + " , " + FinalInformation[0].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 1's Selection Information", FinalInformation[1].PlayerName + " , " + FinalInformation[1].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 2's Selection Information", FinalInformation[2].PlayerName + " , " + FinalInformation[2].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 3's Selection Information", FinalInformation[3].PlayerName + " , " + FinalInformation[3].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 4's Selection Information", FinalInformation[4].PlayerName + " , " + FinalInformation[4].PlayerColor.ToString());
-        ConsoleProDebug.Watch("Player 5's Selection Information", FinalInformation[5].PlayerName + " , " + FinalInformation[5].PlayerColor.ToString());
-
-
-
+        //ConsoleProDebug.Watch("Player 0's Selection Information", FinalInformation[0].PlayerName + " , " + FinalInformation[0].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 1's Selection Information", FinalInformation[1].PlayerName + " , " + FinalInformation[1].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 2's Selection Information", FinalInformation[2].PlayerName + " , " + FinalInformation[2].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 3's Selection Information", FinalInformation[3].PlayerName + " , " + FinalInformation[3].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 4's Selection Information", FinalInformation[4].PlayerName + " , " + FinalInformation[4].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Player 5's Selection Information", FinalInformation[5].PlayerName + " , " + FinalInformation[5].PlayerColor.ToString());
+        //ConsoleProDebug.Watch("Max Joysticks Count", ReInput.controllers.joystickCount.ToString());
     }
 
     private void CheckSelectionInput(int playernumber)
@@ -79,13 +83,48 @@ public class CanvasController : MonoBehaviour
                 // Take up the slot
                 CharacterSlotsTaken[curPlayerSelectionIndex] = true;
                 // Select the thing
-                CharactersInTeam[curPlayerSelectionIndex].GetComponentInChildren<Image>().color = Color.white;
+                GreyCharacters[curPlayerSelectionIndex].SetActive(false);
                 // Record the information
                 RecordSelectionInformation(playernumber, curPlayerSelectionIndex);
                 // Lock the Player so they cannot make anymore choices
                 PlayersLockedIn[playernumber] = true;
+                // Add to player selection count
+                OnPlayerSelection();
             }
         }
+    }
+
+    private void OnPlayerSelection()
+    {
+        _playersLockedInCount++;
+        if (_playersLockedInCount >= ReInput.controllers.joystickCount)
+        {
+            // Meaning We are ready to start
+            StartCountDown.SetActive(true);
+            StartCoroutine(ChangeNumber());
+        }
+    }
+
+    IEnumerator ChangeNumber()
+    {
+        yield return new WaitForSeconds(1f);
+        foreach (var text in StartCountDown.GetComponentsInChildren<Text>())
+        {
+            text.text = "2";
+        }
+        yield return new WaitForSeconds(1f);
+        foreach (var text in StartCountDown.GetComponentsInChildren<Text>())
+        {
+            text.text = "1";
+        }
+        yield return new WaitForSeconds(1f);
+        foreach (var text in StartCountDown.GetComponentsInChildren<Text>())
+        {
+            text.text = "0";
+        }
+        yield return new WaitForSeconds(1f);
+        StartCountDown.SetActive(false);
+        SceneManager.LoadScene(1);
     }
 
     private void RecordSelectionInformation(int playerNumber, int characterSlotNumber)
@@ -99,41 +138,37 @@ public class CanvasController : MonoBehaviour
     private void CheckInput(int playernumber)
     {
         float horizontal = _players[playernumber].GetAxis("Move Horizontal");
-        float vertical = _players[playernumber].GetAxis("Move Vertical");
+        //float vertical = _players[playernumber].GetAxis("Move Vertical");
         // If player Moved Horizontally then do something
         if ((Mathf.Abs(horizontal) - 0.9f > 0f) && _playersMoveCharged[playernumber])
         {
             _playersMoveCharged[playernumber] = false;
-            PlayerHoveringSlots[playernumber] = truncate(PlayerHoveringSlots[playernumber], (horizontal > 0f ? 1 : -1));
+            // Change Grey Background Image
+            if (!_isOtherPlayerHoveringHere(playernumber, PlayerHoveringSlots[playernumber]))
+                PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(true);
+            //PlayerHoveringSlots[playernumber] = nmod(PlayerHoveringSlots[playernumber] + (horizontal > 0f ? 1 : -1), 6);
+            PlayerHoveringSlots[playernumber] = _advancePlace(PlayerHoveringSlots[playernumber], (horizontal > 0f ? 1 : -1));
+            PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(false);
+
             _changeMember(PlayerHoveringSlots[playernumber], playernumber);
         }
         else if (Mathf.Approximately(horizontal, 0f))
         {
             _playersMoveCharged[playernumber] = true;
         }
-
-        // If player moved vertically then do something
-        if ((Mathf.Abs(vertical) - 0.9f > 0f) && _playersMoveCharged[playernumber])
-        {
-            _playersMoveCharged[playernumber] = false;
-            PlayerHoveringSlots[playernumber] = truncate(PlayerHoveringSlots[playernumber], (vertical > 0f ? 3 : -3));
-            _changeMember(PlayerHoveringSlots[playernumber], playernumber);
-        }
-        else if (Mathf.Approximately(vertical, 0f))
-        {
-            _playersMoveCharged[playernumber] = true;
-        }
     }
 
-    private void OnHover(int playernumber)
+    private bool _isOtherPlayerHoveringHere(int thisPlayerNumber, int slotIndex)
     {
-        int curPlayerSelectionIndex = PlayerHoveringSlots[playernumber];
-        if (!CharacterSlotsTaken[curPlayerSelectionIndex])
+        for (int i = 0; i < 6; i++)
         {
-
+            if (i != thisPlayerNumber && PlayerHoveringSlots[i] == slotIndex)
+            {
+                return true;
+            }
         }
+        return false;
     }
-
     // This function takes 3 arguements
     // Which Slot to change, which player to change, and whether it is an addition or subtraction
     private void _changeMember(int slotindex, int playernumber)
@@ -150,6 +185,23 @@ public class CanvasController : MonoBehaviour
         PlayerSlots[playernumber].transform.parent.GetComponent<RadicalLayout>().StartAngle -= 25f;
         PlayerSlots[playernumber].transform.parent.GetComponent<RadicalLayout>().MaxAngle += 50f;
 
+    }
+
+    private int _advancePlace(int curPlace, int advanceAmount)
+    {
+        int nextPlace = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            nextPlace = nmod(curPlace + advanceAmount, 6);
+            if (!CharacterSlotsTaken[nextPlace]) return nextPlace;
+            else curPlace = nextPlace;
+        }
+        return nextPlace;
+    }
+
+    private int nmod(int x, int m)
+    {
+        return (x % m + m) % m;
     }
 
     private int truncate(int a, int b)

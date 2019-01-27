@@ -14,6 +14,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> Players;
     [Tooltip("Need to fill all six Beforehand")]
     public GameObject[] APlayers;
+    public Dictionary<string, Material> NameToMaterialsDict;
     public LayerMask AllPlayers;
     public Transform RespawnPointHolder;
     public GameObject[] Team1ResourceRespawnPoints;
@@ -34,6 +35,7 @@ public class GameManager : MonoBehaviour
     public GameObject TeamRed1Explosion;
     public GameObject TeamBlue2Explosion;
     public Color EndGameBackgroundImageColor;
+    public Material[] CharacterMaterials;
     [HideInInspector]
     public int Winner;
     [HideInInspector]
@@ -67,8 +69,6 @@ public class GameManager : MonoBehaviour
     private int Team1RespawnIndex = 0;
     private int Team2RespawnIndex = 0;
 
-    private float EndImageScale = 208f;
-
     //teleport a weapon to a random position within a given space
     public Vector3 weaponSpawnerCenter;
     public Vector3 weaponSpawnerSize;
@@ -89,6 +89,16 @@ public class GameManager : MonoBehaviour
     {
         GM = this;
         Players = new List<GameObject>();
+        NameToMaterialsDict = new Dictionary<string, Material>()
+        {
+            {"Yellow", CharacterMaterials[0] },
+            {"Pink", CharacterMaterials[1] },
+            {"Orange", CharacterMaterials[2] },
+            {"Blue", CharacterMaterials[3] },
+            {"Purple", CharacterMaterials[4] },
+            {"Green", CharacterMaterials[5] },
+
+        };
         SuicideRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
         KillRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
         TeammateMurderRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
@@ -120,22 +130,17 @@ public class GameManager : MonoBehaviour
             Team2RespawnPts[i] = team2.GetChild(i).gameObject;
         }
         SuckGunTutorialTimes = 4;
-        //_fillPlayerInformation();
+        _fillPlayerInformation();
     }
 
-    // This function is only for UI testing purposes
     private void _fillPlayerInformation()
     {
-        //PlayersInformation[0] = new PlayerInformation("Yellow", Color.yellow);
-        //PlayersInformation[1] = new PlayerInformation("Pink", Color.red);
-        //PlayersInformation[2] = new PlayerInformation("Orange", Color.magenta);
-        //PlayersInformation[3] = new PlayerInformation("Blue", Color.blue);
-        //PlayersInformation[4] = new PlayerInformation("Green", Color.green);
-        //PlayersInformation[5] = new PlayerInformation("Purple", Color.cyan);
         for (int i = 0; i < 6; i++)
         {
-            PlayersInformation[i] = CanvasController.CC.FinalInformation[i];
+            if (CanvasController.CC != null)
+                PlayersInformation[i] = CanvasController.CC.FinalInformation[i];
         }
+        Destroy(CanvasController.CC.gameObject);
     }
 
     IEnumerator EndImageShow(float time, GameObject _tar = null)

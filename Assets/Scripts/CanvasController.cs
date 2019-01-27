@@ -9,6 +9,7 @@ public class CanvasController : MonoBehaviour
 {
     public static CanvasController CC = null;
     public RectTransform[] Characters;
+    public GameObject[] GreyCharacterIcons;
     public GameObject[] GreyCharacters;
     public GameObject[] PureGreyBackgrounds;
     public GameObject[] PlayerSlots;
@@ -116,6 +117,7 @@ public class CanvasController : MonoBehaviour
                     _characterShadowLocked[i] = true;
                     CharacterSlotsTaken[i] = true;
                     // Deactivate the icons
+                    GreyCharacterIcons[i].SetActive(true);
                 }
             }
         }
@@ -129,6 +131,7 @@ public class CanvasController : MonoBehaviour
                     _characterShadowLocked[i] = true;
                     CharacterSlotsTaken[i] = true;
                     // Deactivate the icons
+                    GreyCharacterIcons[i].SetActive(true);
                 }
             }
         }
@@ -142,6 +145,7 @@ public class CanvasController : MonoBehaviour
                     _characterShadowLocked[i] = false;
                     CharacterSlotsTaken[i] = false;
                     // Actate the icons
+                    GreyCharacterIcons[i].SetActive(false);
                 }
             }
         }

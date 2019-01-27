@@ -33,7 +33,7 @@ public class CanvasController : MonoBehaviour
         DontDestroyOnLoad(gameObject);
         CharacterSlotsTaken = new List<bool>(new bool[] { false, false, false, false, false, false });
         _playersMoveCharged = new bool[] { true, true, true, true, true, true };
-        PlayerHoveringSlots = new int[] { 0, 0, 0, 0, 0, 0 };
+        PlayerHoveringSlots = new int[] { -1, -1, -1, -1, -1, -1 };
         FinalInformation = new PlayerInformation[6];
         for (int i = 0; i < 6; i++) FinalInformation[i] = new PlayerInformation();
         PlayersLockedIn = new bool[6];
@@ -103,8 +103,10 @@ public class CanvasController : MonoBehaviour
         {
             _playersMoveCharged[playernumber] = false;
             // Change Grey Background Image
-            PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(true);
-            PlayerHoveringSlots[playernumber] = nmod(PlayerHoveringSlots[playernumber] + (horizontal > 0f ? 1 : -1), 6);
+            if (!_isOtherPlayerHoveringHere(playernumber, PlayerHoveringSlots[playernumber]))
+                PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(true);
+            //PlayerHoveringSlots[playernumber] = nmod(PlayerHoveringSlots[playernumber] + (horizontal > 0f ? 1 : -1), 6);
+            PlayerHoveringSlots[playernumber] = _advancePlace(PlayerHoveringSlots[playernumber], (horizontal > 0f ? 1 : -1));
             PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(false);
 
             _changeMember(PlayerHoveringSlots[playernumber], playernumber);
@@ -113,29 +115,19 @@ public class CanvasController : MonoBehaviour
         {
             _playersMoveCharged[playernumber] = true;
         }
-
-        //// If player moved vertically then do something
-        //if ((Mathf.Abs(vertical) - 0.9f > 0f) && _playersMoveCharged[playernumber])
-        //{
-        //    _playersMoveCharged[playernumber] = false;
-        //    PlayerHoveringSlots[playernumber] = truncate(PlayerHoveringSlots[playernumber], (vertical > 0f ? 3 : -3));
-        //    _changeMember(PlayerHoveringSlots[playernumber], playernumber);
-        //}
-        //else if (Mathf.Approximately(vertical, 0f))
-        //{
-        //    _playersMoveCharged[playernumber] = true;
-        //}
     }
 
-    private void OnHover(int playernumber)
+    private bool _isOtherPlayerHoveringHere(int thisPlayerNumber, int slotIndex)
     {
-        int curPlayerSelectionIndex = PlayerHoveringSlots[playernumber];
-        if (!CharacterSlotsTaken[curPlayerSelectionIndex])
+        for (int i = 0; i < 6; i++)
         {
-
+            if (i != thisPlayerNumber && PlayerHoveringSlots[i] == slotIndex)
+            {
+                return true;
+            }
         }
+        return false;
     }
-
     // This function takes 3 arguements
     // Which Slot to change, which player to change, and whether it is an addition or subtraction
     private void _changeMember(int slotindex, int playernumber)
@@ -152,6 +144,18 @@ public class CanvasController : MonoBehaviour
         PlayerSlots[playernumber].transform.parent.GetComponent<RadicalLayout>().StartAngle -= 25f;
         PlayerSlots[playernumber].transform.parent.GetComponent<RadicalLayout>().MaxAngle += 50f;
 
+    }
+
+    private int _advancePlace(int curPlace, int advanceAmount)
+    {
+        int nextPlace = 0;
+        for (int i = 0; i < 6; i++)
+        {
+            nextPlace = nmod(curPlace + advanceAmount, 6);
+            if (!CharacterSlotsTaken[nextPlace]) return nextPlace;
+            else curPlace = nextPlace;
+        }
+        return nextPlace;
     }
 
     private int nmod(int x, int m)

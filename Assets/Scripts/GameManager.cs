@@ -135,6 +135,18 @@ public class GameManager : MonoBehaviour
 
     private void _fillPlayerInformation()
     {
+        if (CanvasController.CC == null)
+        {
+            PlayersInformation = new PlayerInformation[]
+            {
+                new PlayerInformation("Yellow", Color.yellow),
+                new PlayerInformation("Orange", Color.red),
+                new PlayerInformation("Pink", Color.magenta),
+                new PlayerInformation("Blue", Color.blue),
+                new PlayerInformation("Purple", Color.cyan),
+                new PlayerInformation("Green", Color.green),
+            };
+        }
         for (int i = 0; i < 6; i++)
         {
             if (CanvasController.CC != null)

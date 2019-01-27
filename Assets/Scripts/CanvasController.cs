@@ -9,6 +9,7 @@ public class CanvasController : MonoBehaviour
 {
     public static CanvasController CC = null;
     public RectTransform[] Characters;
+    public GameObject[] GreyCharacterIcons;
     public GameObject[] GreyCharacters;
     public GameObject[] PureGreyBackgrounds;
     public GameObject[] PlayerSlots;
@@ -20,7 +21,7 @@ public class CanvasController : MonoBehaviour
     [HideInInspector]
     public PlayerInformation[] FinalInformation;
     [HideInInspector]
-    public List<bool> CharacterSlotsTaken;
+    public bool[] CharacterSlotsTaken;
     [HideInInspector]
     public int[] PlayerHoveringSlots;
     [HideInInspector]
@@ -31,6 +32,7 @@ public class CanvasController : MonoBehaviour
     private int _playersLockedInCount = 0;
     private bool _chickenSelected = false;
     private bool _duckSelected = false;
+    private bool[] _characterShadowLocked;
 
     // Use this for initialization
     private void Awake()
@@ -38,7 +40,8 @@ public class CanvasController : MonoBehaviour
         if (CC == null)
             CC = this;
         DontDestroyOnLoad(gameObject);
-        CharacterSlotsTaken = new List<bool>(new bool[] { false, false, false, false, false, false });
+        CharacterSlotsTaken = new bool[] { false, false, false, false, false, false };
+        _characterShadowLocked = new bool[6];
         _playersMoveCharged = new bool[] { true, true, true, true, true, true };
         PlayerHoveringSlots = new int[] { -1, -1, -1, -1, -1, -1 };
         FinalInformation = new PlayerInformation[6];
@@ -91,8 +94,71 @@ public class CanvasController : MonoBehaviour
                 RecordSelectionInformation(playernumber, curPlayerSelectionIndex);
                 // Lock the Player so they cannot make anymore choices
                 PlayersLockedIn[playernumber] = true;
+                // Balance the chicken and duck
+                _balanceChickDuck(curPlayerSelectionIndex);
                 // Add to player selection count
                 OnPlayerSelection();
+
+            }
+        }
+    }
+
+    private void _balanceChickDuck(int curSelectionIndex)
+    {
+        if (curSelectionIndex <= 2) _chickenSelected = true;
+        else _duckSelected = true;
+
+        if (_chickenSelected && !_duckSelected)
+        {
+            // Block Out the Chicken
+            for (int i = 0; i < 3; i++)
+            {
+                if (i != curSelectionIndex)
+                {
+                    _characterShadowLocked[i] = true;
+                    CharacterSlotsTaken[i] = true;
+                    // Deactivate the icons
+                    GreyCharacterIcons[i].SetActive(true);
+                }
+            }
+        }
+        else if (!_chickenSelected && _duckSelected)
+        {
+            // Block Out the Duck
+            for (int i = 3; i < 6; i++)
+            {
+                if (i != curSelectionIndex)
+                {
+                    _characterShadowLocked[i] = true;
+                    CharacterSlotsTaken[i] = true;
+                    // Deactivate the icons
+                    GreyCharacterIcons[i].SetActive(true);
+                }
+            }
+        }
+        else
+        {
+            // UnBlock All
+            for (int i = 0; i < 6; i++)
+            {
+                if (_characterShadowLocked[i])
+                {
+                    _characterShadowLocked[i] = false;
+                    CharacterSlotsTaken[i] = false;
+                    // Actate the icons
+                    GreyCharacterIcons[i].SetActive(false);
+                }
+            }
+        }
+    }
+
+    private void _greyOutUnselectedIcons()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (!CharacterSlotsTaken[i])
+            {
+                GreyCharacterIcons[i].SetActive(true);
             }
         }
     }
@@ -103,13 +169,16 @@ public class CanvasController : MonoBehaviour
         if (_playersLockedInCount >= ReInput.controllers.joystickCount && ReInput.controllers.joystickCount > 1)
         {
             // Meaning We are ready to start
-            StartCountDown.SetActive(true);
+            _greyOutUnselectedIcons();
             StartCoroutine(ChangeNumber());
         }
     }
 
     IEnumerator ChangeNumber()
     {
+        yield return new WaitForSeconds(1f);
+        StartCountDown.SetActive(true);
+
         yield return new WaitForSeconds(1f);
         foreach (var text in StartCountDown.GetComponentsInChildren<Text>())
         {

@@ -94,10 +94,11 @@ public class CanvasController : MonoBehaviour
                 RecordSelectionInformation(playernumber, curPlayerSelectionIndex);
                 // Lock the Player so they cannot make anymore choices
                 PlayersLockedIn[playernumber] = true;
-                // Add to player selection count
-                OnPlayerSelection();
                 // Balance the chicken and duck
                 _balanceChickDuck(curPlayerSelectionIndex);
+                // Add to player selection count
+                OnPlayerSelection();
+
             }
         }
     }
@@ -151,12 +152,24 @@ public class CanvasController : MonoBehaviour
         }
     }
 
+    private void _greyOutUnselectedIcons()
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            if (!CharacterSlotsTaken[i])
+            {
+                GreyCharacterIcons[i].SetActive(true);
+            }
+        }
+    }
+
     private void OnPlayerSelection()
     {
         _playersLockedInCount++;
         if (_playersLockedInCount >= ReInput.controllers.joystickCount && ReInput.controllers.joystickCount > 1)
         {
             // Meaning We are ready to start
+            _greyOutUnselectedIcons();
             StartCoroutine(ChangeNumber());
         }
     }

@@ -646,7 +646,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &208027804
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2069,6 +2069,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a318a61b68348945bc7e384a11c6202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  StartImagePhaseObjects:
+  - {fileID: 208027803}
+  CharacterSelectionPhaseObjects:
+  - {fileID: 652701535}
+  - {fileID: 33219706}
+  - {fileID: 1550872729}
+  - {fileID: 979734809}
+  - {fileID: 876768417}
+  OnLoadingPhaseObjects: []
 --- !u!1 &825510938
 GameObject:
   m_ObjectHideFlags: 0
@@ -4558,7 +4567,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1625771069
 RectTransform:
   m_ObjectHideFlags: 0

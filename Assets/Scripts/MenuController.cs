@@ -1,11 +1,16 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Rewired;
+using UnityEngine.SceneManagement;
 
 // This Class is for the entire 2Dstartscene progress
 public class MenuController : MonoBehaviour
 {
-    public GameObject CanvasManager;
+    public static MenuController MC;
+    public GameObject[] StartImagePhaseObjects;
+    public GameObject[] CharacterSelectionPhaseObjects;
+    public GameObject[] OnLoadingPhaseObjects;
 
     private enum State
     {
@@ -16,10 +21,25 @@ public class MenuController : MonoBehaviour
 
     private State MenuState;
 
+    private void Awake()
+    {
+        MC = this;
+    }
     // Use this for initialization
     void Start()
     {
-        CanvasManager.SetActive(false);
+        foreach (GameObject go in StartImagePhaseObjects)
+        {
+            go.SetActive(true);
+        }
+        foreach (GameObject go in CharacterSelectionPhaseObjects)
+        {
+            go.SetActive(false);
+        }
+        foreach (GameObject go in OnLoadingPhaseObjects)
+        {
+            go.SetActive(false);
+        }
         MenuState = State.OnStartImage;
     }
 
@@ -32,5 +52,37 @@ public class MenuController : MonoBehaviour
     private void _checkSelectionInput()
     {
         if (MenuState != State.OnStartImage) return;
+        for (int i = 0; i < 6; i++)
+        {
+            if (ReInput.players.GetPlayer(i).GetButtonDown("Jump"))
+            {
+                // Now we are on the phase of CharacterSelection
+                // Initialize as such
+                MenuState = State.OnCharacterSelection;
+                foreach (GameObject go in CharacterSelectionPhaseObjects)
+                {
+                    go.SetActive(true);
+                }
+                foreach (GameObject go in StartImagePhaseObjects)
+                {
+                    go.SetActive(false);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Once Called from outside, change to loading phase
+    /// </summary>
+    public void ChangeToLoadingState()
+    {
+        MenuState = State.OnLoading;
+        // Deactivate other stuff, other than the first child, CanvasController
+        // Which should always be there
+        for (int i = 1; i < CharacterSelectionPhaseObjects.Length; i++)
+        {
+            CharacterSelectionPhaseObjects[i].SetActive(false);
+        }
+        SceneManager.LoadScene(1);
     }
 }

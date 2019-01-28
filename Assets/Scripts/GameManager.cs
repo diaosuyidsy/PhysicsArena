@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using Rewired;
+using UnityEngine.SocialPlatforms.Impl;
 
 
 public class GameManager : MonoBehaviour
@@ -213,7 +214,7 @@ public class GameManager : MonoBehaviour
         _dcfx.enabled = false;
         // And here we need to let player be able to restart
         GetComponent<InputController>().CanRestart();
-        yield return StartCoroutine(StartTransitionColor(3f));
+        yield return StartCoroutine(StartTransitionColor(2f));
 
         GetComponent<Scoreboard>().DisplayKiller();
 
@@ -224,6 +225,10 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(9f);
 
         GetComponent<Scoreboard>().DisplayTMKiller();
+        
+        yield return new WaitForSeconds(9f);
+        
+        GetComponent<Scoreboard>().DisplayBlocker();
 
     }
 

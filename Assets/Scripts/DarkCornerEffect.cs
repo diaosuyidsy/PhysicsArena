@@ -9,18 +9,13 @@ public class DarkCornerEffect : MonoBehaviour
     public float Length;
     public Vector2 CenterPosition;
 
-    private Material _material;
-
-    private void Awake()
-    {
-        _material = new Material(Shader.Find("Hidden/DCEffect"));
-    }
+    public Material Material;
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        _material.SetFloat("_dcLength", Length);
-        _material.SetVector("_CenterPoint", CenterPosition);
-        Graphics.Blit(source, destination, _material);
+        Material.SetFloat("_dcLength", Length);
+        Material.SetVector("_CenterPoint", CenterPosition);
+        Graphics.Blit(source, destination, Material);
 
     }
 }

@@ -99,6 +99,11 @@ public class MenuController : MonoBehaviour
     IEnumerator _startLoadingScene(float time)
     {
         yield return new WaitForSeconds(time);
-        SceneManager.LoadSceneAsync(1);
+        //SceneManager.LoadSceneAsync(1);
+        foreach (GameObject go in OnLoadingPhaseObjects)
+        {
+            go.SetActive(false);
+        }
+        GameManagerStart.GMS.StartIntro();
     }
 }

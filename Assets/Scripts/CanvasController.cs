@@ -100,8 +100,27 @@ public class CanvasController : MonoBehaviour
                 Characters[curPlayerSelectionIndex].GetComponent<Animator>().SetTrigger("OnChosen");
                 // Balance the chicken and duck
                 _balanceChickDuck(curPlayerSelectionIndex);
+                // Kick Out other hovering players
+                _kickOutOtherPlayers(playernumber, curPlayerSelectionIndex);
                 // Add to player selection count
                 OnPlayerSelection();
+            }
+        }
+    }
+
+    private void _kickOutOtherPlayers(int playernumber, int currentSelectionIndex)
+    {
+        for (int i = 0; i < 6; i++)
+        {
+            // Meaning ith player is hovering over the current selection,
+            // Need to be kicked out
+            if (i != playernumber && PlayerHoveringSlots[i] == currentSelectionIndex)
+            {
+                PlayerHoveringSlots[i] = _advancePlace(PlayerHoveringSlots[i], 1);
+                Characters[PlayerHoveringSlots[i]].GetComponent<Animator>().SetTrigger("OnHover");
+                PureGreyBackgrounds[PlayerHoveringSlots[i]].SetActive(false);
+
+                _changeMember(PlayerHoveringSlots[i], i);
             }
         }
     }
@@ -122,6 +141,7 @@ public class CanvasController : MonoBehaviour
                     CharacterSlotsTaken[i] = true;
                     // Deactivate the icons
                     GreyCharacterIcons[i].SetActive(true);
+                    _kickOutOtherPlayers(-1, i);
                 }
             }
         }
@@ -136,6 +156,7 @@ public class CanvasController : MonoBehaviour
                     CharacterSlotsTaken[i] = true;
                     // Deactivate the icons
                     GreyCharacterIcons[i].SetActive(true);
+                    _kickOutOtherPlayers(-1, i);
                 }
             }
         }
@@ -220,7 +241,6 @@ public class CanvasController : MonoBehaviour
     private void CheckInput(int playernumber)
     {
         float horizontal = _players[playernumber].GetAxis("Move Horizontal");
-        //float vertical = _players[playernumber].GetAxis("Move Vertical");
         // If player Moved Horizontally then do something
         if ((Mathf.Abs(horizontal) - 0.9f > 0f) && _playersMoveCharged[playernumber])
         {

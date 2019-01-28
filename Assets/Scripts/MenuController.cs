@@ -36,10 +36,10 @@ public class MenuController : MonoBehaviour
         {
             go.SetActive(false);
         }
-        foreach (GameObject go in OnLoadingPhaseObjects)
-        {
-            go.SetActive(false);
-        }
+        //foreach (GameObject go in OnLoadingPhaseObjects)
+        //{
+        //    go.SetActive(false);
+        //}
         MenuState = State.OnStartImage;
     }
 
@@ -83,6 +83,22 @@ public class MenuController : MonoBehaviour
         {
             CharacterSelectionPhaseObjects[i].SetActive(false);
         }
-        SceneManager.LoadScene(1);
+        foreach (GameObject go in OnLoadingPhaseObjects)
+        {
+            go.SetActive(true);
+            go.GetComponentInChildren<CountDownVideoPlayer>().PlayTheVideo();
+        }
+        StartCoroutine(_startLoadingScene(5f));
+    }
+
+    public void LoadingEnd()
+    {
+        SceneManager.LoadSceneAsync(1);
+    }
+
+    IEnumerator _startLoadingScene(float time)
+    {
+        yield return new WaitForSeconds(time);
+        SceneManager.LoadSceneAsync(1);
     }
 }

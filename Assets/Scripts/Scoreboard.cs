@@ -38,9 +38,17 @@ public class Scoreboard : MonoBehaviour
 	public GameObject TMKillerRecordGM;
 	public TextFxUGUI TMKillerRecordFX;
 	
+	[Header("Block Master")]
+	public GameObject Block;
+	public GameObject BlockNameGM;
+	public TextFxUGUI BlockNameFX;
+	public GameObject BlockRecordGM;
+	public TextFxUGUI BlockRecordFX;
+
 	private int MostKillPlayer;
 	private int MostSuicidePlayer;
 	private int MostTMQPlayer;
+	private int MostBlockPlayer;
 
 	public void DisplayWinner()
 	{
@@ -87,7 +95,6 @@ public class Scoreboard : MonoBehaviour
 		KillRecordFX.SetText("who killed " + GameManager.GM.KillRecord[MostKillPlayer] + " other birdies");
 		KillRecordGM.SetActive(true);
 	}
-	
 
 	public void DisplaySuicider()
 	{
@@ -152,5 +159,36 @@ public class Scoreboard : MonoBehaviour
 		
 		TMKillerRecordFX.SetText("who killed their teammates for " + GameManager.GM.TeammateMurderRecord[MostTMQPlayer] + " times!");
 		TMKillerRecordGM.SetActive(true);
+	}
+	public void DisplayBlocker()
+	{
+		Block.SetActive(true);
+
+		StartCoroutine(ShowBlockName());
+	}
+
+	IEnumerator ShowBlockName()
+	{
+		yield return new WaitForSeconds(TextToName);
+		
+		var maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
+		for (int tracker = 0; tracker < 6; tracker++)
+		{
+			if (GameManager.GM.BlockTimes[tracker] == maxBlockValue)
+			{
+				MostBlockPlayer = tracker;
+				break;
+			}
+		}
+		
+		BlockNameFX.SetText(GameManager.GM.PlayersInformation[MostBlockPlayer].PlayerName);
+		BlockNameFX.SetColour(GameManager.GM.PlayersInformation[MostBlockPlayer].PlayerColor);
+		
+		BlockNameGM.SetActive(true);
+		
+		yield return new WaitForSeconds(NameToRecord);
+		
+		BlockRecordFX.SetText("who blocked attack for " + GameManager.GM.BlockTimes[MostBlockPlayer] + " times!");
+		BlockRecordGM.SetActive(true);
 	}
 }

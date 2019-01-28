@@ -13,10 +13,12 @@ public class CanvasController : MonoBehaviour
     public GameObject[] GreyCharacters;
     public GameObject[] PureGreyBackgrounds;
     public GameObject[] PlayerSlots;
+    public Text HeaderText;
+    public GameObject StartCountDown;
+
     [Header("Character Information: Align with Image")]
     public Color[] CharacterColors;
     public string[] CharacterNames;
-    public GameObject StartCountDown;
     // Final Information is what is kept to the playing scene
     [HideInInspector]
     public PlayerInformation[] FinalInformation;
@@ -98,7 +100,6 @@ public class CanvasController : MonoBehaviour
                 _balanceChickDuck(curPlayerSelectionIndex);
                 // Add to player selection count
                 OnPlayerSelection();
-
             }
         }
     }
@@ -163,6 +164,12 @@ public class CanvasController : MonoBehaviour
         }
     }
 
+    private void _switchToEndingHeader()
+    {
+        HeaderText.text = "Game Starting In...";
+        HeaderText.transform.GetChild(0).GetComponent<Text>().text = "Game Starting In...";
+    }
+
     private void OnPlayerSelection()
     {
         _playersLockedInCount++;
@@ -170,6 +177,7 @@ public class CanvasController : MonoBehaviour
         {
             // Meaning We are ready to start
             _greyOutUnselectedIcons();
+            _switchToEndingHeader();
             StartCoroutine(ChangeNumber());
         }
     }

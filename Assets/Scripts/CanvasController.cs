@@ -90,10 +90,10 @@ public class CanvasController : MonoBehaviour
                 PlayersLockedIn[playernumber] = true;
                 // Bubble Animation chosen icon
                 Characters[curPlayerSelectionIndex].GetComponent<Animator>().SetTrigger("OnChosen");
-                print("Before Balance Chick Duck");
+
                 // Balance the chicken and duck
                 _balanceChickDuck(curPlayerSelectionIndex);
-                print("After balance chick duck");
+
                 // Kick Out other hovering players
                 _kickOutOtherPlayers(playernumber, curPlayerSelectionIndex);
                 // Add to player selection count
@@ -110,15 +110,14 @@ public class CanvasController : MonoBehaviour
             // Need to be kicked out
             if (i != playernumber && PlayerHoveringSlots[i] == currentSelectionIndex)
             {
-                print("Player Hovering Slot before move: " + PlayerHoveringSlots[i]);
+
                 if (playernumber == -1)
                     PureGreyBackgrounds[PlayerHoveringSlots[i]].SetActive(true);
                 PlayerHoveringSlots[i] = _advancePlace(PlayerHoveringSlots[i], 1);
-                print("Player Hovering Slot after move: " + PlayerHoveringSlots[i]);
+
                 Characters[PlayerHoveringSlots[i]].GetComponent<Animator>().SetTrigger("OnHover");
                 PureGreyBackgrounds[PlayerHoveringSlots[i]].SetActive(false);
-                print("Disabled Grey Background: " + PureGreyBackgrounds[PlayerHoveringSlots[i]].name);
-                print("Kicked Out Other Player at position: " + currentSelectionIndex);
+
                 _changeMember(PlayerHoveringSlots[i], i);
             }
         }
@@ -263,7 +262,6 @@ public class CanvasController : MonoBehaviour
             PlayerHoveringSlots[playernumber] = _advancePlace(PlayerHoveringSlots[playernumber], (horizontal > 0f ? 1 : -1));
             Characters[PlayerHoveringSlots[playernumber]].GetComponent<Animator>().SetTrigger("OnHover");
             PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(false);
-            print("Deactivated background name: " + PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].name);
 
             _changeMember(PlayerHoveringSlots[playernumber], playernumber);
         }

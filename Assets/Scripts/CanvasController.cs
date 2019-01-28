@@ -96,6 +96,8 @@ public class CanvasController : MonoBehaviour
                 RecordSelectionInformation(playernumber, curPlayerSelectionIndex);
                 // Lock the Player so they cannot make anymore choices
                 PlayersLockedIn[playernumber] = true;
+                // Bubble Animation chosen icon
+                Characters[curPlayerSelectionIndex].GetComponent<Animator>().SetTrigger("OnChosen");
                 // Balance the chicken and duck
                 _balanceChickDuck(curPlayerSelectionIndex);
                 // Add to player selection count
@@ -226,8 +228,8 @@ public class CanvasController : MonoBehaviour
             // Change Grey Background Image
             if (!_isOtherPlayerHoveringHere(playernumber, PlayerHoveringSlots[playernumber]))
                 PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(true);
-            //PlayerHoveringSlots[playernumber] = nmod(PlayerHoveringSlots[playernumber] + (horizontal > 0f ? 1 : -1), 6);
             PlayerHoveringSlots[playernumber] = _advancePlace(PlayerHoveringSlots[playernumber], (horizontal > 0f ? 1 : -1));
+            Characters[PlayerHoveringSlots[playernumber]].GetComponent<Animator>().SetTrigger("OnHover");
             PureGreyBackgrounds[PlayerHoveringSlots[playernumber]].SetActive(false);
 
             _changeMember(PlayerHoveringSlots[playernumber], playernumber);

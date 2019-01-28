@@ -71,13 +71,6 @@ public class CanvasController : MonoBehaviour
             CheckInput(i);
             CheckSelectionInput(i);
         }
-        //ConsoleProDebug.Watch("Player 0's Selection Information", FinalInformation[0].PlayerName + " , " + FinalInformation[0].PlayerColor.ToString());
-        //ConsoleProDebug.Watch("Player 1's Selection Information", FinalInformation[1].PlayerName + " , " + FinalInformation[1].PlayerColor.ToString());
-        //ConsoleProDebug.Watch("Player 2's Selection Information", FinalInformation[2].PlayerName + " , " + FinalInformation[2].PlayerColor.ToString());
-        //ConsoleProDebug.Watch("Player 3's Selection Information", FinalInformation[3].PlayerName + " , " + FinalInformation[3].PlayerColor.ToString());
-        //ConsoleProDebug.Watch("Player 4's Selection Information", FinalInformation[4].PlayerName + " , " + FinalInformation[4].PlayerColor.ToString());
-        //ConsoleProDebug.Watch("Player 5's Selection Information", FinalInformation[5].PlayerName + " , " + FinalInformation[5].PlayerColor.ToString());
-        //ConsoleProDebug.Watch("Max Joysticks Count", ReInput.controllers.joystickCount.ToString());
     }
 
     private void CheckSelectionInput(int playernumber)
@@ -225,9 +218,9 @@ public class CanvasController : MonoBehaviour
         {
             text.text = "0";
         }
-        SceneManager.LoadScene(1);
         yield return new WaitForSeconds(1f);
-        //StartCountDown.SetActive(false);
+        // Switch to Loading State instead of straightly loading the scene
+        MenuController.MC.ChangeToLoadingState();
     }
 
     private void RecordSelectionInformation(int playerNumber, int characterSlotNumber)

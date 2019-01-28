@@ -39,8 +39,7 @@ public class CanvasController : MonoBehaviour
     // Use this for initialization
     private void Awake()
     {
-        if (CC == null)
-            CC = this;
+        CC = this;
         DontDestroyOnLoad(gameObject);
         CharacterSlotsTaken = new bool[] { false, false, false, false, false, false };
         _characterShadowLocked = new bool[6];
@@ -78,7 +77,7 @@ public class CanvasController : MonoBehaviour
         if (_players[playernumber].GetButtonDown("Jump"))
         {
             int curPlayerSelectionIndex = PlayerHoveringSlots[playernumber];
-            // If this slot is still available
+            // If this slot is still availabled
             if (!CharacterSlotsTaken[curPlayerSelectionIndex])
             {
                 // Take up the slot
@@ -91,8 +90,10 @@ public class CanvasController : MonoBehaviour
                 PlayersLockedIn[playernumber] = true;
                 // Bubble Animation chosen icon
                 Characters[curPlayerSelectionIndex].GetComponent<Animator>().SetTrigger("OnChosen");
+
                 // Balance the chicken and duck
                 _balanceChickDuck(curPlayerSelectionIndex);
+
                 // Kick Out other hovering players
                 _kickOutOtherPlayers(playernumber, curPlayerSelectionIndex);
                 // Add to player selection count
@@ -109,7 +110,11 @@ public class CanvasController : MonoBehaviour
             // Need to be kicked out
             if (i != playernumber && PlayerHoveringSlots[i] == currentSelectionIndex)
             {
+
+                if (playernumber == -1)
+                    PureGreyBackgrounds[PlayerHoveringSlots[i]].SetActive(true);
                 PlayerHoveringSlots[i] = _advancePlace(PlayerHoveringSlots[i], 1);
+
                 Characters[PlayerHoveringSlots[i]].GetComponent<Animator>().SetTrigger("OnHover");
                 PureGreyBackgrounds[PlayerHoveringSlots[i]].SetActive(false);
 
@@ -134,11 +139,18 @@ public class CanvasController : MonoBehaviour
                     CharacterSlotsTaken[i] = true;
                     // Deactivate the icons
                     GreyCharacterIcons[i].SetActive(true);
+                }
+            }
+            print("Deactivated");
+            for (int i = 0; i < 3; i++)
+            {
+                if (i != curSelectionIndex)
+                {
                     _kickOutOtherPlayers(-1, i);
                 }
             }
         }
-        else if (!_chickenSelected && _duckSelected)
+        if (!_chickenSelected && _duckSelected)
         {
             // Block Out the Duck
             for (int i = 3; i < 6; i++)
@@ -149,11 +161,17 @@ public class CanvasController : MonoBehaviour
                     CharacterSlotsTaken[i] = true;
                     // Deactivate the icons
                     GreyCharacterIcons[i].SetActive(true);
+                }
+            }
+            for (int i = 3; i < 6; i++)
+            {
+                if (i != curSelectionIndex)
+                {
                     _kickOutOtherPlayers(-1, i);
                 }
             }
         }
-        else
+        if (_chickenSelected && _duckSelected)
         {
             // UnBlock All
             for (int i = 0; i < 6; i++)
@@ -284,12 +302,13 @@ public class CanvasController : MonoBehaviour
 
     private int _advancePlace(int curPlace, int advanceAmount)
     {
+        int cur = curPlace;
         int nextPlace = 0;
         for (int i = 0; i < 6; i++)
         {
-            nextPlace = nmod(curPlace + advanceAmount, 6);
+            nextPlace = nmod(cur + advanceAmount, 6);
             if (!CharacterSlotsTaken[nextPlace]) return nextPlace;
-            else curPlace = nextPlace;
+            else cur = nextPlace;
         }
         return nextPlace;
     }

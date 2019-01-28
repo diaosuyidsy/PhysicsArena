@@ -16,7 +16,7 @@ public class PlayerController : MonoBehaviour
     [Tooltip("It should be the same speed, little less than Duck's normal WalkSpeed")]
     public float PickUpSpeed = 1.8f;
     [HideInInspector]
-    public float MaxBlockCD = 1f;
+    public float MaxBlockCD = 5f;
     [HideInInspector]
     public float BlockRegenInterval = 3f;
     // How many regen per time.deltatime
@@ -55,6 +55,11 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public bool IsOccupied = false;
 
+    [Header("Block VFX & UI")] 
+    public GameObject BlockVFX;
+    public GameObject BlockUI;
+    public GameObject BlockUIFill;
+    
     #region Statistics Variables
     [HideInInspector]
     public int PlayerNumber;
@@ -142,6 +147,7 @@ public class PlayerController : MonoBehaviour
         _rightHandhj = RightArms[2].GetComponent<HingeJoint>();
         _freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
         LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", WalkSpeed / 2f);
+        MaxBlockCD = 1.5f;
     }
 
     // Update is called once per frame
@@ -515,11 +521,19 @@ public class PlayerController : MonoBehaviour
 
     public void CheckBlock()
     {
-
+        // ShieldEnergy is the percentage of shield energy. 
+        float _shieldEnergy = (MaxBlockCD - _blockCharge)/MaxBlockCD;
+        ConsoleProDebug.Watch("Shield Energy", _shieldEnergy.ToString());
+            
         if (!_player.GetButton("Block") && _blockCanRegen)
         {
             _blockCharge -= Time.deltaTime;
             if (_blockCharge <= 0f) _blockCanRegen = false;
+            //BlockUIFill.transform.localScale = new Vector3(_shieldEnergy, 1f, 1f);
+            //if (Mathf.Abs(1 - _shieldEnergy) < 0.01)
+            //{
+            //    BlockUI.SetActive(false);
+            //}
         }
 
         if (attackState == State.Meleeing || attackState == State.Shooting || normalState == State.Picking || normalState == State.Holding
@@ -528,6 +542,9 @@ public class PlayerController : MonoBehaviour
         if (_player.GetButtonDown("Block") && _blockCharge <= MaxBlockCD)
         {
             attackState = State.Blocking;
+            
+            BlockVFX.SetActive(true);
+            BlockUI.SetActive(true);
         }
 
         // if Player hold the button, check if player could block then block
@@ -543,7 +560,11 @@ public class PlayerController : MonoBehaviour
                 starttimer_blockregen = true;
                 timer_blockregen = 0f;
                 ResetBody();
+                BlockVFX.SetActive(false);
             }
+            
+            // Change BlockFill UI scale
+            BlockUIFill.transform.localScale = new Vector3(_shieldEnergy, 1f, 1f);
         }
 
         // When player released the button, should skip blockregeninterval seconds before it can regen
@@ -553,6 +574,12 @@ public class PlayerController : MonoBehaviour
             timer_blockregen = 0f;
             ResetBody();
             attackState = State.Empty;
+        }
+
+        if (_player.GetButtonUp("Block"))
+        {
+            BlockVFX.SetActive(false);
+            BlockUI.SetActive(false);
         }
     }
 

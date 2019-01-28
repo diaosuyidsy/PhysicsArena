@@ -72,7 +72,7 @@ GameObject:
   - component: {fileID: 4238390009841176}
   - component: {fileID: 198321961847396524}
   - component: {fileID: 199108355760743224}
-  - component: {fileID: 114401728797170668}
+  - component: {fileID: 114273267369358370}
   m_Layer: 0
   m_Name: GlowBits
   m_TagString: Untagged
@@ -3434,6 +3434,19 @@ MonoBehaviour:
   unityCollider: {fileID: 65134158470339792}
   useDistanceFields: 0
   distanceField: {fileID: 0}
+--- !u!114 &114273267369358370
+MonoBehaviour:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 100100000}
+  m_GameObject: {fileID: 1111696467406380}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a84c9fd6072e17c46b93dd9cf28a0904, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rotateVector: {x: 0, y: 0, z: 240}
+  rotateSpace: 0
 --- !u!114 &114348776518032538
 MonoBehaviour:
   m_ObjectHideFlags: 1
@@ -3482,19 +3495,6 @@ MonoBehaviour:
   unityCollider: {fileID: 65257276140356270}
   useDistanceFields: 0
   distanceField: {fileID: 0}
---- !u!114 &114401728797170668
-MonoBehaviour:
-  m_ObjectHideFlags: 1
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
-  m_GameObject: {fileID: 1111696467406380}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a84c9fd6072e17c46b93dd9cf28a0904, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rotateVector: {x: 0, y: 0, z: 240}
-  rotateSpace: 0
 --- !u!114 &114415594681437140
 MonoBehaviour:
   m_ObjectHideFlags: 1

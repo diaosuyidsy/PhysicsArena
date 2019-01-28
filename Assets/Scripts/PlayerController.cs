@@ -55,11 +55,11 @@ public class PlayerController : MonoBehaviour
     [HideInInspector]
     public bool IsOccupied = false;
 
-    [Header("Block VFX & UI")] 
+    [Header("Block VFX & UI")]
     public GameObject BlockVFX;
     public GameObject BlockUI;
     public GameObject BlockUIFill;
-    
+
     #region Statistics Variables
     [HideInInspector]
     public int PlayerNumber;
@@ -522,9 +522,8 @@ public class PlayerController : MonoBehaviour
     public void CheckBlock()
     {
         // ShieldEnergy is the percentage of shield energy. 
-        float _shieldEnergy = (MaxBlockCD - _blockCharge)/MaxBlockCD;
-        ConsoleProDebug.Watch("Shield Energy", _shieldEnergy.ToString());
-            
+        float _shieldEnergy = (MaxBlockCD - _blockCharge) / MaxBlockCD;
+
         if (!_player.GetButton("Block") && _blockCanRegen)
         {
             _blockCharge -= Time.deltaTime;
@@ -542,7 +541,7 @@ public class PlayerController : MonoBehaviour
         if (_player.GetButtonDown("Block") && _blockCharge <= MaxBlockCD)
         {
             attackState = State.Blocking;
-            
+
             BlockVFX.SetActive(true);
             BlockUI.SetActive(true);
         }
@@ -562,7 +561,7 @@ public class PlayerController : MonoBehaviour
                 ResetBody();
                 BlockVFX.SetActive(false);
             }
-            
+
             // Change BlockFill UI scale
             BlockUIFill.transform.localScale = new Vector3(_shieldEnergy, 1f, 1f);
         }

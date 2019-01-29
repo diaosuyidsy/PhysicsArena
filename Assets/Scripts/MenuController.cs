@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 // This Class is for the entire 2Dstartscene progress
 public class MenuController : MonoBehaviour
@@ -11,6 +12,7 @@ public class MenuController : MonoBehaviour
     public GameObject[] StartImagePhaseObjects;
     public GameObject[] CharacterSelectionPhaseObjects;
     public GameObject[] OnLoadingPhaseObjects;
+    public Image TransitionImage;
 
     private enum State
     {
@@ -77,6 +79,7 @@ public class MenuController : MonoBehaviour
     public void ChangeToLoadingState()
     {
         MenuState = State.OnLoading;
+        StartCoroutine(_transition(0.5f));
         // Deactivate other stuff, other than the first child, CanvasController
         // Which should always be there
         for (int i = 1; i < CharacterSelectionPhaseObjects.Length; i++)
@@ -105,5 +108,31 @@ public class MenuController : MonoBehaviour
             go.SetActive(false);
         }
         GameManagerStart.GMS.StartIntro();
+    }
+
+    IEnumerator _transition(float time)
+    {
+        float halftime = time / 2f;
+        float elapsedTime = 0f;
+        float deltaAlpha = 1f / halftime * Time.deltaTime;
+        Color transitionImageColor = TransitionImage.color;
+        //while (elapsedTime < halftime)
+        //{
+        //    elapsedTime += Time.deltaTime;
+        //    transitionImageColor.a += deltaAlpha;
+        //    TransitionImage.color = transitionImageColor;
+        //    yield return new WaitForEndOfFrame();
+        //}
+        transitionImageColor.a = 1f;
+        TransitionImage.color = transitionImageColor;
+        yield return new WaitForSeconds(halftime);
+        elapsedTime = 0f;
+        while (elapsedTime < halftime)
+        {
+            elapsedTime += Time.deltaTime;
+            transitionImageColor.a -= deltaAlpha;
+            TransitionImage.color = transitionImageColor;
+            yield return new WaitForEndOfFrame();
+        }
     }
 }

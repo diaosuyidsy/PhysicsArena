@@ -57,6 +57,8 @@ public class InputController : MonoBehaviour
         if (GameManager.GM.Players.Count <= playerNum) GameManager.GM.Players.Add(curPlayer);
         GameManager.GM.Players[playerNum] = curPlayer;
         playerNum++;
+        // Disable the Press A to spawn text
+        GameManagerStart.GMS.PressAToSpawn.SetActive(false);
     }
 
     private GameObject _getCharacter(int playerNum)
@@ -88,7 +90,7 @@ public class InputController : MonoBehaviour
                 print(_playerHoldRestart[i]);
                 if (Mathf.Abs(_playerHoldRestart[i] - 1f) < 0.2f)
                 {
-                    SceneManager.LoadScene("2DStartScene");
+                    SceneManager.LoadScene(0);
                 }
             }
             else

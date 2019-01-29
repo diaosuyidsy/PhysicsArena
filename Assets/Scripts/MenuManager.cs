@@ -24,81 +24,88 @@ public class MenuManager : MonoBehaviour
     private bool _allowClickThrice = false;
 
 
-    private void Awake ()
+    private void Awake()
     {
-        _player1 = ReInput.players.GetPlayer (0);
-        _player2 = ReInput.players.GetPlayer (1);
-        _player3 = ReInput.players.GetPlayer (2);
-        _player4 = ReInput.players.GetPlayer (3);
-        _player5 = ReInput.players.GetPlayer (4);
-        _player6 = ReInput.players.GetPlayer (5);
+        _player1 = ReInput.players.GetPlayer(0);
+        _player2 = ReInput.players.GetPlayer(1);
+        _player3 = ReInput.players.GetPlayer(2);
+        _player4 = ReInput.players.GetPlayer(3);
+        _player5 = ReInput.players.GetPlayer(4);
+        _player6 = ReInput.players.GetPlayer(5);
     }
 
-
-    private void Update ()
+    void OnGUI()
+    {
+        //Delete all of the PlayerPrefs settings by pressing this Button
+        if (GUI.Button(new Rect(100, 200, 200, 60), "Delete"))
+        {
+            PlayerPrefs.DeleteAll();
+        }
+    }
+    private void Update()
     {
         Color temp = StartImage.color;
-        temp.a = Mathf.Sin (Time.time);
+        temp.a = Mathf.Sin(Time.time);
         if (temp.a <= 0f) temp.a *= -1f;
         StartImage.color = temp;
 
         Color temp2 = GameImage.color;
-        temp2.a = Mathf.Sin (Time.time);
+        temp2.a = Mathf.Sin(Time.time);
         if (temp2.a <= 0f) temp2.a *= -1f;
         GameImage.color = temp2;
 
-        if (!_pressedFirst && (_player1.GetButton ("Jump") ||
-           _player2.GetButton ("Jump") ||
-           _player3.GetButton ("Jump") ||
-           _player4.GetButton ("Jump") ||
-           _player5.GetButton ("Jump") ||
-           _player6.GetButton ("Jump"))
+        if (!_pressedFirst && (_player1.GetButton("Jump") ||
+           _player2.GetButton("Jump") ||
+           _player3.GetButton("Jump") ||
+           _player4.GetButton("Jump") ||
+           _player5.GetButton("Jump") ||
+           _player6.GetButton("Jump"))
            )
         {
             _pressedFirst = true;
-            print ("Pressed Once");
-            IntroImage.gameObject.SetActive (true);
-            StartCoroutine (AllowClickTwice (5f));
+            print("Pressed Once");
+            IntroImage.gameObject.SetActive(true);
+            StartCoroutine(AllowClickTwice(5f));
         }
-        if (!_pressedSecond && _allowClickTwice && (_player1.GetButton ("Jump") ||
-           _player2.GetButton ("Jump") ||
-           _player3.GetButton ("Jump") ||
-           _player4.GetButton ("Jump") ||
-           _player5.GetButton ("Jump") ||
-           _player6.GetButton ("Jump"))
+        if (!_pressedSecond && _allowClickTwice && (_player1.GetButton("Jump") ||
+           _player2.GetButton("Jump") ||
+           _player3.GetButton("Jump") ||
+           _player4.GetButton("Jump") ||
+           _player5.GetButton("Jump") ||
+           _player6.GetButton("Jump"))
            )
         {
             _pressedSecond = true;
-            WinImage.gameObject.SetActive (true);
-            StartCoroutine (AllowClickThrice (3f));
+            WinImage.gameObject.SetActive(true);
+            StartCoroutine(AllowClickThrice(3f));
         }
 
-        if (_allowClickThrice && (_player1.GetButton ("Jump") ||
-           _player2.GetButton ("Jump") ||
-           _player3.GetButton ("Jump") ||
-           _player4.GetButton ("Jump") ||
-           _player5.GetButton ("Jump") ||
-           _player6.GetButton ("Jump"))
+        if (_allowClickThrice && (_player1.GetButton("Jump") ||
+           _player2.GetButton("Jump") ||
+           _player3.GetButton("Jump") ||
+           _player4.GetButton("Jump") ||
+           _player5.GetButton("Jump") ||
+           _player6.GetButton("Jump"))
            )
         {
-            SceneManager.LoadScene (1);
+            SceneManager.LoadScene(1);
         }
-        if (Input.GetKeyDown (KeyCode.Space))
+        if (Input.GetKeyDown(KeyCode.Space))
         {
-            SceneManager.LoadScene (1);
+            SceneManager.LoadScene(1);
         }
     }
 
-    IEnumerator AllowClickTwice (float time)
+    IEnumerator AllowClickTwice(float time)
     {
-        yield return new WaitForSeconds (time);
+        yield return new WaitForSeconds(time);
         _allowClickTwice = true;
-        GameImage.gameObject.SetActive (true);
+        GameImage.gameObject.SetActive(true);
     }
 
-    IEnumerator AllowClickThrice (float time)
+    IEnumerator AllowClickThrice(float time)
     {
-        yield return new WaitForSeconds (time);
+        yield return new WaitForSeconds(time);
         _allowClickThrice = true;
     }
 }

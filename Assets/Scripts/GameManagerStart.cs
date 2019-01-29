@@ -11,6 +11,7 @@ public class GameManagerStart : MonoBehaviour
     public GameObject Payload;
     public GameObject Or;
     public GameObject Food;
+    public GameObject PressAToSpawn;
 
     private void Awake()
     {
@@ -43,6 +44,7 @@ public class GameManagerStart : MonoBehaviour
             yield return new WaitForSeconds(3f);
         }
 
+        PressAToSpawn.SetActive(true);
 
         //SceneManager.LoadSceneAsync(1);
         GameManager.GM.FillPlayerInformation();

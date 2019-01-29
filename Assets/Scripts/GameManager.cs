@@ -131,6 +131,11 @@ public class GameManager : MonoBehaviour
             Team2RespawnPts[i] = team2.GetChild(i).gameObject;
         }
         SuckGunTutorialTimes = 4;
+        //_fillPlayerInformation();
+    }
+
+    public void FillPlayerInformation()
+    {
         _fillPlayerInformation();
     }
 
@@ -225,9 +230,9 @@ public class GameManager : MonoBehaviour
         yield return new WaitForSeconds(9f);
 
         GetComponent<Scoreboard>().DisplayTMKiller();
-        
+
         yield return new WaitForSeconds(9f);
-        
+
         GetComponent<Scoreboard>().DisplayBlocker();
 
     }

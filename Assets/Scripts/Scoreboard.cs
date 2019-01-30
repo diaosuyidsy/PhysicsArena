@@ -52,10 +52,10 @@ public class Scoreboard : MonoBehaviour
     private int MostTMQPlayer;
     private int MostBlockPlayer;
 
-    private int maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
-    private int maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
-    private int maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
-    private int maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
+    //private int maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
+    //private int maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
+    //private int maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
+    //private int maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
     
     public void DisplayWinner()
     {
@@ -76,6 +76,11 @@ public class Scoreboard : MonoBehaviour
     
     IEnumerator ScoreDisplayer()
     {
+        var maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
+        var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
+        var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
+        var maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
+        
         if (maxKillValue > 0)
         {
             DisplayKiller();
@@ -112,6 +117,8 @@ public class Scoreboard : MonoBehaviour
 
     IEnumerator ShowKillerName()
     {
+        var maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
+        
         yield return new WaitForSeconds(TextToName);
 
         // Find player with most kills.
@@ -154,6 +161,7 @@ public class Scoreboard : MonoBehaviour
 
     IEnumerator ShowSuiciderName()
     {
+        var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
         yield return new WaitForSeconds(TextToName);
 
         //var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
@@ -194,6 +202,7 @@ public class Scoreboard : MonoBehaviour
 
     IEnumerator ShowTMKillerName()
     {
+        var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
         yield return new WaitForSeconds(TextToName);
 
         //var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
@@ -232,6 +241,8 @@ public class Scoreboard : MonoBehaviour
 
     IEnumerator ShowBlockName()
     {
+        var maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
+        
         yield return new WaitForSeconds(TextToName);
 
         //int maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());

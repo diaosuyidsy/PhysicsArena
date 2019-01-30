@@ -220,21 +220,15 @@ public class GameManager : MonoBehaviour
         // And here we need to let player be able to restart
         GetComponent<InputController>().CanRestart();
         yield return StartCoroutine(StartTransitionColor(2f));
-
-        GetComponent<Scoreboard>().DisplayKiller();
-
-        yield return new WaitForSeconds(9f);
-
-        GetComponent<Scoreboard>().DisplaySuicider();
-
-        yield return new WaitForSeconds(9f);
-
-        GetComponent<Scoreboard>().DisplayTMKiller();
-
-        yield return new WaitForSeconds(9f);
-
-        GetComponent<Scoreboard>().DisplayBlocker();
-
+        
+        GetComponent<Scoreboard>().DisplayScore();
+        //GetComponent<Scoreboard>().DisplayKiller();
+        //yield return new WaitForSeconds(9f);
+        //GetComponent<Scoreboard>().DisplaySuicider();
+        //yield return new WaitForSeconds(9f);
+        //GetComponent<Scoreboard>().DisplayTMKiller();
+        //yield return new WaitForSeconds(9f);
+        //GetComponent<Scoreboard>().DisplayBlocker();
     }
 
     // This function takes the center position on sreen

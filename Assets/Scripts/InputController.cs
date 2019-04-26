@@ -95,7 +95,6 @@ public class InputController : MonoBehaviour
 			if (ReInput.players.GetPlayer(i).GetButton("Jump"))
 			{
 				_playerHoldRestart[i] += Time.deltaTime;
-				print(_playerHoldRestart[i]);
 				if (Mathf.Abs(_playerHoldRestart[i] - 1f) < 0.2f)
 				{
 					SceneManager.LoadScene(0);

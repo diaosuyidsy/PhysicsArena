@@ -6,6 +6,8 @@ using UnityEngine.UI;
 using TextFx;
 using Unity.Collections;
 using GUIText = Rewired.Internal.GUIText;
+using TMPro;
+using DG.Tweening;
 
 public class Scoreboard : MonoBehaviour
 {
@@ -69,6 +71,8 @@ public class Scoreboard : MonoBehaviour
 
 	private Dictionary<string, Sprite> _playerLookUpDict;
 
+	private bool _canSkip = false;
+
 	//private int maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
 	//private int maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
 	//private int maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
@@ -101,6 +105,41 @@ public class Scoreboard : MonoBehaviour
 	{
 		_fillSummary();
 		StartCoroutine(ScoreDisplayer());
+	}
+
+	private void Update()
+	{
+		if (!_canSkip) return;
+		for (int i = 0; i < 6; i++)
+		{
+			if (ReInput.players.GetPlayer(i).GetButton("Jump"))
+			{
+				_canSkip = false;
+				StopAllCoroutines();
+				_disableAllfloatingText();
+				var maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
+				var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
+				var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
+				var maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
+				_displaySummaryPanel(maxKillValue, maxSuicideValue, maxTMQValue, maxBlockValue);
+			}
+		}
+	}
+
+	private void _disableAllfloatingText()
+	{
+		MostKills.SetActive(false);
+		MostKillsNameGM.SetActive(false);
+		KillRecordGM.SetActive(false);
+		MostSuicide.SetActive(false);
+		MostSuicideNameGM.SetActive(false);
+		SuicideRecordGM.SetActive(false);
+		TMKiller.SetActive(false);
+		TMKillerNameGM.SetActive(false);
+		TMKillerRecordGM.SetActive(false);
+		Block.SetActive(false);
+		BlockNameGM.SetActive(false);
+		BlockRecordGM.SetActive(false);
 	}
 
 	private void _fillSummary()
@@ -149,10 +188,50 @@ public class Scoreboard : MonoBehaviour
 		TMKillerSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxTMQPlayer].PlayerName];
 		BlockMasterSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxBlockPlayer].PlayerName];
 
-		KillMasterSummary.transform.GetChild(2).GetComponent<Text>().text = maxKillValue.ToString();
-		SuicideMasterSummary.transform.GetChild(2).GetComponent<Text>().text = maxSuicideValue.ToString();
-		TMKillerSummary.transform.GetChild(2).GetComponent<Text>().text = maxTMQValue.ToString();
-		BlockMasterSummary.transform.GetChild(2).GetComponent<Text>().text = maxBlockValue.ToString();
+		KillMasterSummary.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = maxKillValue.ToString();
+		SuicideMasterSummary.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = maxSuicideValue.ToString();
+		TMKillerSummary.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = maxTMQValue.ToString();
+		BlockMasterSummary.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = maxBlockValue.ToString();
+
+		_canSkip = true;
+	}
+
+	private void _displaySummaryPanel(int maxKillValue, int maxSuicideValue, int maxTMQValue, int maxBlockValue)
+	{
+		SummaryPanel.SetActive(true);
+
+		// Move them into the scene
+		if (maxKillValue > 0)
+		{
+			Sequence mySequence = DOTween.Sequence();
+			mySequence.PrependInterval(0f);
+			mySequence.Append(KillMasterSummary.transform.DOLocalMove(new Vector3(1679f, 0f), 0.3f).SetRelative(true));
+			//KillMasterSummary.GetComponent<DOTweenAnimation>().DOPlayForward();
+		}
+		if (maxSuicideValue > 0)
+		{
+			Sequence mySequence = DOTween.Sequence();
+			mySequence.PrependInterval(0.15f);
+			mySequence.Append(SuicideMasterSummary.transform.DOLocalMove(new Vector3(1679f, 0f), 0.3f).SetRelative(true));
+			//SuicideMasterSummary.GetComponent<DOTweenAnimation>().DOPlayForward();
+
+		}
+		if (maxTMQValue > 0)
+		{
+			Sequence mySequence = DOTween.Sequence();
+			mySequence.PrependInterval(0.3f);
+			mySequence.Append(TMKillerSummary.transform.DOLocalMove(new Vector3(1679f, 0f), 0.3f).SetRelative(true));
+			//TMKillerSummary.GetComponent<DOTweenAnimation>().DOPlayForward();
+
+		}
+		if (maxBlockValue > 0)
+		{
+			Sequence mySequence = DOTween.Sequence();
+			mySequence.PrependInterval(0.45f);
+			mySequence.Append(BlockMasterSummary.transform.DOLocalMove(new Vector3(1679f, 0f), 0.3f).SetRelative(true));
+			//BlockMasterSummary.GetComponent<DOTweenAnimation>().DOPlayForward();
+
+		}
 	}
 
 	IEnumerator ScoreDisplayer()
@@ -189,8 +268,7 @@ public class Scoreboard : MonoBehaviour
 			yield return new WaitForSeconds(_interval);
 		}
 
-		SummaryPanel.SetActive(true);
-
+		_displaySummaryPanel(maxKillValue, maxSuicideValue, maxTMQValue, maxBlockValue);
 	}
 
 	public void DisplayKiller()

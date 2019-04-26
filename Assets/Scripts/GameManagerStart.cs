@@ -58,6 +58,7 @@ public class GameManagerStart : MonoBehaviour
 		yield return new WaitForSeconds(4f);
 		BasketIndicator.SetActive(false);
 
+		_skipped = true;
 		//PressAToSpawn.SetActive(true);
 
 		//SceneManager.LoadSceneAsync(1);
@@ -97,7 +98,7 @@ public class GameManagerStart : MonoBehaviour
 					Food.SetActive(false);
 					HoldAToSkip.SetActive(false);
 
-					PressAToSpawn.SetActive(true);
+					PressAToSpawn.SetActive(false);
 
 					GameManager.GM.FillPlayerInformation();
 					GameManager.GM.GetComponent<InputController>().enabled = true;

@@ -7188,7 +7188,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 482002, guid: 80c6b5d330112ef41800a729a58d22e7, type: 2}
       propertyPath: m_LocalPosition.x
-      value: -4.63
+      value: -5.9300013
       objectReference: {fileID: 0}
     - target: {fileID: 482002, guid: 80c6b5d330112ef41800a729a58d22e7, type: 2}
       propertyPath: m_LocalPosition.y
@@ -7196,7 +7196,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 482002, guid: 80c6b5d330112ef41800a729a58d22e7, type: 2}
       propertyPath: m_LocalPosition.z
-      value: 3.97
+      value: 5.7300005
       objectReference: {fileID: 0}
     - target: {fileID: 482002, guid: 80c6b5d330112ef41800a729a58d22e7, type: 2}
       propertyPath: m_LocalRotation.x
@@ -12491,6 +12491,7 @@ GameObject:
   m_Component:
   - component: {fileID: 297269562}
   - component: {fileID: 297269563}
+  - component: {fileID: 297269564}
   m_Layer: 0
   m_Name: Spot Blue
   m_TagString: Untagged
@@ -12505,7 +12506,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 297269561}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 6.0942955, y: 9.491784, z: -4.4141483}
+  m_LocalPosition: {x: 5.309, y: 9.491784, z: -5.3999996}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 2070163390}
@@ -12526,7 +12527,7 @@ Light:
   m_SpotAngle: 43.07
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -12540,7 +12541,7 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -12548,6 +12549,31 @@ Light:
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &297269564
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 297269561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SampleCount: 8
+  ScatteringCoef: 0.073
+  ExtinctionCoef: 0
+  SkyboxExtinctionCoef: 0.864
+  MieG: 0.675
+  HeightFog: 0
+  HeightScale: 0.1
+  GroundLevel: 0
+  Noise: 1
+  NoiseScale: 0.015
+  NoiseIntensity: 1
+  NoiseIntensityOffset: 0.3
+  NoiseVelocity: {x: 3, y: 3}
+  MaxRayLength: 400
 --- !u!1 &297626683
 GameObject:
   m_ObjectHideFlags: 0
@@ -17536,6 +17562,7 @@ GameObject:
   m_Component:
   - component: {fileID: 370799509}
   - component: {fileID: 370799510}
+  - component: {fileID: 370799511}
   m_Layer: 0
   m_Name: Spot Red
   m_TagString: Untagged
@@ -17550,7 +17577,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 370799508}
   m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: -4.72, y: 9.49, z: 3.9}
+  m_LocalPosition: {x: -6.02, y: 9.49, z: 5.66}
   m_LocalScale: {x: 1, y: 1.0000005, z: 1.0000005}
   m_Children: []
   m_Father: {fileID: 2070163390}
@@ -17571,7 +17598,7 @@ Light:
   m_SpotAngle: 43.07
   m_CookieSize: 10
   m_Shadows:
-    m_Type: 0
+    m_Type: 2
     m_Resolution: -1
     m_CustomResolution: -1
     m_Strength: 1
@@ -17585,7 +17612,7 @@ Light:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_Lightmapping: 4
+  m_Lightmapping: 1
   m_LightShadowCasterMode: 0
   m_AreaSize: {x: 1, y: 1}
   m_BounceIntensity: 1
@@ -17593,6 +17620,31 @@ Light:
   m_UseColorTemperature: 0
   m_ShadowRadius: 0
   m_ShadowAngle: 0
+--- !u!114 &370799511
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 370799508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  SampleCount: 8
+  ScatteringCoef: 0.073
+  ExtinctionCoef: 0
+  SkyboxExtinctionCoef: 0.864
+  MieG: 0.675
+  HeightFog: 0
+  HeightScale: 0.1
+  GroundLevel: 0
+  Noise: 1
+  NoiseScale: 0.015
+  NoiseIntensity: 1
+  NoiseIntensityOffset: 0.3
+  NoiseVelocity: {x: 3, y: 3}
+  MaxRayLength: 400
 --- !u!1001 &378717030
 Prefab:
   m_ObjectHideFlags: 0
@@ -20052,7 +20104,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4351392909682804, guid: c41647929c5902142afab3503262a30f, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 23.92
+      value: 23.45
       objectReference: {fileID: 0}
     - target: {fileID: 4351392909682804, guid: c41647929c5902142afab3503262a30f, type: 2}
       propertyPath: m_LocalPosition.y
@@ -20060,7 +20112,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4351392909682804, guid: c41647929c5902142afab3503262a30f, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -23.96
+      value: -22.62
       objectReference: {fileID: 0}
     - target: {fileID: 4351392909682804, guid: c41647929c5902142afab3503262a30f, type: 2}
       propertyPath: m_LocalRotation.x
@@ -30954,6 +31006,10 @@ Prefab:
       propertyPath: m_RootOrder
       value: 20
       objectReference: {fileID: 0}
+    - target: {fileID: 4255781285600126, guid: 49d95d6e840749d46b091d45dad02862, type: 2}
+      propertyPath: m_LocalPosition.x
+      value: 51.86
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 49d95d6e840749d46b091d45dad02862, type: 2}
   m_IsPrefabAsset: 0
@@ -34626,7 +34682,7 @@ Prefab:
     m_Modifications:
     - target: {fileID: 482002, guid: 80c6b5d330112ef41800a729a58d22e7, type: 2}
       propertyPath: m_LocalPosition.x
-      value: 6.0852966
+      value: 5.3
       objectReference: {fileID: 0}
     - target: {fileID: 482002, guid: 80c6b5d330112ef41800a729a58d22e7, type: 2}
       propertyPath: m_LocalPosition.y
@@ -34634,7 +34690,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 482002, guid: 80c6b5d330112ef41800a729a58d22e7, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -4.364149
+      value: -5.35
       objectReference: {fileID: 0}
     - target: {fileID: 482002, guid: 80c6b5d330112ef41800a729a58d22e7, type: 2}
       propertyPath: m_LocalRotation.x

@@ -51,10 +51,19 @@ public class InputController : MonoBehaviour
 
 	public void AllEnterGame()
 	{
+		// Start Generating Weapon
+		WeaponGenerationManager.WGM.StartGeneratingWeapon();
 		for (int i = 0; i < ReInput.controllers.joystickCount; i++)
 		{
-			EnterGame(i);
+			if (ReInput.controllers.Joysticks[i].isConnected)
+			{
+				EnterGame(i);
+			}
 		}
+		//for (int i = 0; i < ReInput.controllers.joystickCount; i++)
+		//{
+		//	EnterGame(i);
+		//}
 	}
 
 	private void EnterGame(int playerID)
@@ -97,7 +106,7 @@ public class InputController : MonoBehaviour
 				_playerHoldRestart[i] += Time.deltaTime;
 				if (Mathf.Abs(_playerHoldRestart[i] - 1f) < 0.2f)
 				{
-					SceneManager.LoadScene(0);
+					SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 				}
 			}
 			else

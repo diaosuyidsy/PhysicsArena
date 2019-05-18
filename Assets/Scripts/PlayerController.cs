@@ -206,6 +206,7 @@ public class PlayerController : MonoBehaviour
 		DropHelper();
 		StatsAfterDeath();
 		StartCoroutine(Respawn(GameManager.GM.RespawnTime));
+
 	}
 
 	private void StatsAfterDeath()
@@ -224,6 +225,8 @@ public class PlayerController : MonoBehaviour
 			}
 
 			print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[PlayerNumber] + " Times");
+
+			EventManager.TriggerEvent("On" + tag + "Suicide");
 		}
 		else
 		{
@@ -242,6 +245,7 @@ public class PlayerController : MonoBehaviour
 				}
 				print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
 					" and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
+				EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
 			}
 			else
 			{
@@ -256,6 +260,8 @@ public class PlayerController : MonoBehaviour
 				}
 				print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
 					" and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");
+				EventManager.TriggerEvent("On" + tag + "Suicide");
+
 			}
 
 		}

@@ -53,6 +53,7 @@ public class InputController : MonoBehaviour
 	{
 		// Start Generating Weapon
 		WeaponGenerationManager.WGM.StartGeneratingWeapon();
+		EventManager.TriggerEvent("GameStart");
 		for (int i = 0; i < ReInput.controllers.joystickCount; i++)
 		{
 			if (ReInput.controllers.Joysticks[i].isConnected)

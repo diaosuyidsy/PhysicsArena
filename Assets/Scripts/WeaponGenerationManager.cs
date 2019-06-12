@@ -30,8 +30,6 @@ public class WeaponGenerationManager : MonoBehaviour
 			Weapons[i] = WeaponsHolder.transform.GetChild(i).gameObject;
 			Weapons[i].SetActive(false);
 		}
-
-
 	}
 
 	// This function is called when the game actually starts (After all enter game)

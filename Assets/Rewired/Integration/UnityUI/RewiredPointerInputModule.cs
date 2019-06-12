@@ -56,7 +56,6 @@ namespace Rewired.Integration.UnityUI {
     using System.Text;
     using UnityEngine;
     using UnityEngine.EventSystems;
-    using UnityEngine.Serialization;
     using System.Collections.Generic;
     using Rewired.UI;
 
@@ -601,7 +600,11 @@ namespace Rewired.Integration.UnityUI {
             }
 
             bool IMouseInputSource.enabled {
-                get { TryUpdate(); return Input.mousePresent; }
+                get {
+                    TryUpdate();
+                    return true;
+                    // return Input.mousePresent; // REMOVED: Input.mousePresent is unreliable. Some platforms will return false when a mouse is present and working.
+                }
             }
 
             bool IMouseInputSource.locked {

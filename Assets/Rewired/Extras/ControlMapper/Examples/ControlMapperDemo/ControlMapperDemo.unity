@@ -1866,11 +1866,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 10efa70eea88e69459c632aac286892d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rewiredInputManager: {fileID: 0}
   useAllRewiredGamePlayers: 1
   useRewiredSystemPlayer: 1
   rewiredPlayerIds: 00000000
   usePlayingPlayersOnly: 0
+  playerMice: []
   moveOneElementPerAxisPress: 0
+  setActionsById: 0
+  horizontalActionId: -1
+  verticalActionId: -1
+  submitActionId: -1
+  cancelActionId: -1
   m_HorizontalAxis: UIHorizontal
   m_VerticalAxis: UIVertical
   m_SubmitButton: UISubmit
@@ -1879,6 +1886,7 @@ MonoBehaviour:
   m_RepeatDelay: 0
   m_allowMouseInput: 1
   m_allowMouseInputIfTouchSupported: 1
+  m_allowTouchInput: 1
   m_ForceModuleActive: 0
 --- !u!114 &586074305
 MonoBehaviour:
@@ -4437,6 +4445,9 @@ MonoBehaviour:
       android_supportUnknownGamepads: 0
       ps4_assignJoysticksByPS4JoyId: 1
       useSteamControllerSupport: 1
+      logToScreen: 0
+      runInEditMode: 0
+      allowInputInEditorSceneView: 0
       platformVars_windowsStandalone:
         disableKeyboard: 0
         ignoreInputWhenAppNotInFocus: 1
@@ -4500,6 +4511,7 @@ MonoBehaviour:
       defaultJoystickAxis2DDeadZoneType: 1
       force4WayHats: 0
       throttleCalibrationMode: 0
+      activateActionButtonsOnNegativeValue: 0
       deferControllerConnectedEventsOnStart: 0
       logLevel: 7
       editorSettings:
@@ -4517,6 +4529,8 @@ MonoBehaviour:
         exportConsts_layoutsClassName: Layout
         exportConsts_players: 1
         exportConsts_playersClassName: Player
+        exportConsts_inputBehaviors: 0
+        exportConsts_inputBehaviorsClassName: InputBehavior
         exportConsts_customControllers: 1
         exportConsts_customControllersClassName: CustomController
         exportConsts_customControllersAxesClassName: Axis

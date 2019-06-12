@@ -62,6 +62,10 @@
 #define UNITY_PS4_2018_PLUS
 #endif
 
+#if UNITY_2018_PLUS || UNITY_2017_4_OR_NEWER
+#define PS4INPUT_NEW_PAD_API
+#endif
+
 // Copyright (c) 2015 Augie R. Maddox, Guavaman Enterprises. All rights reserved.
 #pragma warning disable 0219
 #pragma warning disable 0618
@@ -79,11 +83,79 @@ namespace Rewired.Utils {
     [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Never)]
     public class ExternalTools : IExternalTools {
 
+        public ExternalTools() {
+#if UNITY_EDITOR
+#if UNITY_2018_PLUS
+            UnityEditor.EditorApplication.pauseStateChanged += OnEditorPauseStateChanged;
+#else
+            UnityEditor.EditorApplication.update += OnEditorUpdate;            
+#endif
+            _isEditorPaused = UnityEditor.EditorApplication.isPaused; // get initial state
+#endif
+        }
+
+        public void Destroy() {
+#if UNITY_EDITOR
+#if UNITY_2018_PLUS
+            UnityEditor.EditorApplication.pauseStateChanged -= OnEditorPauseStateChanged;
+#else
+            UnityEditor.EditorApplication.update -= OnEditorUpdate;
+#endif
+#endif
+        }
+
+        private bool _isEditorPaused;
+        public bool isEditorPaused {
+            get {
+                return _isEditorPaused;
+            }
+        }
+
+        private System.Action<bool> _EditorPausedStateChangedEvent;
+        public event System.Action<bool> EditorPausedStateChangedEvent {
+            add { _EditorPausedStateChangedEvent += value; }
+            remove { _EditorPausedStateChangedEvent -= value; }
+        }
+
+#if UNITY_EDITOR
+#if UNITY_2018_PLUS
+        private void OnEditorPauseStateChanged(UnityEditor.PauseState state) {
+            _isEditorPaused = state == UnityEditor.PauseState.Paused;
+            var evt = _EditorPausedStateChangedEvent;
+            if (evt != null) evt(_isEditorPaused);
+        }
+#else
+        private void OnEditorUpdate() {
+            // Watch EditorApplication.isPaused state
+            bool isPaused = UnityEditor.EditorApplication.isPaused;
+            if(isPaused != _isEditorPaused) {
+                _isEditorPaused = isPaused;
+                var evt = _EditorPausedStateChangedEvent;
+                if (evt != null) evt(_isEditorPaused);
+            }
+        }
+#endif
+#endif
+
         public object GetPlatformInitializer() {
+#if UNITY_5_PLUS
+#if (!UNITY_EDITOR && UNITY_STANDALONE_WIN) || UNITY_EDITOR_WIN
+            return Rewired.Utils.Platforms.Windows.Main.GetPlatformInitializer();
+#elif (!UNITY_EDITOR && UNITY_STANDALONE_OSX) || UNITY_EDITOR_OSX
+            return Rewired.Utils.Platforms.OSX.Main.GetPlatformInitializer();
+#elif (!UNITY_EDITOR && UNITY_STANDALONE_LINUX) || UNITY_EDITOR_LINUX
+            return Rewired.Utils.Platforms.Linux.Main.GetPlatformInitializer();
+#elif UNITY_WEBGL && !UNITY_EDITOR
+            return Rewired.Utils.Platforms.WebGL.Main.GetPlatformInitializer();
+#else
+            return null;
+#endif
+#else
 #if UNITY_WEBGL && !UNITY_EDITOR
             return Rewired.Utils.Platforms.WebGL.Main.GetPlatformInitializer();
 #else
             return null;
+#endif
 #endif
         }
 
@@ -150,18 +222,24 @@ namespace Rewired.Utils {
         public string XboxOneInput_GetControllerType(ulong xboxControllerId) { return XboxOneInput.GetControllerType(xboxControllerId); }
 
         public uint XboxOneInput_GetJoystickId(ulong xboxControllerId) { return XboxOneInput.GetJoystickId(xboxControllerId); }
+        
+        private bool _xboxOne_gamepadDLLException;
 
         public void XboxOne_Gamepad_UpdatePlugin() {
 #if !REWIRED_XBOXONE_DISABLE_VIBRATION
+            if(_xboxOne_gamepadDLLException) return;
             try {
                 Ext_Gamepad_UpdatePlugin();
             } catch {
+                UnityEngine.Debug.LogError("Rewired: An exception occurred updating vibration. Gamepad vibration will not function. Did you install the required Gamepad.dll dependency? See Special Platforms - Xbox One in the documentation for information.");
+                _xboxOne_gamepadDLLException = true;
             }
 #endif
         }
 
         public bool XboxOne_Gamepad_SetGamepadVibration(ulong xboxOneJoystickId, float leftMotor, float rightMotor, float leftTriggerLevel, float rightTriggerLevel) {
 #if !REWIRED_XBOXONE_DISABLE_VIBRATION
+            if(_xboxOne_gamepadDLLException) return false;
             try {
                 return Ext_Gamepad_SetGamepadVibration(xboxOneJoystickId, leftMotor, rightMotor, leftTriggerLevel, rightTriggerLevel);
             } catch {
@@ -174,6 +252,7 @@ namespace Rewired.Utils {
 
         public void XboxOne_Gamepad_PulseVibrateMotor(ulong xboxOneJoystickId, int motorInt, float startLevel, float endLevel, ulong durationMS) {
 #if !REWIRED_XBOXONE_DISABLE_VIBRATION
+            if(_xboxOne_gamepadDLLException) return;
             Rewired.Platforms.XboxOne.XboxOneGamepadMotorType motor = (Rewired.Platforms.XboxOne.XboxOneGamepadMotorType)motorInt;
             try {
                 switch(motor) {
@@ -240,7 +319,7 @@ namespace Rewired.Utils {
 #if UNITY_PS4
 
         public Vector3 PS4Input_GetLastAcceleration(int id) {
-#if UNITY_PS4_2018_PLUS
+#if PS4INPUT_NEW_PAD_API
             return UnityEngine.PS4.PS4Input.PadGetLastAcceleration(id);
 #else
             return UnityEngine.PS4.PS4Input.GetLastAcceleration(id);
@@ -248,7 +327,7 @@ namespace Rewired.Utils {
         }
 
         public Vector3 PS4Input_GetLastGyro(int id) {
-#if UNITY_PS4_2018_PLUS
+#if PS4INPUT_NEW_PAD_API
             return UnityEngine.PS4.PS4Input.PadGetLastGyro(id);
 #else
             return UnityEngine.PS4.PS4Input.GetLastGyro(id);
@@ -256,7 +335,7 @@ namespace Rewired.Utils {
         }
 
         public Vector4 PS4Input_GetLastOrientation(int id) {
-#if UNITY_PS4_2018_PLUS
+#if PS4INPUT_NEW_PAD_API
             return UnityEngine.PS4.PS4Input.PadGetLastOrientation(id);
 #else
             return UnityEngine.PS4.PS4Input.GetLastOrientation(id);
@@ -307,7 +386,7 @@ namespace Rewired.Utils {
 
         public void PS4Input_GetUsersDetails(int slot, object loggedInUser) {
             if(loggedInUser == null) throw new System.ArgumentNullException("loggedInUser");
-#if UNITY_PS4_2018_PLUS
+#if PS4INPUT_NEW_PAD_API
             UnityEngine.PS4.PS4Input.LoggedInUser user = UnityEngine.PS4.PS4Input.GetUsersDetails(slot);
 #else
             UnityEngine.PS4.PS4Input.LoggedInUser user = UnityEngine.PS4.PS4Input.PadGetUsersDetails(slot);
@@ -392,7 +471,7 @@ namespace Rewired.Utils {
 
         private readonly UnityEngine.PS4.PS4Input.ControllerInformation _controllerInformation = new UnityEngine.PS4.PS4Input.ControllerInformation();
 
-        public void GetSpecialControllerInformation(int id, int padIndex, object controllerInformation) {
+        public void PS4Input_GetSpecialControllerInformation(int id, int padIndex, object controllerInformation) {
             if(controllerInformation == null) throw new System.ArgumentNullException("controllerInformation");
             Rewired.Platforms.PS4.Internal.ControllerInformation tControllerInformation = controllerInformation as Rewired.Platforms.PS4.Internal.ControllerInformation;
             if(tControllerInformation == null) throw new System.ArgumentException("controllerInformation is not the correct type.");
@@ -522,7 +601,7 @@ namespace Rewired.Utils {
 
 #if UNITY_2018_PLUS
 
-        public void GetSpecialControllerInformation(int id, int padIndex, object controllerInformation) { }
+        public void PS4Input_GetSpecialControllerInformation(int id, int padIndex, object controllerInformation) { }
 
         public Vector3 PS4Input_SpecialGetLastAcceleration(int id) { return Vector3.zero; }
 

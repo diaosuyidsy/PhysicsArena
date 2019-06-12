@@ -167,6 +167,7 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 0
+      alternateElementCounts: []
       productName_useRegex: 0
       productName: []
       productGUID: []
@@ -184,15 +185,18 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 1
+      alternateElementCounts: []
       productName_useRegex: 0
       productName:
       - 8Bitdo NES30 Pro
       - 8Bitdo FC30 Pro
       - 8Bitdo N30 Pro
       - 8Bitdo F30 Pro
+      - 8Bitdo AP40
       productGUID:
       - 90001002
       - 90002002
+      - 90032DC8
       productId: 00900000
       deviceType: 21
     elements:
@@ -602,11 +606,14 @@ MonoBehaviour:
         disabled: 0
         tag: 
         hatCount: 1
+        alternateElementCounts: []
         productName_useRegex: 0
         productName:
         - 8Bitdo NES30 Pro
         - 8Bitdo FC30 Pro
-        productGUID: []
+        - 8Bitdo AP40 GamePad
+        productGUID:
+        - 38402DC8
         productId: 
         deviceType: 21
       elements:
@@ -1028,19 +1035,22 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 1
+      alternateElementCounts: []
       productName_useRegex: 0
       productName:
       - 8Bitdo NES30 Pro
       - 8Bitdo FC30 Pro
       - 8Bitdo N30 Pro
       - 8Bitdo F30 Pro
+      - 8Bitdo AP40
       manufacturer:
       - 8Bitdo NES30 Pro
       - 8Bitdo FC30 Pro
       - 8Bitdo N30 Pro
       - 8Bitdo F30 Pro
-      productId: 0090000000900000
-      vendorId: 0210000002200000
+      - 8Bitdo AP40
+      productId: 009000000090000003900000
+      vendorId: 0210000002200000c82d0000
     elements:
       axes:
       - elementIdentifier: 0
@@ -1428,13 +1438,15 @@ MonoBehaviour:
         disabled: 0
         tag: 
         hatCount: 1
+        alternateElementCounts: []
         productName_useRegex: 0
         productName:
         - 8Bitdo NES30 Pro
         - 8Bitdo FC30 Pro
+        - 8Bitdo AP40 GamePad
         manufacturer: []
-        productId: 
-        vendorId: 
+        productId: 40380000
+        vendorId: c82d0000
       elements:
         axes:
         - elementIdentifier: 0
@@ -1822,6 +1834,7 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 1
+      alternateElementCounts: []
       manufacturer_useRegex: 0
       productName_useRegex: 0
       systemName_useRegex: 0
@@ -1831,10 +1844,12 @@ MonoBehaviour:
       - 8Bitdo FC30 Pro
       - 8Bitdo N30 Pro
       - 8Bitdo F30 Pro
+      - 8Bitdo AP40
       systemName: []
       productGUID:
       - 90001002
       - 90002002
+      - 90032DC8
     elements:
       axes:
       - elementIdentifier: 0
@@ -2182,6 +2197,7 @@ MonoBehaviour:
         disabled: 0
         tag: 
         hatCount: 1
+        alternateElementCounts: []
         manufacturer_useRegex: 0
         productName_useRegex: 0
         systemName_useRegex: 0
@@ -2189,8 +2205,10 @@ MonoBehaviour:
         productName:
         - 8Bitdo NES30 Pro
         - 8Bitdo FC30 Pro
+        - 8Bitdo AP40 GamePad
         systemName: []
-        productGUID: []
+        productGUID:
+        - 38402DC8
       elements:
         axes:
         - elementIdentifier: 0
@@ -2538,6 +2556,7 @@ MonoBehaviour:
       disabled: 0
       tag: 
       hatCount: 1
+      alternateElementCounts: []
       manufacturer_useRegex: 0
       productName_useRegex: 0
       manufacturer: []
@@ -2546,9 +2565,11 @@ MonoBehaviour:
       - 8Bitdo FC30 Pro
       - 8Bitdo N30 Pro
       - 8Bitdo F30 Pro
+      - 8Bitdo AP40
       productGUID:
       - 90001002
       - 90002002
+      - 90032DC8
     elements:
       axes:
       - elementIdentifier: 0
@@ -2896,13 +2917,16 @@ MonoBehaviour:
         disabled: 0
         tag: 
         hatCount: 1
+        alternateElementCounts: []
         manufacturer_useRegex: 0
         productName_useRegex: 0
         manufacturer: []
         productName:
         - 8Bitdo NES30 Pro
         - 8Bitdo FC30 Pro
-        productGUID: []
+        - 8Bitdo AP40 GamePad
+        productGUID:
+        - 38402DC8
       elements:
         axes:
         - elementIdentifier: 0
@@ -3256,9 +3280,13 @@ MonoBehaviour:
       - 8Bitdo FC30 Pro
       - 8Bitdo N30 Pro
       - 8Bitdo F30 Pro
+      - 8Bitdo AP40
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes:
       - elementIdentifier: 0
@@ -3740,6 +3768,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -3758,9 +3789,13 @@ MonoBehaviour:
       - 8Bitdo FC30 Pro 8Bitdo FC30 Pro
       - 8Bitdo N30 Pro 8Bitdo N30 Pro
       - 8Bitdo F30 Pro 8Bitdo F30 Pro
+      - 8Bitdo AP40 8Bitdo AP40
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes:
       - elementIdentifier: 0
@@ -4243,9 +4278,16 @@ MonoBehaviour:
       - 8Bitdo FC30 Pro    8Bitdo FC30 Pro
       - 8Bitdo NES30 Pro
       - 8Bitdo FC30 Pro
+      - 8Bitdo AP40 GamePad    8Bitdo AP40 GamePad
+      - 8Bitdo AP40 GamePad
+      - 8Bitdo AP40    8Bitdo AP40
+      - 8Bitdo AP40
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes:
       - elementIdentifier: 0
@@ -4727,6 +4769,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -4749,9 +4794,16 @@ MonoBehaviour:
       - 8Bitdo F30 Pro    8Bitdo F30 Pro
       - 8Bitdo N30 Pro
       - 8Bitdo F30 Pro
+      - 8Bitdo AP40 GamePad
+      - 8Bitdo AP40    8Bitdo AP40
+      - 8Bitdo AP40
+      - 8Bitdo AP40    8Bitdo AP40
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes:
       - elementIdentifier: 0
@@ -5233,6 +5285,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5250,6 +5305,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5267,6 +5325,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5284,6 +5345,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5301,6 +5365,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5318,6 +5385,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5335,6 +5405,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5352,6 +5425,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5369,6 +5445,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5386,6 +5465,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5403,6 +5485,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5420,6 +5505,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []
@@ -5437,6 +5525,9 @@ MonoBehaviour:
       matchUnityVersion: 0
       matchUnityVersion_min: 
       matchUnityVersion_max: 
+      matchSysVersion: 0
+      matchSysVersion_min: 
+      matchSysVersion_max: 
     elements:
       axes: []
       buttons: []

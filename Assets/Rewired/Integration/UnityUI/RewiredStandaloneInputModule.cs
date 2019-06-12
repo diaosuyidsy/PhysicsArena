@@ -428,7 +428,7 @@ namespace Rewired.Integration.UnityUI {
 
         private bool isTouchAllowed {
             get {
-                if (!isTouchSupported) return false;
+                // if (!isTouchSupported) return false; // Removed because Unity Remote will return touches even on platforms that report touch not supported and returning on this will break it.
                 return m_allowTouchInput;
             }
         }
@@ -635,6 +635,7 @@ namespace Rewired.Integration.UnityUI {
         public override void Process() {
             if (!ReInput.isReady) return;
             if (!m_HasFocus && ShouldIgnoreEventsOnNoFocus()) return;
+            if (!enabled || !gameObject.activeInHierarchy) return;
 
             bool usedEvent = SendUpdateEventToSelectedObject();
 

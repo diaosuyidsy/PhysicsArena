@@ -43,6 +43,9 @@
 #if UNITY_5_9_OR_NEWER || UNITY_2017_PLUS
 #define UNITY_5_9_PLUS
 #endif
+#if UNITY_4_6 || UNITY_4_7 || UNITY_5_PLUS
+#define UNITY_4_6_PLUS
+#endif
 #pragma warning disable 0219
 #pragma warning disable 0618
 #pragma warning disable 0649
@@ -55,40 +58,64 @@ namespace Rewired.Demos {
     [AddComponentMenu("")]
     public class PlayerMouseSpriteExample : MonoBehaviour {
 
+#if UNITY_4_6_PLUS
         [Tooltip("The Player that will control the mouse")]
+#endif
         public int playerId = 0;
 
+#if UNITY_4_6_PLUS
         [Tooltip("The Rewired Action used for the mouse horizontal axis.")]
+#endif
         public string horizontalAction = "MouseX";
 
+#if UNITY_4_6_PLUS
         [Tooltip("The Rewired Action used for the mouse vertical axis.")]
+#endif
         public string verticalAction = "MouseY";
 
+#if UNITY_4_6_PLUS
         [Tooltip("The Rewired Action used for the mouse wheel axis.")]
+#endif
         public string wheelAction = "MouseWheel";
 
+#if UNITY_4_6_PLUS
         [Tooltip("The Rewired Action used for the mouse left button.")]
+#endif
         public string leftButtonAction = "MouseLeftButton";
 
+#if UNITY_4_6_PLUS
         [Tooltip("The Rewired Action used for the mouse right button.")]
+#endif
         public string rightButtonAction = "MouseRightButton";
 
+#if UNITY_4_6_PLUS
         [Tooltip("The Rewired Action used for the mouse middle button.")]
+#endif
         public string middleButtonAction = "MouseMiddleButton";
 
+#if UNITY_4_6_PLUS
         [Tooltip("The distance from the camera that the pointer will be drawn.")]
+#endif
         public float distanceFromCamera = 1f;
 
+#if UNITY_4_6_PLUS
         [Tooltip("The scale of the sprite pointer.")]
+#endif
         public float spriteScale = 0.05f;
 
+#if UNITY_4_6_PLUS
         [Tooltip("The pointer prefab.")]
+#endif
         public GameObject pointerPrefab;
 
+#if UNITY_4_6_PLUS
         [Tooltip("The click effect prefab.")]
+#endif
         public GameObject clickEffectPrefab;
 
+#if UNITY_4_6_PLUS
         [Tooltip("Should the hardware pointer be hidden?")]
+#endif
         public bool hideHardwarePointer = true;
 
         [System.NonSerialized]

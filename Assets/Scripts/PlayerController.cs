@@ -206,6 +206,7 @@ public class PlayerController : MonoBehaviour
 		DropHelper();
 		StatsAfterDeath();
 		StartCoroutine(Respawn(GameManager.GM.RespawnTime));
+
 	}
 
 	private void StatsAfterDeath()
@@ -224,6 +225,8 @@ public class PlayerController : MonoBehaviour
 			}
 
 			print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[PlayerNumber] + " Times");
+
+			EventManager.TriggerEvent("On" + tag + "Suicide");
 		}
 		else
 		{
@@ -242,6 +245,7 @@ public class PlayerController : MonoBehaviour
 				}
 				print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
 					" and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
+				EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
 			}
 			else
 			{
@@ -256,6 +260,8 @@ public class PlayerController : MonoBehaviour
 				}
 				print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
 					" and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");
+				EventManager.TriggerEvent("On" + tag + "Suicide");
+
 			}
 
 		}
@@ -346,7 +352,7 @@ public class PlayerController : MonoBehaviour
 		if (HandObject.CompareTag("Weapon"))
 		{
 			// Stop the shooting
-			HandObject.SendMessage("Shoot", 0f);
+			HandObject.SendMessage("Shoot", 0f, SendMessageOptions.RequireReceiver);
 			// Disable the UI
 			HandObject.SendMessage("KillUI");
 		}
@@ -420,7 +426,7 @@ public class PlayerController : MonoBehaviour
 					if (HandObject != null && !_dropping)
 					{
 						attackState = State.Shooting;
-						HandObject.SendMessage("Shoot", 1f);
+						HandObject.SendMessage("Shoot", 1f, SendMessageOptions.RequireReceiver);
 						if (EnableAuxillaryAiming)
 							AuxillaryAim();
 					}
@@ -479,7 +485,7 @@ public class PlayerController : MonoBehaviour
 					attackState = State.Empty;
 					// Add weapon right trigger action
 					if (HandObject != null)
-						HandObject.SendMessage("Shoot", 0f);
+						HandObject.SendMessage("Shoot", 0f, SendMessageOptions.RequireReceiver);
 					// Auxillary Aiming
 					_auxillaryRotationLock = false;
 					_weaponCD = 0f;

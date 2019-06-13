@@ -1,21 +1,11 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &100100000
-Prefab:
-  m_ObjectHideFlags: 1
-  serializedVersion: 2
-  m_Modification:
-    m_TransformParent: {fileID: 0}
-    m_Modifications: []
-    m_RemovedComponents: []
-  m_SourcePrefab: {fileID: 0}
-  m_RootGameObject: {fileID: 1252270308440266}
-  m_IsPrefabAsset: 1
 --- !u!1 &1252270308440266
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4444648816419700}
@@ -30,9 +20,10 @@ GameObject:
   m_IsActive: 1
 --- !u!4 &4444648816419700
 Transform:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252270308440266}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -43,9 +34,10 @@ Transform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &114744745699282176
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252270308440266}
   m_Enabled: 1
   m_EditorHideFlags: 0
@@ -136,6 +128,8 @@ MonoBehaviour:
       distributeJoysticksEvenly: 1
       reassignJoystickToPreviousOwnerOnReconnect: 0
       defaultJoystickAxis2DDeadZoneType: 1
+      defaultJoystickAxis2DSensitivityType: 0
+      defaultAxisSensitivityType: 0
       force4WayHats: 0
       throttleCalibrationMode: 0
       activateActionButtonsOnNegativeValue: 0
@@ -162,6 +156,10 @@ MonoBehaviour:
         exportConsts_customControllersClassName: CustomController
         exportConsts_customControllersAxesClassName: Axis
         exportConsts_customControllersButtonsClassName: Button
+        exportConsts_layoutManagerRuleSets: 1
+        exportConsts_layoutManagerRuleSetsClassName: LayoutManagerRuleSet
+        exportConsts_mapEnablerRuleSets: 1
+        exportConsts_mapEnablerRuleSetsClassName: MapEnablerRuleSet
         exportConsts_allCapsConstantNames: 0
     players:
     - _id: 9999999
@@ -176,6 +174,13 @@ MonoBehaviour:
       _assignMouseOnStart: 1
       _assignKeyboardOnStart: 1
       _excludeFromControllerAutoAssignment: 1
+      _controllerMapLayoutManagerSettings:
+        _enabled: 1
+        _loadFromUserDataStore: 1
+        _ruleSets: []
+      _controllerMapEnablerSettings:
+        _enabled: 1
+        _ruleSets: []
     - _id: 1
       _name: Player1
       _descriptiveName: Player1
@@ -194,6 +199,13 @@ MonoBehaviour:
       _assignMouseOnStart: 0
       _assignKeyboardOnStart: 1
       _excludeFromControllerAutoAssignment: 0
+      _controllerMapLayoutManagerSettings:
+        _enabled: 1
+        _loadFromUserDataStore: 1
+        _ruleSets: []
+      _controllerMapEnablerSettings:
+        _enabled: 1
+        _ruleSets: []
     - _id: 2
       _name: Player2
       _descriptiveName: Player2
@@ -209,6 +221,13 @@ MonoBehaviour:
       _assignMouseOnStart: 0
       _assignKeyboardOnStart: 1
       _excludeFromControllerAutoAssignment: 0
+      _controllerMapLayoutManagerSettings:
+        _enabled: 1
+        _loadFromUserDataStore: 1
+        _ruleSets: []
+      _controllerMapEnablerSettings:
+        _enabled: 1
+        _ruleSets: []
     - _id: 3
       _name: Player3
       _descriptiveName: Player3
@@ -224,6 +243,13 @@ MonoBehaviour:
       _assignMouseOnStart: 0
       _assignKeyboardOnStart: 1
       _excludeFromControllerAutoAssignment: 0
+      _controllerMapLayoutManagerSettings:
+        _enabled: 1
+        _loadFromUserDataStore: 1
+        _ruleSets: []
+      _controllerMapEnablerSettings:
+        _enabled: 1
+        _ruleSets: []
     - _id: 4
       _name: Player4
       _descriptiveName: Player4
@@ -239,6 +265,13 @@ MonoBehaviour:
       _assignMouseOnStart: 0
       _assignKeyboardOnStart: 1
       _excludeFromControllerAutoAssignment: 0
+      _controllerMapLayoutManagerSettings:
+        _enabled: 1
+        _loadFromUserDataStore: 1
+        _ruleSets: []
+      _controllerMapEnablerSettings:
+        _enabled: 1
+        _ruleSets: []
     - _id: 5
       _name: Player5
       _descriptiveName: Player5
@@ -254,6 +287,13 @@ MonoBehaviour:
       _assignMouseOnStart: 0
       _assignKeyboardOnStart: 1
       _excludeFromControllerAutoAssignment: 0
+      _controllerMapLayoutManagerSettings:
+        _enabled: 1
+        _loadFromUserDataStore: 1
+        _ruleSets: []
+      _controllerMapEnablerSettings:
+        _enabled: 1
+        _ruleSets: []
     - _id: 6
       _name: Player6
       _descriptiveName: Player6
@@ -269,6 +309,13 @@ MonoBehaviour:
       _assignMouseOnStart: 0
       _assignKeyboardOnStart: 1
       _excludeFromControllerAutoAssignment: 0
+      _controllerMapLayoutManagerSettings:
+        _enabled: 1
+        _loadFromUserDataStore: 1
+        _ruleSets: []
+      _controllerMapEnablerSettings:
+        _enabled: 1
+        _ruleSets: []
     actions:
     - _id: 0
       _name: Move Horizontal
@@ -706,6 +753,8 @@ MonoBehaviour:
     mouseMaps: []
     customControllerMaps: []
     customControllers: []
+    controllerMapLayoutManagerRuleSets: []
+    controllerMapEnablerRuleSets: []
     playerIdCounter: 7
     actionIdCounter: 8
     actionCategoryIdCounter: 1
@@ -720,13 +769,16 @@ MonoBehaviour:
     mouseMapIdCounter: 0
     customControllerMapIdCounter: 0
     customControllerIdCounter: 0
+    controllerMapLayoutManagerSetIdCounter: 0
+    controllerMapEnablerSetIdCounter: 0
   _controllerDataFiles: {fileID: 11400000, guid: d21d2b20df8369642b76aafbb2576ba7,
     type: 2}
 --- !u!114 &114811229115478466
 MonoBehaviour:
-  m_ObjectHideFlags: 1
+  m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 100100000}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1252270308440266}
   m_Enabled: 1
   m_EditorHideFlags: 0

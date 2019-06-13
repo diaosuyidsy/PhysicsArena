@@ -53,12 +53,18 @@ public class InputController : MonoBehaviour
 	{
 		// Start Generating Weapon
 		WeaponGenerationManager.WGM.StartGeneratingWeapon();
-		for (int i = 0; i < ReInput.controllers.joystickCount; i++)
+		EventManager.TriggerEvent("GameStart");
+		//for (int i = 0; i < ReInput.controllers.joystickCount; i++)
+		//{
+		//	if (ReInput.controllers.Joysticks[i].isConnected)
+		//	{
+		//		EnterGame(i);
+		//	}
+		//}
+
+		foreach (Joystick a in ReInput.controllers.Joysticks)
 		{
-			if (ReInput.controllers.Joysticks[i].isConnected)
-			{
-				EnterGame(i);
-			}
+			EnterGame(a.id);
 		}
 		//for (int i = 0; i < ReInput.controllers.joystickCount; i++)
 		//{

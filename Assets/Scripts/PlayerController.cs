@@ -226,7 +226,7 @@ public class PlayerController : MonoBehaviour
 
 			print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[PlayerNumber] + " Times");
 
-			EventManager.TriggerEvent("On" + tag + "Suicide");
+			//EventManager.TriggerEvent("On" + tag + "Suicide");
 		}
 		else
 		{
@@ -245,7 +245,7 @@ public class PlayerController : MonoBehaviour
 				}
 				print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
 					" and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
-				EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
+				//EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
 			}
 			else
 			{
@@ -260,7 +260,7 @@ public class PlayerController : MonoBehaviour
 				}
 				print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
 					" and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");
-				EventManager.TriggerEvent("On" + tag + "Suicide");
+				//EventManager.TriggerEvent("On" + tag + "Suicide");
 
 			}
 
@@ -764,12 +764,16 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// If sender is not null, meaning the hit could be blocked
-	public void OnMeleeHit(Vector3 force, GameObject sender = null)
+	public void OnMeleeHit(PlayerHit ph)
 	{
+		if (ph.Hitted != gameObject) return;
+		Vector3 force = ph.Force;
+		GameObject sender = ph.Hiter;
 		// First check if the player could block the attack
 		if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - DesignPanelManager.DPM.BlockAngleSlider.value))
 		{
-			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * DesignPanelManager.DPM.BlockMultiplierSlider.value);
+			//sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * DesignPanelManager.DPM.BlockMultiplierSlider.value);
+			EventManager.Instance.TriggerEvent(new PlayerHit(gameObject, null, -ph.Force * DesignPanelManager.DPM.BlockMultiplierSlider.value));
 			// Statistics: Block Success
 			if (PlayerNumber < GameManager.GM.BlockTimes.Count)
 			{
@@ -1011,8 +1015,10 @@ public class PlayerController : MonoBehaviour
 			{
 				rb.velocity = Vector3.zero;
 			}
-			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(transform.forward * 500f * MeleeCharge * velocityAddon, gameObject);
+			Vector3 force = transform.forward * 500f * MeleeCharge * velocityAddon;
+			//hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(transform.forward * 500f * MeleeCharge * velocityAddon, gameObject);
 			hit.transform.GetComponentInParent<PlayerController>().Mark(gameObject);
+			EventManager.Instance.TriggerEvent(new PlayerHit(gameObject, hit.transform.GetComponentInParent<PlayerController>().gameObject, force));
 			// Game Feel
 			_player.SetVibration(0, 1.0f, 0.15f);
 			_player.SetVibration(1, 1.0f, 0.15f);
@@ -1115,7 +1121,7 @@ public class PlayerController : MonoBehaviour
 			hl.min = Mathf.Lerp(inithlMin, -2.8f, elapesdTime / time);
 			Armhj.spring = js;
 			Handhj.limits = hl;
-			if (time / 2f - elapesdTime <= 0f)
+			if (elapesdTime >= 0f)
 			{
 				if (DesignPanelManager.DPM.MeleeAlternateSchemaToggle.isOn)
 				{
@@ -1182,6 +1188,18 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 	#endregion
+
+	private void OnEnable()
+	{
+		EventManager.Instance.AddHandler<PlayerHit>(OnMeleeHit);
+	}
+
+	private void OnDisable()
+	{
+		EventManager.Instance.RemoveHandler<PlayerHit>(OnMeleeHit);
+
+	}
+
 }
 
 //private void CheckRun ()

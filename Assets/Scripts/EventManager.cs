@@ -1,76 +1,67 @@
-﻿using UnityEngine;
-using UnityEngine.Events;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System;
 
-public class EventManager : MonoBehaviour
+public class GameEvent { }
+
+public class EventManager
 {
+	public delegate void EventDelegate<T>(T e) where T : GameEvent;
+	private delegate void EventDelegate(GameEvent e);
 
-	private Dictionary<string, UnityEvent> eventDictionary;
+	private readonly Dictionary<Type, EventDelegate> _delegates = new Dictionary<Type, EventDelegate>();
+	private readonly Dictionary<Delegate, EventDelegate> _delegateLookup = new Dictionary<Delegate, EventDelegate>();
 
-	private static EventManager eventManager;
+	private static readonly EventManager _instance = new EventManager();
+	public static EventManager Instance => _instance;
 
-	public static EventManager instance
+	private EventManager() { }
+
+	public void AddHandler<T>(EventDelegate<T> del) where T : GameEvent
 	{
-		get
+		if (_delegateLookup.ContainsKey(del)) return;
+
+		EventDelegate internalDelegate = (e) => del((T)e);
+		_delegateLookup[del] = internalDelegate;
+
+		EventDelegate tempDel;
+		if (_delegates.TryGetValue(typeof(T), out tempDel))
 		{
-			if (!eventManager)
-			{
-				eventManager = FindObjectOfType(typeof(EventManager)) as EventManager;
-
-				if (!eventManager)
-				{
-					Debug.LogError("There needs to be one active EventManger script on a GameObject in your scene.");
-				}
-				else
-				{
-					eventManager.Init();
-				}
-			}
-
-			return eventManager;
-		}
-	}
-
-	void Init()
-	{
-		if (eventDictionary == null)
-		{
-			eventDictionary = new Dictionary<string, UnityEvent>();
-		}
-	}
-
-	public static void StartListening(string eventName, UnityAction listener)
-	{
-		UnityEvent thisEvent = null;
-		if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
-		{
-			thisEvent.AddListener(listener);
+			_delegates[typeof(T)] = tempDel += internalDelegate;
 		}
 		else
 		{
-			thisEvent = new UnityEvent();
-			thisEvent.AddListener(listener);
-			instance.eventDictionary.Add(eventName, thisEvent);
+			_delegates[typeof(T)] = internalDelegate;
 		}
 	}
 
-	public static void StopListening(string eventName, UnityAction listener)
+	public void RemoveHandler<T>(EventDelegate<T> del) where T : GameEvent
 	{
-		if (eventManager == null) return;
-		UnityEvent thisEvent = null;
-		if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
+		EventDelegate internalDelegate;
+		if (_delegateLookup.TryGetValue(del, out internalDelegate))
 		{
-			thisEvent.RemoveListener(listener);
+			EventDelegate tempDel;
+			if (_delegates.TryGetValue(typeof(T), out tempDel))
+			{
+				tempDel -= internalDelegate;
+				if (tempDel == null)
+				{
+					_delegates.Remove(typeof(T));
+				}
+				else
+				{
+					_delegates[typeof(T)] = tempDel;
+				}
+			}
+			_delegateLookup.Remove(del);
 		}
 	}
 
-	public static void TriggerEvent(string eventName)
+	public void TriggerEvent(GameEvent e)
 	{
-		UnityEvent thisEvent = null;
-		if (instance.eventDictionary.TryGetValue(eventName, out thisEvent))
+		EventDelegate del;
+		if (_delegates.TryGetValue(e.GetType(), out del))
 		{
-			thisEvent.Invoke();
+			del.Invoke(e);
 		}
 	}
 }

@@ -26,7 +26,7 @@ public class ResourceCollector : MonoBehaviour
 				TeamTracker++;
 				other.tag = "Untagged";
 				print("Team 1 Score = " + TeamTracker);
-				EventManager.TriggerEvent("Team1ScoreBig");
+				//EventManager.TriggerEvent("Team1ScoreBig");
 				// Statistics: Add the dropper to the stats record
 				int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
 				if (GameManager.GM.FoodScoreTimes.Count > lastholder)
@@ -65,7 +65,7 @@ public class ResourceCollector : MonoBehaviour
 				TeamTracker++;
 				other.tag = "Untagged";
 				print("Team 2 Score = " + TeamTracker);
-				EventManager.TriggerEvent("Team2ScoreBig");
+				//EventManager.TriggerEvent("Team2ScoreBig");
 				// Statistics: Add the dropper to the stats record
 				int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
 				if (GameManager.GM.FoodScoreTimes.Count > lastholder)

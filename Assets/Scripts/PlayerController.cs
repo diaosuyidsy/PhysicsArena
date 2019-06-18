@@ -191,14 +191,10 @@ public class PlayerController : MonoBehaviour
 
 	// OnEnterDeathZone controls the behavior how player reacts when it dies
 	// It's called immediately after player enters death zone
-	public void OnEnterDeathZone()
+	public void OnEnterDeathZone(PlayerDied pd)
 	{
+		if (pd.Player != gameObject) return;
 		_canControl = false;
-		// Game Feel Addon
-		CameraShake.CS.Shake(0.1f, 0.1f);
-		_player.SetVibration(0, 1.0f, 0.25f);
-		_player.SetVibration(1, 1.0f, 0.25f);
-		// Game Feel End
 		foreach (GameObject go in OnDeathHidden)
 		{
 			go.SetActive(false);
@@ -283,6 +279,7 @@ public class PlayerController : MonoBehaviour
 			go.SetActive(true);
 		}
 		_canControl = true;
+		EventManager.Instance.TriggerEvent(new PlayerRespawned(gameObject));
 	}
 
 	private void CheckDrop()
@@ -764,16 +761,12 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// If sender is not null, meaning the hit could be blocked
-	public void OnMeleeHit(PlayerHit ph)
+	public void OnMeleeHit(Vector3 force, GameObject sender = null)
 	{
-		if (ph.Hitted != gameObject) return;
-		Vector3 force = ph.Force;
-		GameObject sender = ph.Hiter;
 		// First check if the player could block the attack
 		if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - DesignPanelManager.DPM.BlockAngleSlider.value))
 		{
-			//sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * DesignPanelManager.DPM.BlockMultiplierSlider.value);
-			EventManager.Instance.TriggerEvent(new PlayerHit(gameObject, null, -ph.Force * DesignPanelManager.DPM.BlockMultiplierSlider.value));
+			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * DesignPanelManager.DPM.BlockMultiplierSlider.value);
 			// Statistics: Block Success
 			if (PlayerNumber < GameManager.GM.BlockTimes.Count)
 			{
@@ -789,18 +782,8 @@ public class PlayerController : MonoBehaviour
 		}
 		else // Player is hit cause he could not block
 		{
-			// Add HIT VFX
-			GameObject par = Instantiate(VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
-			// END VFX
-			// Add Hit Gamefeel
-			CameraShake.CS.Shake(0.1f, 0.1f);
-			_player.SetVibration(0, 1.0f, 0.25f);
-			_player.SetVibration(1, 1.0f, 0.25f);
-			// End Gamefeel
-			ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem>().main;
-			ParticleSystem.MainModule psmain2 = par.transform.GetChild(0).GetComponent<ParticleSystem>().main;
-			psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
-			psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
+			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber));
+
 			_rb.AddForce(force, ForceMode.Impulse);
 		}
 
@@ -1003,26 +986,21 @@ public class PlayerController : MonoBehaviour
 		RaycastHit hit;
 		// This Layermask get all player's layer except this player's
 		int layermask = GameManager.GM.AllPlayers ^ (1 << gameObject.layer);
-		//if (Physics.CapsuleCast(transform.position, transform.position - transform.forward * 3f, 0.5f, transform.forward, out hit, 0.05f, layermask))
 		if (Physics.SphereCast(transform.position, 0.3f, transform.forward, out hit, 0.05f, layermask))
 		{
 			print(hit.transform.tag);
 			print(hit.transform.name);
 			IsPunching = false;
 			float velocityAddon = transform.GetComponent<Rigidbody>().velocity.magnitude;
-			velocityAddon = Mathf.Clamp(velocityAddon, 1f, 1.6f);
+			//velocityAddon = Mathf.Clamp(velocityAddon, 1f, 1.6f);
+			velocityAddon = 1.6f;
 			foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
 			{
 				rb.velocity = Vector3.zero;
 			}
 			Vector3 force = transform.forward * 500f * MeleeCharge * velocityAddon;
-			//hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(transform.forward * 500f * MeleeCharge * velocityAddon, gameObject);
+			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, gameObject);
 			hit.transform.GetComponentInParent<PlayerController>().Mark(gameObject);
-			EventManager.Instance.TriggerEvent(new PlayerHit(gameObject, hit.transform.GetComponentInParent<PlayerController>().gameObject, force));
-			// Game Feel
-			_player.SetVibration(0, 1.0f, 0.15f);
-			_player.SetVibration(1, 1.0f, 0.15f);
-			// Gamefeel End
 		}
 	}
 
@@ -1191,26 +1169,13 @@ public class PlayerController : MonoBehaviour
 
 	private void OnEnable()
 	{
-		EventManager.Instance.AddHandler<PlayerHit>(OnMeleeHit);
+		EventManager.Instance.AddHandler<PlayerDied>(OnEnterDeathZone);
 	}
 
 	private void OnDisable()
 	{
-		EventManager.Instance.RemoveHandler<PlayerHit>(OnMeleeHit);
+		EventManager.Instance.RemoveHandler<PlayerDied>(OnEnterDeathZone);
 
 	}
 
 }
-
-//private void CheckRun ()
-//{
-//    if (Input.GetKey (RunCode) && IsGrounded ())
-//    {
-//        LegSwingReference.GetComponent<Animator> ().speed = 2f;
-//        _rb.AddForce (transform.forward * Thrust * RunSpeedMultiplier);
-//    }
-//    else
-//    {
-//        LegSwingReference.GetComponent<Animator> ().speed = 1.6f;
-//    }
-//}

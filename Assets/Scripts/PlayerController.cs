@@ -1066,7 +1066,7 @@ public class PlayerController : MonoBehaviour
 			js.targetPosition = Mathf.Lerp(initLmTargetPosition, -85f, MeleeCharge);
 
 			hl.max = Mathf.Lerp(inithlMax, 130f, MeleeCharge);
-			hl.min = Mathf.Lerp(inithlMin, 128f, MeleeCharge);
+			hl.min = Mathf.Lerp(inithlMin, 110f, MeleeCharge);
 
 			Arm2hj.limits = lm2;
 			Armhj.spring = js;

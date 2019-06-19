@@ -9,7 +9,7 @@ using Rewired;
 /// </summary>
 public class GameFeelManager : MonoBehaviour
 {
-
+	#region Event Handlers
 	private void _onPlayerHit(PlayerHit ph)
 	{
 		Player _hitted = ReInput.players.GetPlayer(ph.HittedPlayerNumber);
@@ -31,16 +31,26 @@ public class GameFeelManager : MonoBehaviour
 		thedead.SetVibration(1, 1.0f, 0.25f);
 	}
 
+	private void _onPlayerFireWaterGun(WaterGunFired wf)
+	{
+		Player p = ReInput.players.GetPlayer(wf.WaterGunOwnerPlayerNumber);
+		p.SetVibration(0, 1.0f, 0.15f);
+		p.SetVibration(1, 1.0f, 0.15f);
+	}
+	#endregion
+
 	private void OnEnable()
 	{
 		EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
 		EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
+		EventManager.Instance.AddHandler<WaterGunFired>(_onPlayerFireWaterGun);
 	}
 
 	private void OnDisable()
 	{
 		EventManager.Instance.RemoveHandler<PlayerHit>(_onPlayerHit);
 		EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
+		EventManager.Instance.RemoveHandler<WaterGunFired>(_onPlayerFireWaterGun);
 
 	}
 }

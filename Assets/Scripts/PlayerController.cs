@@ -349,7 +349,7 @@ public class PlayerController : MonoBehaviour
 		if (HandObject.CompareTag("Weapon"))
 		{
 			// Stop the shooting
-			HandObject.SendMessage("Shoot", 0f, SendMessageOptions.RequireReceiver);
+			HandObject.SendMessage("Shoot", false);
 			// Disable the UI
 			HandObject.SendMessage("KillUI");
 		}
@@ -374,6 +374,15 @@ public class PlayerController : MonoBehaviour
 		{
 			switch (_rightTriggerRegister)
 			{
+				case "Weapon":
+					if (HandObject != null && !_dropping)
+					{
+						attackState = State.Shooting;
+						HandObject.SendMessage("Shoot", true);
+						if (EnableAuxillaryAiming)
+							AuxillaryAim();
+					}
+					break;
 				case "Hook":
 					if (HandObject != null && !_dropping)
 					{
@@ -395,6 +404,15 @@ public class PlayerController : MonoBehaviour
 		{
 			switch (_rightTriggerRegister)
 			{
+				case "Weapon":
+					attackState = State.Empty;
+					// Add weapon right trigger action
+					if (HandObject != null)
+						HandObject.SendMessage("Shoot", false);
+					// Auxillary Aiming
+					_auxillaryRotationLock = false;
+					_weaponCD = 0f;
+					break;
 				case "Hook":
 					if (HandObject != null && !_dropping)
 					{
@@ -414,38 +432,6 @@ public class PlayerController : MonoBehaviour
 			// Means we want to fire
 			switch (_rightTriggerRegister)
 			{
-				case "Throwable":
-					LeftHand.GetComponent<Fingers>().Throw();
-					RightHand.GetComponent<Fingers>().Throw();
-					break;
-				case "Weapon":
-					// Add weapon right trigger action
-					if (HandObject != null && !_dropping)
-					{
-						attackState = State.Shooting;
-						HandObject.SendMessage("Shoot", 1f, SendMessageOptions.RequireReceiver);
-						if (EnableAuxillaryAiming)
-							AuxillaryAim();
-					}
-					break;
-				case "WoodStamp":
-					if (HandObject != null && !_dropping && attackState != State.Shooting)
-					{
-						attackState = State.Shooting;
-						HandObject.SendMessage("Stamp", true);
-						if (EnableAuxillaryAiming) AuxillaryAim();
-						// Bend the body
-						JointSpring tempjs = _chesthj.spring;
-						tempjs.targetPosition = 40f;
-						_chesthj.spring = tempjs;
-					}
-					break;
-				//case "SuckGun":
-				//    if (HandObject != null && !_dropping)
-				//    {
-				//        HandObject.SendMessage("Suck", true);
-				//    }
-				//    break;
 				case "Team1Resource":
 				case "Team2Resource":
 					if (!_dropping)
@@ -475,32 +461,6 @@ public class PlayerController : MonoBehaviour
 		{
 			switch (_rightTriggerRegister)
 			{
-				// Means we release the button
-				case "Throwable":
-					break;
-				case "Weapon":
-					attackState = State.Empty;
-					// Add weapon right trigger action
-					if (HandObject != null)
-						HandObject.SendMessage("Shoot", 0f, SendMessageOptions.RequireReceiver);
-					// Auxillary Aiming
-					_auxillaryRotationLock = false;
-					_weaponCD = 0f;
-					break;
-				case "WoodStamp":
-					attackState = State.Empty;
-					HandObject.SendMessage("Stamp", false);
-					_auxillaryRotationLock = false;
-
-					// Bend the body back
-					JointSpring tempjs = _chesthj.spring;
-					tempjs.targetPosition = -5f;
-					_chesthj.spring = tempjs;
-					break;
-				//case "SuckGun":
-				//    if (HandObject != null)
-				//        HandObject.SendMessage("Suck", false);
-				//    break;
 				default:
 					// If we previously started melee and released the trigger, then release the fist
 					if (attackState == State.Meleeing)

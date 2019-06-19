@@ -34,6 +34,11 @@ public static class ConsoleProDebug
 		Debug.Log(inName + " : " + inValue + "\nCPAPI:{\"cmd\":\"Watch\" \"name\":\"" + inName + "\"}");
 	}
 
+	public static void Search(string inText)
+	{
+		Debug.Log("\nCPAPI:{\"cmd\":\"Search\" \"text\":\"" + inText + "\"}");
+	}
+
 	#if UNITY_EDITOR
 	// Reflection calls to access Console Pro from runtime
 	private static bool _checkedConsoleClearMethod = false;

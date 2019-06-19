@@ -1,4 +1,8 @@
-﻿public class GameStart : GameEvent
+﻿using UnityEngine;
+using System.Collections;
+using System.Collections.Generic;
+
+public class GameStart : GameEvent
 {
 	public GameStart()
 	{
@@ -7,17 +11,17 @@
 
 public class PlayerHit : GameEvent
 {
-	public UnityEngine.GameObject Hiter { get; }
-	public UnityEngine.GameObject Hitted { get; }
-	public UnityEngine.Vector3 Force { get; }
+	public GameObject Hiter { get; }
+	public GameObject Hitted { get; }
+	public Vector3 Force { get; }
 	/// <summary>
 	/// Represents the Rewired Player Number
 	/// </summary>
 	public int HiterPlayerNumber { get; }
 	public int HittedPlayerNumber { get; }
 
-	public PlayerHit(UnityEngine.GameObject _hiter, UnityEngine.GameObject _hitted,
-		UnityEngine.Vector3 _force)
+	public PlayerHit(GameObject _hiter, GameObject _hitted,
+		Vector3 _force)
 	{
 		Hiter = _hiter;
 		Hitted = _hitted;
@@ -26,8 +30,8 @@ public class PlayerHit : GameEvent
 		HittedPlayerNumber = 0;
 	}
 
-	public PlayerHit(UnityEngine.GameObject _hiter, UnityEngine.GameObject _hitted,
-		UnityEngine.Vector3 _force, int _hiternum, int _hittednum)
+	public PlayerHit(GameObject _hiter, GameObject _hitted,
+		Vector3 _force, int _hiternum, int _hittednum)
 	{
 		Hiter = _hiter;
 		Hitted = _hitted;
@@ -39,22 +43,20 @@ public class PlayerHit : GameEvent
 
 public class PlayerDied : GameEvent
 {
-	public UnityEngine.GameObject Player { get; }
+	public GameObject Player { get; }
 	public int PlayerNumber { get; }
 
-	public PlayerDied(UnityEngine.GameObject _player, int _playernum)
+	public PlayerDied(GameObject _player, int _playernum)
 	{
 		Player = _player;
 		PlayerNumber = _playernum;
 	}
-
-
 }
 
 public class PlayerRespawned : GameEvent
 {
-	public UnityEngine.GameObject Player { get; }
-	public PlayerRespawned(UnityEngine.GameObject _player)
+	public GameObject Player { get; }
+	public PlayerRespawned(GameObject _player)
 	{
 		Player = _player;
 	}
@@ -62,8 +64,8 @@ public class PlayerRespawned : GameEvent
 
 public class ObjectDespawned : GameEvent
 {
-	public UnityEngine.GameObject Obj { get; }
-	public ObjectDespawned(UnityEngine.GameObject _obj)
+	public GameObject Obj { get; }
+	public ObjectDespawned(GameObject _obj)
 	{
 		Obj = _obj;
 	}
@@ -71,9 +73,100 @@ public class ObjectDespawned : GameEvent
 
 public class WeaponSpawned : GameEvent
 {
-	public UnityEngine.GameObject Weapon { get; }
-	public WeaponSpawned(UnityEngine.GameObject _weapon)
+	public GameObject Weapon { get; }
+	public WeaponSpawned(GameObject _weapon)
 	{
 		Weapon = _weapon;
+	}
+}
+
+public class WaterGunFired : GameEvent
+{
+	public GameObject WaterGun { get; }
+	public GameObject WaterGunOwner { get; }
+	public int WaterGunOwnerPlayerNumber { get; }
+
+	public WaterGunFired(GameObject _watergun, GameObject _watergunowner, int _watergunownerplayernumber)
+	{
+		WaterGun = _watergun;
+		WaterGunOwner = _watergunowner;
+		WaterGunOwnerPlayerNumber = _watergunownerplayernumber;
+	}
+}
+
+public class HookGunFired : GameEvent
+{
+	public GameObject HookGun { get; }
+	public GameObject HookGunOwner { get; }
+	public int HookGunOwnerPlayerNumber { get; }
+
+	public HookGunFired(GameObject _hookgun, GameObject _hookgunowner, int _hookgunownerplayernumber)
+	{
+		HookGun = _hookgun;
+		HookGunOwner = _hookgunowner;
+		HookGunOwnerPlayerNumber = _hookgunownerplayernumber;
+	}
+}
+
+public class HookHit : GameEvent
+{
+	public GameObject HookGun { get; }
+	public GameObject Hook { get; }
+	public GameObject Hooker { get; }
+	public GameObject Hooked { get; }
+	public int HookerPlayerNumber { get; }
+	public int HookedPlayerNumber { get; }
+
+	public HookHit(GameObject _hookgun, GameObject _hook, GameObject _hooker, GameObject _hooked, int _hookerplayernumber, int _hookedplayernumber)
+	{
+		HookGun = _hookgun;
+		Hook = _hook;
+		Hooker = _hooker;
+		Hooked = _hooked;
+		HookerPlayerNumber = _hookerplayernumber;
+		HookedPlayerNumber = _hookedplayernumber;
+	}
+}
+
+public class SuckGunFired : GameEvent
+{
+	public GameObject SuckGun { get; }
+	public GameObject SuckGunOwner { get; }
+	public int SuckGunOwnerPlayerNumber { get; }
+
+	public SuckGunFired(GameObject _suckgun, GameObject _suckgunowner, int _suckgunownerplayernumber)
+	{
+		SuckGun = _suckgun;
+		SuckGunOwner = _suckgunowner;
+		SuckGunOwnerPlayerNumber = _suckgunownerplayernumber;
+	}
+}
+
+public class SuckGunSuck : GameEvent
+{
+	public GameObject SuckGun { get; }
+	public GameObject SuckGunOwner { get; }
+	public int SuckGunOwnerPlayerNumber { get; }
+
+	public List<GameObject> SuckedPlayers { get; private set; }
+	public List<int> SuckedPlayersNumber { get; private set; }
+
+	public SuckGunSuck(GameObject _suckgun, GameObject _suckgunowner, int _suckgunownerplayernumber, List<GameObject> _suckedplayers)
+	{
+		SuckGun = _suckgun;
+		SuckGunOwner = _suckgunowner;
+		SuckGunOwnerPlayerNumber = _suckgunownerplayernumber;
+		_init(_suckedplayers);
+	}
+
+	private void _init(List<GameObject> _suckedplayers)
+	{
+		SuckedPlayers = new List<GameObject>();
+		SuckedPlayersNumber = new List<int>();
+		foreach (GameObject player in _suckedplayers)
+		{
+			SuckedPlayers.Add(player);
+			SuckedPlayersNumber.Add(player.GetComponent<PlayerController>().PlayerNumber);
+		}
 	}
 }

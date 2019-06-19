@@ -133,6 +133,7 @@ public class rtHook : MonoBehaviour
 				// Statistics: Record the player has used the hook one time
 				_addToHookTime();
 				// End Statistics
+				EventManager.Instance.TriggerEvent(new HookGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
 			}
 		}
 		else
@@ -197,6 +198,7 @@ public class rtHook : MonoBehaviour
 			rb.isKinematic = true;
 		}
 		StartCoroutine(hookhelper(0.25f));
+		EventManager.Instance.TriggerEvent(new HookHit(gameObject, _hook, _gpc.Owner, hit, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, hit.GetComponent<PlayerController>().PlayerNumber));
 	}
 
 	IEnumerator hookhelper(float time)

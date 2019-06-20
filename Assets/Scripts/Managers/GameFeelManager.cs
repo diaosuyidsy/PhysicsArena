@@ -12,38 +12,73 @@ public class GameFeelManager : MonoBehaviour
 	#region Event Handlers
 	private void _onPlayerHit(PlayerHit ph)
 	{
-		Player _hitted = ReInput.players.GetPlayer(ph.HittedPlayerNumber);
 		CameraShake.CS.Shake(0.1f, 0.1f);
-		_hitted.SetVibration(0, 1.0f, 0.25f);
-		_hitted.SetVibration(1, 1.0f, 0.25f);
+		_vibrateController(ph.HittedPlayerNumber, 1.0f, 0.25f);
 
+		/// If the hiter number is below 0, means it's a block
+		/// and blocked attack don't have a hitter
 		if (ph.HiterPlayerNumber < 0) return;
-		Player _hiter = ReInput.players.GetPlayer(ph.HiterPlayerNumber);
-		_hiter.SetVibration(0, 1.0f, 0.15f);
-		_hiter.SetVibration(1, 1.0f, 0.15f);
+		_vibrateController(ph.HiterPlayerNumber, 1.0f, 0.15f);
+
 	}
 
 	private void _onPlayerDied(PlayerDied pd)
 	{
-		Player thedead = ReInput.players.GetPlayer(pd.PlayerNumber);
 		CameraShake.CS.Shake(0.1f, 0.1f);
-		thedead.SetVibration(0, 1.0f, 0.25f);
-		thedead.SetVibration(1, 1.0f, 0.25f);
+		_vibrateController(pd.PlayerNumber, 1.0f, 0.25f);
 	}
 
 	private void _onPlayerFireWaterGun(WaterGunFired wf)
 	{
-		Player p = ReInput.players.GetPlayer(wf.WaterGunOwnerPlayerNumber);
-		p.SetVibration(0, 1.0f, 0.15f);
-		p.SetVibration(1, 1.0f, 0.15f);
+		_vibrateController(wf.WaterGunOwnerPlayerNumber);
 	}
+
+	private void _onPlayerFireHookGun(HookGunFired hf)
+	{
+		_vibrateController(hf.HookGunOwnerPlayerNumber, 1.0f, 0.1f);
+	}
+
+	private void _onHookHit(HookHit hh)
+	{
+		_vibrateController(hh.HookedPlayerNumber);
+		_vibrateController(hh.HookerPlayerNumber);
+	}
+
+	private void _onSuckGunFire(SuckGunFired sf)
+	{
+		_vibrateController(sf.SuckGunOwnerPlayerNumber);
+	}
+
+	private void _onSuckGunSuck(SuckGunSuck ss)
+	{
+		_vibrateController(ss.SuckedPlayersNumber);
+		_vibrateController(ss.SuckGunOwnerPlayerNumber);
+	}
+
 	#endregion
+
+	private void _vibrateController(int playernumber, float motorlevel = 1.0f, float duration = 0.15f)
+	{
+		Player player = ReInput.players.GetPlayer(playernumber);
+		player.SetVibration(0, motorlevel, duration);
+		player.SetVibration(1, motorlevel, duration);
+	}
+
+	private void _vibrateController(List<int> playernumbers, float motorlevel = 1.0f, float duration = 0.15f)
+	{
+		foreach (int playernumber in playernumbers)
+		{
+			_vibrateController(playernumber, motorlevel, duration);
+		}
+	}
 
 	private void OnEnable()
 	{
 		EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
 		EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
 		EventManager.Instance.AddHandler<WaterGunFired>(_onPlayerFireWaterGun);
+		EventManager.Instance.AddHandler<HookGunFired>(_onPlayerFireHookGun);
+		EventManager.Instance.AddHandler<HookHit>(_onHookHit);
 	}
 
 	private void OnDisable()
@@ -51,6 +86,8 @@ public class GameFeelManager : MonoBehaviour
 		EventManager.Instance.RemoveHandler<PlayerHit>(_onPlayerHit);
 		EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
 		EventManager.Instance.RemoveHandler<WaterGunFired>(_onPlayerFireWaterGun);
+		EventManager.Instance.RemoveHandler<HookGunFired>(_onPlayerFireHookGun);
+		EventManager.Instance.RemoveHandler<HookHit>(_onHookHit);
 
 	}
 }

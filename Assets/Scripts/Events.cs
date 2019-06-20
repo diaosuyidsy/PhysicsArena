@@ -145,15 +145,17 @@ public class SuckGunFired : GameEvent
 public class SuckGunSuck : GameEvent
 {
 	public GameObject SuckGun { get; }
+	public GameObject SuckBall { get; }
 	public GameObject SuckGunOwner { get; }
 	public int SuckGunOwnerPlayerNumber { get; }
 
 	public List<GameObject> SuckedPlayers { get; private set; }
 	public List<int> SuckedPlayersNumber { get; private set; }
 
-	public SuckGunSuck(GameObject _suckgun, GameObject _suckgunowner, int _suckgunownerplayernumber, List<GameObject> _suckedplayers)
+	public SuckGunSuck(GameObject _suckgun, GameObject _suckball, GameObject _suckgunowner, int _suckgunownerplayernumber, List<GameObject> _suckedplayers)
 	{
 		SuckGun = _suckgun;
+		SuckBall = _suckball;
 		SuckGunOwner = _suckgunowner;
 		SuckGunOwnerPlayerNumber = _suckgunownerplayernumber;
 		_init(_suckedplayers);
@@ -168,5 +170,29 @@ public class SuckGunSuck : GameEvent
 			SuckedPlayers.Add(player);
 			SuckedPlayersNumber.Add(player.GetComponent<PlayerController>().PlayerNumber);
 		}
+	}
+}
+
+public class PunchHolding : GameEvent
+{
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+
+	public PunchHolding(GameObject _player, int _playernumber)
+	{
+		Player = _player;
+		PlayerNumber = _playernumber;
+	}
+}
+
+public class PunchReleased : GameEvent
+{
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+
+	public PunchReleased(GameObject _player, int _playernumber)
+	{
+		Player = _player;
+		PlayerNumber = _playernumber;
 	}
 }

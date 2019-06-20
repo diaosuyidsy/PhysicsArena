@@ -91,7 +91,7 @@ public class rtSuck : MonoBehaviour
 	IEnumerator sucking(float time)
 	{
 		List<GameObject> gos = _sbc.InRangePlayers;
-		EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber,
+		EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber,
 			gos));
 		// First prototype: let's try adding a force to every object
 		yield return new WaitForSeconds(time);

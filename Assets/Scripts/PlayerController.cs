@@ -453,6 +453,7 @@ public class PlayerController : MonoBehaviour
 							StartCoroutine(MeleeClockFistLeftHandHelper(1f, _leftArmhj));
 						}
 						StartCoroutine(MeleeClockFistHelper(_rightArm2hj, _rightArmhj, _rightHandhj, 1f));
+						EventManager.Instance.TriggerEvent(new PunchHolding(gameObject, PlayerNumber));
 					}
 					break;
 			}
@@ -479,6 +480,7 @@ public class PlayerController : MonoBehaviour
 							StartCoroutine(MeleePunchLeftHandHelper(0.2f, _leftArmhj));
 						}
 						StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, 0.2f));
+						EventManager.Instance.TriggerEvent(new PunchReleased(gameObject, PlayerNumber));
 					}
 					_auxillaryRotationLock = false;
 

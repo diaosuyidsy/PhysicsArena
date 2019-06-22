@@ -4,18 +4,10 @@ using Rewired;
 
 public class PlayerController : MonoBehaviour
 {
-	public CharacterData CharacterDatas;
-	[Header("Player Basic Control Section")]
-	//[Tooltip("Enter 1 Digit 1-4")]
-	//public int PlayerControllerNumber;
-	public float Thrust = 300f;
-	public float JumpForce = 300f;
-	public LayerMask JumpMask;
-	public float RotationSpeed = 200f;
-	[Tooltip("For Chicken, it should be 2, Duck, could be 1.9")]
-	public float WalkSpeed = 2f;
-	[Tooltip("It should be the same speed, little less than Duck's normal WalkSpeed")]
-	public float PickUpSpeed = 1.8f;
+	[Header("Player Movement Control Section")]
+	public CharacterData CharacterDataStore;
+	[HideInInspector]
+	public float RotationSpeed;
 	[HideInInspector]
 	public float MaxBlockCD = 5f;
 	[HideInInspector]
@@ -148,7 +140,7 @@ public class PlayerController : MonoBehaviour
 		_leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
 		_rightHandhj = RightArms[2].GetComponent<HingeJoint>();
 		_freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
-		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", WalkSpeed / 2f);
+		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", CharacterDataStore.CharacterMovementDataStore.WalkSpeed / 2f);
 		MaxBlockCD = 1.5f;
 	}
 
@@ -362,7 +354,7 @@ public class PlayerController : MonoBehaviour
 		// Nullify the holder
 		HandObject = null;
 		// Change the speed back to normal
-		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", WalkSpeed / 2f);
+		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", CharacterDataStore.CharacterMovementDataStore.WalkSpeed / 2f);
 		// Clear the right trigger register
 		_rightTriggerRegister = "";
 		// Set Auxillary Aim to false
@@ -471,7 +463,7 @@ public class PlayerController : MonoBehaviour
 						attackState = State.Empty;
 						// This is add a push force when melee
 						if (DesignPanelManager.DPM.MeleeChargeToggle.isOn)
-							_rb.AddForce(transform.forward * Thrust * MeleeCharge * 2f, ForceMode.Impulse);
+							_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * MeleeCharge * 2f, ForceMode.Impulse);
 						StopAllCoroutines();
 						if (DesignPanelManager.DPM.MeleeDoubleArmToggle.isOn)
 						{
@@ -765,7 +757,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (_player.GetButtonDown("Jump") && IsGrounded())
 		{
-			_rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
+			_rb.AddForce(new Vector3(0, CharacterDataStore.CharacterMovementDataStore.JumpForce, 0), ForceMode.Impulse);
 			_isJumping = true;
 			EventManager.Instance.TriggerEvent(new PlayerJump(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber));
 			OnDeathHidden[3].SetActive(false);
@@ -795,11 +787,11 @@ public class PlayerController : MonoBehaviour
 			// Add force based on that percentage
 			if (IsGrounded())
 			{
-				_rb.AddForce(transform.forward * Thrust * normalizedInputVal);
+				_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal);
 			}
 			else
 			{
-				_rb.AddForce(transform.forward * Thrust * normalizedInputVal * 0.5f);
+				_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal * 0.5f);
 			}
 			// Turn player according to the rotation of the joystick
 			//transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
@@ -811,7 +803,7 @@ public class PlayerController : MonoBehaviour
 			}
 			else
 			{
-				RotationSpeed = 4f;
+				RotationSpeed = CharacterDataStore.CharacterMovementDataStore.MinRotationSpeed;
 			}
 			// Check if player's speed is not within x degree of the controller angle
 			// Then disable the animator if so
@@ -820,7 +812,7 @@ public class PlayerController : MonoBehaviour
 
 			LegSwingReference.GetComponent<Animator>().enabled = true;
 
-			RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
+			RotationSpeed = Mathf.Clamp(RotationSpeed, CharacterDataStore.CharacterMovementDataStore.MinRotationSpeed, CharacterDataStore.CharacterMovementDataStore.MaxRotationSpeed);
 			Transform target = TurnReference.transform.GetChild(0);
 			Vector3 relativePos = target.position - transform.position;
 
@@ -861,7 +853,7 @@ public class PlayerController : MonoBehaviour
 	private bool IsGrounded()
 	{
 		RaycastHit hit;
-		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, JumpMask);
+		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
 	}
 
 	private void CheckArmHelper(bool down, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)

@@ -4,6 +4,7 @@ using Rewired;
 
 public class PlayerController : MonoBehaviour
 {
+	public CharacterData CharacterDatas;
 	[Header("Player Basic Control Section")]
 	//[Tooltip("Enter 1 Digit 1-4")]
 	//public int PlayerControllerNumber;
@@ -111,6 +112,7 @@ public class PlayerController : MonoBehaviour
 	private bool _dropping = false;
 	private float _blockCharge = 0f;
 	private bool _blockCanRegen = false;
+	private bool _isJumping = false;
 	#endregion
 
 	#region Private Timer Variable
@@ -122,7 +124,7 @@ public class PlayerController : MonoBehaviour
 	private bool starttimer_hitmakrer = false;
 	#endregion
 
-	[Header("Debug Section: Don't Ever Touch")]
+	[Header("Debug Section: Please Touch Me~")]
 	#region Debug Toggle
 	public bool debugT_CheckArm = true;
 	#endregion
@@ -764,6 +766,9 @@ public class PlayerController : MonoBehaviour
 		if (_player.GetButtonDown("Jump") && IsGrounded())
 		{
 			_rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
+			_isJumping = true;
+			EventManager.Instance.TriggerEvent(new PlayerJump(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber));
+			OnDeathHidden[3].SetActive(false);
 		}
 	}
 
@@ -780,8 +785,6 @@ public class PlayerController : MonoBehaviour
 
 	private void CheckMovement()
 	{
-		//string HLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis1";
-		//string VLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis2";
 		float HLAxis = _player.GetAxis("Move Horizontal");
 		float VLAxis = _player.GetAxis("Move Vertical");
 
@@ -791,21 +794,19 @@ public class PlayerController : MonoBehaviour
 			float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
 			// Add force based on that percentage
 			if (IsGrounded())
+			{
 				_rb.AddForce(transform.forward * Thrust * normalizedInputVal);
+			}
 			else
+			{
 				_rb.AddForce(transform.forward * Thrust * normalizedInputVal * 0.5f);
+			}
 			// Turn player according to the rotation of the joystick
 			//transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
 			float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
 			float controllerRot = Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
 			if (!(Mathf.Abs(playerRot - controllerRot) < 20f))
 			{
-				//float mirrorAngle = playerRot > 0f ? (playerRot - 180f) : (playerRot + 180f);
-				//float rotation = controllerRot - playerRot > 0f ? 1f : -1f;
-				//Debug.Log("Controller Rotation: " + controllerRot);
-				//Debug.Log("Plauer Rotation: " + playerRot);
-				//transform.Rotate(new Vector3(0f, rotation * RotationSpeed, 0f) * Time.deltaTime);
-				//_rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal * 3f);
 				RotationSpeed += Time.deltaTime;
 			}
 			else
@@ -817,9 +818,6 @@ public class PlayerController : MonoBehaviour
 			// Turn on the animator of the Leg Swing Preference
 			float playerVelRot = Mathf.Atan2(_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
 
-
-
-			//LegSwingReference.GetComponent<Animator>().enabled = IsGrounded();
 			LegSwingReference.GetComponent<Animator>().enabled = true;
 
 			RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
@@ -950,8 +948,6 @@ public class PlayerController : MonoBehaviour
 		int layermask = GameManager.GM.AllPlayers ^ (1 << gameObject.layer);
 		if (Physics.SphereCast(transform.position, 0.3f, transform.forward, out hit, 0.05f, layermask))
 		{
-			print(hit.transform.tag);
-			print(hit.transform.name);
 			IsPunching = false;
 			float velocityAddon = transform.GetComponent<Rigidbody>().velocity.magnitude;
 			//velocityAddon = Mathf.Clamp(velocityAddon, 1f, 1.6f);
@@ -1129,6 +1125,15 @@ public class PlayerController : MonoBehaviour
 	}
 	#endregion
 
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.gameObject.layer == 13 && _isJumping)
+		{
+			_isJumping = false;
+			EventManager.Instance.TriggerEvent(new PlayerLand(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber));
+			OnDeathHidden[3].SetActive(true);
+		}
+	}
 	private void OnEnable()
 	{
 		EventManager.Instance.AddHandler<PlayerDied>(OnEnterDeathZone);

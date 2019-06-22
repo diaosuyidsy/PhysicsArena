@@ -4,21 +4,14 @@ using UnityEngine;
 
 public class AudioManager : MonoBehaviour
 {
-	public AudioClip BlockAudioClip;
-	public AudioClip PunchChargingAudioClip;
-	public AudioClip PunchReleasedAudioClip;
-	public AudioClip HookGunFiredAudioClip;
-	public AudioClip HookGunHitAudioClip;
-	public AudioClip SuckGunFiredAudioClip;
-	public AudioClip SuckGunSuckAudioClip;
-	public AudioClip DeathAudioClip;
-	public AudioClip PlayerHitAudioClip;
+	public AudioData AudioDataStore;
 
-	[Header("Optional")]
-	public AudioClip ObjectDespawnedAudioClip;
-	public AudioClip PlayerRespawnedAudioClip;
-	public AudioClip WeaponSpawnedAudioClip;
-
+	/// <summary>
+	/// Play clip Sound at obj
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="clip"></param>
+	/// <param name="oneshot"></param>
 	private void _playSound(GameObject obj, AudioClip clip, bool oneshot = true)
 	{
 		AudioSource objas = obj.GetComponent<AudioSource>();
@@ -34,75 +27,94 @@ public class AudioManager : MonoBehaviour
 		}
 	}
 
+	/// <summary>
+	/// Play sound randomly from given clips
+	/// </summary>
+	/// <param name="obj"></param>
+	/// <param name="clips"></param>
+	/// <param name="oneshot"></param>
+	private void _playSound(GameObject obj, AudioClip[] clips, bool oneshot = true)
+	{
+		int rand = Random.Range(0, clips.Length);
+		_playSound(obj, clips[rand], oneshot);
+	}
+
+	#region Event Handlers
 	private void _onPlayerHit(PlayerHit ph)
 	{
-		AudioSource hittedas = ph.Hitted.GetComponent<AudioSource>();
-		if (hittedas == null) hittedas = ph.Hiter.AddComponent<AudioSource>();
-		Debug.Assert(hittedas != null);
-
 		if (ph.Hiter == null)
 		{
 			///If hiter is null, then it's a block
-			hittedas.PlayOneShot(BlockAudioClip);
+			_playSound(ph.Hitted, AudioDataStore.BlockAudioClip);
 		}
 		else
 		{
 			///If it's not null, then it's a hit
-			hittedas.PlayOneShot(PlayerHitAudioClip);
+			_playSound(ph.Hitted, AudioDataStore.PlayerHitAudioClip);
 		}
 	}
 
 	private void _onHookGunFired(HookGunFired hgf)
 	{
-		_playSound(hgf.HookGun, HookGunFiredAudioClip);
+		_playSound(hgf.HookGun, AudioDataStore.HookGunFiredAudioClip);
 	}
 
 	private void _onHookGunHit(HookHit hh)
 	{
-		_playSound(hh.Hook, HookGunHitAudioClip);
+		_playSound(hh.Hook, AudioDataStore.HookGunHitAudioClip);
 	}
 
 	private void _onSuckGunFired(SuckGunFired sgf)
 	{
-		_playSound(sgf.SuckGun, SuckGunFiredAudioClip);
+		_playSound(sgf.SuckGun, AudioDataStore.SuckGunFiredAudioClip);
 	}
 
 	private void _onSuckGunSuck(SuckGunSuck sgs)
 	{
-		_playSound(sgs.SuckBall, SuckGunSuckAudioClip);
+		_playSound(sgs.SuckBall, AudioDataStore.SuckGunSuckAudioClip);
 	}
 
 	private void _onPlayerDied(PlayerDied pd)
 	{
-		_playSound(pd.Player, DeathAudioClip);
+		_playSound(pd.Player, AudioDataStore.DeathAudioClip);
 	}
 
 	private void _onObjectDespawned(ObjectDespawned od)
 	{
-
+		_playSound(od.Obj, AudioDataStore.ObjectDespawnedAudioClip);
 	}
 
 	private void _onPlayerRespawned(PlayerRespawned pr)
 	{
-
+		_playSound(pr.Player, AudioDataStore.PlayerRespawnedAudioClip);
 	}
 
 	private void _onWeaponSpawned(WeaponSpawned ws)
 	{
-
+		_playSound(ws.Weapon, AudioDataStore.WeaponSpawnedAudioClip);
 	}
 
 	private void _onPunchHolding(PunchHolding ph)
 	{
-		_playSound(ph.Player, PunchChargingAudioClip, false);
+		_playSound(ph.Player, AudioDataStore.PunchChargingAudioClip, false);
 	}
 
 	private void _onPunchReleased(PunchReleased pr)
 	{
-		_playSound(pr.Player, PunchReleasedAudioClip, false);
-
+		_playSound(pr.Player, AudioDataStore.PunchReleasedAudioClip, false);
 	}
 
+	private void _onFootStep(FootStep fs)
+	{
+		_playSound(fs.PlayerFeet, AudioDataStore.FootstepAudioClips);
+	}
+
+	private void _onPlayerJump(PlayerJump pj)
+	{
+		_playSound(pj.Player, AudioDataStore.JumpAudioClip);
+	}
+
+	#endregion
 
 	private void OnEnable()
 	{
@@ -117,6 +129,8 @@ public class AudioManager : MonoBehaviour
 		EventManager.Instance.AddHandler<WeaponSpawned>(_onWeaponSpawned);
 		EventManager.Instance.AddHandler<PunchHolding>(_onPunchHolding);
 		EventManager.Instance.AddHandler<PunchReleased>(_onPunchReleased);
+		EventManager.Instance.AddHandler<FootStep>(_onFootStep);
+		EventManager.Instance.AddHandler<PlayerJump>(_onPlayerJump);
 	}
 
 	private void OnDisable()
@@ -132,5 +146,7 @@ public class AudioManager : MonoBehaviour
 		EventManager.Instance.RemoveHandler<WeaponSpawned>(_onWeaponSpawned);
 		EventManager.Instance.RemoveHandler<PunchHolding>(_onPunchHolding);
 		EventManager.Instance.RemoveHandler<PunchReleased>(_onPunchReleased);
+		EventManager.Instance.RemoveHandler<FootStep>(_onFootStep);
+		EventManager.Instance.RemoveHandler<PlayerJump>(_onPlayerJump);
 	}
 }

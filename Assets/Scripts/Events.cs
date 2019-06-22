@@ -196,3 +196,61 @@ public class PunchReleased : GameEvent
 		PlayerNumber = _playernumber;
 	}
 }
+
+public class FootStep : GameEvent
+{
+	public GameObject PlayerFeet { get; }
+	public string GroundType { get; }
+
+	public FootStep(GameObject _playerfeet)
+	{
+		PlayerFeet = _playerfeet;
+		GroundType = "Grass";
+	}
+
+	public FootStep(GameObject _playerfeet, string _groundType)
+	{
+		PlayerFeet = _playerfeet;
+		GroundType = _groundType;
+	}
+}
+
+public class PlayerJump : GameEvent
+{
+	public GameObject Player;
+	public GameObject PlayerFeet;
+	public int PlayerNumber;
+
+	public PlayerJump(GameObject _player, GameObject _playerfeet, int _playernumber)
+	{
+		Player = _player;
+		PlayerFeet = _playerfeet;
+		PlayerNumber = _playernumber;
+	}
+}
+
+public class PlayerLand : GameEvent
+{
+	public GameObject Player;
+	public GameObject PlayerFeet;
+	public int PlayerNumber;
+
+	public PlayerLand(GameObject _player, GameObject _playerfeet, int _playernumber)
+	{
+		Player = _player;
+		PlayerFeet = _playerfeet;
+		PlayerNumber = _playernumber;
+	}
+}
+
+public class FoodDelivered : GameEvent
+{
+	public GameObject Food { get; }
+	public string FoodTag { get; }
+
+	public FoodDelivered(GameObject _food, string _foodtag)
+	{
+		Food = _food;
+		FoodTag = _foodtag;
+	}
+}

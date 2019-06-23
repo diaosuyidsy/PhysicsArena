@@ -4,11 +4,7 @@ using UnityEngine;
 
 public class rtSuck : MonoBehaviour
 {
-	public float MaxBallTravelTime = 4f;
-	public float BallTravelSpeed = 3f;
-	public float SuckStrength = 350f;
-	[HideInInspector]
-	public int SuckGunMaxUseTimes = 15;
+	public WeaponData WeaponDataStore;
 
 	private float _ballTraveledTime = 0f;
 	private GameObject _suckBall;
@@ -34,16 +30,16 @@ public class rtSuck : MonoBehaviour
 		_sbc = _suckBall.GetComponent<SuckBallController>();
 		_gpc = GetComponent<GunPositionControl>();
 		_suckBallInitialScale = new Vector3(_suckBall.transform.localScale.x, _suckBall.transform.localScale.y, _suckBall.transform.localScale.z);
-		_suckGunLeftTimes = SuckGunMaxUseTimes;
+		_suckGunLeftTimes = WeaponDataStore.SuckGunDataStore.SuckGunMaxUseTimes;
 	}
 
 	private void Update()
 	{
 		if (_ballState == State.Out)
 		{
-			_suckBall.transform.position += Time.deltaTime * -1f * _suckBall.transform.right * BallTravelSpeed;
+			_suckBall.transform.position += Time.deltaTime * -1f * _suckBall.transform.right * WeaponDataStore.SuckGunDataStore.BallTravelSpeed;
 			_ballTraveledTime += Time.deltaTime;
-			if (_ballTraveledTime >= MaxBallTravelTime)
+			if (_ballTraveledTime >= WeaponDataStore.SuckGunDataStore.MaxBallTravelTime)
 			{
 				_ballTraveledTime = 0f;
 				_charged = false;
@@ -98,7 +94,7 @@ public class rtSuck : MonoBehaviour
 
 		foreach (GameObject go in gos)
 		{
-			go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * SuckStrength, ForceMode.Impulse);
+			go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * WeaponDataStore.SuckGunDataStore.SuckStrength, ForceMode.Impulse);
 			// Statistics: Add kill marker
 			go.GetComponent<PlayerController>().Mark(_gpc.Owner);
 			// Statistics: Add every player he sucked into statistics
@@ -158,19 +154,19 @@ public class rtSuck : MonoBehaviour
 	{
 		if (other.collider.CompareTag("Ground") && _suckGunLeftTimes <= 0)
 		{
-			_suckGunLeftTimes = SuckGunMaxUseTimes;
+			_suckGunLeftTimes = WeaponDataStore.SuckGunDataStore.SuckGunMaxUseTimes;
 			EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 			gameObject.SetActive(false);
 		}
 		if (((1 << other.gameObject.layer) & (1 << 14)) != 0)
 		{
-			StartCoroutine(DisappearAfterAWhile(3f));
+			StartCoroutine(DisappearAfterAWhile(0f));
 		}
 	}
 
 	private void VanishAfterUsed()
 	{
-		_suckGunLeftTimes = SuckGunMaxUseTimes;
+		_suckGunLeftTimes = WeaponDataStore.SuckGunDataStore.SuckGunMaxUseTimes;
 		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 		gameObject.SetActive(false);
 	}
@@ -184,7 +180,7 @@ public class rtSuck : MonoBehaviour
 	IEnumerator DisappearAfterAWhile(float time)
 	{
 		yield return new WaitForSeconds(time);
-		_suckGunLeftTimes = SuckGunMaxUseTimes;
+		_suckGunLeftTimes = WeaponDataStore.SuckGunDataStore.SuckGunMaxUseTimes;
 		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 		gameObject.SetActive(false);
 	}

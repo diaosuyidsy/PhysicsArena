@@ -10,8 +10,8 @@ public class WeaponGenerationManager : MonoBehaviour
 	public GameObject WeaponsHolder;
 	[HideInInspector]
 	public GameObject[] Weapons;
-	public float WeaponSpawnCD = 10f;
 	public int NextSpawnAmount;
+	public WeaponData WeaponDataStore;
 
 	private int _activatedWeaponNum = 0;
 	private int _nextspawnamount;
@@ -36,7 +36,7 @@ public class WeaponGenerationManager : MonoBehaviour
 	public void StartGeneratingWeapon()
 	{
 		// We need to invoke weapon generation from the start
-		InvokeRepeating("GenerateWeapon", 5f, WeaponSpawnCD);
+		InvokeRepeating("GenerateWeapon", 5f, WeaponDataStore.WeaponSpawnCD);
 	}
 
 	private void GenerateWeapon()

@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class rtHook : MonoBehaviour
 {
-	public float HookSpeed = 5f;
+	public WeaponData WeaponDataStore;
 	[HideInInspector]
 	public GameObject Hooked = null;
 	[HideInInspector]
 	public bool HookCanBend = true;
-	[HideInInspector]
-	public int MaxHookTimes = 15;
 
 	private GameObject _hook;
 	private Vector3 _hookinitlocalPos;
@@ -57,7 +55,7 @@ public class rtHook : MonoBehaviour
 		if (_hookState == State.FlyingOut)
 		{
 			Vector3 nextpos = (_hookmaxPos - _hook.transform.position).normalized;
-			_hook.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
+			_hook.transform.Translate(nextpos * Time.deltaTime * WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
 			if (Vector3.Distance(_hook.transform.position, _hookmaxPos) <= 0.1f)
 			{
 				_hookState = State.FlyingIn;
@@ -73,10 +71,10 @@ public class rtHook : MonoBehaviour
 				Vector3 finalVec = nextpos - vec2;
 				nextpos = (nextpos + finalVec * 10f).normalized;
 			}
-			_hook.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
+			_hook.transform.Translate(nextpos * Time.deltaTime * WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
 			if (Hooked != null && CanCarryBack)
 			{
-				Hooked.transform.Translate(nextpos * Time.deltaTime * HookSpeed, Space.World);
+				Hooked.transform.Translate(nextpos * Time.deltaTime * WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
 			}
 			if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.6f)
 			{
@@ -149,7 +147,7 @@ public class rtHook : MonoBehaviour
 				Vector3 finalVec = force - vec2;
 				force = (force + finalVec * 10f).normalized;
 
-				Hooked.GetComponent<Rigidbody>().AddForce(force * 450f, ForceMode.Impulse);
+				Hooked.GetComponent<Rigidbody>().AddForce(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse);
 				Hooked = null;
 			}
 			if (DesignPanelManager.DPM.HookAlternateSchemaToggle.isOn)
@@ -197,7 +195,7 @@ public class rtHook : MonoBehaviour
 		{
 			rb.isKinematic = true;
 		}
-		StartCoroutine(hookhelper(0.25f));
+		StartCoroutine(hookhelper(WeaponDataStore.HookGunDataStore.HookedTime));
 		EventManager.Instance.TriggerEvent(new HookHit(gameObject, _hook, _gpc.Owner, hit, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, hit.GetComponent<PlayerController>().PlayerNumber));
 	}
 
@@ -211,20 +209,20 @@ public class rtHook : MonoBehaviour
 	{
 		if (other.collider.CompareTag("Ground") && _curHookTimesLeft <= 0)
 		{
-			_curHookTimesLeft = MaxHookTimes;
+			_curHookTimesLeft = WeaponDataStore.HookGunDataStore.MaxHookTimes;
 			EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 
 			gameObject.SetActive(false);
 		}
 		if (((1 << other.gameObject.layer) & (1 << 14)) != 0)
 		{
-			StartCoroutine(DisappearAfterAWhile(3f));
+			StartCoroutine(DisappearAfterAWhile(0f));
 		}
 	}
 
 	private void VanishAfterUse()
 	{
-		_curHookTimesLeft = MaxHookTimes;
+		_curHookTimesLeft = WeaponDataStore.HookGunDataStore.MaxHookTimes;
 		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 
 		gameObject.SetActive(false);
@@ -257,7 +255,7 @@ public class rtHook : MonoBehaviour
 	IEnumerator DisappearAfterAWhile(float time)
 	{
 		yield return new WaitForSeconds(time);
-		_curHookTimesLeft = MaxHookTimes;
+		_curHookTimesLeft = WeaponDataStore.HookGunDataStore.MaxHookTimes;
 		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 
 		gameObject.SetActive(false);

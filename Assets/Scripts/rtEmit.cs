@@ -9,12 +9,8 @@ public class rtEmit : MonoBehaviour
 	public ObiEmitter WaterBall;
 	public GameObject WaterUI;
 	public GameObject GunUI;
-	public float Speed;
-	public float BackFireThrust;
-	public float UpThrust = 1f;
-	public int MaxAmmo = 1000;
+	public WeaponData WeaponDataStore;
 	public int currentAmmo;
-	public float ShootMaxCD = 0.3f;
 	public LayerMask OnHitDisappear;
 
 	private float _shootCD = 0f;
@@ -30,7 +26,7 @@ public class rtEmit : MonoBehaviour
 
 	private void Awake()
 	{
-		currentAmmo = MaxAmmo;
+		currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
 		_gpc = GetComponent<GunPositionControl>();
 		_waterGunState = State.Empty;
 	}
@@ -41,7 +37,7 @@ public class rtEmit : MonoBehaviour
 		{
 			case State.Shooting:
 				_shootCD += Time.deltaTime;
-				if (_shootCD >= ShootMaxCD)
+				if (_shootCD >= WeaponDataStore.WaterGunDataStore.ShootMaxCD)
 				{
 					WaterBall.speed = 0f;
 					_waterGunState = State.Empty;
@@ -76,7 +72,12 @@ public class rtEmit : MonoBehaviour
 		{
 			_waterGunState = State.Shooting;
 			GunUI.SetActive(true);
-			WaterBall.speed = Speed;
+			WaterBall.speed = WeaponDataStore.WaterGunDataStore.Speed;
+			if (_gpc != null)
+			{
+				_gpc.Owner.GetComponent<Rigidbody>().AddForce(-_gpc.Owner.transform.forward * WeaponDataStore.WaterGunDataStore.BackFireThrust, ForceMode.Impulse);
+				_gpc.Owner.GetComponent<Rigidbody>().AddForce(_gpc.Owner.transform.up * WeaponDataStore.WaterGunDataStore.UpThrust, ForceMode.Impulse);
+			}
 			EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
 		}
 		else
@@ -113,7 +114,7 @@ public class rtEmit : MonoBehaviour
 
 	private void ChangeAmmoUI()
 	{
-		float scaleY = currentAmmo * 1.0f / MaxAmmo;
+		float scaleY = currentAmmo * 1.0f / WeaponDataStore.WaterGunDataStore.MaxAmmo;
 		WaterUI.transform.localScale = new Vector3(1f, scaleY, 1f);
 	}
 
@@ -123,20 +124,20 @@ public class rtEmit : MonoBehaviour
 	{
 		if (other.collider.CompareTag("Ground") && currentAmmo == 0)
 		{
-			currentAmmo = MaxAmmo;
+			currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
 			ChangeAmmoUI();
 			EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 			gameObject.SetActive(false);
 		}
 		if (((1 << other.gameObject.layer) & OnHitDisappear) != 0)
 		{
-			StartCoroutine(DisappearAfterAWhile(3f));
+			StartCoroutine(DisappearAfterAWhile(0f));
 		}
 	}
 
 	private void VanishAfterUse()
 	{
-		currentAmmo = MaxAmmo;
+		currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
 		ChangeAmmoUI();
 		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 		gameObject.SetActive(false);
@@ -147,7 +148,7 @@ public class rtEmit : MonoBehaviour
 	{
 		if (other.CompareTag("DeathZone"))
 		{
-			currentAmmo = MaxAmmo;
+			currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
 			ChangeAmmoUI();
 			gameObject.SetActive(false);
 		}
@@ -156,7 +157,7 @@ public class rtEmit : MonoBehaviour
 	IEnumerator DisappearAfterAWhile(float time)
 	{
 		yield return new WaitForSeconds(time);
-		currentAmmo = MaxAmmo;
+		currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
 		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 		ChangeAmmoUI();
 		gameObject.SetActive(false);

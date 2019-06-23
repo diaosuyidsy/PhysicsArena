@@ -118,26 +118,26 @@ public class ArenaScoreboard : MonoBehaviour
 		TeamDuckScoreText.text = DuckScore.ToString();
 	}
 
-	private void OnEnable()
-	{
-		EventManager.StartListening("GameStart", StartTimer);
-		EventManager.StartListening("OnTeam1Score", OnChickeScore);
-		EventManager.StartListening("OnTeam2Score", OnDuckScore);
-		EventManager.StartListening("OnTeam1Suicide", OnChickenSuicide);
-		EventManager.StartListening("OnTeam2Suicide", OnDuckSuicide);
-		EventManager.StartListening("Team1ScoreBig", Team1ScoreBig);
-		EventManager.StartListening("Team2ScoreBig", Team2ScoreBig);
+	//private void OnEnable()
+	//{
+	//	EventManager.StartListening("GameStart", StartTimer);
+	//	EventManager.StartListening("OnTeam1Score", OnChickeScore);
+	//	EventManager.StartListening("OnTeam2Score", OnDuckScore);
+	//	EventManager.StartListening("OnTeam1Suicide", OnChickenSuicide);
+	//	EventManager.StartListening("OnTeam2Suicide", OnDuckSuicide);
+	//	EventManager.StartListening("Team1ScoreBig", Team1ScoreBig);
+	//	EventManager.StartListening("Team2ScoreBig", Team2ScoreBig);
 
-	}
+	//}
 
-	private void OnDisable()
-	{
-		EventManager.StopListening("GameStart", StartTimer);
-		EventManager.StopListening("OnTeam1Score", OnChickeScore);
-		EventManager.StopListening("OnTeam2Score", OnDuckScore);
-		EventManager.StopListening("OnTeam1Suicide", OnChickenSuicide);
-		EventManager.StopListening("OnTeam2Suicide", OnDuckSuicide);
-		EventManager.StopListening("Team1ScoreBig", Team1ScoreBig);
-		EventManager.StopListening("Team2ScoreBig", Team2ScoreBig);
-	}
+	//private void OnDisable()
+	//{
+	//	EventManager.StopListening("GameStart", StartTimer);
+	//	EventManager.StopListening("OnTeam1Score", OnChickeScore);
+	//	EventManager.StopListening("OnTeam2Score", OnDuckScore);
+	//	EventManager.StopListening("OnTeam1Suicide", OnChickenSuicide);
+	//	EventManager.StopListening("OnTeam2Suicide", OnDuckSuicide);
+	//	EventManager.StopListening("Team1ScoreBig", Team1ScoreBig);
+	//	EventManager.StopListening("Team2ScoreBig", Team2ScoreBig);
+	//}
 }

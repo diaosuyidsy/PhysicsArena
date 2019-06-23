@@ -26,7 +26,7 @@ public class ResourceCollector : MonoBehaviour
 				TeamTracker++;
 				other.tag = "Untagged";
 				print("Team 1 Score = " + TeamTracker);
-				EventManager.TriggerEvent("Team1ScoreBig");
+				//EventManager.TriggerEvent("Team1ScoreBig");
 				// Statistics: Add the dropper to the stats record
 				int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
 				if (GameManager.GM.FoodScoreTimes.Count > lastholder)
@@ -38,9 +38,7 @@ public class ResourceCollector : MonoBehaviour
 					Debug.LogError("There is something wrong with the food collector statistics");
 				}
 				// Statistics End
-				// Add Delivery Food VFX
-				Instantiate(VisualEffectManager.VEM.DeliverFoodVFX, other.transform.position, VisualEffectManager.VEM.DeliverFoodVFX.transform.rotation);
-				// END Add
+				EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team1Resource"));
 				if (TeamTracker == 2)
 				{
 					//GameManager.GM.GameOver(1, gameObject);
@@ -50,12 +48,9 @@ public class ResourceCollector : MonoBehaviour
 			}
 			else if (other.CompareTag("Team2Resource"))
 			{
-				// Add Vanish VFX
-				Instantiate(VisualEffectManager.VEM.VanishVFX, other.transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
-				// END ADD
+				EventManager.Instance.TriggerEvent(new ObjectDespawned(other.gameObject));
 				GameManager.GM.Team2ResourceSpawnIndex = (GameManager.GM.Team2ResourceSpawnIndex + 1) % Team2ResourceSpawnPt.Length;
 				other.transform.position = Team2ResourceSpawnPt[GameManager.GM.Team2ResourceSpawnIndex].transform.position;
-
 			}
 		}
 		else
@@ -65,7 +60,7 @@ public class ResourceCollector : MonoBehaviour
 				TeamTracker++;
 				other.tag = "Untagged";
 				print("Team 2 Score = " + TeamTracker);
-				EventManager.TriggerEvent("Team2ScoreBig");
+				//EventManager.TriggerEvent("Team2ScoreBig");
 				// Statistics: Add the dropper to the stats record
 				int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
 				if (GameManager.GM.FoodScoreTimes.Count > lastholder)
@@ -77,9 +72,8 @@ public class ResourceCollector : MonoBehaviour
 					Debug.LogError("There is something wrong with the food collector statistics");
 				}
 				// Statistics End
-				// Add Delivery Food VFX
-				Instantiate(VisualEffectManager.VEM.DeliverFoodVFX, other.transform.position, VisualEffectManager.VEM.DeliverFoodVFX.transform.rotation);
-				// END Add
+				EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team2Resource"));
+
 				if (TeamTracker == 2)
 				{
 					//GameManager.GM.GameOver(2, gameObject);
@@ -90,9 +84,7 @@ public class ResourceCollector : MonoBehaviour
 			}
 			else if (other.CompareTag("Team1Resource"))
 			{
-				// Add Vanish VFX
-				Instantiate(VisualEffectManager.VEM.VanishVFX, other.transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
-				// END ADD
+				EventManager.Instance.TriggerEvent(new ObjectDespawned(other.gameObject));
 				GameManager.GM.Team1ResourceSpawnIndex = (GameManager.GM.Team1ResourceSpawnIndex + 1) % Team1ResourceSpawnPt.Length;
 				other.transform.position = Team1ResourceSpawnPt[GameManager.GM.Team1ResourceSpawnIndex].transform.position;
 			}

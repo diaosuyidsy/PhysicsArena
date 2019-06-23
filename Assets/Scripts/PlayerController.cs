@@ -4,24 +4,8 @@ using Rewired;
 
 public class PlayerController : MonoBehaviour
 {
-	[Header("Player Basic Control Section")]
-	//[Tooltip("Enter 1 Digit 1-4")]
-	//public int PlayerControllerNumber;
-	public float Thrust = 300f;
-	public float JumpForce = 300f;
-	public LayerMask JumpMask;
-	public float RotationSpeed = 200f;
-	[Tooltip("For Chicken, it should be 2, Duck, could be 1.9")]
-	public float WalkSpeed = 2f;
-	[Tooltip("It should be the same speed, little less than Duck's normal WalkSpeed")]
-	public float PickUpSpeed = 1.8f;
-	[HideInInspector]
-	public float MaxBlockCD = 5f;
-	[HideInInspector]
-	public float BlockRegenInterval = 3f;
-	// How many regen per time.deltatime
-	[HideInInspector]
-	public float BlockRegen = 1 / 120f;
+	[Header("Player Data Section")]
+	public CharacterData CharacterDataStore;
 	[Header("Player Body Setting Section")]
 	public GameObject LegSwingReference;
 	public GameObject Chest;
@@ -97,6 +81,7 @@ public class PlayerController : MonoBehaviour
 	private HingeJoint _rightArmhj;
 	private HingeJoint _leftHandhj;
 	private HingeJoint _rightHandhj;
+	private float RotationSpeed;
 	private bool _checkArm = true;
 	private string _rightTriggerRegister = "";
 	private bool _canControl = true;
@@ -111,6 +96,7 @@ public class PlayerController : MonoBehaviour
 	private bool _dropping = false;
 	private float _blockCharge = 0f;
 	private bool _blockCanRegen = false;
+	private bool _isJumping = false;
 	#endregion
 
 	#region Private Timer Variable
@@ -120,9 +106,12 @@ public class PlayerController : MonoBehaviour
 	// Linked to Statistics
 	private float timer_hitMarkerStayTime = 0f;
 	private bool starttimer_hitmakrer = false;
+	// Linked to Melee Punch Hold
+	private float timer_meleeHoldTime = 0f;
+	private bool starttimer_meleeHold = false;
 	#endregion
 
-	[Header("Debug Section: Don't Ever Touch")]
+	[Header("Debug Section: Please Touch Me~")]
 	#region Debug Toggle
 	public bool debugT_CheckArm = true;
 	#endregion
@@ -146,8 +135,7 @@ public class PlayerController : MonoBehaviour
 		_leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
 		_rightHandhj = RightArms[2].GetComponent<HingeJoint>();
 		_freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
-		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", WalkSpeed / 2f);
-		MaxBlockCD = 1.5f;
+		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", CharacterDataStore.CharacterMovementDataStore.WalkSpeed / 2f);
 	}
 
 	// Update is called once per frame
@@ -191,14 +179,10 @@ public class PlayerController : MonoBehaviour
 
 	// OnEnterDeathZone controls the behavior how player reacts when it dies
 	// It's called immediately after player enters death zone
-	public void OnEnterDeathZone()
+	public void OnEnterDeathZone(PlayerDied pd)
 	{
+		if (pd.Player != gameObject) return;
 		_canControl = false;
-		// Game Feel Addon
-		CameraShake.CS.Shake(0.1f, 0.1f);
-		_player.SetVibration(0, 1.0f, 0.25f);
-		_player.SetVibration(1, 1.0f, 0.25f);
-		// Game Feel End
 		foreach (GameObject go in OnDeathHidden)
 		{
 			go.SetActive(false);
@@ -226,7 +210,7 @@ public class PlayerController : MonoBehaviour
 
 			print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[PlayerNumber] + " Times");
 
-			EventManager.TriggerEvent("On" + tag + "Suicide");
+			//EventManager.TriggerEvent("On" + tag + "Suicide");
 		}
 		else
 		{
@@ -245,7 +229,7 @@ public class PlayerController : MonoBehaviour
 				}
 				print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
 					" and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
-				EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
+				//EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
 			}
 			else
 			{
@@ -260,7 +244,7 @@ public class PlayerController : MonoBehaviour
 				}
 				print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
 					" and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");
-				EventManager.TriggerEvent("On" + tag + "Suicide");
+				//EventManager.TriggerEvent("On" + tag + "Suicide");
 
 			}
 
@@ -283,6 +267,7 @@ public class PlayerController : MonoBehaviour
 			go.SetActive(true);
 		}
 		_canControl = true;
+		EventManager.Instance.TriggerEvent(new PlayerRespawned(gameObject));
 	}
 
 	private void CheckDrop()
@@ -352,7 +337,7 @@ public class PlayerController : MonoBehaviour
 		if (HandObject.CompareTag("Weapon"))
 		{
 			// Stop the shooting
-			HandObject.SendMessage("Shoot", 0f, SendMessageOptions.RequireReceiver);
+			HandObject.SendMessage("Shoot", false);
 			// Disable the UI
 			HandObject.SendMessage("KillUI");
 		}
@@ -363,7 +348,7 @@ public class PlayerController : MonoBehaviour
 		// Nullify the holder
 		HandObject = null;
 		// Change the speed back to normal
-		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", WalkSpeed / 2f);
+		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", CharacterDataStore.CharacterMovementDataStore.WalkSpeed / 2f);
 		// Clear the right trigger register
 		_rightTriggerRegister = "";
 		// Set Auxillary Aim to false
@@ -377,6 +362,15 @@ public class PlayerController : MonoBehaviour
 		{
 			switch (_rightTriggerRegister)
 			{
+				case "Weapon":
+					if (HandObject != null && !_dropping)
+					{
+						attackState = State.Shooting;
+						HandObject.SendMessage("Shoot", true);
+						if (EnableAuxillaryAiming)
+							AuxillaryAim();
+					}
+					break;
 				case "Hook":
 					if (HandObject != null && !_dropping)
 					{
@@ -390,6 +384,18 @@ public class PlayerController : MonoBehaviour
 						HandObject.SendMessage("Suck", true);
 					}
 					break;
+				default:
+					//If we don't have anything on hand, we are applying melee action
+					if (attackState != State.Meleeing && attackState != State.Blocking && normalState != State.Picking && normalState != State.Holding)
+					{
+						attackState = State.Meleeing;
+						_checkArm = false;
+						StopAllCoroutines();
+						StartCoroutine(MeleeClockFistLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.ClockFistTime, _leftArmhj));
+						StartCoroutine(MeleeClockFistHelper(_rightArm2hj, _rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.ClockFistTime));
+						EventManager.Instance.TriggerEvent(new PunchHolding(gameObject, PlayerNumber));
+					}
+					break;
 			}
 		}
 
@@ -398,6 +404,15 @@ public class PlayerController : MonoBehaviour
 		{
 			switch (_rightTriggerRegister)
 			{
+				case "Weapon":
+					attackState = State.Empty;
+					// Add weapon right trigger action
+					if (HandObject != null)
+						HandObject.SendMessage("Shoot", false);
+					// Auxillary Aiming
+					_auxillaryRotationLock = false;
+					_weaponCD = 0f;
+					break;
 				case "Hook":
 					if (HandObject != null && !_dropping)
 					{
@@ -408,6 +423,23 @@ public class PlayerController : MonoBehaviour
 					if (HandObject != null)
 						HandObject.SendMessage("Suck", false);
 					break;
+				default:
+					// If we previously started melee and released the trigger, then release the fist
+					if (attackState == State.Meleeing)
+					{
+						starttimer_meleeHold = false;
+						timer_meleeHoldTime = 0f;
+						attackState = State.Empty;
+						// This is add a push force when melee
+						_rb.AddForce(transform.forward * MeleeCharge * CharacterDataStore.CharacterMeleeDataStore.SelfPushForce, ForceMode.Impulse);
+						StopAllCoroutines();
+
+						StartCoroutine(MeleePunchLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime, _leftArmhj));
+						StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime));
+						EventManager.Instance.TriggerEvent(new PunchReleased(gameObject, PlayerNumber));
+					}
+					_auxillaryRotationLock = false;
+					break;
 			}
 		}
 
@@ -417,114 +449,10 @@ public class PlayerController : MonoBehaviour
 			// Means we want to fire
 			switch (_rightTriggerRegister)
 			{
-				case "Throwable":
-					LeftHand.GetComponent<Fingers>().Throw();
-					RightHand.GetComponent<Fingers>().Throw();
-					break;
-				case "Weapon":
-					// Add weapon right trigger action
-					if (HandObject != null && !_dropping)
-					{
-						attackState = State.Shooting;
-						HandObject.SendMessage("Shoot", 1f, SendMessageOptions.RequireReceiver);
-						if (EnableAuxillaryAiming)
-							AuxillaryAim();
-					}
-					break;
-				case "WoodStamp":
-					if (HandObject != null && !_dropping && attackState != State.Shooting)
-					{
-						attackState = State.Shooting;
-						HandObject.SendMessage("Stamp", true);
-						if (EnableAuxillaryAiming) AuxillaryAim();
-						// Bend the body
-						JointSpring tempjs = _chesthj.spring;
-						tempjs.targetPosition = 40f;
-						_chesthj.spring = tempjs;
-					}
-					break;
-				//case "SuckGun":
-				//    if (HandObject != null && !_dropping)
-				//    {
-				//        HandObject.SendMessage("Suck", true);
-				//    }
-				//    break;
 				case "Team1Resource":
 				case "Team2Resource":
 					if (!_dropping)
 						DropHelper();
-					break;
-				default:
-					//If we don't have anything on hand, we are applying melee action
-					if (attackState != State.Meleeing && attackState != State.Blocking && normalState != State.Picking && normalState != State.Holding)
-					{
-						attackState = State.Meleeing;
-						_checkArm = false;
-						StopAllCoroutines();
-						if (DesignPanelManager.DPM.MeleeDoubleArmToggle.isOn)
-						{
-							StartCoroutine(MeleeClockFistHelper(_leftArm2hj, _leftArmhj, _leftHandhj, 1f));
-						}
-						else
-						{
-							StartCoroutine(MeleeClockFistLeftHandHelper(1f, _leftArmhj));
-						}
-						StartCoroutine(MeleeClockFistHelper(_rightArm2hj, _rightArmhj, _rightHandhj, 1f));
-					}
-					break;
-			}
-		}
-		else
-		{
-			switch (_rightTriggerRegister)
-			{
-				// Means we release the button
-				case "Throwable":
-					break;
-				case "Weapon":
-					attackState = State.Empty;
-					// Add weapon right trigger action
-					if (HandObject != null)
-						HandObject.SendMessage("Shoot", 0f, SendMessageOptions.RequireReceiver);
-					// Auxillary Aiming
-					_auxillaryRotationLock = false;
-					_weaponCD = 0f;
-					break;
-				case "WoodStamp":
-					attackState = State.Empty;
-					HandObject.SendMessage("Stamp", false);
-					_auxillaryRotationLock = false;
-
-					// Bend the body back
-					JointSpring tempjs = _chesthj.spring;
-					tempjs.targetPosition = -5f;
-					_chesthj.spring = tempjs;
-					break;
-				//case "SuckGun":
-				//    if (HandObject != null)
-				//        HandObject.SendMessage("Suck", false);
-				//    break;
-				default:
-					// If we previously started melee and released the trigger, then release the fist
-					if (attackState == State.Meleeing)
-					{
-						attackState = State.Empty;
-						// This is add a push force when melee
-						if (DesignPanelManager.DPM.MeleeChargeToggle.isOn)
-							_rb.AddForce(transform.forward * Thrust * MeleeCharge * 2f, ForceMode.Impulse);
-						StopAllCoroutines();
-						if (DesignPanelManager.DPM.MeleeDoubleArmToggle.isOn)
-						{
-							StartCoroutine(MeleePunchHelper(_leftArmhj, _leftHandhj, 0.2f));
-						}
-						else
-						{
-							StartCoroutine(MeleePunchLeftHandHelper(0.2f, _leftArmhj));
-						}
-						StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, 0.2f));
-					}
-					_auxillaryRotationLock = false;
-
 					break;
 			}
 		}
@@ -533,23 +461,18 @@ public class PlayerController : MonoBehaviour
 	public void CheckBlock()
 	{
 		// ShieldEnergy is the percentage of shield energy. 
-		float _shieldEnergy = (MaxBlockCD - _blockCharge) / MaxBlockCD;
+		float _shieldEnergy = (CharacterDataStore.CharacterBlockDataStore.MaxBlockCD - _blockCharge) / CharacterDataStore.CharacterBlockDataStore.MaxBlockCD;
 
 		if (!_player.GetButton("Block") && _blockCanRegen)
 		{
-			_blockCharge -= Time.deltaTime;
+			_blockCharge -= (Time.deltaTime * CharacterDataStore.CharacterBlockDataStore.BlockRegenRate);
 			if (_blockCharge <= 0f) _blockCanRegen = false;
-			//BlockUIFill.transform.localScale = new Vector3(_shieldEnergy, 1f, 1f);
-			//if (Mathf.Abs(1 - _shieldEnergy) < 0.01)
-			//{
-			//    BlockUI.SetActive(false);
-			//}
 		}
 
 		if (attackState == State.Meleeing || attackState == State.Shooting || normalState == State.Picking || normalState == State.Holding
 			|| normalState == State.Dead) return;
 
-		if (_player.GetButtonDown("Block") && _blockCharge <= MaxBlockCD)
+		if (_player.GetButtonDown("Block") && _blockCharge <= CharacterDataStore.CharacterBlockDataStore.MaxBlockCD)
 		{
 			attackState = State.Blocking;
 
@@ -564,7 +487,7 @@ public class PlayerController : MonoBehaviour
 			BlockHelper(_leftArmhj, _leftHandhj);
 			BlockHelper(_rightArmhj, _rightHandhj);
 			_blockCharge += Time.deltaTime;
-			if (_blockCharge > MaxBlockCD)
+			if (_blockCharge > CharacterDataStore.CharacterBlockDataStore.MaxBlockCD)
 			{
 				attackState = State.Empty;
 				starttimer_blockregen = true;
@@ -578,7 +501,7 @@ public class PlayerController : MonoBehaviour
 		}
 
 		// When player released the button, should skip blockregeninterval seconds before it can regen
-		if (_player.GetButtonUp("Block") && _blockCharge <= MaxBlockCD)
+		if (_player.GetButtonUp("Block") && _blockCharge <= CharacterDataStore.CharacterBlockDataStore.MaxBlockCD)
 		{
 			starttimer_blockregen = true;
 			timer_blockregen = 0f;
@@ -600,7 +523,7 @@ public class PlayerController : MonoBehaviour
 		if (starttimer_blockregen)
 		{
 			timer_blockregen += Time.deltaTime;
-			if (timer_blockregen > BlockRegenInterval)
+			if (timer_blockregen > CharacterDataStore.CharacterBlockDataStore.BlockRegenInterval)
 			{
 				starttimer_blockregen = false;
 				timer_blockregen = 0f;
@@ -617,6 +540,30 @@ public class PlayerController : MonoBehaviour
 				starttimer_hitmakrer = false;
 				timer_hitMarkerStayTime = 0f;
 				EnemyWhoHitPlayer = null;
+			}
+		}
+
+		if (starttimer_meleeHold)
+		{
+			timer_meleeHoldTime += Time.deltaTime;
+			if (timer_meleeHoldTime > CharacterDataStore.CharacterMeleeDataStore.MeleeHoldTime)
+			{
+				// Release the punch when hold time exceeds
+				starttimer_meleeHold = false;
+				timer_meleeHoldTime = 0f;
+				// If we previously started melee and released the trigger, then release the fist
+				if (attackState == State.Meleeing)
+				{
+					attackState = State.Empty;
+					// This is add a push force when melee
+					_rb.AddForce(transform.forward * MeleeCharge * CharacterDataStore.CharacterMeleeDataStore.SelfPushForce, ForceMode.Impulse);
+					StopAllCoroutines();
+
+					StartCoroutine(MeleePunchLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime, _leftArmhj));
+					StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime));
+					EventManager.Instance.TriggerEvent(new PunchReleased(gameObject, PlayerNumber));
+				}
+				_auxillaryRotationLock = false;
 			}
 		}
 	}
@@ -767,9 +714,9 @@ public class PlayerController : MonoBehaviour
 	public void OnMeleeHit(Vector3 force, GameObject sender = null)
 	{
 		// First check if the player could block the attack
-		if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - DesignPanelManager.DPM.BlockAngleSlider.value))
+		if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
 		{
-			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * DesignPanelManager.DPM.BlockMultiplierSlider.value);
+			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier);
 			// Statistics: Block Success
 			if (PlayerNumber < GameManager.GM.BlockTimes.Count)
 			{
@@ -785,18 +732,8 @@ public class PlayerController : MonoBehaviour
 		}
 		else // Player is hit cause he could not block
 		{
-			// Add HIT VFX
-			GameObject par = Instantiate(VisualEffectManager.VEM.HitVFX, transform.position, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
-			// END VFX
-			// Add Hit Gamefeel
-			CameraShake.CS.Shake(0.1f, 0.1f);
-			_player.SetVibration(0, 1.0f, 0.25f);
-			_player.SetVibration(1, 1.0f, 0.25f);
-			// End Gamefeel
-			ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem>().main;
-			ParticleSystem.MainModule psmain2 = par.transform.GetChild(0).GetComponent<ParticleSystem>().main;
-			psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
-			psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
+			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber));
+
 			_rb.AddForce(force, ForceMode.Impulse);
 		}
 
@@ -814,7 +751,10 @@ public class PlayerController : MonoBehaviour
 	{
 		if (_player.GetButtonDown("Jump") && IsGrounded())
 		{
-			_rb.AddForce(new Vector3(0, JumpForce, 0), ForceMode.Impulse);
+			_rb.AddForce(new Vector3(0, CharacterDataStore.CharacterMovementDataStore.JumpForce, 0), ForceMode.Impulse);
+			_isJumping = true;
+			EventManager.Instance.TriggerEvent(new PlayerJump(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber));
+			OnDeathHidden[3].SetActive(false);
 		}
 	}
 
@@ -831,8 +771,6 @@ public class PlayerController : MonoBehaviour
 
 	private void CheckMovement()
 	{
-		//string HLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis1";
-		//string VLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis2";
 		float HLAxis = _player.GetAxis("Move Horizontal");
 		float VLAxis = _player.GetAxis("Move Vertical");
 
@@ -842,38 +780,32 @@ public class PlayerController : MonoBehaviour
 			float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
 			// Add force based on that percentage
 			if (IsGrounded())
-				_rb.AddForce(transform.forward * Thrust * normalizedInputVal);
+			{
+				_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal);
+			}
 			else
-				_rb.AddForce(transform.forward * Thrust * normalizedInputVal * 0.5f);
+			{
+				_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal * 0.5f);
+			}
 			// Turn player according to the rotation of the joystick
-			//transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
 			float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
 			float controllerRot = Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
 			if (!(Mathf.Abs(playerRot - controllerRot) < 20f))
 			{
-				//float mirrorAngle = playerRot > 0f ? (playerRot - 180f) : (playerRot + 180f);
-				//float rotation = controllerRot - playerRot > 0f ? 1f : -1f;
-				//Debug.Log("Controller Rotation: " + controllerRot);
-				//Debug.Log("Plauer Rotation: " + playerRot);
-				//transform.Rotate(new Vector3(0f, rotation * RotationSpeed, 0f) * Time.deltaTime);
-				//_rb.GetComponent<Rigidbody>().AddForce(transform.forward * Thrust * normalizedInputVal * 3f);
 				RotationSpeed += Time.deltaTime;
 			}
 			else
 			{
-				RotationSpeed = 4f;
+				RotationSpeed = CharacterDataStore.CharacterMovementDataStore.MinRotationSpeed;
 			}
 			// Check if player's speed is not within x degree of the controller angle
 			// Then disable the animator if so
 			// Turn on the animator of the Leg Swing Preference
 			float playerVelRot = Mathf.Atan2(_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
 
-
-
-			//LegSwingReference.GetComponent<Animator>().enabled = IsGrounded();
 			LegSwingReference.GetComponent<Animator>().enabled = true;
 
-			RotationSpeed = Mathf.Clamp(RotationSpeed, 4f, 15f);
+			RotationSpeed = Mathf.Clamp(RotationSpeed, CharacterDataStore.CharacterMovementDataStore.MinRotationSpeed, CharacterDataStore.CharacterMovementDataStore.MaxRotationSpeed);
 			Transform target = TurnReference.transform.GetChild(0);
 			Vector3 relativePos = target.position - transform.position;
 
@@ -914,7 +846,7 @@ public class PlayerController : MonoBehaviour
 	private bool IsGrounded()
 	{
 		RaycastHit hit;
-		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, JumpMask);
+		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
 	}
 
 	private void CheckArmHelper(bool down, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
@@ -985,11 +917,11 @@ public class PlayerController : MonoBehaviour
 	private void BlockHelper(HingeJoint Armhj, HingeJoint Handhj)
 	{
 		JointSpring ajs = Armhj.spring;
-		ajs.targetPosition = 100f;
+		ajs.targetPosition = CharacterDataStore.CharacterBlockDataStore.ArmTargetPosition;
 		Armhj.spring = ajs;
 
 		JointSpring hjs = Handhj.spring;
-		hjs.targetPosition = 120f;
+		hjs.targetPosition = CharacterDataStore.CharacterBlockDataStore.HandTargetPosition;
 		Handhj.spring = hjs;
 	}
 
@@ -999,24 +931,16 @@ public class PlayerController : MonoBehaviour
 		RaycastHit hit;
 		// This Layermask get all player's layer except this player's
 		int layermask = GameManager.GM.AllPlayers ^ (1 << gameObject.layer);
-		//if (Physics.CapsuleCast(transform.position, transform.position - transform.forward * 3f, 0.5f, transform.forward, out hit, 0.05f, layermask))
-		if (Physics.SphereCast(transform.position, 0.3f, transform.forward, out hit, 0.05f, layermask))
+		if (Physics.SphereCast(transform.position, CharacterDataStore.CharacterMeleeDataStore.PunchRadius, transform.forward, out hit, CharacterDataStore.CharacterMeleeDataStore.PunchDistance, layermask))
 		{
-			print(hit.transform.tag);
-			print(hit.transform.name);
 			IsPunching = false;
-			float velocityAddon = transform.GetComponent<Rigidbody>().velocity.magnitude;
-			velocityAddon = Mathf.Clamp(velocityAddon, 1f, 1.6f);
 			foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
 			{
 				rb.velocity = Vector3.zero;
 			}
-			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(transform.forward * 500f * MeleeCharge * velocityAddon, gameObject);
+			Vector3 force = transform.forward * CharacterDataStore.CharacterMeleeDataStore.PunchForce * MeleeCharge;
+			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, gameObject);
 			hit.transform.GetComponentInParent<PlayerController>().Mark(gameObject);
-			// Game Feel
-			_player.SetVibration(0, 1.0f, 0.15f);
-			_player.SetVibration(1, 1.0f, 0.15f);
-			// Gamefeel End
 		}
 	}
 
@@ -1077,6 +1001,7 @@ public class PlayerController : MonoBehaviour
 		MeleeChargingVFX.GetComponent<ParticleSystem>().Stop();
 		MeleeUltimateVFX.GetComponent<ParticleSystem>().Play();
 		// END
+		starttimer_meleeHold = true;
 	}
 	IEnumerator MeleePunchLeftHandHelper(float time, HingeJoint LeftHandhj)
 	{
@@ -1115,7 +1040,7 @@ public class PlayerController : MonoBehaviour
 			hl.min = Mathf.Lerp(inithlMin, -2.8f, elapesdTime / time);
 			Armhj.spring = js;
 			Handhj.limits = hl;
-			if (time / 2f - elapesdTime <= 0f)
+			if (elapesdTime >= 0f)
 			{
 				if (DesignPanelManager.DPM.MeleeAlternateSchemaToggle.isOn)
 				{
@@ -1182,17 +1107,25 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 	#endregion
-}
 
-//private void CheckRun ()
-//{
-//    if (Input.GetKey (RunCode) && IsGrounded ())
-//    {
-//        LegSwingReference.GetComponent<Animator> ().speed = 2f;
-//        _rb.AddForce (transform.forward * Thrust * RunSpeedMultiplier);
-//    }
-//    else
-//    {
-//        LegSwingReference.GetComponent<Animator> ().speed = 1.6f;
-//    }
-//}
+	private void OnCollisionEnter(Collision collision)
+	{
+		if (collision.gameObject.layer == 13 && _isJumping)
+		{
+			_isJumping = false;
+			EventManager.Instance.TriggerEvent(new PlayerLand(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber));
+			OnDeathHidden[3].SetActive(true);
+		}
+	}
+	private void OnEnable()
+	{
+		EventManager.Instance.AddHandler<PlayerDied>(OnEnterDeathZone);
+	}
+
+	private void OnDisable()
+	{
+		EventManager.Instance.RemoveHandler<PlayerDied>(OnEnterDeathZone);
+
+	}
+
+}

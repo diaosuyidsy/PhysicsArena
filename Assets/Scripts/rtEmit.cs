@@ -6,157 +6,161 @@ using UnityEngine.Experimental.PlayerLoop;
 
 public class rtEmit : MonoBehaviour
 {
-    public ObiEmitter WaterBall;
-    public GameObject WaterUI;
-    public GameObject GunUI;
-    public float Speed;
-    public float BackFireThrust;
-    public float UpThrust = 1f;
-    public int MaxAmmo = 1000;
-    public int currentAmmo;
-    public float ShootMaxCD = 0.3f;
-    public LayerMask OnHitDisappear;
+	public ObiEmitter WaterBall;
+	public GameObject WaterUI;
+	public GameObject GunUI;
+	public WeaponData WeaponDataStore;
+	public int currentAmmo;
+	public LayerMask OnHitDisappear;
 
-    private float _shootCD = 0f;
-    private GunPositionControl _gpc;
+	private float _shootCD = 0f;
+	private GunPositionControl _gpc;
 
-    private void Start()
-    {
-        currentAmmo = MaxAmmo;
-        _gpc = GetComponent<GunPositionControl>();
-    }
-    // This function is called by PlayerController, when player is holding a gun
-    // And it's holding down RT
-    public void Shoot(float TriggerVal)
-    {
-        GunUI.SetActive(true);
-        // If player was holding down the RT button
-        // CD will add up
-        // If CD >= MaxCD, nothing works, only releasing the RT will replenish the CD
-        if (Mathf.Approximately(TriggerVal, 1f))
-        {
-            _shootCD += Time.deltaTime;
-            if (_shootCD >= ShootMaxCD)
-            {
-                WaterBall.speed = 0f;
-                return;
-            }
-        }
+	private enum State
+	{
+		Empty,
+		Shooting,
+	}
 
-        if (Mathf.Approximately(TriggerVal, 0f))
-        {
-            // Need to reset shoot CD if player has released RT
-            _shootCD = 0f;
-            WaterBall.speed = 0f;
-            return;
-        }
-        // This means we are actually shooting water
-        WaterBall.speed = Speed;
-        // Statistics: Here we are using raycast for players hit
-        _detectPlayer();
-        // As long as player are actively spraying, should add that time to the record
-        _addToSprayTime();
-        // Statistics: End
-        if (_gpc != null)
-        {
-            _gpc.Owner.GetComponent<Rigidbody>().AddForce(-_gpc.Owner.transform.forward * BackFireThrust, ForceMode.Impulse);
-            _gpc.Owner.GetComponent<Rigidbody>().AddForce(_gpc.Owner.transform.up * BackFireThrust * UpThrust, ForceMode.Impulse);
-        }
-        currentAmmo--;
-        if (currentAmmo <= 0)
-        {
-            _gpc.CanBePickedUp = false;
-            // If no ammo left, then drop the weapon
-            _gpc.Owner.GetComponent<PlayerController>().DropHelper();
-            _shootCD = 0f;
-            WaterBall.speed = 0f;
-        }
-        // If we changed ammo, then need to change UI as well
-        ChangeAmmoUI();
-    }
+	private State _waterGunState;
 
-    //when gun leaves hands, UI disappears.
-    public void KillUI()
-    {
-        GunUI.SetActive(false);
-    }
+	private void Awake()
+	{
+		currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
+		_gpc = GetComponent<GunPositionControl>();
+		_waterGunState = State.Empty;
+	}
 
-    private void _detectPlayer()
-    {
-        // This layermask means we are only looking for Player1Body - Player6Body
-        int layermask = (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15) | (1 << 16);
-        RaycastHit hit;
-        if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
-        {
-            print("Hit: " + hit.transform.name);
-            hit.transform.GetComponentInParent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
-        }
-    }
+	private void Update()
+	{
+		switch (_waterGunState)
+		{
+			case State.Shooting:
+				_shootCD += Time.deltaTime;
+				if (_shootCD >= WeaponDataStore.WaterGunDataStore.ShootMaxCD)
+				{
+					WaterBall.speed = 0f;
+					_waterGunState = State.Empty;
+					return;
+				}
+				// Statistics: Here we are using raycast for players hit
+				_detectPlayer();
+				// As long as player are actively spraying, should add that time to the record
+				//_addToSprayTime();
+				// Statistics: End
+				currentAmmo--;
+				if (currentAmmo <= 0)
+				{
+					_gpc.CanBePickedUp = false;
+					// If no ammo left, then drop the weapon
+					_gpc.Owner.GetComponent<PlayerController>().DropHelper();
+					_shootCD = 0f;
+					WaterBall.speed = 0f;
+				}
+				// If we changed ammo, then need to change UI as well
+				ChangeAmmoUI();
+				break;
+			case State.Empty:
+				break;
+		}
+	}
 
-    private void _addToSprayTime()
-    {
-        int playerNumber = _gpc.Owner.GetComponent<PlayerController>().PlayerNumber;
-        GameManager.GM.WaterGunUseTime[playerNumber] += Time.deltaTime;
-    }
+	public void Shoot(bool down)
+	{
+		/// means we pressed down button here
+		if (down)
+		{
+			_waterGunState = State.Shooting;
+			GunUI.SetActive(true);
+			WaterBall.speed = WeaponDataStore.WaterGunDataStore.Speed;
+			if (_gpc != null)
+			{
+				_gpc.Owner.GetComponent<Rigidbody>().AddForce(-_gpc.Owner.transform.forward * WeaponDataStore.WaterGunDataStore.BackFireThrust, ForceMode.Impulse);
+				_gpc.Owner.GetComponent<Rigidbody>().AddForce(_gpc.Owner.transform.up * WeaponDataStore.WaterGunDataStore.UpThrust, ForceMode.Impulse);
+			}
+			EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
+		}
+		else
+		{
+			_waterGunState = State.Empty;
+			WaterBall.speed = 0f;
+			_shootCD = 0f;
+		}
+	}
 
-    private void ChangeAmmoUI()
-    {
-        float scaleY = currentAmmo * 1.0f / MaxAmmo;
-        WaterUI.transform.localScale = new Vector3(1f, scaleY, 1f);
-    }
+	//when gun leaves hands, UI disappears.
+	public void KillUI()
+	{
+		GunUI.SetActive(false);
+	}
 
-    // If weapon collide to the ground, and has no ammo, then despawn it
-    // And if weapon does not collide to the ground or other allowed 
-    private void OnCollisionEnter(Collision other)
-    {
-        if (other.collider.CompareTag("Ground") && currentAmmo == 0)
-        {
-            currentAmmo = MaxAmmo;
-            ChangeAmmoUI();
-            // Add Vanish VFX
-            Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
-            // END ADD
-            gameObject.SetActive(false);
-        }
-        if (((1 << other.gameObject.layer) & OnHitDisappear) != 0)
-        {
-            StartCoroutine(DisappearAfterAWhile(3f));
-        }
-    }
+	private void _detectPlayer()
+	{
+		// This layermask means we are only looking for Player1Body - Player6Body
+		int layermask = (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15) | (1 << 16);
+		RaycastHit hit;
+		if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
+		{
+			print("Hit: " + hit.transform.name);
+			hit.transform.GetComponentInParent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
+		}
+	}
 
-    private void VanishAfterUse()
-    {
-        currentAmmo = MaxAmmo;
-        ChangeAmmoUI();
-        // Add Vanish VFX
-        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
-        // END ADD
-        gameObject.SetActive(false);
-    }
+	private void _addToSprayTime()
+	{
+		int playerNumber = _gpc.Owner.GetComponent<PlayerController>().PlayerNumber;
+		GameManager.GM.WaterGunUseTime[playerNumber] += Time.deltaTime;
+	}
 
-    // If the weapon is taken down the death zone, then despawn it
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("DeathZone"))
-        {
-            currentAmmo = MaxAmmo;
-            // Add Vanish VFX
-            Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
-            // END ADD
-            ChangeAmmoUI();
-            gameObject.SetActive(false);
-        }
-    }
+	private void ChangeAmmoUI()
+	{
+		float scaleY = currentAmmo * 1.0f / WeaponDataStore.WaterGunDataStore.MaxAmmo;
+		WaterUI.transform.localScale = new Vector3(1f, scaleY, 1f);
+	}
 
-    IEnumerator DisappearAfterAWhile(float time)
-    {
-        yield return new WaitForSeconds(time);
-        currentAmmo = MaxAmmo;
-        // Add Vanish VFX
-        Instantiate(VisualEffectManager.VEM.VanishVFX, transform.position, VisualEffectManager.VEM.VanishVFX.transform.rotation);
-        // END ADD
-        ChangeAmmoUI();
-        gameObject.SetActive(false);
-    }
+	// If weapon collide to the ground, and has no ammo, then despawn it
+	// And if weapon does not collide to the ground or other allowed 
+	private void OnCollisionEnter(Collision other)
+	{
+		if (other.collider.CompareTag("Ground") && currentAmmo == 0)
+		{
+			currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
+			ChangeAmmoUI();
+			EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+			gameObject.SetActive(false);
+		}
+		if (((1 << other.gameObject.layer) & OnHitDisappear) != 0)
+		{
+			StartCoroutine(DisappearAfterAWhile(0f));
+		}
+	}
+
+	private void VanishAfterUse()
+	{
+		currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
+		ChangeAmmoUI();
+		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+		gameObject.SetActive(false);
+	}
+
+	// If the weapon is taken down the death zone, then despawn it
+	private void OnTriggerEnter(Collider other)
+	{
+		if (other.CompareTag("DeathZone"))
+		{
+			currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
+			ChangeAmmoUI();
+			gameObject.SetActive(false);
+		}
+	}
+
+	IEnumerator DisappearAfterAWhile(float time)
+	{
+		yield return new WaitForSeconds(time);
+		currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
+		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+		ChangeAmmoUI();
+		gameObject.SetActive(false);
+	}
 
 }

@@ -9,7 +9,6 @@ public class VFXData : ScriptableObject
 	public GameObject DeathVFX;
 	public GameObject VanishVFX;
 	public GameObject HitVFX;
-	public GameObject BlockVFX;
 	public GameObject JumpVFX;
 	public GameObject LandVFX;
 }

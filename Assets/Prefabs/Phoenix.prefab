@@ -65,10 +65,10 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1008863927326106}
-  m_Material: {fileID: 13400000, guid: 0d242f91ab1d749a8b6230e6da662881, type: 2}
+  m_Material: {fileID: 13400000, guid: 2c9c11933a4de7c49a022dff1ab4e5e8, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.01
+  m_Radius: 0.3
   m_Height: 2.7468803
   m_Direction: 1
   m_Center: {x: 0, y: -0.17921698, z: 0}
@@ -101,10 +101,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CharacterDataStore: {fileID: 11400000, guid: 7d14baa331efc614583f4c28a2e6c1aa, type: 2}
-  RotationSpeed: 4
-  MaxBlockCD: 1
-  BlockRegenInterval: 3
-  BlockRegen: 0.008333334
   LegSwingReference: {fileID: 1694084379956174}
   Chest: {fileID: 1558221434653460}
   LeftArms:
@@ -38626,7 +38622,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4205590344859172}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Body__RightToeBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63217,7 +63213,7 @@ GameObject:
   - component: {fileID: 114625647233622680}
   - component: {fileID: 114815498411110812}
   - component: {fileID: 114415594681437140}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Body__LeftLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -63363,7 +63359,7 @@ GameObject:
   - component: {fileID: 114852466781976478}
   - component: {fileID: 114682141848126122}
   - component: {fileID: 114348776518032538}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Body__LeftUpLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111168,7 +111164,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4134559117437222}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Body__RightFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111308,7 +111304,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4337278385041864}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Body__LeftToeBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111344,7 +111340,7 @@ GameObject:
   - component: {fileID: 114982706775568594}
   - component: {fileID: 114844450170602174}
   - component: {fileID: 114803787550468184}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Body__RightLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116181,7 +116177,7 @@ GameObject:
   - component: {fileID: 114374518843558204}
   - component: {fileID: 114451122537417856}
   - component: {fileID: 114843034877605066}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Body__RightUpLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -116452,7 +116448,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4248038975432460}
-  m_Layer: 9
+  m_Layer: 17
   m_Name: Body__LeftFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}

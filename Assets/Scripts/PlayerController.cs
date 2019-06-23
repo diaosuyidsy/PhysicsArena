@@ -135,7 +135,7 @@ public class PlayerController : MonoBehaviour
 		_leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
 		_rightHandhj = RightArms[2].GetComponent<HingeJoint>();
 		_freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
-		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", CharacterDataStore.CharacterMovementDataStore.WalkSpeed / 2f);
+		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", 1f);
 	}
 
 	// Update is called once per frame
@@ -348,7 +348,7 @@ public class PlayerController : MonoBehaviour
 		// Nullify the holder
 		HandObject = null;
 		// Change the speed back to normal
-		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", CharacterDataStore.CharacterMovementDataStore.WalkSpeed / 2f);
+		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", 1f);
 		// Clear the right trigger register
 		_rightTriggerRegister = "";
 		// Set Auxillary Aim to false
@@ -641,8 +641,6 @@ public class PlayerController : MonoBehaviour
 		// Actual Logic Below
 		_rightTriggerRegister = tag;
 		// if pick up resource, then slow down
-		if (tag == "Team1Resource" || tag == "Team2Resource")
-			LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", DesignPanelManager.DPM.PickUpRunMultiplierSlider.value);
 
 		switch (tag)
 		{
@@ -779,13 +777,23 @@ public class PlayerController : MonoBehaviour
 			// Get the percent of input force player put in
 			float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
 			// Add force based on that percentage
+			var targetVelocity = transform.forward;
+			targetVelocity *= CharacterDataStore.CharacterMovementDataStore.WalkSpeed;
+
+			var velocity = _rb.velocity;
+			var velocityChange = (targetVelocity - velocity);
+			velocityChange.x = Mathf.Clamp(velocityChange.x, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
+			velocityChange.z = Mathf.Clamp(velocityChange.z, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
+			velocityChange.y = 0f;
 			if (IsGrounded())
 			{
-				_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal);
+				//_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal);
+				_rb.AddForce(velocityChange, ForceMode.VelocityChange);
 			}
 			else
 			{
-				_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal * 0.5f);
+				//_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal * 0.5f);
+				_rb.AddForce(velocityChange * CharacterDataStore.CharacterMovementDataStore.InAirSpeedMultiplier, ForceMode.VelocityChange);
 			}
 			// Turn player according to the rotation of the joystick
 			float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;

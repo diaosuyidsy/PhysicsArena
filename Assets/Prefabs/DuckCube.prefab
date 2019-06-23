@@ -4957,7 +4957,7 @@ GameObject:
   - component: {fileID: 114843866504510070}
   - component: {fileID: 114129941693613350}
   - component: {fileID: 114231924894889154}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Character1_LeftUpLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -20212,7 +20212,7 @@ GameObject:
   - component: {fileID: 114710976046637948}
   - component: {fileID: 114014151362504346}
   - component: {fileID: 114605070445696844}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Character1_RightUpLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25075,7 +25075,7 @@ GameObject:
   - component: {fileID: 114747205150013848}
   - component: {fileID: 114127366691738324}
   - component: {fileID: 114131399898643764}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Character1_LeftLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25405,7 +25405,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4996874150513900}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Character1_RightToeBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25535,7 +25535,7 @@ GameObject:
   - component: {fileID: 114271230500941140}
   - component: {fileID: 114473618982721620}
   - component: {fileID: 114790463054571992}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Character1_RightLeg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -25706,7 +25706,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4718366880415412}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Character1_LeftFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -26045,7 +26045,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4944405569020526}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Character1_RightFoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -31290,7 +31290,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &4258873899518940
 Transform:
   m_ObjectHideFlags: 0
@@ -31298,7 +31298,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1616173924689024}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 16.116, y: 1.151, z: -16.329647}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
@@ -40791,10 +40791,10 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1681016044515186}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 2c9c11933a4de7c49a022dff1ab4e5e8, type: 2}
   m_IsTrigger: 0
   m_Enabled: 1
-  m_Radius: 0.01
+  m_Radius: 0.12
   m_Height: 0.69023997
   m_Direction: 1
   m_Center: {x: 0, y: -0.036981553, z: 0}
@@ -40811,10 +40811,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CharacterDataStore: {fileID: 11400000, guid: 7d14baa331efc614583f4c28a2e6c1aa, type: 2}
-  RotationSpeed: 4
-  MaxBlockCD: 1
-  BlockRegenInterval: 3
-  BlockRegen: 0.008333334
   LegSwingReference: {fileID: 1606629450697680}
   Chest: {fileID: 1505164372519546}
   LeftArms:
@@ -50290,7 +50286,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4082400665113178}
-  m_Layer: 11
+  m_Layer: 17
   m_Name: Character1_LeftToeBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}

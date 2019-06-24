@@ -35,12 +35,32 @@ public class VisualEffectManager : MonoBehaviour
 
 	private void _onPlayerJump(PlayerJump pj)
 	{
-		_instantiateVFX(VFXDataStore.JumpVFX, pj.PlayerFeet.transform.position, VFXDataStore.JumpVFX.transform.rotation);
+		var VFX = VFXDataStore.JumpGrassVFX;
+		switch (pj.GroundTag)
+		{
+			case "Ground_Concrete":
+				VFX = VFXDataStore.JumpConcreteVFX;
+				break;
+			case "Ground_YellowStone":
+				VFX = VFXDataStore.JumpYellowStoneVFX;
+				break;
+		}
+		_instantiateVFX(VFX, pj.PlayerFeet.transform.position, VFX.transform.rotation);
 	}
 
 	private void _onPlayerLand(PlayerLand pl)
 	{
-		_instantiateVFX(VFXDataStore.LandVFX, pl.PlayerFeet.transform.position, VFXDataStore.LandVFX.transform.rotation);
+		var VFX = VFXDataStore.LandGrassVFX;
+		switch (pl.GroundTag)
+		{
+			case "Ground_Concrete":
+				VFX = VFXDataStore.LandConcreteVFX;
+				break;
+			case "Ground_YellowStone":
+				VFX = VFXDataStore.LandYellowStoneVFX;
+				break;
+		}
+		_instantiateVFX(VFX, pl.PlayerFeet.transform.position, VFX.transform.rotation);
 	}
 	#endregion
 

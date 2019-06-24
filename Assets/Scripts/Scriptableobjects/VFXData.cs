@@ -9,6 +9,10 @@ public class VFXData : ScriptableObject
 	public GameObject DeathVFX;
 	public GameObject VanishVFX;
 	public GameObject HitVFX;
-	public GameObject JumpVFX;
-	public GameObject LandVFX;
+	public GameObject JumpGrassVFX;
+	public GameObject JumpConcreteVFX;
+	public GameObject JumpYellowStoneVFX;
+	public GameObject LandGrassVFX;
+	public GameObject LandConcreteVFX;
+	public GameObject LandYellowStoneVFX;
 }

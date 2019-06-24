@@ -106,7 +106,14 @@ public class AudioManager : MonoBehaviour
 
 	private void _onFootStep(FootStep fs)
 	{
-		_playSound(fs.PlayerFeet, AudioDataStore.FootstepAudioClips);
+		//_playSound(fs.PlayerFeet, AudioDataStore.FootstepAudioClips);
+		AudioSource objas = fs.PlayerFeet.GetComponent<AudioSource>();
+		if (objas == null) objas = fs.PlayerFeet.AddComponent<AudioSource>();
+		Debug.Assert(objas != null);
+
+		objas.volume = Random.Range(0.8f, 1f);
+		objas.pitch = Random.Range(0.8f, 1f);
+		objas.PlayOneShot(AudioDataStore.FootstepAudioClips[0]);
 	}
 
 	private void _onPlayerJump(PlayerJump pj)

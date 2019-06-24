@@ -10,4 +10,6 @@ public class WeaponData : ScriptableObject
 	public HookGunData HookGunDataStore;
 
 	public float WeaponSpawnCD = 12f;
+	public LayerMask Ground;
+	public LayerMask OnHitDisappear;
 }

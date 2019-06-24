@@ -207,14 +207,14 @@ public class rtHook : MonoBehaviour
 
 	private void OnCollisionEnter(Collision other)
 	{
-		if (other.collider.CompareTag("Ground") && _curHookTimesLeft <= 0)
+		if ((WeaponDataStore.Ground == (WeaponDataStore.Ground | (1 << other.gameObject.layer))) && _curHookTimesLeft <= 0)
 		{
 			_curHookTimesLeft = WeaponDataStore.HookGunDataStore.MaxHookTimes;
 			EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 
 			gameObject.SetActive(false);
 		}
-		if (((1 << other.gameObject.layer) & (1 << 14)) != 0)
+		if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | (1 << other.gameObject.layer)))
 		{
 			StartCoroutine(DisappearAfterAWhile(0f));
 		}

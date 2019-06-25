@@ -152,13 +152,13 @@ public class rtSuck : MonoBehaviour
 
 	private void OnCollisionEnter(Collision other)
 	{
-		if (other.collider.CompareTag("Ground") && _suckGunLeftTimes <= 0)
+		if ((WeaponDataStore.Ground == (WeaponDataStore.Ground | (1 << other.gameObject.layer))) && _suckGunLeftTimes <= 0)
 		{
 			_suckGunLeftTimes = WeaponDataStore.SuckGunDataStore.SuckGunMaxUseTimes;
 			EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 			gameObject.SetActive(false);
 		}
-		if (((1 << other.gameObject.layer) & (1 << 14)) != 0)
+		if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | (1 << other.gameObject.layer)))
 		{
 			StartCoroutine(DisappearAfterAWhile(0f));
 		}

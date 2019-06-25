@@ -101,7 +101,6 @@ public class rtEmit : MonoBehaviour
 		RaycastHit hit;
 		if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
 		{
-			print("Hit: " + hit.transform.name);
 			hit.transform.GetComponentInParent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
 		}
 	}
@@ -122,14 +121,14 @@ public class rtEmit : MonoBehaviour
 	// And if weapon does not collide to the ground or other allowed 
 	private void OnCollisionEnter(Collision other)
 	{
-		if (other.collider.CompareTag("Ground") && currentAmmo == 0)
+		if ((WeaponDataStore.Ground == (WeaponDataStore.Ground | (1 << other.gameObject.layer))) && currentAmmo == 0)
 		{
 			currentAmmo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
 			ChangeAmmoUI();
 			EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 			gameObject.SetActive(false);
 		}
-		if (((1 << other.gameObject.layer) & OnHitDisappear) != 0)
+		if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | (1 << other.gameObject.layer)))
 		{
 			StartCoroutine(DisappearAfterAWhile(0f));
 		}

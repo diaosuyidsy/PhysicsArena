@@ -751,7 +751,7 @@ public class PlayerController : MonoBehaviour
 		{
 			_rb.AddForce(new Vector3(0, CharacterDataStore.CharacterMovementDataStore.JumpForce, 0), ForceMode.Impulse);
 			_isJumping = true;
-			EventManager.Instance.TriggerEvent(new PlayerJump(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber));
+			EventManager.Instance.TriggerEvent(new PlayerJump(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber, GetGroundTag()));
 			OnDeathHidden[3].SetActive(false);
 		}
 	}
@@ -787,12 +787,10 @@ public class PlayerController : MonoBehaviour
 			velocityChange.y = 0f;
 			if (IsGrounded())
 			{
-				//_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal);
 				_rb.AddForce(velocityChange, ForceMode.VelocityChange);
 			}
 			else
 			{
-				//_rb.AddForce(transform.forward * CharacterDataStore.CharacterMovementDataStore.Thrust * normalizedInputVal * 0.5f);
 				_rb.AddForce(velocityChange * CharacterDataStore.CharacterMovementDataStore.InAirSpeedMultiplier, ForceMode.VelocityChange);
 			}
 			// Turn player according to the rotation of the joystick
@@ -855,6 +853,13 @@ public class PlayerController : MonoBehaviour
 	{
 		RaycastHit hit;
 		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+	}
+
+	private string GetGroundTag()
+	{
+		RaycastHit hit;
+		Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+		return hit.collider.tag;
 	}
 
 	private void CheckArmHelper(bool down, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
@@ -1114,6 +1119,17 @@ public class PlayerController : MonoBehaviour
 			yield return new WaitForEndOfFrame();
 		}
 	}
+
+	/// <summary>
+	/// This function is called from FootSteps on LegSwingRefernece
+	/// </summary>
+	public void FootStep()
+	{
+		if (IsGrounded())
+		{
+			EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[2], GetGroundTag()));
+		}
+	}
 	#endregion
 
 	private void OnCollisionEnter(Collision collision)
@@ -1121,7 +1137,7 @@ public class PlayerController : MonoBehaviour
 		if (collision.gameObject.layer == 13 && _isJumping)
 		{
 			_isJumping = false;
-			EventManager.Instance.TriggerEvent(new PlayerLand(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber));
+			EventManager.Instance.TriggerEvent(new PlayerLand(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber, GetGroundTag()));
 			OnDeathHidden[3].SetActive(true);
 		}
 	}

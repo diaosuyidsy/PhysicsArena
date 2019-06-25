@@ -4889,7 +4889,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.01, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.15126036, y: -0.01007346, z: 0}
+  m_ConnectedAnchor: {x: 0.1512594, y: -0.01007346, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -25137,7 +25137,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.1, z: 0}
   m_Axis: {x: -1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.00000078976154, y: -0.23916945, z: 0}
+  m_ConnectedAnchor: {x: -0.00000078976154, y: -0.23916933, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -25597,7 +25597,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.1, z: 0}
   m_Axis: {x: -1, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.00000078976154, y: -0.23916945, z: 0}
+  m_ConnectedAnchor: {x: 0.00000078976154, y: -0.23916933, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -31115,6 +31115,7 @@ GameObject:
   - component: {fileID: 33535179453996540}
   - component: {fileID: 23467895745224832}
   - component: {fileID: 95017249423029770}
+  - component: {fileID: 8933335222325221142}
   m_Layer: 0
   m_Name: LegSwingReference
   m_TagString: Untagged
@@ -31200,6 +31201,18 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &8933335222325221142
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1606629450697680}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 885a05a7a9b3d074aab8af71b7c2d62c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1607890455694926
 GameObject:
   m_ObjectHideFlags: 0

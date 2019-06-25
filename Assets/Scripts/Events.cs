@@ -200,18 +200,12 @@ public class PunchReleased : GameEvent
 public class FootStep : GameEvent
 {
 	public GameObject PlayerFeet { get; }
-	public string GroundType { get; }
+	public string GroundTag { get; }
 
-	public FootStep(GameObject _playerfeet)
+	public FootStep(GameObject _playerfeet, string _groundTag)
 	{
 		PlayerFeet = _playerfeet;
-		GroundType = "Grass";
-	}
-
-	public FootStep(GameObject _playerfeet, string _groundType)
-	{
-		PlayerFeet = _playerfeet;
-		GroundType = _groundType;
+		GroundTag = _groundTag;
 	}
 }
 
@@ -220,12 +214,14 @@ public class PlayerJump : GameEvent
 	public GameObject Player;
 	public GameObject PlayerFeet;
 	public int PlayerNumber;
+	public string GroundTag;
 
-	public PlayerJump(GameObject _player, GameObject _playerfeet, int _playernumber)
+	public PlayerJump(GameObject _player, GameObject _playerfeet, int _playernumber, string _groundtag)
 	{
 		Player = _player;
 		PlayerFeet = _playerfeet;
 		PlayerNumber = _playernumber;
+		GroundTag = _groundtag;
 	}
 }
 
@@ -234,12 +230,14 @@ public class PlayerLand : GameEvent
 	public GameObject Player;
 	public GameObject PlayerFeet;
 	public int PlayerNumber;
+	public string GroundTag;
 
-	public PlayerLand(GameObject _player, GameObject _playerfeet, int _playernumber)
+	public PlayerLand(GameObject _player, GameObject _playerfeet, int _playernumber, string _groundtag)
 	{
 		Player = _player;
 		PlayerFeet = _playerfeet;
 		PlayerNumber = _playernumber;
+		GroundTag = _groundtag;
 	}
 }
 

@@ -709,12 +709,12 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// If sender is not null, meaning the hit could be blocked
-	public void OnMeleeHit(Vector3 force, GameObject sender = null)
+	public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender = null)
 	{
 		// First check if the player could block the attack
 		if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
 		{
-			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier);
+			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge);
 			// Statistics: Block Success
 			if (PlayerNumber < GameManager.GM.BlockTimes.Count)
 			{
@@ -730,7 +730,7 @@ public class PlayerController : MonoBehaviour
 		}
 		else // Player is hit cause he could not block
 		{
-			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber));
+			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge));
 
 			_rb.AddForce(force, ForceMode.Impulse);
 		}
@@ -952,7 +952,7 @@ public class PlayerController : MonoBehaviour
 				rb.velocity = Vector3.zero;
 			}
 			Vector3 force = transform.forward * CharacterDataStore.CharacterMeleeDataStore.PunchForce * MeleeCharge;
-			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, gameObject);
+			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, MeleeCharge, gameObject);
 			hit.transform.GetComponentInParent<PlayerController>().Mark(gameObject);
 		}
 	}

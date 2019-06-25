@@ -859,7 +859,6 @@ public class PlayerController : MonoBehaviour
 	{
 		RaycastHit hit;
 		Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
-		print("Get Ground Tag: " + hit.collider.tag);
 		return hit.collider.tag;
 	}
 

@@ -12,14 +12,14 @@ public class AudioManager : MonoBehaviour
 	/// <param name="obj"></param>
 	/// <param name="clip"></param>
 	/// <param name="oneshot"></param>
-	private void _playSound(GameObject obj, AudioClip clip, bool oneshot = true)
+	private void _playSound(GameObject obj, AudioClip clip, bool oneshot = true, float volume = 1)
 	{
 		AudioSource objas = obj.GetComponent<AudioSource>();
 		if (objas == null) objas = obj.AddComponent<AudioSource>();
 		Debug.Assert(objas != null);
 
 		if (oneshot)
-			objas.PlayOneShot(clip);
+			objas.PlayOneShot(clip, volume);
 		else
 		{
 			objas.clip = clip;
@@ -33,10 +33,10 @@ public class AudioManager : MonoBehaviour
 	/// <param name="obj"></param>
 	/// <param name="clips"></param>
 	/// <param name="oneshot"></param>
-	private void _playSound(GameObject obj, AudioClip[] clips, bool oneshot = true)
+	private void _playSound(GameObject obj, AudioClip[] clips, bool oneshot = true, float volume = 1)
 	{
 		int rand = Random.Range(0, clips.Length);
-		_playSound(obj, clips[rand], oneshot);
+		_playSound(obj, clips[rand], oneshot, volume);
 	}
 
 	#region Event Handlers
@@ -106,14 +106,17 @@ public class AudioManager : MonoBehaviour
 
 	private void _onFootStep(FootStep fs)
 	{
-		//_playSound(fs.PlayerFeet, AudioDataStore.FootstepAudioClips);
-		AudioSource objas = fs.PlayerFeet.GetComponent<AudioSource>();
-		if (objas == null) objas = fs.PlayerFeet.AddComponent<AudioSource>();
-		Debug.Assert(objas != null);
-
-		objas.volume = Random.Range(0.8f, 1f);
-		objas.pitch = Random.Range(0.8f, 1f);
-		objas.PlayOneShot(AudioDataStore.FootstepAudioClips[0]);
+		AudioClip ac = AudioDataStore.FootstepGrassAudioClip;
+		switch (fs.GroundTag)
+		{
+			case "Ground_Concrete":
+				ac = AudioDataStore.FootstepConcreteAudioClip;
+				break;
+			case "Ground_YellowStone":
+				ac = AudioDataStore.FootstepYellowStoneAudioClip;
+				break;
+		}
+		_playSound(fs.PlayerFeet, ac, true, Random.Range(0.2f, 0.3f));
 	}
 
 	private void _onPlayerJump(PlayerJump pj)

@@ -8,7 +8,7 @@ public class ResourceCollector : MonoBehaviour
 	private GameObject[] Team1ResourceSpawnPt;
 	private GameObject[] Team2ResourceSpawnPt;
 
-	private int TeamTracker;
+	//private int TeamTracker;
 	private int TeamResourceSpawnIndex;
 
 	private void Start()
@@ -23,10 +23,9 @@ public class ResourceCollector : MonoBehaviour
 		{
 			if (other.CompareTag("Team1Resource"))
 			{
-				TeamTracker++;
+				//TeamTracker++;
 				other.tag = "Untagged";
-				print("Team 1 Score = " + TeamTracker);
-				//EventManager.TriggerEvent("Team1ScoreBig");
+				//print("Team 1 Score = " + TeamTracker);
 				// Statistics: Add the dropper to the stats record
 				int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
 				if (GameManager.GM.FoodScoreTimes.Count > lastholder)
@@ -39,12 +38,12 @@ public class ResourceCollector : MonoBehaviour
 				}
 				// Statistics End
 				EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team1Resource"));
-				if (TeamTracker == 2)
-				{
-					//GameManager.GM.GameOver(1, gameObject);
-					//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(transform);
-					ArenaScoreboard.instance.EndGame(gameObject);
-				}
+				//if (TeamTracker == 2)
+				//{
+				//	//GameManager.GM.GameOver(1, gameObject);
+				//	//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(transform);
+				//	//ArenaScoreboard.instance.EndGame(gameObject);
+				//}
 			}
 			else if (other.CompareTag("Team2Resource"))
 			{
@@ -57,10 +56,9 @@ public class ResourceCollector : MonoBehaviour
 		{
 			if (other.CompareTag("Team2Resource"))
 			{
-				TeamTracker++;
+				//TeamTracker++;
 				other.tag = "Untagged";
-				print("Team 2 Score = " + TeamTracker);
-				//EventManager.TriggerEvent("Team2ScoreBig");
+				//print("Team 2 Score = " + TeamTracker);
 				// Statistics: Add the dropper to the stats record
 				int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
 				if (GameManager.GM.FoodScoreTimes.Count > lastholder)
@@ -74,12 +72,12 @@ public class ResourceCollector : MonoBehaviour
 				// Statistics End
 				EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team2Resource"));
 
-				if (TeamTracker == 2)
-				{
-					//GameManager.GM.GameOver(2, gameObject);
-					//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(transform);
-					ArenaScoreboard.instance.EndGame(gameObject);
-				}
+				//if (TeamTracker == 2)
+				//{
+				//	//GameManager.GM.GameOver(2, gameObject);
+				//	//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(transform);
+				//	ArenaScoreboard.instance.EndGame(gameObject);
+				//}
 
 			}
 			else if (other.CompareTag("Team1Resource"))

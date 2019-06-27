@@ -18,7 +18,7 @@ Effects can be found in the 'Epic Toon FX/Prefabs' folder. Here they are sorted 
 
 In each category folder is a more detailed explanation of what effects you'll find inside.
 
-There is also a '2D Prefabs' folder which contain some extra effects which are more suitable for 2D games.
+There is also a '2D Prefabs' folder which contain some extra effects which are re-designed to work and look better for 2D side-scrolling games. They are mainly different in the way that their collision are pre-set to work with 2D colliders.
 
 ----------------------------------------
 2. SPAWNING EFFECTS
@@ -90,13 +90,18 @@ ETFXRotation - A simple script that applies constant rotation to an object
 
 Need help with anything? 
 
-Reach me at: archanor.work@gmail.com
+E-Mail : archanor.work@gmail.com
+Website: archanor.com
+
+Follow me on Twitter for regular updates and news
+
+Twitter: @Archanor
 
 ----------------------------------------
 7. CREDITS
 ----------------------------------------
 
-Special thanks to the following:
+Special thanks to:
 
 Jan Jørgensen
 Daniel Kole

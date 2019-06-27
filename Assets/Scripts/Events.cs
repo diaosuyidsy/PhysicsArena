@@ -9,6 +9,15 @@ public class GameStart : GameEvent
 	}
 }
 
+public class GameEnd : GameEvent
+{
+	public int Winner;
+	public GameEnd(int _winner)
+	{
+		Winner = _winner;
+	}
+}
+
 public class PlayerHit : GameEvent
 {
 	public GameObject Hiter { get; }

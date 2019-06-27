@@ -154,10 +154,11 @@ public class PlayerController : MonoBehaviour
 			return;
 
 		CheckRewiredInput();
-		CheckMovement();
 		CheckJump();
 		if (_checkArm && debugT_CheckArm)
 			CheckArm();
+		if (attackState == State.Shooting && EnableAuxillaryAiming)
+			AuxillaryAim();
 		CheckFire();
 		CheckDrop();
 		CheckBlock();
@@ -166,15 +167,12 @@ public class PlayerController : MonoBehaviour
 	// This is primarily for dropping item when velocity change too much 
 	private void FixedUpdate()
 	{
-		//if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
-		//{
-		//    DropHelper ();
-		//}
+		if (_canControl || !IsOccupied)
+		{
+			CheckMovement();
+		}
 		if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
-
 			DropHelper();
-
-		//_previousFrameVel = _rb.velocity.magnitude;
 
 	}
 
@@ -191,6 +189,20 @@ public class PlayerController : MonoBehaviour
 	{
 		if (pd.Player != gameObject) return;
 		_canControl = false;
+		if (attackState == State.Meleeing)
+		{
+			starttimer_meleeHold = false;
+			timer_meleeHoldTime = 0f;
+			attackState = State.Empty;
+			// This is add a push force when melee
+			_rb.AddForce(transform.forward * MeleeCharge * CharacterDataStore.CharacterMeleeDataStore.SelfPushForce, ForceMode.Impulse);
+			StopAllCoroutines();
+
+			StartCoroutine(MeleePunchLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime, _leftArmhj));
+			StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime));
+			EventManager.Instance.TriggerEvent(new PunchReleased(gameObject, PlayerNumber));
+		}
+		_auxillaryRotationLock = false;
 		foreach (GameObject go in OnDeathHidden)
 		{
 			go.SetActive(false);
@@ -560,7 +572,7 @@ public class PlayerController : MonoBehaviour
 				starttimer_meleeHold = false;
 				timer_meleeHoldTime = 0f;
 				// If we previously started melee and released the trigger, then release the fist
-				if (attackState == State.Meleeing)
+				if (attackState == State.Meleeing && _canControl)
 				{
 					attackState = State.Empty;
 					// This is add a push force when melee
@@ -867,6 +879,7 @@ public class PlayerController : MonoBehaviour
 	{
 		RaycastHit hit;
 		Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+		if (hit.collider == null) return "";
 		return hit.collider.tag;
 	}
 

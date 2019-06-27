@@ -8,4 +8,5 @@ public class CharacterData : ScriptableObject
 	public CharacterMovementData CharacterMovementDataStore;
 	public CharacterBlockData CharacterBlockDataStore;
 	public CharacterMeleeData CharacterMeleeDataStore;
+	public CharacterPickUpData CharacterPickUpDataStore;
 }

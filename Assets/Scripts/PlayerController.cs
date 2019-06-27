@@ -121,16 +121,16 @@ public class PlayerController : MonoBehaviour
 		_player = ReInput.players.GetPlayer(controllerNumber);
 		IsOccupied = true;
 	}
-    /// <summary>
-    /// should be deleted when done prototyping
-    /// </summary>
-    /// 
-    private void Init()
-    {
-        _player = ReInput.players.GetPlayer(PlayerNumber);
-        IsOccupied = true;
-    }
-    private void Start()
+	/// <summary>
+	/// should be deleted when done prototyping
+	/// </summary>
+	/// 
+	private void Init()
+	{
+		_player = ReInput.players.GetPlayer(PlayerNumber);
+		IsOccupied = true;
+	}
+	private void Start()
 	{
 		_rb = GetComponent<Rigidbody>();
 		_distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour
 		_rightHandhj = RightArms[2].GetComponent<HingeJoint>();
 		_freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
 		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", 1f);
-        Init();
+		Init();
 	}
 
 	// Update is called once per frame
@@ -352,7 +352,7 @@ public class PlayerController : MonoBehaviour
 		ResetBody();
 		// These two are necessary for all objects
 		HandObject.GetComponent<Rigidbody>().isKinematic = false;
-		HandObject.layer = 0;
+		HandObject.layer = LayerMask.NameToLayer("Pickup");
 		// Specialized checking
 		if (HandObject.CompareTag("Weapon"))
 		{

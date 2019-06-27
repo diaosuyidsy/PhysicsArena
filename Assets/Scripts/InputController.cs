@@ -66,6 +66,8 @@ public class InputController : MonoBehaviour
 		{
 			EnterGame(a.id);
 		}
+
+		EventManager.Instance.TriggerEvent(new GameStart());
 		//for (int i = 0; i < ReInput.controllers.joystickCount; i++)
 		//{
 		//	EnterGame(i);

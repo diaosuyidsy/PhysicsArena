@@ -9,13 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7ba6b12cf74687544a65170525528b0c, type: 3}
-  m_Name: CharacterMeleeData_Original
+  m_Script: {fileID: 11500000, guid: eccde90da01d159458fc72b86ffe1961, type: 3}
+  m_Name: CarModeData
   m_EditorClassIdentifier: 
-  ClockFistTime: 0.5
-  FistReleaseTime: 0.2
-  SelfPushForce: 200
-  PunchRadius: 0.3
-  PunchDistance: 0.05
-  PunchForce: 900
-  MeleeHoldTime: 10
+  CarInitalSpeed: 0.5
+  CarMaxSpeed: 1.5
+  CarSpeedIncreaseRate: 0.005
+  RotationSpeed: 6
+  MaxAnglePerSecond: 30

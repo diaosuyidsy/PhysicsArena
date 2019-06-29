@@ -50,7 +50,7 @@ namespace Obi
 
 		private void DestroyCommandBuffer(){
 			if (renderFluid != null){
-				GetComponent<Camera>().RemoveCommandBuffer (CameraEvent.BeforeImageEffectsOpaque,renderFluid);
+				GetComponent<Camera>().RemoveCommandBuffer (CameraEvent.BeforeImageEffects,renderFluid);
 				renderFluid = null;
 			}
 		}
@@ -73,7 +73,7 @@ namespace Obi
 				renderFluid = new CommandBuffer();
 				renderFluid.name = "Render fluid";
 				UpdateFluidRenderingCommandBuffer();
-				currentCam.AddCommandBuffer (CameraEvent.BeforeImageEffectsOpaque, renderFluid);
+				currentCam.AddCommandBuffer (CameraEvent.BeforeImageEffects, renderFluid);
 
 			}else if (autoupdate){
 

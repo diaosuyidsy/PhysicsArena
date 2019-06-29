@@ -13,6 +13,7 @@ public class GameFeelManager : MonoBehaviour
 	private void _onPlayerHit(PlayerHit ph)
 	{
 		float charge = ph.MeleeCharge;
+		if (charge <= 0.3f) charge = 0f;
 		CameraShake.CS.Shake(0.1f * charge, 0.1f * charge);
 		_vibrateController(ph.HittedPlayerNumber, 1.0f * charge, 0.25f * charge);
 

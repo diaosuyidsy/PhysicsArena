@@ -5,7 +5,6 @@ using System.Linq;
 
 public class Fingers : MonoBehaviour
 {
-
 	public float Force = 4000;
 	public GameObject OtherHand;
 	public GameObject Hip;
@@ -39,10 +38,10 @@ public class Fingers : MonoBehaviour
 
 	private void Update()
 	{
+		if (taken) return;
 		RaycastHit hit;
 		if (Physics.SphereCast(transform.position, _pc.CharacterDataStore.CharacterPickUpDataStore.Radius, transform.forward, out hit, 0.1f, _pc.CharacterDataStore.CharacterPickUpDataStore.PickUpLayer))
 		{
-			print(hit.collider.name);
 			if (!taken && hit.collider.GetComponent<GunPositionControl>().CanBePickedUp)
 			{
 				// Tell other necessary components that it has taken something

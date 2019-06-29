@@ -1014,7 +1014,6 @@ public class PlayerController : MonoBehaviour
 		{
 			elapesdTime += Time.deltaTime;
 			MeleeCharge = elapesdTime / time;
-
 			// VFX Section
 			MeleeChargingVFX.transform.localScale = new Vector3(0.8f * MeleeCharge, 0.8f * MeleeCharge, 0.8f * MeleeCharge);
 			// VFX END

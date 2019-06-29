@@ -124,11 +124,17 @@ public class AudioManager : MonoBehaviour
 		_playSound(pj.Player, AudioDataStore.JumpAudioClip);
 	}
 
+	private void _onWaterGunFired(WaterGunFired wf)
+	{
+		_playSound(wf.WaterGun, AudioDataStore.WaterGunFiredAudioClip);
+	}
+
 	#endregion
 
 	private void OnEnable()
 	{
 		EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
+		EventManager.Instance.AddHandler<WaterGunFired>(_onWaterGunFired);
 		EventManager.Instance.AddHandler<HookGunFired>(_onHookGunFired);
 		EventManager.Instance.AddHandler<HookHit>(_onHookGunHit);
 		EventManager.Instance.AddHandler<SuckGunFired>(_onSuckGunFired);
@@ -146,6 +152,7 @@ public class AudioManager : MonoBehaviour
 	private void OnDisable()
 	{
 		EventManager.Instance.RemoveHandler<PlayerHit>(_onPlayerHit);
+		EventManager.Instance.RemoveHandler<WaterGunFired>(_onWaterGunFired);
 		EventManager.Instance.RemoveHandler<HookGunFired>(_onHookGunFired);
 		EventManager.Instance.RemoveHandler<HookHit>(_onHookGunHit);
 		EventManager.Instance.RemoveHandler<SuckGunFired>(_onSuckGunFired);

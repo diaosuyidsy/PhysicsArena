@@ -12,13 +12,15 @@ public class GameFeelManager : MonoBehaviour
 	#region Event Handlers
 	private void _onPlayerHit(PlayerHit ph)
 	{
-		CameraShake.CS.Shake(0.1f, 0.1f);
-		_vibrateController(ph.HittedPlayerNumber, 1.0f, 0.25f);
+		float charge = ph.MeleeCharge;
+		if (charge <= 0.3f) charge = 0f;
+		CameraShake.CS.Shake(0.1f * charge, 0.1f * charge);
+		_vibrateController(ph.HittedPlayerNumber, 1.0f * charge, 0.25f * charge);
 
 		/// If the hiter number is below 0, means it's a block
 		/// and blocked attack don't have a hitter
 		if (ph.HiterPlayerNumber < 0) return;
-		_vibrateController(ph.HiterPlayerNumber, 1.0f, 0.15f);
+		_vibrateController(ph.HiterPlayerNumber, 1.0f * charge, 0.15f * charge);
 
 	}
 

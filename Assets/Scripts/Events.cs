@@ -9,6 +9,15 @@ public class GameStart : GameEvent
 	}
 }
 
+public class GameEnd : GameEvent
+{
+	public int Winner;
+	public GameEnd(int _winner)
+	{
+		Winner = _winner;
+	}
+}
+
 public class PlayerHit : GameEvent
 {
 	public GameObject Hiter { get; }
@@ -19,25 +28,17 @@ public class PlayerHit : GameEvent
 	/// </summary>
 	public int HiterPlayerNumber { get; }
 	public int HittedPlayerNumber { get; }
+	public float MeleeCharge { get; }
 
 	public PlayerHit(GameObject _hiter, GameObject _hitted,
-		Vector3 _force)
-	{
-		Hiter = _hiter;
-		Hitted = _hitted;
-		Force = _force;
-		HiterPlayerNumber = 0;
-		HittedPlayerNumber = 0;
-	}
-
-	public PlayerHit(GameObject _hiter, GameObject _hitted,
-		Vector3 _force, int _hiternum, int _hittednum)
+		Vector3 _force, int _hiternum, int _hittednum, float _meleeCharge)
 	{
 		Hiter = _hiter;
 		Hitted = _hitted;
 		Force = _force;
 		HiterPlayerNumber = _hiternum;
 		HittedPlayerNumber = _hittednum;
+		MeleeCharge = _meleeCharge;
 	}
 }
 

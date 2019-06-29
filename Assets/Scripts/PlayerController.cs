@@ -45,7 +45,6 @@ public class PlayerController : MonoBehaviour
 	public GameObject BlockUIFill;
 
 	#region Statistics Variables
-	[HideInInspector]
 	public int PlayerNumber;
 	public GameObject EnemyWhoHitPlayer;
 	#endregion
@@ -122,7 +121,15 @@ public class PlayerController : MonoBehaviour
 		_player = ReInput.players.GetPlayer(controllerNumber);
 		IsOccupied = true;
 	}
-
+	/// <summary>
+	/// should be deleted when done prototyping
+	/// </summary>
+	/// 
+	private void Init()
+	{
+		_player = ReInput.players.GetPlayer(PlayerNumber);
+		IsOccupied = true;
+	}
 	private void Start()
 	{
 		_rb = GetComponent<Rigidbody>();
@@ -136,6 +143,7 @@ public class PlayerController : MonoBehaviour
 		_rightHandhj = RightArms[2].GetComponent<HingeJoint>();
 		_freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
 		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", 1f);
+		Init();
 	}
 
 	// Update is called once per frame
@@ -146,10 +154,11 @@ public class PlayerController : MonoBehaviour
 			return;
 
 		CheckRewiredInput();
-		CheckMovement();
 		CheckJump();
 		if (_checkArm && debugT_CheckArm)
 			CheckArm();
+		if (attackState == State.Shooting && EnableAuxillaryAiming)
+			AuxillaryAim();
 		CheckFire();
 		CheckDrop();
 		CheckBlock();
@@ -158,15 +167,12 @@ public class PlayerController : MonoBehaviour
 	// This is primarily for dropping item when velocity change too much 
 	private void FixedUpdate()
 	{
-		//if (Mathf.Abs (_rb.velocity.magnitude - _previousFrameVel) >= GameManager.GM.DropWeaponVelocityThreshold)
-		//{
-		//    DropHelper ();
-		//}
+		if (_canControl || !IsOccupied)
+		{
+			CheckMovement();
+		}
 		if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
-
 			DropHelper();
-
-		//_previousFrameVel = _rb.velocity.magnitude;
 
 	}
 
@@ -183,6 +189,20 @@ public class PlayerController : MonoBehaviour
 	{
 		if (pd.Player != gameObject) return;
 		_canControl = false;
+		if (attackState == State.Meleeing)
+		{
+			starttimer_meleeHold = false;
+			timer_meleeHoldTime = 0f;
+			attackState = State.Empty;
+			// This is add a push force when melee
+			_rb.AddForce(transform.forward * MeleeCharge * CharacterDataStore.CharacterMeleeDataStore.SelfPushForce, ForceMode.Impulse);
+			StopAllCoroutines();
+
+			StartCoroutine(MeleePunchLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime, _leftArmhj));
+			StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime));
+			EventManager.Instance.TriggerEvent(new PunchReleased(gameObject, PlayerNumber));
+		}
+		_auxillaryRotationLock = false;
 		foreach (GameObject go in OnDeathHidden)
 		{
 			go.SetActive(false);
@@ -332,7 +352,7 @@ public class PlayerController : MonoBehaviour
 		ResetBody();
 		// These two are necessary for all objects
 		HandObject.GetComponent<Rigidbody>().isKinematic = false;
-		HandObject.layer = 0;
+		HandObject.layer = LayerMask.NameToLayer("Pickup");
 		// Specialized checking
 		if (HandObject.CompareTag("Weapon"))
 		{
@@ -552,7 +572,7 @@ public class PlayerController : MonoBehaviour
 				starttimer_meleeHold = false;
 				timer_meleeHoldTime = 0f;
 				// If we previously started melee and released the trigger, then release the fist
-				if (attackState == State.Meleeing)
+				if (attackState == State.Meleeing && _canControl)
 				{
 					attackState = State.Empty;
 					// This is add a push force when melee
@@ -709,12 +729,12 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// If sender is not null, meaning the hit could be blocked
-	public void OnMeleeHit(Vector3 force, GameObject sender = null)
+	public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender = null)
 	{
 		// First check if the player could block the attack
 		if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
 		{
-			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier);
+			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge);
 			// Statistics: Block Success
 			if (PlayerNumber < GameManager.GM.BlockTimes.Count)
 			{
@@ -730,7 +750,7 @@ public class PlayerController : MonoBehaviour
 		}
 		else // Player is hit cause he could not block
 		{
-			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber));
+			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge));
 
 			_rb.AddForce(force, ForceMode.Impulse);
 		}
@@ -859,6 +879,7 @@ public class PlayerController : MonoBehaviour
 	{
 		RaycastHit hit;
 		Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+		if (hit.collider == null) return "";
 		return hit.collider.tag;
 	}
 
@@ -952,7 +973,7 @@ public class PlayerController : MonoBehaviour
 				rb.velocity = Vector3.zero;
 			}
 			Vector3 force = transform.forward * CharacterDataStore.CharacterMeleeDataStore.PunchForce * MeleeCharge;
-			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, gameObject);
+			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, MeleeCharge, gameObject);
 			hit.transform.GetComponentInParent<PlayerController>().Mark(gameObject);
 		}
 	}
@@ -993,7 +1014,6 @@ public class PlayerController : MonoBehaviour
 		{
 			elapesdTime += Time.deltaTime;
 			MeleeCharge = elapesdTime / time;
-
 			// VFX Section
 			MeleeChargingVFX.transform.localScale = new Vector3(0.8f * MeleeCharge, 0.8f * MeleeCharge, 0.8f * MeleeCharge);
 			// VFX END

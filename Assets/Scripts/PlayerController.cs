@@ -805,7 +805,7 @@ public class PlayerController : MonoBehaviour
 			velocityChange.x = Mathf.Clamp(velocityChange.x, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
 			velocityChange.z = Mathf.Clamp(velocityChange.z, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
 			velocityChange.y = 0f;
-			if (IsGrounded())
+			if (IsGrounded() && !IsFacingCliff())
 			{
 				_rb.AddForce(velocityChange, ForceMode.VelocityChange);
 			}
@@ -873,6 +873,13 @@ public class PlayerController : MonoBehaviour
 	{
 		RaycastHit hit;
 		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+	}
+
+	private bool IsFacingCliff()
+	{
+		RaycastHit hit;
+		Physics.Raycast(transform.position + transform.forward * 0.5f, Vector3.down, out hit);
+		return hit.collider.gameObject.CompareTag("DeathZone");
 	}
 
 	private string GetGroundTag()

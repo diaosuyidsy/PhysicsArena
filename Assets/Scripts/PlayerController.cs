@@ -794,6 +794,8 @@ public class PlayerController : MonoBehaviour
 
 		if (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f))
 		{
+			var isOnGround = IsGrounded();
+			var isfacingcliff = IsFacingCliff();
 			// Get the percent of input force player put in
 			float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
 			// Add force based on that percentage
@@ -805,9 +807,13 @@ public class PlayerController : MonoBehaviour
 			velocityChange.x = Mathf.Clamp(velocityChange.x, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
 			velocityChange.z = Mathf.Clamp(velocityChange.z, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
 			velocityChange.y = 0f;
-			if (IsGrounded() && !IsFacingCliff())
+			if (isOnGround && !isfacingcliff)
 			{
 				_rb.AddForce(velocityChange, ForceMode.VelocityChange);
+			}
+			else if(isOnGround && isfacingcliff)
+			{
+				_rb.AddForce(velocityChange * CharacterDataStore.CharacterMovementDataStore.FacingCliffMultiplier, ForceMode.VelocityChange);
 			}
 			else
 			{

@@ -62,12 +62,6 @@ public class Fingers : MonoBehaviour
 		}
 	}
 
-	private void OnDrawGizmosSelected()
-	{
-		Gizmos.color = Color.yellow;
-		Gizmos.DrawSphere(transform.position, _pc.CharacterDataStore.CharacterPickUpDataStore.Radius);
-	}
-
 	//void OnCollisionEnter(Collision col)
 	//{
 	//	// Make it so that you cannot stick to the ground, payload or any other players

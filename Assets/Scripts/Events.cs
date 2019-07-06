@@ -174,6 +174,40 @@ public class SuckGunSuck : GameEvent
 	}
 }
 
+public class FistGunFired : GameEvent
+{
+	public GameObject FistGun { get; }
+	public GameObject FistGunOwner { get; }
+	public int FistGunOwnerPlayerNumber { get; }
+	
+	public FistGunFired(GameObject _fistGun, GameObject _fistGunOwner, int _fistgunownerplayernumber)
+	{
+		FistGun = _fistGun;
+		FistGunOwner = _fistGunOwner;
+		FistGunOwnerPlayerNumber = _fistgunownerplayernumber;
+	}
+}
+
+public class FistGunHit : GameEvent
+{
+	public GameObject FistGun { get; }
+	public GameObject Fist { get; }
+	public GameObject FistGunUser { get; }
+	public GameObject Hitted { get; }
+	public int UserPlayerNumber { get; }
+	public int HittedPlayerNumber { get; }
+
+	public FistGunHit(GameObject _FistGun, GameObject _Fist, GameObject _FistGunUser, GameObject _Hitted, int _UserPlayerNumber, int _HittedPlayerNumber)
+	{
+		FistGun = _FistGun;
+		Fist = _Fist;
+		FistGunUser = _FistGunUser;
+		Hitted = _Hitted;
+		UserPlayerNumber = _UserPlayerNumber;
+		HittedPlayerNumber = _HittedPlayerNumber;
+	}
+}
+
 public class PunchHolding : GameEvent
 {
 	public GameObject Player { get; }

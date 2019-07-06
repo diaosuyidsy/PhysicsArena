@@ -404,6 +404,13 @@ public class PlayerController : MonoBehaviour
 						HandObject.SendMessage("Suck", true);
 					}
 					break;
+				case "FistGun":
+					if(HandObject != null && !_dropping)
+					{
+						AuxillaryAimOnce(DesignPanelManager.DPM.HookGunAuxillaryAimSlider.value);
+						HandObject.SendMessage("Fist", true);
+					}
+					break;
 				default:
 					//If we don't have anything on hand, we are applying melee action
 					if (attackState != State.Meleeing && attackState != State.Blocking && normalState != State.Picking && normalState != State.Holding)
@@ -627,15 +634,18 @@ public class PlayerController : MonoBehaviour
 	}
 	private void AuxillaryAimOnce(float maxangle)
 	{
+		print(maxangle);
 		GameObject target = null;
 		float minAngle = 360f;
 		foreach (GameObject otherPlayer in GameManager.GM.Players)
 		{
 			if (otherPlayer != null && !otherPlayer.CompareTag(tag))
 			{
+				print("1" + otherPlayer);
 				// If other player are within max Distance, then check for the smalliest angle player
 				if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= _axuillaryMaxDistance)
 				{
+					print(otherPlayer);
 					Vector3 targetDir = otherPlayer.transform.position - transform.position;
 					float angle = Vector3.Angle(targetDir, transform.forward);
 					if (angle <= maxangle && angle < minAngle)
@@ -650,6 +660,7 @@ public class PlayerController : MonoBehaviour
 		if (target != null)
 		{
 			transform.LookAt(target.transform);
+			print("Auxillary Aim Once");
 			if (HandObject != null)
 			{
 				HandObject.transform.eulerAngles = transform.eulerAngles + new Vector3(0f, 90f, 0f);
@@ -680,6 +691,7 @@ public class PlayerController : MonoBehaviour
 				StartCoroutine(PickUpWeaponHelper(_rightArm2hj, _rightArmhj, false, 0.1f));
 				break;
 			case "Hook":
+			case "FistGun":
 				_checkArm = false;
 
 				// Bend the body back
@@ -794,6 +806,8 @@ public class PlayerController : MonoBehaviour
 
 		if (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f))
 		{
+			var isOnGround = IsGrounded();
+			var isfacingcliff = IsFacingCliff();
 			// Get the percent of input force player put in
 			float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
 			// Add force based on that percentage
@@ -805,9 +819,13 @@ public class PlayerController : MonoBehaviour
 			velocityChange.x = Mathf.Clamp(velocityChange.x, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
 			velocityChange.z = Mathf.Clamp(velocityChange.z, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
 			velocityChange.y = 0f;
-			if (IsGrounded())
+			if (isOnGround && !isfacingcliff)
 			{
 				_rb.AddForce(velocityChange, ForceMode.VelocityChange);
+			}
+			else if(isOnGround && isfacingcliff)
+			{
+				_rb.AddForce(velocityChange * CharacterDataStore.CharacterMovementDataStore.FacingCliffMultiplier, ForceMode.VelocityChange);
 			}
 			else
 			{
@@ -873,6 +891,13 @@ public class PlayerController : MonoBehaviour
 	{
 		RaycastHit hit;
 		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+	}
+
+	private bool IsFacingCliff()
+	{
+		RaycastHit hit;
+		Physics.Raycast(transform.position + transform.forward * 0.5f, Vector3.down, out hit);
+		return hit.collider.gameObject.CompareTag("DeathZone");
 	}
 
 	private string GetGroundTag()

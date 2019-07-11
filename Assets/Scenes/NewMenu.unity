@@ -427,7 +427,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 22
+  m_RootOrder: 23
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &572213938
 PrefabInstance:
@@ -442,15 +442,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4447631086457572, guid: a03aa47d349828e448491925956e34e7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -7.411171
+      value: -7.63
       objectReference: {fileID: 0}
     - target: {fileID: 4447631086457572, guid: a03aa47d349828e448491925956e34e7, type: 3}
       propertyPath: m_LocalPosition.y
-      value: -2.0469737
+      value: -2.1
       objectReference: {fileID: 0}
     - target: {fileID: 4447631086457572, guid: a03aa47d349828e448491925956e34e7, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 12.448938
+      value: 12.35
       objectReference: {fileID: 0}
     - target: {fileID: 4447631086457572, guid: a03aa47d349828e448491925956e34e7, type: 3}
       propertyPath: m_LocalRotation.x
@@ -470,7 +470,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4447631086457572, guid: a03aa47d349828e448491925956e34e7, type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 4447631086457572, guid: a03aa47d349828e448491925956e34e7, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -2279,43 +2279,3 @@ MonoBehaviour:
   shakeDuration: 0
   shakeAmount: 0.2
   decreaseFactor: 1
---- !u!114 &2093812649
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2093812645}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8a338d679868f45439ea43c7ae035e36, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  settings:
-    visualizeFocus: 0
-    tweakMode: 0
-    filteringQuality: 2
-    apertureShape: 2
-    apertureOrientation: 0
-  focus:
-    transform: {fileID: 0}
-    focusPlane: 0.0000009536743
-    range: 26.200003
-    nearPlane: -13.1
-    nearFalloff: 15
-    farPlane: 13.100002
-    farFalloff: 26.2
-    nearBlurRadius: 15
-    farBlurRadius: 18.3
-  bokehTexture:
-    texture: {fileID: 0}
-    scale: 1
-    intensity: 50
-    threshold: 2
-    spawnHeuristic: 0.15
-  m_FilmicDepthOfFieldShader: {fileID: 4800000, guid: bff0e5458fb914f5c9985ba4f09171d2,
-    type: 3}
-  m_MedianFilterShader: {fileID: 4800000, guid: a058b22d4123add4b807e832604e5e7b,
-    type: 3}
-  m_TextureBokehShader: {fileID: 4800000, guid: c961b8ed1f00f924d804ada5143bd0e8,
-    type: 3}

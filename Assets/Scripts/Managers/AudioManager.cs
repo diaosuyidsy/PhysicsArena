@@ -94,7 +94,7 @@ public class AudioManager : MonoBehaviour
 		_playSound(ws.Weapon, AudioDataStore.WeaponSpawnedAudioClip);
 	}
 
-	private void _onPunchHolding(PunchHolding ph)
+	private void _onPunchStart(PunchStart ph)
 	{
 		_playSound(ph.Player, AudioDataStore.PunchChargingAudioClip, false);
 	}
@@ -143,7 +143,7 @@ public class AudioManager : MonoBehaviour
 		EventManager.Instance.AddHandler<ObjectDespawned>(_onObjectDespawned);
 		EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawned);
 		EventManager.Instance.AddHandler<WeaponSpawned>(_onWeaponSpawned);
-		EventManager.Instance.AddHandler<PunchHolding>(_onPunchHolding);
+		EventManager.Instance.AddHandler<PunchStart>(_onPunchStart);
 		EventManager.Instance.AddHandler<PunchReleased>(_onPunchReleased);
 		EventManager.Instance.AddHandler<FootStep>(_onFootStep);
 		EventManager.Instance.AddHandler<PlayerJump>(_onPlayerJump);
@@ -161,7 +161,7 @@ public class AudioManager : MonoBehaviour
 		EventManager.Instance.RemoveHandler<ObjectDespawned>(_onObjectDespawned);
 		EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawned);
 		EventManager.Instance.RemoveHandler<WeaponSpawned>(_onWeaponSpawned);
-		EventManager.Instance.RemoveHandler<PunchHolding>(_onPunchHolding);
+		EventManager.Instance.RemoveHandler<PunchStart>(_onPunchStart);
 		EventManager.Instance.RemoveHandler<PunchReleased>(_onPunchReleased);
 		EventManager.Instance.RemoveHandler<FootStep>(_onFootStep);
 		EventManager.Instance.RemoveHandler<PlayerJump>(_onPlayerJump);

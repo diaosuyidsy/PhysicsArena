@@ -62,6 +62,34 @@ public class VisualEffectManager : MonoBehaviour
 		}
 		_instantiateVFX(VFX, pl.PlayerFeet.transform.position, VFX.transform.rotation);
 	}
+
+	private void _onPunchStart(PunchStart ps)
+	{
+		GameObject VFX = ps.Player.CompareTag("Team1") ? VFXDataStore.ChickenMeleeChargingVFX : VFXDataStore.DuckMeleeChargingVFX;
+		GameObject MeleeVFXHolder = ps.Player.GetComponent<PlayerController>().MeleeVFXHolder;
+		if (MeleeVFXHolder != null) Destroy(MeleeVFXHolder);
+		ps.Player.GetComponent<PlayerController>().MeleeVFXHolder = Instantiate(VFX, ps.PlayerRightHand, false);
+
+	}
+
+	private void _onPunchHolding(PunchHolding ph)
+	{
+		GameObject VFX = ph.Player.CompareTag("Team1") ? VFXDataStore.ChickenUltimateVFX : VFXDataStore.DuckUltimateVFX;
+		GameObject MeleeVFXHolder = ph.Player.GetComponent<PlayerController>().MeleeVFXHolder;
+		if (MeleeVFXHolder != null) Destroy(MeleeVFXHolder);
+		ph.Player.GetComponent<PlayerController>().MeleeVFXHolder = Instantiate(VFX, ph.PlayerRightHand, false);
+	}
+
+	private void _onPunchReleased(PunchReleased pr)
+	{
+
+	}
+
+	private void _onPunchDone(PunchDone pd)
+	{
+		GameObject MeleeVFXHolder = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder;
+		if (MeleeVFXHolder != null) Destroy(MeleeVFXHolder);
+	}
 	#endregion
 
 	private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -78,6 +106,11 @@ public class VisualEffectManager : MonoBehaviour
 		EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelivered);
 		EventManager.Instance.AddHandler<PlayerJump>(_onPlayerJump);
 		EventManager.Instance.AddHandler<PlayerLand>(_onPlayerLand);
+		EventManager.Instance.AddHandler<PunchStart>(_onPunchStart);
+		EventManager.Instance.AddHandler<PunchHolding>(_onPunchHolding);
+		EventManager.Instance.AddHandler<PunchReleased>(_onPunchReleased);
+		EventManager.Instance.AddHandler<PunchDone>(_onPunchDone);
+
 	}
 
 	private void OnDisable()
@@ -88,6 +121,10 @@ public class VisualEffectManager : MonoBehaviour
 		EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelivered);
 		EventManager.Instance.RemoveHandler<PlayerJump>(_onPlayerJump);
 		EventManager.Instance.RemoveHandler<PlayerLand>(_onPlayerLand);
+		EventManager.Instance.RemoveHandler<PunchStart>(_onPunchStart);
+		EventManager.Instance.RemoveHandler<PunchHolding>(_onPunchHolding);
+		EventManager.Instance.RemoveHandler<PunchReleased>(_onPunchReleased);
+		EventManager.Instance.RemoveHandler<PunchDone>(_onPunchDone);
 	}
 
 }

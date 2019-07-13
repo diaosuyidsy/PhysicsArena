@@ -179,7 +179,7 @@ public class FistGunFired : GameEvent
 	public GameObject FistGun { get; }
 	public GameObject FistGunOwner { get; }
 	public int FistGunOwnerPlayerNumber { get; }
-	
+
 	public FistGunFired(GameObject _fistGun, GameObject _fistGunOwner, int _fistgunownerplayernumber)
 	{
 		FistGun = _fistGun;
@@ -208,15 +208,30 @@ public class FistGunHit : GameEvent
 	}
 }
 
+public class PunchStart : GameEvent
+{
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+	public Transform PlayerRightHand { get; }
+	public PunchStart(GameObject player, int playerNumber, Transform playerRightHand)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+		PlayerRightHand = playerRightHand;
+	}
+}
+
 public class PunchHolding : GameEvent
 {
 	public GameObject Player { get; }
 	public int PlayerNumber { get; }
+	public Transform PlayerRightHand;
 
-	public PunchHolding(GameObject _player, int _playernumber)
+	public PunchHolding(GameObject player, int playerNumber, Transform playerRightHand)
 	{
-		Player = _player;
-		PlayerNumber = _playernumber;
+		Player = player;
+		PlayerNumber = playerNumber;
+		PlayerRightHand = playerRightHand;
 	}
 }
 
@@ -229,6 +244,20 @@ public class PunchReleased : GameEvent
 	{
 		Player = _player;
 		PlayerNumber = _playernumber;
+	}
+}
+
+public class PunchDone : GameEvent
+{
+	public GameObject Player;
+	public int PlayerNumber;
+	public Transform PlayerRightHand;
+
+	public PunchDone(GameObject player, int playerNumber, Transform playerRightHand)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+		PlayerRightHand = playerRightHand;
 	}
 }
 

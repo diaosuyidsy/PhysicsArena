@@ -15,4 +15,9 @@ public class VFXData : ScriptableObject
 	public GameObject LandGrassVFX;
 	public GameObject LandConcreteVFX;
 	public GameObject LandYellowStoneVFX;
+	public GameObject ChickenMeleeChargingVFX;
+	public GameObject ChickenUltimateVFX;
+	public GameObject DuckMeleeChargingVFX;
+	public GameObject DuckUltimateVFX;
+
 }

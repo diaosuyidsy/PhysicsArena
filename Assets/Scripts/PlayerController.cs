@@ -618,18 +618,15 @@ public class PlayerController : MonoBehaviour
 	}
 	private void AuxillaryAimOnce(float maxangle)
 	{
-		print(maxangle);
 		GameObject target = null;
 		float minAngle = 360f;
 		foreach (GameObject otherPlayer in GameManager.GM.Players)
 		{
 			if (otherPlayer != null && !otherPlayer.CompareTag(tag))
 			{
-				print("1" + otherPlayer);
 				// If other player are within max Distance, then check for the smalliest angle player
 				if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= _axuillaryMaxDistance)
 				{
-					print(otherPlayer);
 					Vector3 targetDir = otherPlayer.transform.position - transform.position;
 					float angle = Vector3.Angle(targetDir, transform.forward);
 					if (angle <= maxangle && angle < minAngle)
@@ -644,7 +641,6 @@ public class PlayerController : MonoBehaviour
 		if (target != null)
 		{
 			transform.LookAt(target.transform);
-			print("Auxillary Aim Once");
 			if (HandObject != null)
 			{
 				HandObject.transform.eulerAngles = transform.eulerAngles + new Vector3(0f, 90f, 0f);
@@ -1156,6 +1152,7 @@ public class PlayerController : MonoBehaviour
 			OnDeathHidden[3].SetActive(true);
 		}
 	}
+
 	private void OnEnable()
 	{
 		EventManager.Instance.AddHandler<PlayerDied>(OnEnterDeathZone);

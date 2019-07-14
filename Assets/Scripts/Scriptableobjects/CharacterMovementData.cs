@@ -14,4 +14,5 @@ public class CharacterMovementData : ScriptableObject
 	public LayerMask JumpMask;
 	public float MinRotationSpeed = 4f;
 	public float MaxRotationSpeed = 15f;
+	public float DropWeaponVelocityThreshold = 6f;
 }

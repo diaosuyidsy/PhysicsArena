@@ -170,7 +170,7 @@ public class PlayerController : MonoBehaviour
 		{
 			CheckMovement();
 		}
-		if (_rb.velocity.magnitude >= GameManager.GM.DropWeaponVelocityThreshold)
+		if (_rb.velocity.magnitude >= CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
 			DropHelper();
 
 	}

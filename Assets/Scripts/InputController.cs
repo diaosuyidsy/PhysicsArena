@@ -51,27 +51,12 @@ public class InputController : MonoBehaviour
 
 	public void AllEnterGame()
 	{
-		// Start Generating Weapon
-		WeaponGenerationManager.WGM.StartGeneratingWeapon();
-		//EventManager.TriggerEvent("GameStart");
-		//for (int i = 0; i < ReInput.controllers.joystickCount; i++)
-		//{
-		//	if (ReInput.controllers.Joysticks[i].isConnected)
-		//	{
-		//		EnterGame(i);
-		//	}
-		//}
-
 		foreach (Joystick a in ReInput.controllers.Joysticks)
 		{
 			EnterGame(a.id);
 		}
 
 		EventManager.Instance.TriggerEvent(new GameStart());
-		//for (int i = 0; i < ReInput.controllers.joystickCount; i++)
-		//{
-		//	EnterGame(i);
-		//}
 	}
 
 	private void EnterGame(int playerID)

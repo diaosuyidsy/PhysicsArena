@@ -60,6 +60,8 @@ public class rtFist : MonoBehaviour
 				_fistDup.transform.position = _fist.position;
 				_fistDup.transform.parent = null;
 				_fist.gameObject.SetActive(false);
+				/// Add Backfire force to player as well
+				_gpc.Owner.GetComponent<Rigidbody>().AddForce(transform.right * WeaponDataStore.FistGunDataStore.BackfireHitForce, ForceMode.VelocityChange);
 				_fistGunState = FistGunState.Out;
 			}
 		}

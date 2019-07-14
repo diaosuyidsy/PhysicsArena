@@ -13,4 +13,13 @@ public class WeaponData : ScriptableObject
 	public float WeaponSpawnCD = 12f;
 	public LayerMask Ground;
 	public LayerMask OnHitDisappear;
+
+
+	//teleport a weapon to a random position within a given space
+	[Header("Weapon Spawn Setting")]
+	public Vector3 WeaponSpawnerSize;
+
+	// Need to manually set up world center until we figure out a way to automatically do it.
+	public Vector3 WorldCenter;
+	public Vector3 WorldSize;
 }

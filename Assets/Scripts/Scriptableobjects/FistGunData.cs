@@ -6,7 +6,7 @@ using UnityEngine;
 public class FistGunData : ScriptableObject
 {
 	public float FistSpeed = 12f;
-	public int MaxHookTimes = 15;
+	public int MaxAmmo = 15;
 	public float FistHitForce = 900f;
 	public float BackfireHitForce = 300f;
 	public float MaxFlyDistance = 10f;

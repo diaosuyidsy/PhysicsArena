@@ -15,4 +15,5 @@ public class CharacterMovementData : ScriptableObject
 	public float MinRotationSpeed = 4f;
 	public float MaxRotationSpeed = 15f;
 	public float DropWeaponVelocityThreshold = 6f;
+	public float RespawnTime = 5f;
 }

@@ -208,7 +208,7 @@ public class PlayerController : MonoBehaviour
 		}
 		DropHelper();
 		StatsAfterDeath();
-		StartCoroutine(Respawn(GameManager.GM.RespawnTime));
+		StartCoroutine(Respawn(CharacterDataStore.CharacterMovementDataStore.RespawnTime));
 
 	}
 
@@ -356,7 +356,7 @@ public class PlayerController : MonoBehaviour
 		if (HandObject.CompareTag("Weapon"))
 		{
 			// Stop the shooting
-			HandObject.SendMessage("Shoot", false);
+			HandObject.GetComponent<WeaponBase>().Fire(false);
 			// Disable the UI
 			HandObject.SendMessage("KillUI");
 		}
@@ -385,7 +385,6 @@ public class PlayerController : MonoBehaviour
 					if (HandObject != null && !_dropping)
 					{
 						attackState = State.Shooting;
-						HandObject.SendMessage("Shoot", true);
 						if (EnableAuxillaryAiming)
 							AuxillaryAim();
 					}
@@ -394,20 +393,12 @@ public class PlayerController : MonoBehaviour
 					if (HandObject != null && !_dropping)
 					{
 						AuxillaryAimOnce(DesignPanelManager.DPM.HookGunAuxillaryAimSlider.value);
-						HandObject.SendMessage("Hook", true);
-					}
-					break;
-				case "SuckGun":
-					if (HandObject != null && !_dropping)
-					{
-						HandObject.SendMessage("Suck", true);
 					}
 					break;
 				case "FistGun":
 					if (HandObject != null && !_dropping)
 					{
 						AuxillaryAimOnce(DesignPanelManager.DPM.HookGunAuxillaryAimSlider.value);
-						HandObject.SendMessage("Fist", true);
 					}
 					break;
 				default:
@@ -422,31 +413,26 @@ public class PlayerController : MonoBehaviour
 					}
 					break;
 			}
+			if (HandObject != null && !_dropping)
+			{
+				HandObject.GetComponent<WeaponBase>().Fire(true);
+			}
 		}
 
 		// If player lift the button up
 		if (_player.GetButtonUp("Right Trigger"))
 		{
+			if (HandObject != null && !_dropping)
+			{
+				HandObject.GetComponent<WeaponBase>().Fire(false);
+			}
 			switch (_rightTriggerRegister)
 			{
 				case "Weapon":
 					attackState = State.Empty;
-					// Add weapon right trigger action
-					if (HandObject != null)
-						HandObject.SendMessage("Shoot", false);
 					// Auxillary Aiming
 					_auxillaryRotationLock = false;
 					_weaponCD = 0f;
-					break;
-				case "Hook":
-					if (HandObject != null && !_dropping)
-					{
-						HandObject.SendMessage("Hook", false);
-					}
-					break;
-				case "SuckGun":
-					if (HandObject != null)
-						HandObject.SendMessage("Suck", false);
 					break;
 				default:
 					// If we previously started melee and released the trigger, then release the fist

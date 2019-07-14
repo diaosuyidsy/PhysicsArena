@@ -28,7 +28,6 @@ public class GameManager : MonoBehaviour
 	public GameObject[] Team1RespawnPts;
 	[HideInInspector]
 	public GameObject[] Team2RespawnPts;
-	public float RespawnTime = 5f;
 	public GameObject TeamRed1Explosion;
 	public GameObject TeamBlue2Explosion;
 	public Color EndGameBackgroundImageColor;

@@ -70,12 +70,18 @@ public class rtBazooka : WeaponBase
 		}
 		else if (_bazookaState == BazookaStates.Out)
 		{
+			transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
 			_gpc.Owner.transform.position = transform.position - _diff;
+			_gpc.Owner.transform.eulerAngles = transform.eulerAngles + new Vector3(90f, 0f);
 			RaycastHit hit;
 			if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.LineCastLayer))
 			{
 				_gpc.Owner.GetComponent<PlayerController>().SetControl(true);
 				_bazookaState = BazookaStates.Idle;
+				//foreach (var rb in _gpc.Owner.GetComponentsInChildren<Rigidbody>())
+				//{
+				//	rb.isKinematic = false;
+				//}
 				List<GameObject> affectedPlayers = new List<GameObject>();
 				RaycastHit[] _affected = Physics.SphereCastAll(transform.position,
 					WeaponDataStore.BazookaDataStore.MaxAffectionRange,
@@ -117,6 +123,7 @@ public class rtBazooka : WeaponBase
 			_shadowThrowMark.gameObject.SetActive(true);
 			_throwMark.parent = null;
 			_shadowThrowMark.parent = null;
+			_throwMark.eulerAngles = new Vector3(90f, 0f, 0f);
 			_gpc.Owner.GetComponent<PlayerController>().SetControl(false);
 		}
 		else

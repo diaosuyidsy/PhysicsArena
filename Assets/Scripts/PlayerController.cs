@@ -178,6 +178,7 @@ public class PlayerController : MonoBehaviour
 	// Late Update is for standing the character
 	private void LateUpdate()
 	{
+		if (!_canControl) return;
 		_freezeBody.y = transform.localEulerAngles.y;
 		transform.localEulerAngles = _freezeBody;
 	}
@@ -682,8 +683,6 @@ public class PlayerController : MonoBehaviour
 
 				StartCoroutine(PickUpWeaponHalfHelper(_leftArmhj, 0.1f));
 				StartCoroutine(PickUpWeaponHalfHelper(_rightArmhj, 0.1f));
-				break;
-			case "Throwable":
 				break;
 			default:
 				break;

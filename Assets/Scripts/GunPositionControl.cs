@@ -10,6 +10,7 @@ public class GunPositionControl : MonoBehaviour
 	public float DownAngle = 10f;
 	[Tooltip("This Angle is for weapon y axis angle offset, normally it's 90f")]
 	public float FaceAngleOffset = 90f;
+	public float XOffset = 0f;
 
 	public float VerticalOffset = 10f;
 	[HideInInspector]
@@ -31,7 +32,7 @@ public class GunPositionControl : MonoBehaviour
 			//transform.position = (lh.transform.position + rh.transform.position) / 2f;
 			targetposition = (lh.transform.position + rh.transform.position) / 2f;
 			transform.position = new Vector3(targetposition.x, targetposition.y + VerticalOffset, targetposition.z);
-			transform.eulerAngles = new Vector3(0f, Owner.transform.eulerAngles.y + FaceAngleOffset, DownAngle);
+			transform.eulerAngles = new Vector3(XOffset, Owner.transform.eulerAngles.y + FaceAngleOffset, DownAngle);
 		}
 	}
 

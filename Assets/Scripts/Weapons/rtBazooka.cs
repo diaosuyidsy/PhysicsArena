@@ -45,6 +45,7 @@ public class rtBazooka : WeaponBase
 			return Mathf.Pow(WeaponDataStore.BazookaDataStore.MarkThrowThurst, 2) / -_throwMarkGravity.y - 1f;
 		}
 	}
+	private Vector3 _diff;
 
 	protected override void Awake()
 	{
@@ -54,6 +55,7 @@ public class rtBazooka : WeaponBase
 		Debug.Assert(_throwMark != null);
 		_shadowThrowMark = transform.Find("ShadowThrowMark");
 		Debug.Assert(_shadowThrowMark != null);
+		_ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
 	}
 
 	private void Update()
@@ -68,7 +70,34 @@ public class rtBazooka : WeaponBase
 		}
 		else if (_bazookaState == BazookaStates.Out)
 		{
-			_gpc.Owner.transform.position = transform.position;
+			_gpc.Owner.transform.position = transform.position - _diff;
+			RaycastHit hit;
+			if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.LineCastLayer))
+			{
+				_gpc.Owner.GetComponent<PlayerController>().SetControl(true);
+				_bazookaState = BazookaStates.Idle;
+				List<GameObject> affectedPlayers = new List<GameObject>();
+				RaycastHit[] _affected = Physics.SphereCastAll(transform.position,
+					WeaponDataStore.BazookaDataStore.MaxAffectionRange,
+					transform.forward, 0.1f,
+					WeaponDataStore.BazookaDataStore.AllPlayerLayer);
+				foreach (RaycastHit _a in _affected)
+				{
+					if (_a.collider.gameObject.tag.Contains("Team") &&
+						_a.collider.gameObject != _gpc.Owner &&
+						!Physics.Linecast(_a.collider.transform.position, transform.position, WeaponDataStore.BazookaDataStore.CanHideLayer))
+					{
+						affectedPlayers.Add(_a.collider.gameObject);
+						print(_a.collider.name);
+						Vector3 dir = (_a.collider.transform.position - transform.position).normalized;
+						float dis = Vector3.Distance(_a.collider.transform.position, transform.position);
+
+						_a.collider.gameObject.GetComponent<Rigidbody>().AddForce(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir, ForceMode.Impulse);
+					}
+				}
+				EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));
+				_onWeaponUsedOnce();
+			}
 		}
 	}
 
@@ -93,12 +122,12 @@ public class rtBazooka : WeaponBase
 		else
 		{
 			_bazookaState = BazookaStates.Out;
+			_diff = transform.position - _gpc.Owner.transform.position;
 			_lineRenderer.enabled = false;
 			//foreach (var rb in _gpc.Owner.GetComponentsInChildren<Rigidbody>())
 			//{
 			//	rb.isKinematic = true;
 			//}
-			_gpc.Owner.GetComponent<PlayerController>().SetControl(true);
 			transform.GetComponent<Rigidbody>().isKinematic = false;
 			transform.GetComponent<Rigidbody>().velocity = _startVelocity;
 			_gpc.FollowHand = false;
@@ -107,7 +136,22 @@ public class rtBazooka : WeaponBase
 
 	protected override void _onWeaponDespawn()
 	{
-
+		_gpc.FollowHand = true;
+		_bazookaState = BazookaStates.Idle;
+		_lineRenderer.enabled = false;
+		_player = null;
+		_throwMark.gameObject.SetActive(false);
+		_shadowThrowMark.gameObject.SetActive(false);
+		_throwMark.parent = transform;
+		_shadowThrowMark.parent = transform;
+		_throwMark.transform.localPosition = Vector3.zero;
+		_throwMark.transform.localEulerAngles = Vector3.zero;
+		_shadowThrowMark.transform.localPosition = Vector3.zero;
+		_shadowThrowMark.transform.localEulerAngles = Vector3.zero;
+		_ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
+		transform.GetComponent<Rigidbody>().isKinematic = false;
+		_gpc.CanBePickedUp = true;
+		//gameObject.SetActive(false);
 	}
 
 	private void _aim()

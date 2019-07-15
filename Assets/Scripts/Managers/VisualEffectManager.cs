@@ -90,6 +90,11 @@ public class VisualEffectManager : MonoBehaviour
 		GameObject MeleeVFXHolder = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder;
 		if (MeleeVFXHolder != null) Destroy(MeleeVFXHolder);
 	}
+
+	private void _onBazookaBombed(BazookaBombed bb)
+	{
+		_instantiateVFX(VFXDataStore.BazookaExplosionVFX, bb.BazookaGun.transform.position, VFXDataStore.BazookaExplosionVFX.transform.rotation);
+	}
 	#endregion
 
 	private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -110,7 +115,7 @@ public class VisualEffectManager : MonoBehaviour
 		EventManager.Instance.AddHandler<PunchHolding>(_onPunchHolding);
 		EventManager.Instance.AddHandler<PunchReleased>(_onPunchReleased);
 		EventManager.Instance.AddHandler<PunchDone>(_onPunchDone);
-
+		EventManager.Instance.AddHandler<BazookaBombed>(_onBazookaBombed);
 	}
 
 	private void OnDisable()
@@ -125,6 +130,7 @@ public class VisualEffectManager : MonoBehaviour
 		EventManager.Instance.RemoveHandler<PunchHolding>(_onPunchHolding);
 		EventManager.Instance.RemoveHandler<PunchReleased>(_onPunchReleased);
 		EventManager.Instance.RemoveHandler<PunchDone>(_onPunchDone);
+		EventManager.Instance.RemoveHandler<BazookaBombed>(_onBazookaBombed);
 	}
 
 }

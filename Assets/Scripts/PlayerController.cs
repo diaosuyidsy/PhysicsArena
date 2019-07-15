@@ -659,6 +659,7 @@ public class PlayerController : MonoBehaviour
 			case "Team2Resource":
 			case "WoodStamp":
 			case "SuckGun":
+			case "Bazooka":
 			case "Weapon":
 				_checkArm = false;
 

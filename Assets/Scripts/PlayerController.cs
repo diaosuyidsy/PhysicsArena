@@ -1164,4 +1164,11 @@ public class PlayerController : MonoBehaviour
 
 	}
 
+	public void SetControl(bool canControl)
+	{
+		_canControl = canControl;
+		if (!canControl)
+			LegSwingReference.GetComponent<Animator>().enabled = _canControl;
+	}
+
 }

@@ -178,6 +178,7 @@ public class PlayerController : MonoBehaviour
 	// Late Update is for standing the character
 	private void LateUpdate()
 	{
+		if (!_canControl) return;
 		_freezeBody.y = transform.localEulerAngles.y;
 		transform.localEulerAngles = _freezeBody;
 	}
@@ -659,6 +660,7 @@ public class PlayerController : MonoBehaviour
 			case "Team2Resource":
 			case "WoodStamp":
 			case "SuckGun":
+			case "Bazooka":
 			case "Weapon":
 				_checkArm = false;
 
@@ -681,8 +683,6 @@ public class PlayerController : MonoBehaviour
 
 				StartCoroutine(PickUpWeaponHalfHelper(_leftArmhj, 0.1f));
 				StartCoroutine(PickUpWeaponHalfHelper(_rightArmhj, 0.1f));
-				break;
-			case "Throwable":
 				break;
 			default:
 				break;
@@ -1162,6 +1162,13 @@ public class PlayerController : MonoBehaviour
 	{
 		EventManager.Instance.RemoveHandler<PlayerDied>(OnEnterDeathZone);
 
+	}
+
+	public void SetControl(bool canControl)
+	{
+		_canControl = canControl;
+		if (!canControl)
+			LegSwingReference.GetComponent<Animator>().enabled = _canControl;
 	}
 
 }

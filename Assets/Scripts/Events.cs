@@ -208,6 +208,36 @@ public class FistGunHit : GameEvent
 	}
 }
 
+public class BazookaFired : GameEvent
+{
+	public GameObject BazookaGun;
+	public GameObject BazookaUser;
+	public int PlayerNumber;
+
+	public BazookaFired(GameObject bazookaGun, GameObject bazookaUser, int playerNumber)
+	{
+		BazookaGun = bazookaGun;
+		BazookaUser = bazookaUser;
+		PlayerNumber = playerNumber;
+	}
+}
+
+public class BazookaBombed : GameEvent
+{
+	public GameObject BazookaGun;
+	public GameObject BazookaUser;
+	public int PlayerNumber;
+	public List<GameObject> HitPlayers;
+
+	public BazookaBombed(GameObject bazookaGun, GameObject bazookaUser, int playerNumber, List<GameObject> hitPlayers)
+	{
+		BazookaGun = bazookaGun;
+		BazookaUser = bazookaUser;
+		PlayerNumber = playerNumber;
+		HitPlayers = hitPlayers;
+	}
+}
+
 public class PunchStart : GameEvent
 {
 	public GameObject Player { get; }

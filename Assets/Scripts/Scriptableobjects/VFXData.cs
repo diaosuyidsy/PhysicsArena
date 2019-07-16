@@ -19,5 +19,5 @@ public class VFXData : ScriptableObject
 	public GameObject ChickenUltimateVFX;
 	public GameObject DuckMeleeChargingVFX;
 	public GameObject DuckUltimateVFX;
-
+	public GameObject BazookaExplosionVFX;
 }

@@ -392,13 +392,13 @@ public class PlayerController2 : MonoBehaviour
 				case "Hook":
 					if (HandObject != null && !_dropping)
 					{
-						AuxillaryAimOnce(DesignPanelManager.DPM.HookGunAuxillaryAimSlider.value);
+						AuxillaryAimOnce(60f);
 					}
 					break;
 				case "FistGun":
 					if (HandObject != null && !_dropping)
 					{
-						AuxillaryAimOnce(DesignPanelManager.DPM.HookGunAuxillaryAimSlider.value);
+						AuxillaryAimOnce(60f);
 					}
 					break;
 				default:
@@ -1068,10 +1068,7 @@ public class PlayerController2 : MonoBehaviour
 			Handhj.limits = hl;
 			if (elapesdTime >= 0f)
 			{
-				if (DesignPanelManager.DPM.MeleeAlternateSchemaToggle.isOn)
-				{
-					MeleeAlternateSchemaHelper();
-				}
+				MeleeAlternateSchemaHelper();
 			}
 
 			yield return new WaitForEndOfFrame();

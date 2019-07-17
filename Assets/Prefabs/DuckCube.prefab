@@ -15784,7 +15784,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f974f270ff4b4211a16c322c662d00d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Hip: {fileID: 114741485603362228}
+  Hip: {fileID: 0}
   WalkThrust: 50
 --- !u!114 &114127366691738324
 MonoBehaviour:
@@ -16244,7 +16244,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f974f270ff4b4211a16c322c662d00d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Hip: {fileID: 114741485603362228}
+  Hip: {fileID: 0}
   WalkThrust: 50
 --- !u!114 &114473618982721620
 MonoBehaviour:
@@ -22004,9 +22004,9 @@ GameObject:
   - component: {fileID: 54277860791405356}
   - component: {fileID: 65478889847531866}
   - component: {fileID: 136930837115226236}
-  - component: {fileID: 114741485603362228}
   - component: {fileID: 114768233734231244}
   - component: {fileID: 114722090183962748}
+  - component: {fileID: 256144837880108149}
   m_Layer: 11
   m_Name: Character1_Hips
   m_TagString: Team2
@@ -22081,55 +22081,6 @@ CapsuleCollider:
   m_Height: 0.69023997
   m_Direction: 1
   m_Center: {x: 0, y: -0.036981553, z: 0}
---- !u!114 &114741485603362228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1681016044515186}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4b8dbe361d31b48559f82cae547cd64e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  CharacterDataStore: {fileID: 11400000, guid: 7d14baa331efc614583f4c28a2e6c1aa, type: 2}
-  LegSwingReference: {fileID: 1606629450697680}
-  Chest: {fileID: 1505164372519546}
-  LeftArms:
-  - {fileID: 1537322419898184}
-  - {fileID: 1183346828184106}
-  - {fileID: 1140468392654790}
-  RightArms:
-  - {fileID: 1120906859067978}
-  - {fileID: 1201743376916662}
-  - {fileID: 1472041671428054}
-  LeftHand: {fileID: 1085232372371890}
-  RightHand: {fileID: 1065112619154996}
-  TurnReference: {fileID: 1607890455694926}
-  OnDeathHidden:
-  - {fileID: 1096943252394544}
-  - {fileID: 1912263346144760}
-  - {fileID: 1606629450697680}
-  - {fileID: 1616821926377846}
-  MeleeVFXHolder: {fileID: 0}
-  EnableAuxillaryAiming: 1
-  MaxWeaponCD: 0.3
-  HandObject: {fileID: 0}
-  MeleeCharge: 0
-  DropCharge: 0
-  IsPunching: 0
-  HandTaken: 0
-  IsOnGround: 0
-  IsOccupied: 0
-  BlockVFX: {fileID: 1178178912132672}
-  BlockUI: {fileID: 1358018753589866}
-  BlockUIFill: {fileID: 1812489222194638}
-  PlayerNumber: 0
-  EnemyWhoHitPlayer: {fileID: 0}
-  _axuillaryMaxDistance: 50
-  _auxillaryMaxAngle: 10
-  debugT_CheckArm: 1
 --- !u!114 &114768233734231244
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22161,6 +22112,41 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   kinematicForParticles: 0
+--- !u!114 &256144837880108149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1681016044515186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2e4e087fd385fc84fb1499ba75d44201, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  CharacterDataStore: {fileID: 11400000, guid: 7d14baa331efc614583f4c28a2e6c1aa, type: 2}
+  LegSwingReference: {fileID: 1606629450697680}
+  Chest: {fileID: 1505164372519546}
+  LeftArms:
+  - {fileID: 1537322419898184}
+  - {fileID: 1183346828184106}
+  - {fileID: 1140468392654790}
+  RightArms:
+  - {fileID: 1120906859067978}
+  - {fileID: 1201743376916662}
+  - {fileID: 1472041671428054}
+  LeftHand: {fileID: 1085232372371890}
+  RightHand: {fileID: 1065112619154996}
+  TurnReference: {fileID: 1607890455694926}
+  OnDeathHidden:
+  - {fileID: 1096943252394544}
+  - {fileID: 1912263346144760}
+  - {fileID: 1606629450697680}
+  - {fileID: 1616821926377846}
+  PlayerNumber: 0
+  HandObject: {fileID: 0}
+  MeleeVFXHolder: {fileID: 0}
+  EnemyWhoHitPlayer: {fileID: 0}
 --- !u!1 &1724292166806106
 GameObject:
   m_ObjectHideFlags: 0

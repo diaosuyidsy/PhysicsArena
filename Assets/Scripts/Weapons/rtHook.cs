@@ -148,13 +148,11 @@ public class rtHook : WeaponBase
 				Hooked.GetComponent<Rigidbody>().AddForce(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse);
 				Hooked = null;
 			}
-			if (DesignPanelManager.DPM.HookAlternateSchemaToggle.isOn)
+			if (_hookState == State.FlyingOut)
 			{
-				if (_hookState == State.FlyingOut)
-				{
-					_hookState = State.FlyingIn;
-				}
+				_hookState = State.FlyingIn;
 			}
+
 		}
 	}
 

@@ -7,8 +7,9 @@ using Rewired;
 /// Game Feel Manager Manages Controller vibration
 /// and screen shakes
 /// </summary>
-public class GameFeelManager : MonoBehaviour
+public class GameFeelManager
 {
+	public GameFeelManager() { OnEnable(); }
 	#region Event Handlers
 	private void _onPlayerHit(PlayerHit ph)
 	{
@@ -90,6 +91,10 @@ public class GameFeelManager : MonoBehaviour
 		EventManager.Instance.RemoveHandler<WaterGunFired>(_onPlayerFireWaterGun);
 		EventManager.Instance.RemoveHandler<HookGunFired>(_onPlayerFireHookGun);
 		EventManager.Instance.RemoveHandler<HookHit>(_onHookHit);
+	}
 
+	public void Destory()
+	{
+		OnDisable();
 	}
 }

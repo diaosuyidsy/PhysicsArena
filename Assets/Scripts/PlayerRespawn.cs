@@ -8,7 +8,7 @@ public class PlayerRespawn : MonoBehaviour
 	{
 		if (other.CompareTag("Team1") || other.CompareTag("Team2"))
 		{
-			EventManager.Instance.TriggerEvent(new PlayerDied(other.gameObject, other.GetComponent<PlayerController>().PlayerNumber));
+			//EventManager.Instance.TriggerEvent(new PlayerDied(other.gameObject, other.GetComponent<PlayerController>().PlayerNumber));
 		}
 	}
 }

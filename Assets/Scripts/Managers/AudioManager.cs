@@ -2,9 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AudioManager : MonoBehaviour
+public class AudioManager
 {
-	public AudioData AudioDataStore;
+	private AudioData AudioDataStore;
+
+	public AudioManager(AudioData _data)
+	{
+		AudioDataStore = _data;
+		OnEnable();
+	}
 
 	/// <summary>
 	/// Play clip Sound at obj
@@ -166,5 +172,10 @@ public class AudioManager : MonoBehaviour
 		EventManager.Instance.RemoveHandler<PunchReleased>(_onPunchReleased);
 		EventManager.Instance.RemoveHandler<FootStep>(_onFootStep);
 		EventManager.Instance.RemoveHandler<PlayerJump>(_onPlayerJump);
+	}
+
+	public void Destroy()
+	{
+		OnDisable();
 	}
 }

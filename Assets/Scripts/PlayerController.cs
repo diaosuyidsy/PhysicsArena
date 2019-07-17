@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour
 
 	[HideInInspector] public GameObject HandObject;
 	[HideInInspector] public GameObject MeleeVFXHolder;
+	[HideInInspector] public GameObject BlockVFXHolder;
 	[HideInInspector] public GameObject EnemyWhoHitPlayer;
 	private float _playerMarkedTime;
 
@@ -71,7 +72,7 @@ public class PlayerController : MonoBehaviour
 	}
 
 	// Update is called once per frame
-	void Update()
+	private void Update()
 	{
 		_movementFSM.Update();
 		_actionFSM.Update();
@@ -95,7 +96,7 @@ public class PlayerController : MonoBehaviour
 		{
 			((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
 			((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
-			EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber));
+			EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, EnemyWhoHitPlayer, Time.time < _playerMarkedTime + 3f));
 		}
 	}
 
@@ -133,6 +134,15 @@ public class PlayerController : MonoBehaviour
 		_playerMarkedTime = Time.time;
 	}
 
+	public void ForceDropHandObject()
+	{
+		if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)) ||
+			_actionFSM.CurrentState.GetType().BaseType.Equals(typeof(WeaponActionState)))
+			_actionFSM.TransitionTo<IdleActionState>();
+		if (_movementFSM.CurrentState.GetType().BaseType.Equals(typeof(BazookaMovementState)))
+			_movementFSM.TransitionTo<IdleState>();
+	}
+
 	/// <summary>
 	/// This function is called from FootSteps on LegSwingRefernece
 	/// </summary>
@@ -157,7 +167,7 @@ public class PlayerController : MonoBehaviour
 		return Vector3.Angle(A, B) > degree;
 	}
 
-	public void DropHelper()
+	private void _dropHandObject()
 	{
 		if (HandObject == null) return;
 		// Drop the thing
@@ -183,6 +193,39 @@ public class PlayerController : MonoBehaviour
 		HandObject = null;
 		// Set Auxillary Aim to false
 		//_auxillaryRotationLock = false;
+	}
+
+	private void _helpAim(float maxangle)
+	{
+		GameObject target = null;
+		float minAngle = 360f;
+		GameObject[] enemies = tag == "Team1" ? GameObject.FindGameObjectsWithTag("Team2") : GameObject.FindGameObjectsWithTag("Team1");
+		foreach (GameObject otherPlayer in enemies)
+		{
+			if (otherPlayer.activeSelf)
+			{
+				// If other player are within max Distance, then check for the smalliest angle player
+				if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= CharacterDataStore.HelpAimMaxRange)
+				{
+					Vector3 targetDir = otherPlayer.transform.position - transform.position;
+					float angle = Vector3.Angle(targetDir, transform.forward);
+					if (angle <= maxangle && angle < minAngle)
+					{
+						minAngle = angle;
+						target = otherPlayer;
+					}
+				}
+			}
+		}
+		// Now we got the target Player, time to auxillary against it
+		if (target != null)
+		{
+			transform.LookAt(target.transform);
+			if (HandObject != null)
+			{
+				HandObject.transform.eulerAngles = transform.eulerAngles + new Vector3(0f, 90f, 0f);
+			}
+		}
 	}
 
 	private bool _isGrounded()
@@ -454,42 +497,23 @@ public class PlayerController : MonoBehaviour
 	}
 	#endregion
 
+	#region Movment States
 	private class MovementState : FSM<PlayerController>.State
 	{
-		protected float _HLAxis
-		{
-			get
-			{
-				return Context._player.GetAxis("Move Horizontal");
-			}
-		}
-		protected float _VLAxis
-		{
-			get
-			{
-				return Context._player.GetAxis("Move Vertical");
-			}
-		}
-		protected bool _jump
-		{
-			get
-			{
-				return Context._player.GetButtonDown("Jump");
-			}
-		}
-		protected CharacterMovementData _charMovData
-		{
-			get
-			{
-				return Context.CharacterDataStore.CharacterMovementDataStore;
-			}
-		}
+		protected float _HLAxis { get { return Context._player.GetAxis("Move Horizontal"); } }
+		protected float _VLAxis { get { return Context._player.GetAxis("Move Vertical"); } }
+		protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
+		protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
+		protected CharacterMovementData _charMovData { get { return Context.CharacterDataStore.CharacterMovementDataStore; } }
 
 		public void OnEnterDeathZone()
 		{
 			Parent.TransitionTo<DeadState>();
 		}
+	}
 
+	private class ControllableMovementState : MovementState
+	{
 		public override void Update()
 		{
 			if (_jump && Context._isGrounded())
@@ -506,7 +530,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	private class IdleState : MovementState
+	private class IdleState : ControllableMovementState
 	{
 		public override void OnEnter()
 		{
@@ -524,14 +548,14 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	private class RunState : MovementState
+	private class RunState : ControllableMovementState
 	{
 		public override void OnEnter()
 		{
 			base.OnEnter();
 			Context.LegSwingReference.GetComponent<Animator>().enabled = true;
-
 		}
+
 		public override void Update()
 		{
 			base.Update();
@@ -559,6 +583,35 @@ public class PlayerController : MonoBehaviour
 			Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
 			Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
 			Context.transform.rotation = tr;
+		}
+	}
+
+	private class BazookaMovementState : MovementState { }
+	private class BazookaMovmentAimState : BazookaMovementState
+	{
+		public override void OnEnter()
+		{
+			Context.LegSwingReference.GetComponent<Animator>().enabled = false;
+			Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			Vector3 lookpos = Context.HandObject.GetComponent<rtBazooka>().BazookaShadowTransformPosition;
+			lookpos.y = Context.transform.position.y;
+			Context.transform.LookAt(lookpos);
+			if (_RightTriggerUp)
+				TransitionTo<BazookaMovementLaunchState>();
+		}
+	}
+
+	private class BazookaMovementLaunchState : BazookaMovementState
+	{
+		public override void Update()
+		{
+			base.Update();
+			Context.LegSwingReference.GetComponent<Animator>().enabled = (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis));
 		}
 	}
 
@@ -595,7 +648,9 @@ public class PlayerController : MonoBehaviour
 
 		}
 	}
+	#endregion
 
+	#region Action States
 	private class ActionState : FSM<PlayerController>.State
 	{
 		protected bool _LeftTrigger { get { return Context._player.GetButton("Left Trigger"); } }
@@ -634,7 +689,7 @@ public class PlayerController : MonoBehaviour
 		public override void OnEnter()
 		{
 			Context._resetBodyAnimation();
-			Context.DropHelper();
+			Context._dropHandObject();
 		}
 
 		public override void Update()
@@ -645,7 +700,7 @@ public class PlayerController : MonoBehaviour
 				TransitionTo<PickingState>();
 				return;
 			}
-			if (_RightTrigger)
+			if (_RightTriggerDown)
 			{
 				TransitionTo<PunchHoldingState>();
 				return;
@@ -738,12 +793,34 @@ public class PlayerController : MonoBehaviour
 			}
 			if (_RightTriggerDown)
 			{
+				switch (Context.HandObject.tag)
+				{
+					case "Weapon":
+					case "Hook":
+					case "FistGun":
+						Context._helpAim(Context.CharacterDataStore.HelpAimMaxRange);
+						break;
+				}
 				Context.HandObject.GetComponent<WeaponBase>().Fire(true);
+				switch (Context.HandObject.tag)
+				{
+					case "Bazooka":
+						Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
+						TransitionTo<BazookaActionState>();
+						break;
+				}
 			}
 			if (_RightTriggerUp)
 			{
 				Context.HandObject.GetComponent<WeaponBase>().Fire(false);
 			}
+		}
+
+		public override void FixedUpdate()
+		{
+			base.FixedUpdate();
+			if (Context._rb.velocity.magnitude >= Context.CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
+				TransitionTo<IdleActionState>();
 		}
 
 		public override void OnExit()
@@ -881,6 +958,7 @@ public class PlayerController : MonoBehaviour
 
 		public override void OnEnter()
 		{
+			EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
 			_leftblockcoroutine = Context._blockAnimation(Context._leftArmhj, Context._leftHandhj, 0.1f);
 			_rightblockcoroutine = Context._blockAnimation(Context._rightArmhj, Context._rightHandhj, 0.1f);
 			Context.StartCoroutine(_leftblockcoroutine);
@@ -908,6 +986,24 @@ public class PlayerController : MonoBehaviour
 		{
 			Context.StopCoroutine(_leftblockcoroutine);
 			Context.StopCoroutine(_rightblockcoroutine);
+			EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
+		}
+	}
+
+	/// <summary>
+	/// A Base state class for any weapon that is being used
+	/// </summary>
+	private class WeaponActionState : ActionState { }
+
+	private class BazookaActionState : WeaponActionState
+	{
+		public override void Update()
+		{
+			base.Update();
+			if (_RightTriggerUp)
+			{
+				Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+			}
 		}
 	}
 
@@ -921,7 +1017,7 @@ public class PlayerController : MonoBehaviour
 			base.OnEnter();
 			_startTime = Time.time;
 			Context._resetBodyAnimation();
-			Context.DropHelper();
+			Context._dropHandObject();
 			if (Context.MeleeVFXHolder != null) Destroy(Context.MeleeVFXHolder);
 		}
 
@@ -940,4 +1036,5 @@ public class PlayerController : MonoBehaviour
 			base.OnExit();
 		}
 	}
+	#endregion
 }

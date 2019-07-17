@@ -46,11 +46,15 @@ public class PlayerDied : GameEvent
 {
 	public GameObject Player { get; }
 	public int PlayerNumber { get; }
+	public GameObject PlayerHitter { get; }
+	public bool HitterIsValid { get; }
 
-	public PlayerDied(GameObject _player, int _playernum)
+	public PlayerDied(GameObject player, int playerNumber, GameObject playerHitter, bool hitterIsValid)
 	{
-		Player = _player;
-		PlayerNumber = _playernum;
+		Player = player;
+		PlayerNumber = playerNumber;
+		PlayerHitter = playerHitter;
+		HitterIsValid = hitterIsValid;
 	}
 }
 
@@ -235,6 +239,28 @@ public class BazookaBombed : GameEvent
 		BazookaUser = bazookaUser;
 		PlayerNumber = playerNumber;
 		HitPlayers = hitPlayers;
+	}
+}
+
+public class BlockStart : GameEvent
+{
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+	public BlockStart(GameObject player, int playerNumber)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+	}
+}
+
+public class BlockEnd : GameEvent
+{
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+	public BlockEnd(GameObject player, int playerNumber)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
 	}
 }
 

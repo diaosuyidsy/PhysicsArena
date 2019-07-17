@@ -76,7 +76,7 @@ public class rtBazooka : WeaponBase
 			RaycastHit hit;
 			if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.LineCastLayer))
 			{
-				_gpc.Owner.GetComponent<PlayerController>().SetControl(true);
+				_gpc.Owner.GetComponent<PlayerController2>().SetControl(true);
 				_bazookaState = BazookaStates.Idle;
 				//foreach (var rb in _gpc.Owner.GetComponentsInChildren<Rigidbody>())
 				//{
@@ -124,7 +124,7 @@ public class rtBazooka : WeaponBase
 			_throwMark.parent = null;
 			_shadowThrowMark.parent = null;
 			_throwMark.eulerAngles = new Vector3(90f, 0f, 0f);
-			_gpc.Owner.GetComponent<PlayerController>().SetControl(false);
+			_gpc.Owner.GetComponent<PlayerController2>().SetControl(false);
 		}
 		else
 		{

@@ -14,6 +14,7 @@ public class AudioManager : MonoBehaviour
 	/// <param name="oneshot"></param>
 	private void _playSound(GameObject obj, AudioClip clip, bool oneshot = true, float volume = 1)
 	{
+		if (clip == null) return;
 		AudioSource objas = obj.GetComponent<AudioSource>();
 		if (objas == null) objas = obj.AddComponent<AudioSource>();
 		Debug.Assert(objas != null);

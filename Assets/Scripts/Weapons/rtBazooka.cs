@@ -70,25 +70,22 @@ public class rtBazooka : WeaponBase
 			transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
 			_gpc.Owner.transform.position = transform.position - _diff;
 			RaycastHit hit;
-			if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.LineCastLayer))
+			if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.HitExplodeLayer))
 			{
 				_bazookaState = BazookaStates.Idle;
 				List<GameObject> affectedPlayers = new List<GameObject>();
-				RaycastHit[] _affected = Physics.SphereCastAll(transform.position,
-					WeaponDataStore.BazookaDataStore.MaxAffectionRange,
-					transform.forward, 0.1f,
-					WeaponDataStore.BazookaDataStore.AllPlayerLayer);
-				foreach (RaycastHit _a in _affected)
+				foreach (PlayerController _pc in Services.Config.Players)
 				{
-					if (_a.collider.gameObject.tag.Contains("Team") &&
-						_a.collider.gameObject != _gpc.Owner &&
-						!Physics.Linecast(_a.collider.transform.position, transform.position, WeaponDataStore.BazookaDataStore.CanHideLayer))
+					float dis = Vector3.Distance(_pc.transform.position, transform.position);
+					if (_pc.gameObject.activeInHierarchy &&
+						dis < WeaponDataStore.BazookaDataStore.MaxAffectionRange &&
+						_pc.gameObject != _gpc.Owner &&
+						!Physics.Linecast(_pc.transform.position, transform.position, WeaponDataStore.BazookaDataStore.CanHideLayer))
 					{
-						affectedPlayers.Add(_a.collider.gameObject);
-						Vector3 dir = (_a.collider.transform.position - transform.position).normalized;
-						float dis = Vector3.Distance(_a.collider.transform.position, transform.position);
-
-						_a.collider.gameObject.GetComponent<Rigidbody>().AddForce(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir, ForceMode.Impulse);
+						affectedPlayers.Add(_pc.gameObject);
+						Vector3 dir = _pc.transform.position - transform.position;
+						dir.y = 0f;
+						_pc.gameObject.GetComponent<Rigidbody>().AddForce(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse);
 					}
 				}
 				EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));

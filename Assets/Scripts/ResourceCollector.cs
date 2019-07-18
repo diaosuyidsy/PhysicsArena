@@ -25,19 +25,20 @@ public class ResourceCollector : MonoBehaviour
 			{
 				//TeamTracker++;
 				other.tag = "Untagged";
+				other.gameObject.layer = LayerMask.NameToLayer("Defualt");
 				//print("Team 1 Score = " + TeamTracker);
 				// Statistics: Add the dropper to the stats record
-				int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
-				if (GameManager.GM.FoodScoreTimes.Count > lastholder)
-				{
-					GameManager.GM.FoodScoreTimes[lastholder]++;
-				}
-				else
-				{
-					Debug.LogError("There is something wrong with the food collector statistics");
-				}
+				//int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
+				//if (GameManager.GM.FoodScoreTimes.Count > lastholder)
+				//{
+				//	GameManager.GM.FoodScoreTimes[lastholder]++;
+				//}
+				//else
+				//{
+				//	Debug.LogError("There is something wrong with the food collector statistics");
+				//}
 				// Statistics End
-				EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team1Resource"));
+				EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team1Resource", other.GetComponent<rtBirdFood>().LastHolder));
 				//if (TeamTracker == 2)
 				//{
 				//	//GameManager.GM.GameOver(1, gameObject);
@@ -58,19 +59,20 @@ public class ResourceCollector : MonoBehaviour
 			{
 				//TeamTracker++;
 				other.tag = "Untagged";
+				other.gameObject.layer = LayerMask.NameToLayer("Defualt");
 				//print("Team 2 Score = " + TeamTracker);
 				// Statistics: Add the dropper to the stats record
-				int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
-				if (GameManager.GM.FoodScoreTimes.Count > lastholder)
-				{
-					GameManager.GM.FoodScoreTimes[lastholder]++;
-				}
-				else
-				{
-					Debug.LogError("There is something wrong with the food collector statistics");
-				}
+				//int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
+				//if (GameManager.GM.FoodScoreTimes.Count > lastholder)
+				//{
+				//	GameManager.GM.FoodScoreTimes[lastholder]++;
+				//}
+				//else
+				//{
+				//	Debug.LogError("There is something wrong with the food collector statistics");
+				//}
 				// Statistics End
-				EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team2Resource"));
+				EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team2Resource", other.GetComponent<rtBirdFood>().LastHolder));
 
 				//if (TeamTracker == 2)
 				//{

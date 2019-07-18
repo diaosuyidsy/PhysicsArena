@@ -29,16 +29,17 @@ public class PlayerHit : GameEvent
 	public int HiterPlayerNumber { get; }
 	public int HittedPlayerNumber { get; }
 	public float MeleeCharge { get; }
+	public bool IsABlock;
 
-	public PlayerHit(GameObject _hiter, GameObject _hitted,
-		Vector3 _force, int _hiternum, int _hittednum, float _meleeCharge)
+	public PlayerHit(GameObject hiter, GameObject hitted, Vector3 force, int hiterPlayerNumber, int hittedPlayerNumber, float meleeCharge, bool isABlock)
 	{
-		Hiter = _hiter;
-		Hitted = _hitted;
-		Force = _force;
-		HiterPlayerNumber = _hiternum;
-		HittedPlayerNumber = _hittednum;
-		MeleeCharge = _meleeCharge;
+		Hiter = hiter;
+		Hitted = hitted;
+		Force = force;
+		HiterPlayerNumber = hiterPlayerNumber;
+		HittedPlayerNumber = hittedPlayerNumber;
+		MeleeCharge = meleeCharge;
+		IsABlock = isABlock;
 	}
 }
 
@@ -82,6 +83,20 @@ public class WeaponSpawned : GameEvent
 	public WeaponSpawned(GameObject _weapon)
 	{
 		Weapon = _weapon;
+	}
+}
+
+public class ObjectPickedUp : GameEvent
+{
+	public GameObject Player;
+	public int PlayerNumber;
+	public GameObject Obj;
+
+	public ObjectPickedUp(GameObject player, int playerNumber, GameObject _object)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+		Obj = _object;
 	}
 }
 
@@ -365,10 +380,12 @@ public class FoodDelivered : GameEvent
 {
 	public GameObject Food { get; }
 	public string FoodTag { get; }
+	public int DeliverPlayerNumber { get; }
 
-	public FoodDelivered(GameObject _food, string _foodtag)
+	public FoodDelivered(GameObject food, string foodTag, int deliverPlayerNumber)
 	{
-		Food = _food;
-		FoodTag = _foodtag;
+		Food = food;
+		FoodTag = foodTag;
+		DeliverPlayerNumber = deliverPlayerNumber;
 	}
 }

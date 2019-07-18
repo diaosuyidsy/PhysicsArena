@@ -208,72 +208,72 @@ public class PlayerController2 : MonoBehaviour
 			go.SetActive(false);
 		}
 		DropHelper();
-		StatsAfterDeath();
+		//StatsAfterDeath();
 		StartCoroutine(Respawn(CharacterDataStore.CharacterMovementDataStore.RespawnTime));
 
 	}
 
-	private void StatsAfterDeath()
-	{
-		// First we need to record who killed the player
-		// If no one killed him, then he commited suicide
-		if (EnemyWhoHitPlayer == null)
-		{
-			if (PlayerNumber < GameManager.GM.SuicideRecord.Count)
-			{
-				GameManager.GM.SuicideRecord[PlayerNumber]++;
-			}
-			else
-			{
-				Debug.LogError("Something is wrong with the controller number");
-			}
+	//private void StatsAfterDeath()
+	//{
+	//	// First we need to record who killed the player
+	//	// If no one killed him, then he commited suicide
+	//	if (EnemyWhoHitPlayer == null)
+	//	{
+	//		if (PlayerNumber < GameManager.GM.SuicideRecord.Count)
+	//		{
+	//			GameManager.GM.SuicideRecord[PlayerNumber]++;
+	//		}
+	//		else
+	//		{
+	//			Debug.LogError("Something is wrong with the controller number");
+	//		}
 
-			print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[PlayerNumber] + " Times");
+	//		print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[PlayerNumber] + " Times");
 
-			//EventManager.TriggerEvent("On" + tag + "Suicide");
-		}
-		else
-		{
-			if (!EnemyWhoHitPlayer.CompareTag(tag))
-			{
-				// Record Enemy Killed another player
-				int killer = EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
+	//		//EventManager.TriggerEvent("On" + tag + "Suicide");
+	//	}
+	//	else
+	//	{
+	//		if (!EnemyWhoHitPlayer.CompareTag(tag))
+	//		{
+	//			// Record Enemy Killed another player
+	//			int killer = EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
 
-				if (PlayerNumber < GameManager.GM.KillRecord.Count)
-				{
-					GameManager.GM.KillRecord[killer]++;
-				}
-				else
-				{
-					Debug.LogError("Something is wrong with the controller number");
-				}
-				print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
-					" and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
-				//EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
-			}
-			else
-			{
-				int muderer = EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
-				if (PlayerNumber < GameManager.GM.TeammateMurderRecord.Count)
-				{
-					GameManager.GM.TeammateMurderRecord[muderer]++;
-				}
-				else
-				{
-					Debug.LogError("Something is wrong with the controller number");
-				}
-				print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
-					" and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");
-				//EventManager.TriggerEvent("On" + tag + "Suicide");
+	//			if (PlayerNumber < GameManager.GM.KillRecord.Count)
+	//			{
+	//				GameManager.GM.KillRecord[killer]++;
+	//			}
+	//			else
+	//			{
+	//				Debug.LogError("Something is wrong with the controller number");
+	//			}
+	//			print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
+	//				" and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
+	//			//EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
+	//		}
+	//		else
+	//		{
+	//			int muderer = EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
+	//			if (PlayerNumber < GameManager.GM.TeammateMurderRecord.Count)
+	//			{
+	//				GameManager.GM.TeammateMurderRecord[muderer]++;
+	//			}
+	//			else
+	//			{
+	//				Debug.LogError("Something is wrong with the controller number");
+	//			}
+	//			print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
+	//				" and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");
+	//			//EventManager.TriggerEvent("On" + tag + "Suicide");
 
-			}
+	//		}
 
-		}
-		// Need to clean up the marker and stuff
-		EnemyWhoHitPlayer = null;
-		timer_hitMarkerStayTime = 0f;
-		starttimer_hitmakrer = false;
-	}
+	//	}
+	//	// Need to clean up the marker and stuff
+	//	EnemyWhoHitPlayer = null;
+	//	timer_hitMarkerStayTime = 0f;
+	//	starttimer_hitmakrer = false;
+	//}
 
 	IEnumerator Respawn(float time)
 	{
@@ -726,22 +726,22 @@ public class PlayerController2 : MonoBehaviour
 		if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
 		{
 			sender.GetComponentInParent<PlayerController2>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge);
-			// Statistics: Block Success
-			if (PlayerNumber < GameManager.GM.BlockTimes.Count)
-			{
-				GameManager.GM.BlockTimes[PlayerNumber]++;
-			}
-			else
-			{
-				Debug.LogError("Something is wrong with the controller number");
-			}
+			//// Statistics: Block Success
+			//if (PlayerNumber < GameManager.GM.BlockTimes.Count)
+			//{
+			//	GameManager.GM.BlockTimes[PlayerNumber]++;
+			//}
+			//else
+			//{
+			//	Debug.LogError("Something is wrong with the controller number");
+			//}
 			// Statistics: Kill
 			sender.GetComponentInParent<PlayerController2>().Mark(gameObject);
 			// End Statistics
 		}
 		else // Player is hit cause he could not block
 		{
-			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge));
+			//EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController2>().PlayerNumber, PlayerNumber, _meleeCharge));
 
 			_rb.AddForce(force, ForceMode.Impulse);
 		}
@@ -967,7 +967,7 @@ public class PlayerController2 : MonoBehaviour
 		if (!IsPunching) return;
 		RaycastHit hit;
 		// This Layermask get all player's layer except this player's
-		int layermask = GameManager.GM.AllPlayers ^ (1 << gameObject.layer);
+		int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << gameObject.layer);
 		if (Physics.SphereCast(transform.position, CharacterDataStore.CharacterMeleeDataStore.PunchRadius, transform.forward, out hit, CharacterDataStore.CharacterMeleeDataStore.PunchDistance, layermask))
 		{
 			IsPunching = false;

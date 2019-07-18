@@ -100,13 +100,13 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	// If sender is not null, meaning the hit could be blocked
-	public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender = null)
+	// If is blockable, meaning the hit could be blocked
+	public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
 	{
 		// First check if the player could block the attack
-		if (sender != null && _angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+		if (_blockable && _angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
 		{
-			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge);
+			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
 			// Statistics: Block Success
 			//if (PlayerNumber < GameManager.GM.BlockTimes.Count)
 			//{
@@ -122,7 +122,7 @@ public class PlayerController : MonoBehaviour
 		}
 		else // Player is hit cause he could not block
 		{
-			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge));
+			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
 
 			_rb.AddForce(force, ForceMode.Impulse);
 		}
@@ -744,6 +744,7 @@ public class PlayerController : MonoBehaviour
 			{
 				if (Context.HandObject == null && hit.collider.GetComponent<GunPositionControl>().CanBePickedUp)
 				{
+					EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
 					// Tell other necessary components that it has taken something
 					Context.HandObject = hit.collider.gameObject;
 
@@ -915,7 +916,7 @@ public class PlayerController : MonoBehaviour
 			{
 				RaycastHit hit;
 				// This Layermask get all player's layer except this player's
-				int layermask = GameManager.GM.AllPlayers ^ (1 << Context.gameObject.layer);
+				int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
 				if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
 				{
 					_hitOnce = true;
@@ -924,8 +925,7 @@ public class PlayerController : MonoBehaviour
 						rb.velocity = Vector3.zero;
 					}
 					Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
-					hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject);
-					//hit.transform.GetComponentInParent<PlayerController1>().Mark(Context.gameObject);
+					hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
 				}
 			}
 			else

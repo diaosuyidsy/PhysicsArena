@@ -3,54 +3,50 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 
-public class WeaponGenerationManager : MonoBehaviour
+public class WeaponGenerationManager
 {
-	public static WeaponGenerationManager WGM;
-
-	public GameObject WeaponsHolder;
-	[HideInInspector]
-	public GameObject[] Weapons;
-	public int NextSpawnAmount;
-	public WeaponData WeaponDataStore;
-
-	private int _activatedWeaponNum = 0;
-	private int _nextspawnamount;
+	private GameObject[] Weapons;
+	private WeaponData WeaponDataStore;
 	private Vector3 _weaponSpawnerCenter = new Vector3(0f, 6.5f, 0f);
 	private CameraController _cc;
 	private bool _gamestart;
+	private float _spawnTimer;
 
-	private void Awake()
+	public WeaponGenerationManager(WeaponData _wd, GameObject _weaponsHolder)
 	{
-		WGM = this;
+		WeaponDataStore = _wd;
+		EventManager.Instance.AddHandler<GameStart>(_onGameStart);
 		_cc = Camera.main.GetComponent<CameraController>();
-	}
-
-	private void Start()
-	{
-		_nextspawnamount = NextSpawnAmount;
-		Weapons = new GameObject[WeaponsHolder.transform.childCount];
+		Weapons = new GameObject[_weaponsHolder.transform.childCount];
 		for (int i = 0; i < Weapons.Length; i++)
 		{
-			Weapons[i] = WeaponsHolder.transform.GetChild(i).gameObject;
+			Weapons[i] = _weaponsHolder.transform.GetChild(i).gameObject;
 			Weapons[i].SetActive(false);
 		}
 	}
 
-	private void Update()
+	public void Update()
 	{
 		if (_gamestart)
+		{
 			_setWeaponSpawn();
+			_spawnTimer += Time.deltaTime;
+			if (_spawnTimer > WeaponDataStore.WeaponSpawnCD)
+			{
+				_generateWeapon();
+				_spawnTimer = 0f;
+			}
+		}
 	}
 
 	// This function is called when the game actually starts (After all enter game)
 	private void _onGameStart(GameStart gs)
 	{
 		// We need to invoke weapon generation from the start
-		InvokeRepeating("GenerateWeapon", 5f, WeaponDataStore.WeaponSpawnCD);
 		_gamestart = true;
 	}
 
-	private void GenerateWeapon()
+	private void _generateWeapon()
 	{
 		// If next weapon in array is deactivated
 		// Then move it to the current random spawn location
@@ -69,16 +65,12 @@ public class WeaponGenerationManager : MonoBehaviour
 		for (int i = 0; i < Weapons.Length; i++)
 		{
 			GameObject weapon = Weapons[i];
-			if (!weapon.activeSelf && _nextspawnamount > 0)
+			if (!weapon.activeSelf)
 			{
 				_moveWeaponToSpawnArea(weapon);
 				weapon.SetActive(true);
-				_nextspawnamount--;
 			}
 		}
-
-		// If we want to change next spawn amount accordingly, do it here
-		_nextspawnamount = NextSpawnAmount;
 	}
 
 	private void _moveWeaponToSpawnArea(GameObject weapon)
@@ -127,12 +119,7 @@ public class WeaponGenerationManager : MonoBehaviour
 		_weaponSpawnerCenter.z = Mathf.Clamp(_weaponSpawnerCenter.z, zmin, zmax);
 	}
 
-	private void OnEnable()
-	{
-		EventManager.Instance.AddHandler<GameStart>(_onGameStart);
-	}
-
-	private void OnDisable()
+	public void Destroy()
 	{
 		EventManager.Instance.RemoveHandler<GameStart>(_onGameStart);
 	}

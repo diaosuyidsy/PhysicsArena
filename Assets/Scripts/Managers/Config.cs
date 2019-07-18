@@ -4,9 +4,14 @@ using UnityEngine;
 
 public class Config
 {
-	public Config() { }
+	public ConfigData ConfigData;
 
-	public void Update()
+	public Config(ConfigData _cd)
+	{
+		ConfigData = _cd;
+	}
+
+	public void Destroy()
 	{
 
 	}

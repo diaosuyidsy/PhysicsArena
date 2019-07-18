@@ -127,7 +127,7 @@ public class rtHook : WeaponBase
 				_hook.transform.parent = null;
 
 				// Statistics: Record the player has used the hook one time
-				_addToHookTime();
+				//_addToHookTime();
 				// End Statistics
 				EventManager.Instance.TriggerEvent(new HookGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
 			}
@@ -156,17 +156,17 @@ public class rtHook : WeaponBase
 		}
 	}
 
-	private void _addToHookTime()
-	{
-		int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
-		GameManager.GM.HookGunUseTimes[playernum]++;
-	}
+	//private void _addToHookTime()
+	//{
+	//	int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
+	//	GameManager.GM.HookGunUseTimes[playernum]++;
+	//}
 
-	private void _addToHookSuccessTime()
-	{
-		int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
-		GameManager.GM.HookGunSuccessTimes[playernum]++;
-	}
+	//private void _addToHookSuccessTime()
+	//{
+	//	int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
+	//	GameManager.GM.HookGunSuccessTimes[playernum]++;
+	//}
 
 	public void HookOnHit(GameObject hit)
 	{
@@ -174,7 +174,7 @@ public class rtHook : WeaponBase
 		Hooked = hit;
 		//Statistics
 		Hooked.GetComponent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
-		_addToHookSuccessTime();
+		//_addToHookSuccessTime();
 		//End
 		foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
 		{

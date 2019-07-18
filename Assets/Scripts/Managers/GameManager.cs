@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviour
 	[Tooltip("Need to fill all six Beforehand")]
 	public GameObject[] APlayers;
 	public Dictionary<string, Material> NameToMaterialsDict;
-	public LayerMask AllPlayers;
 	public Transform RespawnPointHolder;
 	public GameObject[] Team1ResourceRespawnPoints;
 	public GameObject[] Team2ResrouceRespawnPoints;
@@ -38,26 +37,6 @@ public class GameManager : MonoBehaviour
 	public int SuckGunTutorialTimes = 6;
 
 	#region Stats Variable
-	[HideInInspector]
-	public List<int> SuicideRecord;
-	[HideInInspector]
-	public List<int> KillRecord;
-	[HideInInspector]
-	public List<int> TeammateMurderRecord;
-	[HideInInspector]
-	public List<float> CartTime;
-	[HideInInspector]
-	public List<int> BlockTimes;
-	[HideInInspector]
-	public List<int> FoodScoreTimes;
-	[HideInInspector]
-	public List<float> WaterGunUseTime;
-	[HideInInspector]
-	public List<int> HookGunUseTimes;
-	[HideInInspector]
-	public List<int> HookGunSuccessTimes;
-	[HideInInspector]
-	public List<int> SuckedPlayersTimes;
 	[HideInInspector]
 	public PlayerInformation[] PlayersInformation;
 	#endregion
@@ -84,16 +63,6 @@ public class GameManager : MonoBehaviour
 			{"Green", CharacterMaterials[5] },
 
 		};
-		SuicideRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
-		KillRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
-		TeammateMurderRecord = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
-		CartTime = new List<float>(new float[] { 0f, 0f, 0f, 0f, 0f, 0f }); // Initialize The cart time to be 6 zeroes
-		BlockTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 }); // Initialize the block time to be 6 zeroes
-		FoodScoreTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 }); // Initalize the Food Score time to be 6 zeroes
-		WaterGunUseTime = new List<float>(new float[] { 0f, 0f, 0f, 0f, 0f, 0f });
-		HookGunUseTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, });
-		HookGunSuccessTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0, });
-		SuckedPlayersTimes = new List<int>(new int[] { 0, 0, 0, 0, 0, 0 });
 		PlayersInformation = new PlayerInformation[6];
 		_player = ReInput.players.GetPlayer(0);
 		_dcfx = Camera.main.GetComponent<DarkCornerEffect>();

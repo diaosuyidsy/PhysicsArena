@@ -15,7 +15,6 @@ public class WeaponData : ScriptableObject
 	public LayerMask Ground;
 	public LayerMask OnHitDisappear;
 
-
 	//teleport a weapon to a random position within a given space
 	[Header("Weapon Spawn Setting")]
 	public Vector3 WeaponSpawnerSize;

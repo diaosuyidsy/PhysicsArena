@@ -117,10 +117,10 @@ public class Scoreboard : MonoBehaviour
 				_canSkip = false;
 				StopAllCoroutines();
 				_disableAllfloatingText();
-				var maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
-				var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
-				var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
-				var maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
+				var maxKillValue = Mathf.Max(Services.StatisticsManager.KillRecord);
+				var maxSuicideValue = Mathf.Max(Services.StatisticsManager.SuicideRecord);
+				var maxTMQValue = Mathf.Max(Services.StatisticsManager.TeammateMurderRecord);
+				var maxBlockValue = Mathf.Max(Services.StatisticsManager.BlockTimes);
 				_displaySummaryPanel(maxKillValue, maxSuicideValue, maxTMQValue, maxBlockValue);
 			}
 		}
@@ -156,24 +156,24 @@ public class Scoreboard : MonoBehaviour
 
 		for (int i = 0; i < 6; i++)
 		{
-			if (GameManager.GM.KillRecord[i] > maxKillValue)
+			if (Services.StatisticsManager.KillRecord[i] > maxKillValue)
 			{
-				maxKillValue = GameManager.GM.KillRecord[i];
+				maxKillValue = Services.StatisticsManager.KillRecord[i];
 				maxKillPlayer = i;
 			}
-			if (GameManager.GM.SuicideRecord[i] > maxSuicideValue)
+			if (Services.StatisticsManager.SuicideRecord[i] > maxSuicideValue)
 			{
-				maxSuicideValue = GameManager.GM.SuicideRecord[i];
+				maxSuicideValue = Services.StatisticsManager.SuicideRecord[i];
 				maxSuicidePlayer = i;
 			}
-			if (GameManager.GM.TeammateMurderRecord[i] > maxTMQValue)
+			if (Services.StatisticsManager.TeammateMurderRecord[i] > maxTMQValue)
 			{
-				maxTMQValue = GameManager.GM.TeammateMurderRecord[i];
+				maxTMQValue = Services.StatisticsManager.TeammateMurderRecord[i];
 				maxTMQPlayer = i;
 			}
-			if (GameManager.GM.BlockTimes[i] > maxBlockValue)
+			if (Services.StatisticsManager.BlockTimes[i] > maxBlockValue)
 			{
-				maxBlockValue = GameManager.GM.BlockTimes[i];
+				maxBlockValue = Services.StatisticsManager.BlockTimes[i];
 				maxBlockPlayer = i;
 			}
 		}
@@ -236,10 +236,10 @@ public class Scoreboard : MonoBehaviour
 
 	IEnumerator ScoreDisplayer()
 	{
-		var maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
-		var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
-		var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
-		var maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
+		var maxKillValue = Mathf.Max(Services.StatisticsManager.KillRecord);
+		var maxSuicideValue = Mathf.Max(Services.StatisticsManager.SuicideRecord);
+		var maxTMQValue = Mathf.Max(Services.StatisticsManager.TeammateMurderRecord);
+		var maxBlockValue = Mathf.Max(Services.StatisticsManager.BlockTimes);
 
 		if (maxKillValue > 0)
 		{
@@ -280,7 +280,7 @@ public class Scoreboard : MonoBehaviour
 
 	IEnumerator ShowKillerName()
 	{
-		var maxKillValue = Mathf.Max(GameManager.GM.KillRecord.ToArray());
+		var maxKillValue = Mathf.Max(Services.StatisticsManager.KillRecord);
 
 		yield return new WaitForSeconds(TextToName);
 
@@ -289,7 +289,7 @@ public class Scoreboard : MonoBehaviour
 
 		for (int tracker = 0; tracker < 6; tracker++)
 		{
-			if (GameManager.GM.KillRecord[tracker] == maxKillValue)
+			if (Services.StatisticsManager.KillRecord[tracker] == maxKillValue)
 			{
 				MostKillPlayer = tracker;
 				break;
@@ -306,11 +306,11 @@ public class Scoreboard : MonoBehaviour
 
 		if (maxKillValue > 1)
 		{
-			KillRecordFX.SetText("who killed " + GameManager.GM.KillRecord[MostKillPlayer] + " other birdies!");
+			KillRecordFX.SetText("who killed " + Services.StatisticsManager.KillRecord[MostKillPlayer] + " other birdies!");
 		}
 		else
 		{
-			KillRecordFX.SetText("who killed " + GameManager.GM.KillRecord[MostKillPlayer] + " other birdy!");
+			KillRecordFX.SetText("who killed " + Services.StatisticsManager.KillRecord[MostKillPlayer] + " other birdy!");
 		}
 		KillRecordGM.SetActive(true);
 	}
@@ -324,13 +324,13 @@ public class Scoreboard : MonoBehaviour
 
 	IEnumerator ShowSuiciderName()
 	{
-		var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
+		var maxSuicideValue = Mathf.Max(Services.StatisticsManager.SuicideRecord);
 		yield return new WaitForSeconds(TextToName);
 
 		//var maxSuicideValue = Mathf.Max(GameManager.GM.SuicideRecord.ToArray());
 		for (int tracker = 0; tracker < 6; tracker++)
 		{
-			if (GameManager.GM.SuicideRecord[tracker] == maxSuicideValue)
+			if (Services.StatisticsManager.SuicideRecord[tracker] == maxSuicideValue)
 			{
 				MostSuicidePlayer = tracker;
 				break;
@@ -347,11 +347,11 @@ public class Scoreboard : MonoBehaviour
 
 		if (maxSuicideValue > 1)
 		{
-			SuicideRecordFX.SetText("who killed themselves for " + GameManager.GM.SuicideRecord[MostSuicidePlayer] + " times!");
+			SuicideRecordFX.SetText("who killed themselves for " + Services.StatisticsManager.SuicideRecord[MostSuicidePlayer] + " times!");
 		}
 		else
 		{
-			SuicideRecordFX.SetText("who killed themselves for " + GameManager.GM.SuicideRecord[MostSuicidePlayer] + " time!");
+			SuicideRecordFX.SetText("who killed themselves for " + Services.StatisticsManager.SuicideRecord[MostSuicidePlayer] + " time!");
 		}
 		SuicideRecordGM.SetActive(true);
 	}
@@ -365,13 +365,13 @@ public class Scoreboard : MonoBehaviour
 
 	IEnumerator ShowTMKillerName()
 	{
-		var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
+		var maxTMQValue = Mathf.Max(Services.StatisticsManager.TeammateMurderRecord);
 		yield return new WaitForSeconds(TextToName);
 
 		//var maxTMQValue = Mathf.Max(GameManager.GM.TeammateMurderRecord.ToArray());
 		for (int tracker = 0; tracker < 6; tracker++)
 		{
-			if (GameManager.GM.TeammateMurderRecord[tracker] == maxTMQValue)
+			if (Services.StatisticsManager.TeammateMurderRecord[tracker] == maxTMQValue)
 			{
 				MostTMQPlayer = tracker;
 				break;
@@ -387,11 +387,11 @@ public class Scoreboard : MonoBehaviour
 
 		if (maxTMQValue > 1)
 		{
-			TMKillerRecordFX.SetText("who killed their teammates for " + GameManager.GM.TeammateMurderRecord[MostTMQPlayer] + " times!");
+			TMKillerRecordFX.SetText("who killed their teammates for " + Services.StatisticsManager.TeammateMurderRecord[MostTMQPlayer] + " times!");
 		}
 		else
 		{
-			TMKillerRecordFX.SetText("who killed their teammates for " + GameManager.GM.TeammateMurderRecord[MostTMQPlayer] + " time!");
+			TMKillerRecordFX.SetText("who killed their teammates for " + Services.StatisticsManager.TeammateMurderRecord[MostTMQPlayer] + " time!");
 		}
 		TMKillerRecordGM.SetActive(true);
 	}
@@ -404,14 +404,14 @@ public class Scoreboard : MonoBehaviour
 
 	IEnumerator ShowBlockName()
 	{
-		var maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
+		var maxBlockValue = Mathf.Max(Services.StatisticsManager.BlockTimes);
 
 		yield return new WaitForSeconds(TextToName);
 
 		//int maxBlockValue = Mathf.Max(GameManager.GM.BlockTimes.ToArray());
 		for (int tracker = 0; tracker < 6; tracker++)
 		{
-			if (GameManager.GM.BlockTimes[tracker] == maxBlockValue)
+			if (Services.StatisticsManager.BlockTimes[tracker] == maxBlockValue)
 			{
 				MostBlockPlayer = tracker;
 				break;
@@ -427,11 +427,11 @@ public class Scoreboard : MonoBehaviour
 
 		if (maxBlockValue > 1)
 		{
-			BlockRecordFX.SetText("who blocked attacks for " + GameManager.GM.BlockTimes[MostBlockPlayer] + " times!");
+			BlockRecordFX.SetText("who blocked attacks for " + Services.StatisticsManager.BlockTimes[MostBlockPlayer] + " times!");
 		}
 		else
 		{
-			BlockRecordFX.SetText("who blocked attacks for " + GameManager.GM.BlockTimes[MostBlockPlayer] + " time!");
+			BlockRecordFX.SetText("who blocked attacks for " + Services.StatisticsManager.BlockTimes[MostBlockPlayer] + " time!");
 		}
 		BlockRecordGM.SetActive(true);
 	}

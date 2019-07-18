@@ -2,8 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TinylyticsHandler : MonoBehaviour
+public class TinylyticsHandler
 {
+	public TinylyticsHandler()
+	{
+		OnEnable();
+	}
+
 	#region Event Handlers
 	private void _onPlayerHit(PlayerHit ph)
 	{
@@ -94,5 +99,10 @@ public class TinylyticsHandler : MonoBehaviour
 		EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
 		EventManager.Instance.RemoveHandler<GameStart>(_onGameStart);
 		EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
+	}
+
+	public void Destory()
+	{
+		OnDisable();
 	}
 }

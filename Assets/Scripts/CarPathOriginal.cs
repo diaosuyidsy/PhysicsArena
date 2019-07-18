@@ -147,15 +147,7 @@ public class CarPathOriginal : MonoBehaviour
 	{
 		foreach (int playernum in _playerInCircle)
 		{
-			// Make sure that the controller number does not go wrong
-			if (GameManager.GM.CartTime.Count > playernum)
-			{
-				GameManager.GM.CartTime[playernum] += Time.deltaTime;
-			}
-			else
-			{
-				Debug.LogError("Something is wrong with the controller number");
-			}
+			Services.StatisticsManager.CartTime[playernum] += Time.deltaTime;
 		}
 	}
 

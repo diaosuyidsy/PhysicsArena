@@ -44,7 +44,7 @@ public class Fingers : MonoBehaviour
 			{
 				// Tell other necessary components that it has taken something
 				OtherHand.GetComponent<Fingers>().taken = true;
-				Hip.GetComponent<PlayerController>().HandTaken = true;
+				//Hip.GetComponent<PlayerController>().HandTaken = true;
 				GetComponentInParent<PlayerController>().HandObject = hit.collider.gameObject;
 
 				// Tell the collected weapon who picked it up
@@ -68,7 +68,7 @@ public class Fingers : MonoBehaviour
 
 	void PickUpItem(string _tag)
 	{
-		GetComponentInParent<PlayerController>().OnPickUpItem(_tag);
+		GetComponentInParent<PlayerController2>().OnPickUpItem(_tag);
 	}
 
 	public void SetTaken(bool _taken)

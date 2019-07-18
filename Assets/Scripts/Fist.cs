@@ -18,7 +18,7 @@ public class Fist : MonoBehaviour
 	{
 		if (_gpc.Owner == null) return;
 		if (!CanHit) return;
-		if (GameManager.GM.AllPlayers != (GameManager.GM.AllPlayers | (1 << other.gameObject.layer))
+		if (Services.Config.ConfigData.AllPlayerLayer != (Services.Config.ConfigData.AllPlayerLayer | (1 << other.gameObject.layer))
 		   || other.gameObject.layer == _gpc.Owner.layer)
 			return;
 		CanHit = false;

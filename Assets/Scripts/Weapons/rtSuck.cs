@@ -96,7 +96,7 @@ public class rtSuck : WeaponBase
 			// Statistics: Add kill marker
 			go.GetComponent<PlayerController>().Mark(_gpc.Owner);
 			// Statistics: Add every player he sucked into statistics
-			_addToSuckedTimes();
+			//_addToSuckedTimes();
 			// End Statistics
 		}
 		yield return new WaitForSeconds(0.3f);
@@ -137,9 +137,9 @@ public class rtSuck : WeaponBase
 		gameObject.SetActive(false);
 	}
 
-	private void _addToSuckedTimes()
-	{
-		int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
-		GameManager.GM.SuckedPlayersTimes[playernum]++;
-	}
+	//private void _addToSuckedTimes()
+	//{
+	//	int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
+	//	GameManager.GM.SuckedPlayersTimes[playernum]++;
+	//}
 }

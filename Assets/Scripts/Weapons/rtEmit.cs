@@ -101,11 +101,11 @@ public class rtEmit : WeaponBase
 		}
 	}
 
-	private void _addToSprayTime()
-	{
-		int playerNumber = _gpc.Owner.GetComponent<PlayerController>().PlayerNumber;
-		GameManager.GM.WaterGunUseTime[playerNumber] += Time.deltaTime;
-	}
+	//private void _addToSprayTime()
+	//{
+	//	int playerNumber = _gpc.Owner.GetComponent<PlayerController>().PlayerNumber;
+	//	GameManager.GM.WaterGunUseTime[playerNumber] += Time.deltaTime;
+	//}
 
 	private void ChangeAmmoUI()
 	{

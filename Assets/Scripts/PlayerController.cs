@@ -17,61 +17,23 @@ public class PlayerController : MonoBehaviour
 	public GameObject RightHand;
 	public GameObject TurnReference;
 	public GameObject[] OnDeathHidden;
-	[HideInInspector] public GameObject MeleeVFXHolder;
 
-	[Header("Auxillary Aiming Section")]
-	public bool EnableAuxillaryAiming = true;
-	public float MaxWeaponCD = 0.3f;
-
-	[HideInInspector]
-	public GameObject HandObject;
-	[HideInInspector]
-	public float MeleeCharge = 0f;
-	[HideInInspector]
-	public float DropCharge = 0f;
-	[HideInInspector]
-	public bool IsPunching = false;
-	[HideInInspector]
-	public bool HandTaken = false;
-	[HideInInspector]
-	public bool IsOnGround = false;
-	[HideInInspector]
-	public bool IsOccupied = false;
-
-	[Header("Block VFX & UI")]
-	public GameObject BlockVFX;
-	public GameObject BlockUI;
-	public GameObject BlockUIFill;
-
-	#region Statistics Variables
 	public int PlayerNumber;
-	public GameObject EnemyWhoHitPlayer;
-	#endregion
 
-	#region States
-	private enum State
-	{
-		Empty,
-		Walking,
-		Jumping,
-		Picking,
-		Holding,
-		MachineGuning,
-		Dead,
-		Shooting,
-		Meleeing,
-		Blocking,
-	}
-	// Normal State should include: Walking, Jumping, Picking, Holding, Dead
-	private State normalState;
-	// Attack State Should include: Shooting, Meleeing, Blocking
-	private State attackState;
-	#endregion
+	[HideInInspector] public GameObject HandObject;
+	[HideInInspector] public GameObject MeleeVFXHolder;
+	[HideInInspector] public GameObject BlockVFXHolder;
+	[HideInInspector] public GameObject EnemyWhoHitPlayer;
+	private float _playerMarkedTime;
 
-	#region Private Variable
+	#region Private Variables
 	private Player _player;
 	private Rigidbody _rb;
 	private float _distToGround;
+	private float _meleeCharge;
+	private float _blockCharge;
+	private float _lastTimeUseBlock;
+	private Vector3 _freezeBody;
 	private HingeJoint _chesthj;
 	private HingeJoint _leftArm2hj;
 	private HingeJoint _rightArm2hj;
@@ -79,60 +41,19 @@ public class PlayerController : MonoBehaviour
 	private HingeJoint _rightArmhj;
 	private HingeJoint _leftHandhj;
 	private HingeJoint _rightHandhj;
-	private float RotationSpeed;
-	private bool _checkArm = true;
-	private string _rightTriggerRegister = "";
-	private bool _canControl = true;
-	private Vector3 _freezeBody;
-	private float _previousFrameVel = 0f;
-	private float _weaponCD;
-	[SerializeField]
-	private float _axuillaryMaxDistance = 30f;
-	[SerializeField]
-	private float _auxillaryMaxAngle = 5f;
-	private bool _auxillaryRotationLock = false;
-	private bool _dropping = false;
-	private float _blockCharge = 0f;
-	private bool _blockCanRegen = false;
-	private bool _isJumping = false;
+
+	private FSM<PlayerController> _movementFSM;
+	private FSM<PlayerController> _actionFSM;
 	#endregion
 
-	#region Private Timer Variable
-	// Linked to BlockRegenInterval
-	private float timer_blockregen = 0f;
-	private bool starttimer_blockregen = false;
-	// Linked to Statistics
-	private float timer_hitMarkerStayTime = 0f;
-	private bool starttimer_hitmakrer = false;
-	// Linked to Melee Punch Hold
-	private float timer_meleeHoldTime = 0f;
-	private bool starttimer_meleeHold = false;
-	#endregion
-
-	[Header("Debug Section: Please Touch Me~")]
-	#region Debug Toggle
-	public bool debugT_CheckArm = true;
-	#endregion
-
-	public void Init(int controllerNumber)
+	private void Awake()
 	{
-		PlayerNumber = controllerNumber;
-		_player = ReInput.players.GetPlayer(controllerNumber);
-		IsOccupied = true;
-	}
-	/// <summary>
-	/// should be deleted when done prototyping
-	/// </summary>
-	/// 
-	private void Init()
-	{
+		_movementFSM = new FSM<PlayerController>(this);
+		_actionFSM = new FSM<PlayerController>(this);
 		_player = ReInput.players.GetPlayer(PlayerNumber);
-		IsOccupied = true;
-	}
-	private void Start()
-	{
 		_rb = GetComponent<Rigidbody>();
 		_distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
+		_freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
 		_chesthj = Chest.GetComponent<HingeJoint>();
 		_leftArm2hj = LeftArms[0].GetComponent<HingeJoint>();
 		_rightArm2hj = RightArms[0].GetComponent<HingeJoint>();
@@ -140,216 +61,119 @@ public class PlayerController : MonoBehaviour
 		_rightArmhj = RightArms[1].GetComponent<HingeJoint>();
 		_leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
 		_rightHandhj = RightArms[2].GetComponent<HingeJoint>();
-		_freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
-		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", 1f);
-		Init();
+		_movementFSM.TransitionTo<IdleState>();
+		_actionFSM.TransitionTo<IdleActionState>();
+	}
+
+	public void Init(int controllernumber)
+	{
+		PlayerNumber = controllernumber;
+		_player = ReInput.players.GetPlayer(controllernumber);
 	}
 
 	// Update is called once per frame
-	void Update()
+	private void Update()
 	{
-		RunTimer();
-		if (!_canControl || !IsOccupied)
-			return;
-
-		CheckRewiredInput();
-		CheckJump();
-		if (_checkArm && debugT_CheckArm)
-			CheckArm();
-		if (attackState == State.Shooting && EnableAuxillaryAiming)
-			AuxillaryAim();
-		CheckFire();
-		CheckDrop();
-		CheckBlock();
+		_movementFSM.Update();
+		_actionFSM.Update();
 	}
 
-	// This is primarily for dropping item when velocity change too much 
 	private void FixedUpdate()
 	{
-		if (_canControl || !IsOccupied)
-		{
-			CheckMovement();
-		}
-		if (_rb.velocity.magnitude >= CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
-			DropHelper();
-
+		_movementFSM.FixedUpdate();
+		_actionFSM.FixedUpdate();
 	}
 
-	// Late Update is for standing the character
 	private void LateUpdate()
 	{
-		if (!_canControl) return;
-		_freezeBody.y = transform.localEulerAngles.y;
-		transform.localEulerAngles = _freezeBody;
+		_movementFSM.LateUpdate();
+		_actionFSM.LateUpdate();
 	}
 
-	// OnEnterDeathZone controls the behavior how player reacts when it dies
-	// It's called immediately after player enters death zone
-	public void OnEnterDeathZone(PlayerDied pd)
+	private void OnTriggerEnter(Collider other)
 	{
-		if (pd.Player != gameObject) return;
-		_canControl = false;
-		if (attackState == State.Meleeing)
+		if (other.CompareTag("DeathZone"))
 		{
-			starttimer_meleeHold = false;
-			timer_meleeHoldTime = 0f;
-			attackState = State.Empty;
-			// This is add a push force when melee
-			_rb.AddForce(transform.forward * MeleeCharge * CharacterDataStore.CharacterMeleeDataStore.SelfPushForce, ForceMode.Impulse);
-			StopAllCoroutines();
-
-			StartCoroutine(MeleePunchLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime, _leftArmhj));
-			StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime));
-			EventManager.Instance.TriggerEvent(new PunchReleased(gameObject, PlayerNumber));
+			((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
+			((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
+			EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, EnemyWhoHitPlayer, Time.time < _playerMarkedTime + 3f));
 		}
-		_auxillaryRotationLock = false;
-		foreach (GameObject go in OnDeathHidden)
-		{
-			go.SetActive(false);
-		}
-		DropHelper();
-		StatsAfterDeath();
-		StartCoroutine(Respawn(CharacterDataStore.CharacterMovementDataStore.RespawnTime));
-
 	}
 
-	private void StatsAfterDeath()
+	// If is blockable, meaning the hit could be blocked
+	public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
 	{
-		// First we need to record who killed the player
-		// If no one killed him, then he commited suicide
-		if (EnemyWhoHitPlayer == null)
+		// First check if the player could block the attack
+		if (_blockable && _angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
 		{
-			if (PlayerNumber < GameManager.GM.SuicideRecord.Count)
-			{
-				GameManager.GM.SuicideRecord[PlayerNumber]++;
-			}
-			else
-			{
-				Debug.LogError("Something is wrong with the controller number");
-			}
-
-			print("Player" + PlayerNumber + "Has Committed Suicide for " + GameManager.GM.SuicideRecord[PlayerNumber] + " Times");
-
-			//EventManager.TriggerEvent("On" + tag + "Suicide");
+			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
+			// Statistics: Block Success
+			//if (PlayerNumber < GameManager.GM.BlockTimes.Count)
+			//{
+			//	GameManager.GM.BlockTimes[PlayerNumber]++;
+			//}
+			//else
+			//{
+			//	Debug.LogError("Something is wrong with the controller number");
+			//}
+			// Statistics: Kill
+			//sender.GetComponentInParent<PlayerController1>().Mark(gameObject);
+			// End Statistics
 		}
-		else
+		else // Player is hit cause he could not block
 		{
-			if (!EnemyWhoHitPlayer.CompareTag(tag))
-			{
-				// Record Enemy Killed another player
-				int killer = EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
+			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
 
-				if (PlayerNumber < GameManager.GM.KillRecord.Count)
-				{
-					GameManager.GM.KillRecord[killer]++;
-				}
-				else
-				{
-					Debug.LogError("Something is wrong with the controller number");
-				}
-				print("Player" + PlayerNumber + "Was Killed By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
-					" and it has killed " + GameManager.GM.KillRecord[killer] + " Players");
-				//EventManager.TriggerEvent("On" + EnemyWhoHitPlayer.tag + "Score");
-			}
-			else
-			{
-				int muderer = EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber;
-				if (PlayerNumber < GameManager.GM.TeammateMurderRecord.Count)
-				{
-					GameManager.GM.TeammateMurderRecord[muderer]++;
-				}
-				else
-				{
-					Debug.LogError("Something is wrong with the controller number");
-				}
-				print("Player" + PlayerNumber + "Was conspired and murdered By Player" + EnemyWhoHitPlayer.GetComponent<PlayerController>().PlayerNumber +
-					" and it has killed " + GameManager.GM.TeammateMurderRecord[muderer] + " Teammates");
-				//EventManager.TriggerEvent("On" + tag + "Suicide");
-
-			}
-
+			_rb.AddForce(force, ForceMode.Impulse);
 		}
-		// Need to clean up the marker and stuff
-		EnemyWhoHitPlayer = null;
-		timer_hitMarkerStayTime = 0f;
-		starttimer_hitmakrer = false;
 	}
 
-	IEnumerator Respawn(float time)
+	public void Mark(GameObject enforcer)
 	{
-		_rb.isKinematic = true;
-		GameManager.GM.SetToRespawn(gameObject, 5f);
-		yield return new WaitForSeconds(time);
-		_rb.isKinematic = false;
-		GameManager.GM.SetToRespawn(gameObject, 0f);
-		foreach (GameObject go in OnDeathHidden)
-		{
-			go.SetActive(true);
-		}
-		_canControl = true;
-		EventManager.Instance.TriggerEvent(new PlayerRespawned(gameObject));
+		EnemyWhoHitPlayer = enforcer;
+		_playerMarkedTime = Time.time;
 	}
 
-	private void CheckDrop()
+	public void ForceDropHandObject()
 	{
-		// Drop Only happens when player is holding something
-		if (HandObject == null || normalState != State.Holding || attackState == State.Shooting)
-			return;
-
-		// If taken something, and pushed LT, drop the thing
-		if (_player.GetButton("Left Trigger"))
-		{
-			_dropping = true;
-			//DropHelper ();
-			StartCoroutine(PowerDrop(2f));
-		}
-		else
-		{
-			if (_dropping)
-			{
-				StopAllCoroutines();
-				JointSpring js = _chesthj.spring;
-				js.targetPosition = 10f * DropCharge;
-				DropCharge = 0f;
-				_chesthj.spring = js;
-				normalState = State.Empty;
-				_dropping = false;
-				DropHelper();
-			}
-		}
+		if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)) ||
+			_actionFSM.CurrentState.GetType().BaseType.Equals(typeof(WeaponActionState)))
+			_actionFSM.TransitionTo<IdleActionState>();
+		if (_movementFSM.CurrentState.GetType().BaseType.Equals(typeof(BazookaMovementState)))
+			_movementFSM.TransitionTo<IdleState>();
 	}
 
-	IEnumerator PowerDrop(float time)
+	/// <summary>
+	/// This function is called from FootSteps on LegSwingRefernece
+	/// </summary>
+	public void FootStep()
 	{
-		float elapsedTime = 0f;
-		JointSpring js = _chesthj.spring;
-
-		float initspringtagetPosition = js.targetPosition;
-
-		while (elapsedTime <= time)
+		if (_isGrounded())
 		{
-			DropCharge = elapsedTime / time;
-			elapsedTime += Time.deltaTime;
-			js.targetPosition = Mathf.Lerp(initspringtagetPosition, -100f, elapsedTime / time);
-			_chesthj.spring = js;
-			yield return new WaitForEndOfFrame();
+			EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[2], _getGroundTag()));
 		}
-
 	}
 
-	public void DropHelper()
+	private string _getGroundTag()
+	{
+		RaycastHit hit;
+		Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+		if (hit.collider == null) return "";
+		return hit.collider.tag;
+	}
+
+	private bool _angleWithin(Vector3 A, Vector3 B, float degree)
+	{
+		return Vector3.Angle(A, B) > degree;
+	}
+
+	private void _dropHandObject()
 	{
 		if (HandObject == null) return;
 		// Drop the thing
 		HandObject.SendMessage("Drop");
-		normalState = State.Empty;
-		_dropping = false;
-		// Change to non-dropping state after a while
-		HandTaken = false;
 		// Return the body to normal position
-		_checkArm = true;
-		StopAllCoroutines();
-		ResetBody();
+		_resetBodyAnimation();
 		// These two are necessary for all objects
 		HandObject.GetComponent<Rigidbody>().isKinematic = false;
 		HandObject.layer = LayerMask.NameToLayer("Pickup");
@@ -367,266 +191,21 @@ public class PlayerController : MonoBehaviour
 		}
 		// Nullify the holder
 		HandObject = null;
-		// Change the speed back to normal
-		LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", 1f);
-		// Clear the right trigger register
-		_rightTriggerRegister = "";
 		// Set Auxillary Aim to false
-		_auxillaryRotationLock = false;
+		//_auxillaryRotationLock = false;
 	}
 
-	public void CheckFire()
-	{
-		// If player push the button down
-		if (_player.GetButtonDown("Right Trigger"))
-		{
-			switch (_rightTriggerRegister)
-			{
-				case "Weapon":
-					if (HandObject != null && !_dropping)
-					{
-						attackState = State.Shooting;
-						if (EnableAuxillaryAiming)
-							AuxillaryAim();
-					}
-					break;
-				case "Hook":
-					if (HandObject != null && !_dropping)
-					{
-						AuxillaryAimOnce(DesignPanelManager.DPM.HookGunAuxillaryAimSlider.value);
-					}
-					break;
-				case "FistGun":
-					if (HandObject != null && !_dropping)
-					{
-						AuxillaryAimOnce(DesignPanelManager.DPM.HookGunAuxillaryAimSlider.value);
-					}
-					break;
-				default:
-					//If we don't have anything on hand, we are applying melee action
-					if (attackState != State.Meleeing && attackState != State.Blocking && normalState != State.Picking && normalState != State.Holding)
-					{
-						attackState = State.Meleeing;
-						_checkArm = false;
-						StopAllCoroutines();
-						StartCoroutine(MeleeClockFistLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.ClockFistTime, _leftArmhj));
-						StartCoroutine(MeleeClockFistHelper(_rightArm2hj, _rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.ClockFistTime));
-					}
-					break;
-			}
-			if (HandObject != null && !_dropping)
-			{
-				HandObject.GetComponent<WeaponBase>().Fire(true);
-			}
-		}
-
-		// If player lift the button up
-		if (_player.GetButtonUp("Right Trigger"))
-		{
-			if (HandObject != null && !_dropping)
-			{
-				HandObject.GetComponent<WeaponBase>().Fire(false);
-			}
-			switch (_rightTriggerRegister)
-			{
-				case "Weapon":
-					attackState = State.Empty;
-					// Auxillary Aiming
-					_auxillaryRotationLock = false;
-					_weaponCD = 0f;
-					break;
-				default:
-					// If we previously started melee and released the trigger, then release the fist
-					if (attackState == State.Meleeing)
-					{
-						starttimer_meleeHold = false;
-						timer_meleeHoldTime = 0f;
-						attackState = State.Empty;
-						// This is add a push force when melee
-						_rb.AddForce(transform.forward * MeleeCharge * CharacterDataStore.CharacterMeleeDataStore.SelfPushForce, ForceMode.Impulse);
-						StopAllCoroutines();
-
-						StartCoroutine(MeleePunchLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime, _leftArmhj));
-						StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime));
-						EventManager.Instance.TriggerEvent(new PunchReleased(gameObject, PlayerNumber));
-					}
-					_auxillaryRotationLock = false;
-					break;
-			}
-		}
-
-		// If players are holding the Right Trigger button
-		if (_player.GetButton("Right Trigger"))
-		{
-			// Means we want to fire
-			switch (_rightTriggerRegister)
-			{
-				case "Team1Resource":
-				case "Team2Resource":
-					if (!_dropping)
-						DropHelper();
-					break;
-			}
-		}
-	}
-
-	public void CheckBlock()
-	{
-		// ShieldEnergy is the percentage of shield energy. 
-		float _shieldEnergy = (CharacterDataStore.CharacterBlockDataStore.MaxBlockCD - _blockCharge) / CharacterDataStore.CharacterBlockDataStore.MaxBlockCD;
-
-		if (!_player.GetButton("Block") && _blockCanRegen)
-		{
-			_blockCharge -= (Time.deltaTime * CharacterDataStore.CharacterBlockDataStore.BlockRegenRate);
-			if (_blockCharge <= 0f) _blockCanRegen = false;
-		}
-
-		if (attackState == State.Meleeing || attackState == State.Shooting || normalState == State.Picking || normalState == State.Holding
-			|| normalState == State.Dead) return;
-
-		if (_player.GetButtonDown("Block") && _blockCharge <= CharacterDataStore.CharacterBlockDataStore.MaxBlockCD)
-		{
-			attackState = State.Blocking;
-
-			BlockVFX.SetActive(true);
-			BlockUI.SetActive(true);
-		}
-
-		// if Player hold the button, check if player could block then block
-		if (_player.GetButton("Block") && attackState == State.Blocking)
-		{
-			_blockCanRegen = false;
-			BlockHelper(_leftArmhj, _leftHandhj);
-			BlockHelper(_rightArmhj, _rightHandhj);
-			_blockCharge += Time.deltaTime;
-			if (_blockCharge > CharacterDataStore.CharacterBlockDataStore.MaxBlockCD)
-			{
-				attackState = State.Empty;
-				starttimer_blockregen = true;
-				timer_blockregen = 0f;
-				ResetBody();
-				BlockVFX.SetActive(false);
-			}
-
-			// Change BlockFill UI scale
-			BlockUIFill.transform.localScale = new Vector3(_shieldEnergy, 1f, 1f);
-		}
-
-		// When player released the button, should skip blockregeninterval seconds before it can regen
-		if (_player.GetButtonUp("Block") && _blockCharge <= CharacterDataStore.CharacterBlockDataStore.MaxBlockCD)
-		{
-			starttimer_blockregen = true;
-			timer_blockregen = 0f;
-			ResetBody();
-			attackState = State.Empty;
-		}
-
-		if (_player.GetButtonUp("Block"))
-		{
-			BlockVFX.SetActive(false);
-			BlockUI.SetActive(false);
-		}
-	}
-
-	// All timers should be contained in this function
-	// And this function could not be stopped by universal stop sign _canControlCharacter
-	private void RunTimer()
-	{
-		if (starttimer_blockregen)
-		{
-			timer_blockregen += Time.deltaTime;
-			if (timer_blockregen > CharacterDataStore.CharacterBlockDataStore.BlockRegenInterval)
-			{
-				starttimer_blockregen = false;
-				timer_blockregen = 0f;
-				_blockCanRegen = true;
-			}
-		}
-		// This is for hit statistics
-		// Player hitter marker only stays on a the player for no more than 2s
-		if (starttimer_hitmakrer)
-		{
-			timer_hitMarkerStayTime += Time.deltaTime;
-			if (timer_hitMarkerStayTime > 3f)
-			{
-				starttimer_hitmakrer = false;
-				timer_hitMarkerStayTime = 0f;
-				EnemyWhoHitPlayer = null;
-			}
-		}
-
-		if (starttimer_meleeHold)
-		{
-			timer_meleeHoldTime += Time.deltaTime;
-			if (timer_meleeHoldTime > CharacterDataStore.CharacterMeleeDataStore.MeleeHoldTime)
-			{
-				// Release the punch when hold time exceeds
-				starttimer_meleeHold = false;
-				timer_meleeHoldTime = 0f;
-				// If we previously started melee and released the trigger, then release the fist
-				if (attackState == State.Meleeing && _canControl)
-				{
-					attackState = State.Empty;
-					// This is add a push force when melee
-					_rb.AddForce(transform.forward * MeleeCharge * CharacterDataStore.CharacterMeleeDataStore.SelfPushForce, ForceMode.Impulse);
-					StopAllCoroutines();
-
-					StartCoroutine(MeleePunchLeftHandHelper(CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime, _leftArmhj));
-					StartCoroutine(MeleePunchHelper(_rightArmhj, _rightHandhj, CharacterDataStore.CharacterMeleeDataStore.FistReleaseTime));
-					EventManager.Instance.TriggerEvent(new PunchReleased(gameObject, PlayerNumber));
-				}
-				_auxillaryRotationLock = false;
-			}
-		}
-	}
-
-	private void AuxillaryAim()
-	{
-		// Auxillary Aiming
-		_weaponCD += Time.deltaTime;
-		if (_weaponCD <= MaxWeaponCD)
-		{
-			GameObject target = null;
-			float minAngle = 360f;
-			foreach (GameObject otherPlayer in GameManager.GM.Players)
-			{
-				if (otherPlayer != null && !otherPlayer.CompareTag(tag))
-				{
-					// If other player are within max Distance, then check for the smalliest angle player
-					if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= _axuillaryMaxDistance)
-					{
-						Vector3 targetDir = otherPlayer.transform.position - transform.position;
-						float angle = Vector3.Angle(targetDir, transform.forward);
-						if (angle <= _auxillaryMaxAngle && angle < minAngle)
-						{
-							minAngle = angle;
-							target = otherPlayer;
-						}
-					}
-				}
-			}
-			// Now we got the target Player, time to auxillary against it
-			if (target != null)
-			{
-				_auxillaryRotationLock = true;
-				transform.LookAt(target.transform);
-			}
-		}
-		else
-		{
-			_auxillaryRotationLock = false;
-		}
-	}
-	private void AuxillaryAimOnce(float maxangle)
+	private void _helpAim(float maxangle)
 	{
 		GameObject target = null;
 		float minAngle = 360f;
-		foreach (GameObject otherPlayer in GameManager.GM.Players)
+		GameObject[] enemies = tag == "Team1" ? GameObject.FindGameObjectsWithTag("Team2") : GameObject.FindGameObjectsWithTag("Team1");
+		foreach (GameObject otherPlayer in enemies)
 		{
-			if (otherPlayer != null && !otherPlayer.CompareTag(tag))
+			if (otherPlayer.activeSelf)
 			{
 				// If other player are within max Distance, then check for the smalliest angle player
-				if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= _axuillaryMaxDistance)
+				if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= CharacterDataStore.HelpAimMaxRange)
 				{
 					Vector3 targetDir = otherPlayer.transform.position - transform.position;
 					float angle = Vector3.Angle(targetDir, transform.forward);
@@ -648,291 +227,77 @@ public class PlayerController : MonoBehaviour
 			}
 		}
 	}
-	public void OnPickUpItem(string tag)
-	{
-		// Actual Logic Below
-		_rightTriggerRegister = tag;
-		// if pick up resource, then slow down
 
-		switch (tag)
-		{
-			case "Team1Resource":
-			case "Team2Resource":
-			case "WoodStamp":
-			case "SuckGun":
-			case "Bazooka":
-			case "Weapon":
-				_checkArm = false;
-
-				// Bend the body back
-				JointSpring tempjs = _chesthj.spring;
-				tempjs.targetPosition = -5f;
-				_chesthj.spring = tempjs;
-
-				StartCoroutine(PickUpWeaponHelper(_leftArm2hj, _leftArmhj, true, 0.1f));
-				StartCoroutine(PickUpWeaponHelper(_rightArm2hj, _rightArmhj, false, 0.1f));
-				break;
-			case "Hook":
-			case "FistGun":
-				_checkArm = false;
-
-				// Bend the body back
-				JointSpring tempjs1 = _chesthj.spring;
-				tempjs1.targetPosition = -5f;
-				_chesthj.spring = tempjs1;
-
-				StartCoroutine(PickUpWeaponHalfHelper(_leftArmhj, 0.1f));
-				StartCoroutine(PickUpWeaponHalfHelper(_rightArmhj, 0.1f));
-				break;
-			default:
-				break;
-		}
-	}
-
-	private void CheckArm()
-	{
-		// Arm2: right max: 90 --> -74
-		//       left min: -75 --> 69
-		// Arm: Connected Mass Scale 1 --> 0
-		//      Target Position: 0 --> 180
-		//      Limits: max 90 --> 121
-		// Hand: Limit Max: 90 --> 0
-		if (attackState == State.Meleeing || normalState == State.Holding) return;
-
-		bool LTPushDown = _player.GetButton("Left Trigger");
-		bool LTLiftUp = _player.GetButtonUp("Left Trigger");
-
-		LeftHand.GetComponent<Fingers>().SetTaken(!LTPushDown || _dropping);
-		RightHand.GetComponent<Fingers>().SetTaken(!LTPushDown || _dropping);
-
-		if (LTPushDown)
-			normalState = State.Picking;
-		else
-			normalState = State.Empty;
-
-		CheckArmHelper(LTPushDown, _leftArm2hj, _leftArmhj, _leftHandhj, true);
-		CheckArmHelper(LTPushDown, _rightArm2hj, _rightArmhj, _rightHandhj, false);
-
-		// Bend the body all together
-		JointSpring tempjs = _chesthj.spring;
-		tempjs.targetPosition = (LTPushDown ? 1f : 0f) * 90f;
-		tempjs.targetPosition = Mathf.Clamp(tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
-		_chesthj.spring = tempjs;
-	}
-
-	// If sender is not null, meaning the hit could be blocked
-	public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender = null)
-	{
-		// First check if the player could block the attack
-		if (sender != null && attackState == State.Blocking && AngleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
-		{
-			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge);
-			// Statistics: Block Success
-			if (PlayerNumber < GameManager.GM.BlockTimes.Count)
-			{
-				GameManager.GM.BlockTimes[PlayerNumber]++;
-			}
-			else
-			{
-				Debug.LogError("Something is wrong with the controller number");
-			}
-			// Statistics: Kill
-			sender.GetComponentInParent<PlayerController>().Mark(gameObject);
-			// End Statistics
-		}
-		else // Player is hit cause he could not block
-		{
-			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, (sender == null) ? -1 : sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge));
-
-			_rb.AddForce(force, ForceMode.Impulse);
-		}
-
-	}
-
-	// This function is used for marking and statistics
-	public void Mark(GameObject enforcer)
-	{
-		EnemyWhoHitPlayer = enforcer;
-		timer_hitMarkerStayTime = 0f;
-		starttimer_hitmakrer = true;
-	}
-
-	private void CheckJump()
-	{
-		if (_player.GetButtonDown("Jump") && IsGrounded())
-		{
-			_rb.AddForce(new Vector3(0, CharacterDataStore.CharacterMovementDataStore.JumpForce, 0), ForceMode.Impulse);
-			_isJumping = true;
-			EventManager.Instance.TriggerEvent(new PlayerJump(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber, GetGroundTag()));
-			OnDeathHidden[3].SetActive(false);
-		}
-	}
-
-	public void ApplyWalkForce(float _force)
-	{
-		//string HLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis1";
-		//string VLcontrollerStr = "Joy" + PlayerControllerNumber + "Axis2";
-		float HLAxis = _player.GetAxis("Move Horizontal");
-		float VLAxis = _player.GetAxis("Move Vertical");
-
-		if (IsGrounded() && (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f)))
-			_rb.AddForce(transform.forward * _force, ForceMode.Impulse);
-	}
-
-	private void CheckMovement()
-	{
-		float HLAxis = _player.GetAxis("Move Horizontal");
-		float VLAxis = _player.GetAxis("Move Vertical");
-
-		if (!Mathf.Approximately(HLAxis, 0f) || !Mathf.Approximately(VLAxis, 0f))
-		{
-			var isOnGround = IsGrounded();
-			var isfacingcliff = IsFacingCliff();
-			// Get the percent of input force player put in
-			float normalizedInputVal = Mathf.Sqrt(Mathf.Pow(HLAxis, 2f) + Mathf.Pow(VLAxis, 2f)) / Mathf.Sqrt(2);
-			// Add force based on that percentage
-			var targetVelocity = transform.forward;
-			targetVelocity *= CharacterDataStore.CharacterMovementDataStore.WalkSpeed;
-
-			var velocity = _rb.velocity;
-			var velocityChange = (targetVelocity - velocity);
-			velocityChange.x = Mathf.Clamp(velocityChange.x, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
-			velocityChange.z = Mathf.Clamp(velocityChange.z, -CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange, CharacterDataStore.CharacterMovementDataStore.MaxVelocityChange);
-			velocityChange.y = 0f;
-			if (isOnGround && !isfacingcliff)
-			{
-				_rb.AddForce(velocityChange, ForceMode.VelocityChange);
-			}
-			else if (isOnGround && isfacingcliff)
-			{
-				_rb.AddForce(velocityChange * CharacterDataStore.CharacterMovementDataStore.FacingCliffMultiplier, ForceMode.VelocityChange);
-			}
-			else
-			{
-				_rb.AddForce(velocityChange * CharacterDataStore.CharacterMovementDataStore.InAirSpeedMultiplier, ForceMode.VelocityChange);
-			}
-			// Turn player according to the rotation of the joystick
-			float playerRot = transform.rotation.eulerAngles.y > 180f ? (transform.rotation.eulerAngles.y - 360f) : transform.rotation.eulerAngles.y;
-			float controllerRot = Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg;
-			if (!(Mathf.Abs(playerRot - controllerRot) < 20f))
-			{
-				RotationSpeed += Time.deltaTime;
-			}
-			else
-			{
-				RotationSpeed = CharacterDataStore.CharacterMovementDataStore.MinRotationSpeed;
-			}
-			// Check if player's speed is not within x degree of the controller angle
-			// Then disable the animator if so
-			// Turn on the animator of the Leg Swing Preference
-			float playerVelRot = Mathf.Atan2(_rb.velocity.x, _rb.velocity.z) * Mathf.Rad2Deg;
-
-			LegSwingReference.GetComponent<Animator>().enabled = true;
-
-			RotationSpeed = Mathf.Clamp(RotationSpeed, CharacterDataStore.CharacterMovementDataStore.MinRotationSpeed, CharacterDataStore.CharacterMovementDataStore.MaxRotationSpeed);
-			Transform target = TurnReference.transform.GetChild(0);
-			Vector3 relativePos = target.position - transform.position;
-
-			TurnReference.transform.eulerAngles = new Vector3(transform.eulerAngles.x, Mathf.Atan2(HLAxis, VLAxis * -1f) * Mathf.Rad2Deg, transform.eulerAngles.z);
-			Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
-			Quaternion tr = Quaternion.Slerp(transform.rotation, rotation, Time.deltaTime * RotationSpeed);
-			if (!_auxillaryRotationLock)
-				transform.rotation = tr;
-		}
-		else
-		{
-			LegSwingReference.GetComponent<Animator>().enabled = false;
-			LegSwingReference.transform.eulerAngles = Vector3.zero;
-		}
-	}
-
-	#region Helper Functions
-
-	// Checks if Vector3 A and Vector3 B are within degree
-	// Only smaller than 180 degrees checking
-	private bool AngleWithin(Vector3 A, Vector3 B, float degree)
-	{
-		return Vector3.Angle(A, B) > degree;
-	}
-	private void CheckRewiredInput()
-	{
-		if (_player == null) return;
-		//LeftTrigger = _player.GetAxis("Left Trigger");
-		//RightTrigger = _player.GetAxis("Right Trigger");
-
-		//LeftTrigger = Mathf.Approximately(LeftTrigger, 0f) || Mathf.Approximately(LeftTrigger, -1f) ? 0f : 1f;
-		//RightTrigger = Mathf.Approximately(RightTrigger, 0f) || Mathf.Approximately(RightTrigger, -1f) ? 0f : 1f;
-
-		if (!_player.GetButton("Left Trigger") && HandObject != null)
-			normalState = State.Holding;
-	}
-
-	private bool IsGrounded()
+	private bool _isGrounded()
 	{
 		RaycastHit hit;
 		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
 	}
 
-	private bool IsFacingCliff()
-	{
-		RaycastHit hit;
-		Physics.Raycast(transform.position + transform.forward * 0.5f, Vector3.down, out hit);
-		return hit.collider.gameObject.CompareTag("DeathZone");
-	}
-
-	private string GetGroundTag()
-	{
-		RaycastHit hit;
-		Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
-		if (hit.collider == null) return "";
-		return hit.collider.tag;
-	}
-
-	private void CheckArmHelper(bool down, HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+	#region Animations
+	private void _pickAnimation()
 	{
 		// Arm2: right max: 90 --> -74
-		//       left min: -75 --> 69        
-		JointLimits lm1 = Arm2hj.limits;
-		if (IsLeftHand)
-			lm1.min = down ? 69f : -75f;
-		else
-			lm1.max = down ? -74f : 90f;
-		Arm2hj.limits = lm1;
+		//       left min: -75 --> 69
+		JointLimits la2l = _leftArm2hj.limits;
+		JointLimits ra2l = _rightArm2hj.limits;
+		la2l.min = 69f;
+		ra2l.max = -74f;
+		_leftArm2hj.limits = la2l;
+		_rightArm2hj.limits = ra2l;
 
-		//  Arm: Limits: -90, 90 --> 0, 121
-		JointLimits lm = Armhj.limits;
-		lm.max = down ? 121f : 90f;
-		lm.min = down ? 0f : -90f;
-		Armhj.limits = lm;
+		JointLimits lal = _leftArmhj.limits;
+		JointLimits ral = _rightArmhj.limits;
+		lal.max = 121f;
+		ral.max = 121f;
+		lal.min = 0f;
+		ral.min = 0f;
+		_leftArmhj.limits = lal;
+		_rightArmhj.limits = ral;
 
-		// Arm: Target Position: 0 --> 180
-		JointSpring js = Armhj.spring;
-		js.targetPosition = down ? 180f : 0f;
-		Armhj.spring = js;
+		JointSpring ljs = _leftArmhj.spring;
+		JointSpring rjs = _rightArmhj.spring;
+		ljs.targetPosition = 180f;
+		rjs.targetPosition = 180f;
+		_leftArmhj.spring = ljs;
+		_rightArmhj.spring = rjs;
 
-		// Hand: Limit Max: 90 --> 0
-		JointLimits tlm = Handhj.limits;
-		tlm.max = down ? 0f : 90f;
-		Handhj.limits = tlm;
+		JointLimits lhl = _leftHandhj.limits;
+		JointLimits rhl = _rightHandhj.limits;
+		lhl.max = 0f;
+		rhl.max = 0f;
+		_leftHandhj.limits = lhl;
+		_rightHandhj.limits = rhl;
 
+		JointSpring tempjs = _chesthj.spring;
+		tempjs.targetPosition = 90f;
+		tempjs.targetPosition = Mathf.Clamp(tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
+		_chesthj.spring = tempjs;
 	}
 
-	void ResetBody()
+	private void _resetBodyAnimation()
 	{
-		ResetBodyHelper(_leftArm2hj, _leftArmhj, _leftHandhj, true);
-		ResetBodyHelper(_rightArm2hj, _rightArmhj, _rightHandhj, false);
+		_resetArmHandAnimation(_leftArm2hj, _leftArmhj, _leftHandhj, true);
+		_resetArmHandAnimation(_rightArm2hj, _rightArmhj, _rightHandhj, false);
+		_resetSpineAnimation();
+	}
+
+	private void _resetSpineAnimation()
+	{
 		JointSpring js = _chesthj.spring;
 		js.targetPosition = 0f;
 		_chesthj.spring = js;
 	}
 
-	// Reset All Body
-	void ResetBodyHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
+	private void _resetArmHandAnimation(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
 	{
 		JointLimits lm2 = Arm2hj.limits;
 		JointLimits lm = Armhj.limits;
+		JointLimits hl = Handhj.limits;
+
 		JointSpring js = Armhj.spring;
 		JointSpring hjs = Handhj.spring;
+
 		if (IsLeftHand)
 		{
 			lm2.max = 70f;
@@ -943,150 +308,20 @@ public class PlayerController : MonoBehaviour
 			lm2.max = 90f;
 			lm2.min = -75f;
 		}
+		hl.min = 0f;
+		hl.max = 90f;
 		lm.min = -90f;
 		lm.max = 90f;
 		js.targetPosition = 0f;
 		hjs.targetPosition = 0f;
 		Handhj.spring = hjs;
+		Handhj.limits = hl;
 		Armhj.spring = js;
 		Armhj.limits = lm;
 		Arm2hj.limits = lm2;
 	}
 
-	private void BlockHelper(HingeJoint Armhj, HingeJoint Handhj)
-	{
-		JointSpring ajs = Armhj.spring;
-		ajs.targetPosition = CharacterDataStore.CharacterBlockDataStore.ArmTargetPosition;
-		Armhj.spring = ajs;
-
-		JointSpring hjs = Handhj.spring;
-		hjs.targetPosition = CharacterDataStore.CharacterBlockDataStore.HandTargetPosition;
-		Handhj.spring = hjs;
-	}
-
-	private void MeleeAlternateSchemaHelper()
-	{
-		if (!IsPunching) return;
-		RaycastHit hit;
-		// This Layermask get all player's layer except this player's
-		int layermask = GameManager.GM.AllPlayers ^ (1 << gameObject.layer);
-		if (Physics.SphereCast(transform.position, CharacterDataStore.CharacterMeleeDataStore.PunchRadius, transform.forward, out hit, CharacterDataStore.CharacterMeleeDataStore.PunchDistance, layermask))
-		{
-			IsPunching = false;
-			foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
-			{
-				rb.velocity = Vector3.zero;
-			}
-			Vector3 force = transform.forward * CharacterDataStore.CharacterMeleeDataStore.PunchForce * MeleeCharge;
-			hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, MeleeCharge, gameObject);
-			hit.transform.GetComponentInParent<PlayerController>().Mark(gameObject);
-		}
-	}
-
-	IEnumerator MeleeClockFistLeftHandHelper(float time, HingeJoint LeftArmhj)
-	{
-		float elapsedTime = 0f;
-		JointSpring ljs = LeftArmhj.spring;
-		float initLATargetPosition = ljs.targetPosition;
-		while (elapsedTime < time)
-		{
-			elapsedTime += Time.deltaTime;
-			ljs.targetPosition = Mathf.Lerp(initLATargetPosition, 80f, MeleeCharge);
-			LeftArmhj.spring = ljs;
-			yield return new WaitForEndOfFrame();
-		}
-	}
-
-	IEnumerator MeleeClockFistHelper(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time)
-	{
-		IsPunching = false;
-		float elapesdTime = 0f;
-		JointLimits lm2 = Arm2hj.limits;
-		JointLimits hl = Handhj.limits;
-		JointSpring js = Armhj.spring;
-
-		float initLm2Max = lm2.max;
-		float initLm2Min = lm2.min;
-		float initLmTargetPosition = js.targetPosition;
-		float inithlMax = hl.max;
-		float inithlMin = hl.min;
-
-		EventManager.Instance.TriggerEvent(new PunchStart(gameObject, PlayerNumber, RightHand.transform));
-
-		while (elapesdTime < time)
-		{
-			elapesdTime += Time.deltaTime;
-			MeleeCharge = elapesdTime / time;
-
-			lm2.max = Mathf.Lerp(initLm2Max, 4f, MeleeCharge);
-			lm2.min = Mathf.Lerp(initLm2Min, -17f, MeleeCharge);
-
-			js.targetPosition = Mathf.Lerp(initLmTargetPosition, -85f, MeleeCharge);
-
-			hl.max = Mathf.Lerp(inithlMax, 130f, MeleeCharge);
-			hl.min = Mathf.Lerp(inithlMin, 110f, MeleeCharge);
-
-			Arm2hj.limits = lm2;
-			Armhj.spring = js;
-			Handhj.limits = hl;
-			yield return new WaitForEndOfFrame();
-		}
-		EventManager.Instance.TriggerEvent(new PunchHolding(gameObject, PlayerNumber, RightHand.transform));
-
-		starttimer_meleeHold = true;
-	}
-	IEnumerator MeleePunchLeftHandHelper(float time, HingeJoint LeftHandhj)
-	{
-		float elapsedTime = 0f;
-		JointSpring ljs = LeftHandhj.spring;
-		float initLATargetPosition = ljs.targetPosition;
-
-		while (elapsedTime < time)
-		{
-			elapsedTime += Time.deltaTime;
-			ljs.targetPosition = Mathf.Lerp(initLATargetPosition, -120f, elapsedTime / time);
-			LeftHandhj.spring = ljs;
-
-			yield return new WaitForEndOfFrame();
-		}
-	}
-	IEnumerator MeleePunchHelper(HingeJoint Armhj, HingeJoint Handhj, float time)
-	{
-		float elapesdTime = 0f;
-		IsPunching = true;
-		JointLimits hl = Handhj.limits;
-		JointSpring js = Armhj.spring;
-		float initLmTargetPosition = js.targetPosition;
-		float inithlMax = hl.max;
-		float inithlMin = hl.min;
-
-		while (elapesdTime < time)
-		{
-			elapesdTime += Time.deltaTime;
-			js.targetPosition = Mathf.Lerp(initLmTargetPosition, 180f, elapesdTime / time);
-			hl.max = Mathf.Lerp(inithlMax, 12f, elapesdTime / time);
-			hl.min = Mathf.Lerp(inithlMin, -2.8f, elapesdTime / time);
-			Armhj.spring = js;
-			Handhj.limits = hl;
-			if (elapesdTime >= 0f)
-			{
-				if (DesignPanelManager.DPM.MeleeAlternateSchemaToggle.isOn)
-				{
-					MeleeAlternateSchemaHelper();
-				}
-			}
-
-			yield return new WaitForEndOfFrame();
-		}
-		yield return new WaitForSeconds(0.1f);
-		EventManager.Instance.TriggerEvent(new PunchDone(gameObject, PlayerNumber, RightHand.transform));
-		_checkArm = true;
-		ResetBody();
-		IsPunching = false;
-		MeleeCharge = 0f;
-	}
-
-	IEnumerator PickUpWeaponHelper(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
+	IEnumerator _pickUpAnimation(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
 	{
 		float elapesdTime = 0f;
 		JointLimits lm2 = Arm2hj.limits;
@@ -1116,7 +351,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	IEnumerator PickUpWeaponHalfHelper(HingeJoint Armhj, float time)
+	IEnumerator _pickUpHalfAnimation(HingeJoint Armhj, float time)
 	{
 		float elapesdTime = 0f;
 		JointSpring js = Armhj.spring;
@@ -1131,44 +366,675 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	/// <summary>
-	/// This function is called from FootSteps on LegSwingRefernece
-	/// </summary>
-	public void FootStep()
+	IEnumerator _powerDropAnimation(float time)
 	{
-		if (IsGrounded())
+		float elapsedTime = 0f;
+		JointSpring js = _chesthj.spring;
+
+		float initspringtagetPosition = js.targetPosition;
+
+		while (elapsedTime <= time)
 		{
-			EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[2], GetGroundTag()));
+			//DropCharge = elapsedTime / time;
+			elapsedTime += Time.deltaTime;
+			js.targetPosition = Mathf.Lerp(initspringtagetPosition, -100f, elapsedTime / time);
+			_chesthj.spring = js;
+			yield return new WaitForEndOfFrame();
+		}
+	}
+
+	IEnumerator _meleeHoldingLeftAnimation(HingeJoint LeftArmhj, float time)
+	{
+		float elapsedTime = 0f;
+		JointSpring ljs = LeftArmhj.spring;
+		float initLATargetPosition = ljs.targetPosition;
+		while (elapsedTime < time)
+		{
+			elapsedTime += Time.deltaTime;
+			ljs.targetPosition = Mathf.Lerp(initLATargetPosition, 80f, _meleeCharge);
+			LeftArmhj.spring = ljs;
+			yield return new WaitForEndOfFrame();
+		}
+	}
+
+	IEnumerator _meleeHoldingRightAnimation(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time)
+	{
+		float elapesdTime = 0f;
+		JointLimits lm2 = Arm2hj.limits;
+		JointLimits hl = Handhj.limits;
+		JointSpring js = Armhj.spring;
+
+		float initLm2Max = lm2.max;
+		float initLm2Min = lm2.min;
+		float initLmTargetPosition = js.targetPosition;
+		float inithlMax = hl.max;
+		float inithlMin = hl.min;
+
+		EventManager.Instance.TriggerEvent(new PunchStart(gameObject, PlayerNumber, RightHand.transform));
+
+		while (elapesdTime < time)
+		{
+			elapesdTime += Time.deltaTime;
+			_meleeCharge = elapesdTime / time;
+
+			lm2.max = Mathf.Lerp(initLm2Max, 4f, _meleeCharge);
+			lm2.min = Mathf.Lerp(initLm2Min, -17f, _meleeCharge);
+
+			js.targetPosition = Mathf.Lerp(initLmTargetPosition, -85f, _meleeCharge);
+
+			hl.max = Mathf.Lerp(inithlMax, 130f, _meleeCharge);
+			hl.min = Mathf.Lerp(inithlMin, 110f, _meleeCharge);
+
+			Arm2hj.limits = lm2;
+			Armhj.spring = js;
+			Handhj.limits = hl;
+			yield return new WaitForEndOfFrame();
+		}
+		EventManager.Instance.TriggerEvent(new PunchHolding(gameObject, PlayerNumber, RightHand.transform));
+
+		//starttimer_meleeHold = true;
+	}
+
+	IEnumerator _meleePunchLeftHandAnimation(HingeJoint LeftHandhj, float time)
+	{
+		float elapsedTime = 0f;
+		JointSpring ljs = LeftHandhj.spring;
+		float initLATargetPosition = ljs.targetPosition;
+
+		while (elapsedTime < time)
+		{
+			elapsedTime += Time.deltaTime;
+			ljs.targetPosition = Mathf.Lerp(initLATargetPosition, -120f, elapsedTime / time);
+			LeftHandhj.spring = ljs;
+
+			yield return new WaitForEndOfFrame();
+		}
+	}
+
+	IEnumerator _meleePunchRightHandAnimation(HingeJoint Armhj, HingeJoint Handhj, float time)
+	{
+		float elapesdTime = 0f;
+		JointLimits hl = Handhj.limits;
+		JointSpring js = Armhj.spring;
+		float initLmTargetPosition = js.targetPosition;
+		float inithlMax = hl.max;
+		float inithlMin = hl.min;
+
+		while (elapesdTime < time)
+		{
+			elapesdTime += Time.deltaTime;
+			js.targetPosition = Mathf.Lerp(initLmTargetPosition, 180f, elapesdTime / time);
+			hl.max = Mathf.Lerp(inithlMax, 12f, elapesdTime / time);
+			hl.min = Mathf.Lerp(inithlMin, -2.8f, elapesdTime / time);
+			Armhj.spring = js;
+			Handhj.limits = hl;
+
+			yield return new WaitForEndOfFrame();
+		}
+		yield return new WaitForSeconds(0.1f);
+	}
+
+	IEnumerator _blockAnimation(HingeJoint Armhj, HingeJoint Handhj, float time)
+	{
+		JointSpring ajs = Armhj.spring;
+		float initaTargetPosition = ajs.targetPosition;
+		JointSpring hjs = Handhj.spring;
+		float inithTargetPosition = hjs.targetPosition;
+		float elapsedTime = 0f;
+		float armtargetpos = CharacterDataStore.CharacterBlockDataStore.ArmTargetPosition;
+		float handtartgetpos = CharacterDataStore.CharacterBlockDataStore.HandTargetPosition;
+		while (elapsedTime < time)
+		{
+			elapsedTime += Time.deltaTime;
+
+			ajs.targetPosition = Mathf.Lerp(initaTargetPosition, armtargetpos, elapsedTime / time);
+			hjs.targetPosition = Mathf.Lerp(inithTargetPosition, handtartgetpos, elapsedTime / time);
+			Armhj.spring = ajs;
+			Handhj.spring = hjs;
+
+			yield return new WaitForEndOfFrame();
 		}
 	}
 	#endregion
 
-	private void OnCollisionEnter(Collision collision)
+	#region Movment States
+	private class MovementState : FSM<PlayerController>.State
 	{
-		if (collision.gameObject.layer == 13 && _isJumping)
+		protected float _HLAxis { get { return Context._player.GetAxis("Move Horizontal"); } }
+		protected float _VLAxis { get { return Context._player.GetAxis("Move Vertical"); } }
+		protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
+		protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
+		protected CharacterMovementData _charMovData { get { return Context.CharacterDataStore.CharacterMovementDataStore; } }
+
+		public void OnEnterDeathZone()
 		{
-			_isJumping = false;
-			EventManager.Instance.TriggerEvent(new PlayerLand(gameObject, GetComponentInChildren<UIController>().UI.gameObject, PlayerNumber, GetGroundTag()));
-			OnDeathHidden[3].SetActive(true);
+			Parent.TransitionTo<DeadState>();
 		}
 	}
 
-	private void OnEnable()
+	private class ControllableMovementState : MovementState
 	{
-		EventManager.Instance.AddHandler<PlayerDied>(OnEnterDeathZone);
+		public override void Update()
+		{
+			if (_jump && Context._isGrounded())
+			{
+				Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);
+			}
+		}
+
+		public override void LateUpdate()
+		{
+			base.LateUpdate();
+			Context._freezeBody.y = Context.transform.localEulerAngles.y;
+			Context.transform.localEulerAngles = Context._freezeBody;
+		}
 	}
 
-	private void OnDisable()
+	private class IdleState : ControllableMovementState
 	{
-		EventManager.Instance.RemoveHandler<PlayerDied>(OnEnterDeathZone);
+		public override void OnEnter()
+		{
+			Context.LegSwingReference.GetComponent<Animator>().enabled = false;
+			Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
+		}
 
+		public override void Update()
+		{
+			base.Update();
+			if (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis))
+			{
+				TransitionTo<RunState>();
+			}
+		}
 	}
 
-	public void SetControl(bool canControl)
+	private class RunState : ControllableMovementState
 	{
-		_canControl = canControl;
-		if (!canControl)
-			LegSwingReference.GetComponent<Animator>().enabled = _canControl;
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context.LegSwingReference.GetComponent<Animator>().enabled = true;
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Mathf.Approximately(_HLAxis, 0f) && Mathf.Approximately(_VLAxis, 0f)) TransitionTo<IdleState>();
+		}
+
+		public override void FixedUpdate()
+		{
+			bool isonground = Context._isGrounded();
+			Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed;
+			Vector3 velocityChange = targetVelocity - Context._rb.velocity;
+			velocityChange.x = Mathf.Clamp(velocityChange.x, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
+			velocityChange.z = Mathf.Clamp(velocityChange.z, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
+			velocityChange.y = 0f;
+
+			if (isonground)
+				Context._rb.AddForce(velocityChange, ForceMode.VelocityChange);
+			else
+				Context._rb.AddForce(velocityChange * _charMovData.InAirSpeedMultiplier, ForceMode.VelocityChange);
+
+			Transform target = Context.TurnReference.transform.GetChild(0);
+			Vector3 relativePos = target.position - Context.transform.position;
+
+			Context.TurnReference.transform.eulerAngles = new Vector3(Context.transform.eulerAngles.x, Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.eulerAngles.z);
+			Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+			Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
+			Context.transform.rotation = tr;
+		}
 	}
 
+	private class BazookaMovementState : MovementState { }
+	private class BazookaMovmentAimState : BazookaMovementState
+	{
+		public override void OnEnter()
+		{
+			Context.LegSwingReference.GetComponent<Animator>().enabled = false;
+			Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			Vector3 lookpos = Context.HandObject.GetComponent<rtBazooka>().BazookaShadowTransformPosition;
+			lookpos.y = Context.transform.position.y;
+			Context.transform.LookAt(lookpos);
+			if (_RightTriggerUp)
+				TransitionTo<BazookaMovementLaunchState>();
+		}
+	}
+
+	private class BazookaMovementLaunchState : BazookaMovementState
+	{
+		public override void Update()
+		{
+			base.Update();
+			Context.LegSwingReference.GetComponent<Animator>().enabled = (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis));
+		}
+	}
+
+	private class DeadState : FSM<PlayerController>.State
+	{
+		private float _startTime;
+		private float _respawnTime { get { return Context.CharacterDataStore.CharacterMovementDataStore.RespawnTime; } }
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			_startTime = Time.time;
+			Context._rb.isKinematic = true;
+			GameManager.GM.SetToRespawn(Context.gameObject, 10f);
+			foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Time.time >= _startTime + _respawnTime)
+			{
+				TransitionTo<IdleState>();
+				return;
+			}
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			Context._rb.isKinematic = false;
+			GameManager.GM.SetToRespawn(Context.gameObject, 0f);
+			foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(true); }
+
+		}
+	}
+	#endregion
+
+	#region Action States
+	private class ActionState : FSM<PlayerController>.State
+	{
+		protected bool _LeftTrigger { get { return Context._player.GetButton("Left Trigger"); } }
+		protected bool _LeftTriggerDown { get { return Context._player.GetButtonDown("Left Trigger"); } }
+		protected bool _LeftTriggerUp { get { return Context._player.GetButtonUp("Left Trigger"); } }
+
+		protected bool _RightTrigger { get { return Context._player.GetButton("Right Trigger"); } }
+		protected bool _RightTriggerDown { get { return Context._player.GetButtonDown("Right Trigger"); } }
+		protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
+
+		protected bool _B { get { return Context._player.GetButton("Block"); } }
+		protected bool _BDown { get { return Context._player.GetButtonDown("Block"); } }
+		protected bool _BUp { get { return Context._player.GetButtonUp("Block"); } }
+
+		protected CharacterMeleeData _charMeleeData { get { return Context.CharacterDataStore.CharacterMeleeDataStore; } }
+		protected CharacterBlockData _charBlockData { get { return Context.CharacterDataStore.CharacterBlockDataStore; } }
+
+		public override void Update()
+		{
+			/// Regen when past 3 seconds after block
+			if (Time.time > Context._lastTimeUseBlock + _charBlockData.BlockRegenInterval)
+			{
+				if (Context._blockCharge > 0f) Context._blockCharge -= (Time.deltaTime * _charBlockData.BlockRegenRate);
+			}
+		}
+
+		public virtual void OnEnterDeathZone()
+		{
+			TransitionTo<ActionDeadState>();
+			return;
+		}
+	}
+
+	private class IdleActionState : ActionState
+	{
+		public override void OnEnter()
+		{
+			Context._resetBodyAnimation();
+			Context._dropHandObject();
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_LeftTrigger)
+			{
+				TransitionTo<PickingState>();
+				return;
+			}
+			if (_RightTriggerDown)
+			{
+				TransitionTo<PunchHoldingState>();
+				return;
+			}
+			if (_B && Context._blockCharge <= _charBlockData.MaxBlockCD)
+			{
+				TransitionTo<BlockingState>();
+				return;
+			}
+		}
+	}
+
+	private class PickingState : ActionState
+	{
+		private CharacterPickUpData _characterPickUpData { get { return Context.CharacterDataStore.CharacterPickUpDataStore; } }
+		public override void OnEnter()
+		{
+			Context._pickAnimation();
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_LeftTriggerUp)
+			{
+				TransitionTo<IdleActionState>();
+				return;
+			}
+			_pickupcheck();
+		}
+
+		private void _pickupcheck()
+		{
+			RaycastHit hit;
+			if (Physics.SphereCast(Context.Chest.transform.position,
+				_characterPickUpData.Radius,
+				Vector3.down,
+				out hit,
+				Context._distToGround,
+				_characterPickUpData.PickUpLayer))
+			{
+				if (Context.HandObject == null && hit.collider.GetComponent<GunPositionControl>().CanBePickedUp)
+				{
+					EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
+					// Tell other necessary components that it has taken something
+					Context.HandObject = hit.collider.gameObject;
+
+					// Tell the collected weapon who picked it up
+					hit.collider.GetComponent<GunPositionControl>().Owner = Context.gameObject;
+					hit.collider.GetComponent<Rigidbody>().isKinematic = true;
+					hit.collider.gameObject.layer = Context.gameObject.layer;
+					TransitionTo<HoldingState>();
+					return;
+				}
+			}
+		}
+	}
+
+	private class HoldingState : ActionState
+	{
+		private IEnumerator _lefthandcoroutine;
+		private IEnumerator _righthandcoroutine;
+
+		public override void OnEnter()
+		{
+			Context._resetSpineAnimation();
+			Debug.Assert(Context.HandObject != null);
+			switch (Context.HandObject.tag)
+			{
+				case "Hook":
+				case "FistGun":
+					_lefthandcoroutine = Context._pickUpHalfAnimation(Context._leftArmhj, 0.1f);
+					_righthandcoroutine = Context._pickUpHalfAnimation(Context._rightArmhj, 0.1f);
+					break;
+				default:
+					_lefthandcoroutine = Context._pickUpAnimation(Context._leftArm2hj, Context._leftArmhj, true, 0.1f);
+					_righthandcoroutine = Context._pickUpAnimation(Context._rightArm2hj, Context._rightArmhj, false, 0.1f);
+					break;
+			}
+			Context.StartCoroutine(_lefthandcoroutine);
+			Context.StartCoroutine(_righthandcoroutine);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_LeftTriggerDown)
+			{
+				TransitionTo<DroppingState>();
+				return;
+			}
+			if (_RightTriggerDown)
+			{
+				switch (Context.HandObject.tag)
+				{
+					case "Weapon":
+					case "Hook":
+					case "FistGun":
+						Context._helpAim(Context.CharacterDataStore.HelpAimMaxRange);
+						break;
+				}
+				Context.HandObject.GetComponent<WeaponBase>().Fire(true);
+				switch (Context.HandObject.tag)
+				{
+					case "Bazooka":
+						Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
+						TransitionTo<BazookaActionState>();
+						break;
+				}
+			}
+			if (_RightTriggerUp)
+			{
+				Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+			}
+		}
+
+		public override void FixedUpdate()
+		{
+			base.FixedUpdate();
+			if (Context._rb.velocity.magnitude >= Context.CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
+				TransitionTo<IdleActionState>();
+		}
+
+		public override void OnExit()
+		{
+			Context.StopCoroutine(_lefthandcoroutine);
+			Context.StopCoroutine(_righthandcoroutine);
+		}
+	}
+
+	private class DroppingState : ActionState
+	{
+		private IEnumerator _dropcoroutine;
+
+		public override void OnEnter()
+		{
+			_dropcoroutine = Context._powerDropAnimation(2f);
+			Context.StartCoroutine(_dropcoroutine);
+		}
+
+		public override void OnExit()
+		{
+			Context.StopCoroutine(_dropcoroutine);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_LeftTriggerUp)
+			{
+				TransitionTo<IdleActionState>();
+				return;
+			}
+		}
+	}
+
+	private class PunchHoldingState : ActionState
+	{
+		private IEnumerator _punchleftcoroutine;
+		private IEnumerator _punchrightcoroutine;
+
+		private float _startHoldingTime;
+
+		public override void OnEnter()
+		{
+			_punchrightcoroutine = Context._meleeHoldingRightAnimation(Context._rightArm2hj, Context._rightArmhj, Context._rightHandhj, _charMeleeData.ClockFistTime);
+			_punchleftcoroutine = Context._meleeHoldingLeftAnimation(Context._leftArmhj, _charMeleeData.ClockFistTime);
+			Context.StartCoroutine(_punchrightcoroutine);
+			Context.StartCoroutine(_punchleftcoroutine);
+			_startHoldingTime = Time.time;
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_RightTriggerUp || Time.time > _startHoldingTime + _charMeleeData.MeleeHoldTime)
+			{
+				TransitionTo<PunchReleasingState>();
+				return;
+			}
+		}
+
+		public override void OnExit()
+		{
+			Context.StopCoroutine(_punchrightcoroutine);
+			Context.StopCoroutine(_punchleftcoroutine);
+		}
+	}
+
+	private class PunchReleasingState : ActionState
+	{
+		private IEnumerator _punchleftcoroutine;
+		private IEnumerator _punchrightcoroutine;
+		private float _time;
+		private bool _hitOnce;
+
+		public override void OnEnter()
+		{
+			_punchrightcoroutine = Context._meleePunchRightHandAnimation(Context._rightArmhj, Context._rightHandhj, _charMeleeData.FistReleaseTime);
+			_punchleftcoroutine = Context._meleePunchLeftHandAnimation(Context._leftArmhj, _charMeleeData.FistReleaseTime);
+			Context.StartCoroutine(_punchleftcoroutine);
+			Context.StartCoroutine(_punchrightcoroutine);
+			_time = Time.time + _charMeleeData.FistReleaseTime + 0.1f;
+			_hitOnce = false;
+			Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * _charMeleeData.SelfPushForce, ForceMode.Impulse);
+			EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Time.time < _time)
+			{
+				RaycastHit hit;
+				// This Layermask get all player's layer except this player's
+				int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
+				if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
+				{
+					_hitOnce = true;
+					foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+					{
+						rb.velocity = Vector3.zero;
+					}
+					Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
+					hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
+				}
+			}
+			else
+			{
+				EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+				TransitionTo<IdleActionState>();
+				return;
+			}
+
+			if (_RightTriggerDown)
+			{
+				TransitionTo<PunchHoldingState>();
+				return;
+			}
+		}
+
+		public override void OnExit()
+		{
+			Context.StopCoroutine(_punchleftcoroutine);
+			Context.StopCoroutine(_punchrightcoroutine);
+			//Context._resetBodyAnimation();
+			Context._meleeCharge = 0f;
+		}
+	}
+
+	private class BlockingState : ActionState
+	{
+		IEnumerator _leftblockcoroutine;
+		IEnumerator _rightblockcoroutine;
+
+		public override void OnEnter()
+		{
+			EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
+			_leftblockcoroutine = Context._blockAnimation(Context._leftArmhj, Context._leftHandhj, 0.1f);
+			_rightblockcoroutine = Context._blockAnimation(Context._rightArmhj, Context._rightHandhj, 0.1f);
+			Context.StartCoroutine(_leftblockcoroutine);
+			Context.StartCoroutine(_rightblockcoroutine);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_BUp)
+			{
+				TransitionTo<IdleActionState>();
+				return;
+			}
+			Context._lastTimeUseBlock = Time.time;
+			Context._blockCharge += Time.deltaTime;
+			if (Context._blockCharge > _charBlockData.MaxBlockCD)
+			{
+				TransitionTo<IdleActionState>();
+				return;
+			}
+		}
+
+		public override void OnExit()
+		{
+			Context.StopCoroutine(_leftblockcoroutine);
+			Context.StopCoroutine(_rightblockcoroutine);
+			EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
+		}
+	}
+
+	/// <summary>
+	/// A Base state class for any weapon that is being used
+	/// </summary>
+	private class WeaponActionState : ActionState { }
+
+	private class BazookaActionState : WeaponActionState
+	{
+		public override void Update()
+		{
+			base.Update();
+			if (_RightTriggerUp)
+			{
+				Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+			}
+		}
+	}
+
+	private class ActionDeadState : ActionState
+	{
+		private float _startTime;
+		private float _respawnTime { get { return Context.CharacterDataStore.CharacterMovementDataStore.RespawnTime; } }
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			_startTime = Time.time;
+			Context._resetBodyAnimation();
+			Context._dropHandObject();
+			if (Context.MeleeVFXHolder != null) Destroy(Context.MeleeVFXHolder);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Time.time >= _startTime + _respawnTime)
+			{
+				TransitionTo<IdleActionState>();
+				return;
+			}
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+		}
+	}
+	#endregion
 }

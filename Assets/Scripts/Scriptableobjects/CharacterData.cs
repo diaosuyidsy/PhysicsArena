@@ -9,4 +9,7 @@ public class CharacterData : ScriptableObject
 	public CharacterBlockData CharacterBlockDataStore;
 	public CharacterMeleeData CharacterMeleeDataStore;
 	public CharacterPickUpData CharacterPickUpDataStore;
+
+	public float HelpAimMaxRange = 10f;
+	public float HelpAimMaxDegree = 40f;
 }

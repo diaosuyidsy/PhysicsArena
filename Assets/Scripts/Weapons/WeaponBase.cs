@@ -33,7 +33,7 @@ public abstract class WeaponBase : MonoBehaviour
 		if (_ammo <= 0)
 		{
 			_gpc.CanBePickedUp = false;
-			_gpc.Owner.GetComponent<PlayerController>().DropHelper();
+			_gpc.Owner.GetComponent<PlayerController>().ForceDropHandObject();
 		}
 	}
 

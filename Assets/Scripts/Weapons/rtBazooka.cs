@@ -46,7 +46,8 @@ public class rtBazooka : WeaponBase
 			return Mathf.Pow(WeaponDataStore.BazookaDataStore.MarkThrowThurst, 2) / -_throwMarkGravity.y - 1f;
 		}
 	}
-	private Vector3 _diff;
+	private float _HLAxis { get { return _player.GetAxis("Move Horizontal"); } }
+	private float _VLAxis { get { return _player.GetAxis("Move Vertical"); } }
 
 	protected override void Awake()
 	{
@@ -67,11 +68,14 @@ public class rtBazooka : WeaponBase
 		}
 		else if (_bazookaState == BazookaStates.Out)
 		{
+			Vector3 movement = new Vector3(_HLAxis, 0f, -_VLAxis) * WeaponDataStore.BazookaDataStore.MarkAirMoveSpeed * Time.deltaTime;
+			transform.position += movement;
+			_throwMark.position += movement;
 			transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
-			_gpc.Owner.transform.position = transform.position - _diff;
 			RaycastHit hit;
 			if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.HitExplodeLayer))
 			{
+				if (hit.collider.gameObject == _gpc.Owner) return;
 				_bazookaState = BazookaStates.Idle;
 				List<GameObject> affectedPlayers = new List<GameObject>();
 				foreach (PlayerController _pc in Services.Config.Players)
@@ -115,7 +119,6 @@ public class rtBazooka : WeaponBase
 		else
 		{
 			_bazookaState = BazookaStates.Out;
-			_diff = transform.position - _gpc.Owner.transform.position;
 			_lineRenderer.enabled = false;
 			transform.GetComponent<Rigidbody>().isKinematic = false;
 			transform.GetComponent<Rigidbody>().velocity = _startVelocity;
@@ -145,10 +148,7 @@ public class rtBazooka : WeaponBase
 
 	private void _aim()
 	{
-		float HLAxis = _player.GetAxis("Move Horizontal");
-		float HVAxis = -_player.GetAxis("Move Vertical");
-
-		Vector3 newPosition = _shadowThrowMark.position + new Vector3(HLAxis, 0f, HVAxis) * Time.deltaTime * WeaponDataStore.BazookaDataStore.MarkMoveSpeed;
+		Vector3 newPosition = _shadowThrowMark.position + new Vector3(_HLAxis, 0f, -_VLAxis) * Time.deltaTime * WeaponDataStore.BazookaDataStore.MarkMoveSpeed;
 		RaycastHit hit;
 		if (Physics.Raycast(newPosition + new Vector3(0, 20f), Vector3.down, out hit, 30f, WeaponDataStore.BazookaDataStore.LineCastLayer))
 			newPosition.y = hit.point.y;

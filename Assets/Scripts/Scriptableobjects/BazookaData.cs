@@ -12,6 +12,7 @@ public class BazookaData : ScriptableObject
 	public float MaxAffectionMultiplier = 1f;
 	public float MinAffectionMultiplier = 0.2f;
 	public float MarkMoveSpeed = 10f;
+	public float MarkAirMoveSpeed = 5f;
 	public float MarkThrowThurst = 10f;
 	public float MarkGravityScale = 1f;
 	public LayerMask CanHideLayer;

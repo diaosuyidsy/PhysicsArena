@@ -608,10 +608,19 @@ public class PlayerController : MonoBehaviour
 
 	private class BazookaMovementLaunchState : BazookaMovementState
 	{
+		private Vector3 _diff;
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			_diff = Context.HandObject.transform.position - Context.transform.position;
+		}
+
 		public override void Update()
 		{
 			base.Update();
 			Context.LegSwingReference.GetComponent<Animator>().enabled = (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis));
+			Context.transform.position = Context.HandObject.transform.position - _diff;
 		}
 	}
 

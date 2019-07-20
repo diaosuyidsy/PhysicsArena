@@ -18,10 +18,6 @@ public class VFXManager
 		Vector3 hittedPos = ph.Hitted.transform.position;
 		Vector3 force = ph.Force;
 		GameObject par = _instantiateVFX(VFXDataStore.HitVFX, hittedPos, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
-		//ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem>().main;
-		//ParticleSystem.MainModule psmain2 = par.transform.GetChild(0).GetComponent<ParticleSystem>().main;
-		//psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
-		//psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
 	}
 
 	private void _onPlayerDied(PlayerDied pd)
@@ -71,10 +67,11 @@ public class VFXManager
 
 	private void _onBlockStart(BlockStart bs)
 	{
+		GameObject VFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockVFX : VFXDataStore.DuckBlockVFX;
 		GameObject BlockVFXHolder = bs.Player.GetComponent<PlayerController>().BlockVFXHolder;
 		if (BlockVFXHolder == null)
 		{
-			bs.Player.GetComponent<PlayerController>().BlockVFXHolder = GameObject.Instantiate(VFXDataStore.BlockVFX, bs.Player.transform);
+			bs.Player.GetComponent<PlayerController>().BlockVFXHolder = GameObject.Instantiate(VFX, bs.Player.transform);
 		}
 		bs.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(true);
 	}

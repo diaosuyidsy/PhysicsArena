@@ -35,7 +35,7 @@ public class rtFist : WeaponBase
 			RaycastHit hit;
 			if (Physics.SphereCast(_fistDup.transform.position, 0.3f, _fistDup.transform.forward, out hit, 0.1f, Services.Config.ConfigData.AllPlayerLayer))
 			{
-				hit.collider.GetComponentInParent<PlayerController>().GetComponent<Rigidbody>().AddForce(_fistDup.transform.up * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse);
+				hit.collider.GetComponentInParent<PlayerController>().OnImpact(_fistDup.transform.up * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _gpc.Owner);
 				_switchToRecharge();
 				return;
 			}

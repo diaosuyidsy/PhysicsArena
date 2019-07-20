@@ -23,7 +23,7 @@ public class PlayerController : MonoBehaviour
 	[HideInInspector] public GameObject HandObject;
 	[HideInInspector] public GameObject MeleeVFXHolder;
 	[HideInInspector] public GameObject BlockVFXHolder;
-	[HideInInspector] public GameObject EnemyWhoHitPlayer;
+	private GameObject _enemyWhoHitPlayer;
 	private float _playerMarkedTime;
 
 	#region Private Variables
@@ -96,7 +96,7 @@ public class PlayerController : MonoBehaviour
 		{
 			((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
 			((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
-			EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, EnemyWhoHitPlayer, Time.time < _playerMarkedTime + 3f));
+			EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _enemyWhoHitPlayer, Time.time < _playerMarkedTime + 3f));
 		}
 	}
 
@@ -104,33 +104,34 @@ public class PlayerController : MonoBehaviour
 	public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
 	{
 		// First check if the player could block the attack
-		if (_blockable && _angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+		if (_blockable &&
+			_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
+			_angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
 		{
 			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
-			// Statistics: Block Success
-			//if (PlayerNumber < GameManager.GM.BlockTimes.Count)
-			//{
-			//	GameManager.GM.BlockTimes[PlayerNumber]++;
-			//}
-			//else
-			//{
-			//	Debug.LogError("Something is wrong with the controller number");
-			//}
-			// Statistics: Kill
-			//sender.GetComponentInParent<PlayerController1>().Mark(gameObject);
-			// End Statistics
 		}
 		else // Player is hit cause he could not block
 		{
 			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
-
-			_rb.AddForce(force, ForceMode.Impulse);
+			OnImpact(force, ForceMode.Impulse, sender);
 		}
 	}
 
-	public void Mark(GameObject enforcer)
+	/// <summary>
+	/// This function is called when enemies want to impact the player
+	/// </summary>
+	/// <param name="force">The amount of force</param>
+	/// <param name="forcemode">Force mode</param>
+	/// <param name="enforcer">who is the impactor</param>
+	public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer)
 	{
-		EnemyWhoHitPlayer = enforcer;
+		_rb.AddForce(force, forcemode);
+		OnImpact(enforcer);
+	}
+
+	public void OnImpact(GameObject enforcer)
+	{
+		_enemyWhoHitPlayer = enforcer;
 		_playerMarkedTime = Time.time;
 	}
 
@@ -191,8 +192,6 @@ public class PlayerController : MonoBehaviour
 		}
 		// Nullify the holder
 		HandObject = null;
-		// Set Auxillary Aim to false
-		//_auxillaryRotationLock = false;
 	}
 
 	private void _helpAim(float maxangle)

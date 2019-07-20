@@ -18406,6 +18406,16 @@ PrefabInstance:
       propertyPath: PlayerNumber
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 59410566824854388, guid: 6fe621e792b7d624c86831e0e2a2be58,
+        type: 3}
+      propertyPath: m_ConnectedAnchor.y
+      value: 0.019976681
+      objectReference: {fileID: 0}
+    - target: {fileID: 59423614171643596, guid: 6fe621e792b7d624c86831e0e2a2be58,
+        type: 3}
+      propertyPath: m_ConnectedAnchor.y
+      value: 0.000008272968
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6fe621e792b7d624c86831e0e2a2be58, type: 3}
 --- !u!1 &409835039 stripped
@@ -31336,7 +31346,6 @@ GameObject:
   - component: {fileID: 995577031}
   - component: {fileID: 995577030}
   - component: {fileID: 995577029}
-  - component: {fileID: 995577028}
   m_Layer: 0
   m_Name: DeathTrigger
   m_TagString: DeathZone
@@ -31344,18 +31353,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &995577028
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 995577027}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cdf85e8ad2ed484a8ebd9a660dd9a17, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!65 &995577029
 BoxCollider:
   m_ObjectHideFlags: 0

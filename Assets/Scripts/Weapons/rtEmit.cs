@@ -97,7 +97,7 @@ public class rtEmit : WeaponBase
 		RaycastHit hit;
 		if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
 		{
-			hit.transform.GetComponentInParent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
+			hit.transform.GetComponentInParent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner);
 		}
 	}
 

@@ -113,6 +113,18 @@ public class VFXManager
 	{
 		_instantiateVFX(VFXDataStore.BazookaExplosionVFX, bb.BazookaGun.transform.position, VFXDataStore.BazookaExplosionVFX.transform.rotation);
 	}
+
+	private void _onPlayerStunned(PlayerStunned ps)
+	{
+		if (ps.Player.GetComponent<PlayerController>().StunVFXHolder == null)
+			ps.Player.GetComponent<PlayerController>().StunVFXHolder = GameObject.Instantiate(VFXDataStore.StunnedVFX, ps.PlayerHead, false);
+		ps.Player.GetComponent<PlayerController>().StunVFXHolder.SetActive(true);
+	}
+
+	private void _onPlayerUnStunned(PlayerUnStunned ps)
+	{
+		ps.Player.GetComponent<PlayerController>().StunVFXHolder.SetActive(false);
+	}
 	#endregion
 
 	private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -136,6 +148,8 @@ public class VFXManager
 		EventManager.Instance.AddHandler<BazookaBombed>(_onBazookaBombed);
 		EventManager.Instance.AddHandler<BlockStart>(_onBlockStart);
 		EventManager.Instance.AddHandler<BlockEnd>(_onBlockEnd);
+		EventManager.Instance.AddHandler<PlayerStunned>(_onPlayerStunned);
+		EventManager.Instance.AddHandler<PlayerUnStunned>(_onPlayerUnStunned);
 	}
 
 	private void OnDisable()
@@ -153,6 +167,8 @@ public class VFXManager
 		EventManager.Instance.RemoveHandler<BazookaBombed>(_onBazookaBombed);
 		EventManager.Instance.RemoveHandler<BlockStart>(_onBlockStart);
 		EventManager.Instance.RemoveHandler<BlockEnd>(_onBlockEnd);
+		EventManager.Instance.RemoveHandler<PlayerStunned>(_onPlayerStunned);
+		EventManager.Instance.RemoveHandler<PlayerUnStunned>(_onPlayerUnStunned);
 	}
 
 	public void Destory()

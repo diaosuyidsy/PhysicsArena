@@ -22,4 +22,5 @@ public class VFXData : ScriptableObject
 	public GameObject BazookaExplosionVFX;
 	public GameObject ChickenBlockVFX;
 	public GameObject DuckBlockVFX;
+	public GameObject StunnedVFX;
 }

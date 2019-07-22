@@ -59,6 +59,31 @@ public class PlayerDied : GameEvent
 	}
 }
 
+public class PlayerStunned : GameEvent
+{
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+	public Transform PlayerHead { get; }
+
+	public PlayerStunned(GameObject player, int playerNumber, Transform playerHead)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+		PlayerHead = playerHead;
+	}
+}
+
+public class PlayerUnStunned : GameEvent
+{
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+	public PlayerUnStunned(GameObject player, int playerNumber)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+	}
+}
+
 public class PlayerRespawned : GameEvent
 {
 	public GameObject Player { get; }

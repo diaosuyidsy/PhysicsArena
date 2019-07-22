@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
 	[Header("Player Body Setting Section")]
 	public GameObject LegSwingReference;
 	public GameObject Chest;
+	public GameObject Head;
 	[Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
 	public GameObject[] LeftArms;
 	[Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
@@ -23,8 +24,7 @@ public class PlayerController : MonoBehaviour
 	[HideInInspector] public GameObject HandObject;
 	[HideInInspector] public GameObject MeleeVFXHolder;
 	[HideInInspector] public GameObject BlockVFXHolder;
-	private GameObject _enemyWhoHitPlayer;
-	private float _playerMarkedTime;
+	[HideInInspector] public GameObject StunVFXHolder;
 
 	#region Private Variables
 	private Player _player;
@@ -41,9 +41,15 @@ public class PlayerController : MonoBehaviour
 	private HingeJoint _rightArmhj;
 	private HingeJoint _leftHandhj;
 	private HingeJoint _rightHandhj;
+	private GameObject _enemyWhoHitPlayer;
+	private float _playerMarkedTime;
 
 	private FSM<PlayerController> _movementFSM;
 	private FSM<PlayerController> _actionFSM;
+	#endregion
+
+	#region Status Variables
+	private float _stunTimer;
 	#endregion
 
 	private void Awake()
@@ -135,13 +141,20 @@ public class PlayerController : MonoBehaviour
 		_playerMarkedTime = Time.time;
 	}
 
+	public void OnImpact(Status status)
+	{
+		if (status.GetType().Equals(typeof(StunEffect)))
+		{
+			_stunTimer = Time.time + status.Duration;
+			_movementFSM.TransitionTo<StunMovementState>();
+			_actionFSM.TransitionTo<StunActionState>();
+		}
+	}
+
 	public void ForceDropHandObject()
 	{
-		if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)) ||
-			_actionFSM.CurrentState.GetType().BaseType.Equals(typeof(WeaponActionState)))
+		if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
 			_actionFSM.TransitionTo<IdleActionState>();
-		if (_movementFSM.CurrentState.GetType().BaseType.Equals(typeof(BazookaMovementState)))
-			_movementFSM.TransitionTo<IdleState>();
 	}
 
 	/// <summary>
@@ -155,6 +168,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	#region Helper Method
 	private string _getGroundTag()
 	{
 		RaycastHit hit;
@@ -232,6 +246,7 @@ public class PlayerController : MonoBehaviour
 		RaycastHit hit;
 		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
 	}
+	#endregion
 
 	#region Animations
 	private void _pickAnimation()
@@ -430,8 +445,6 @@ public class PlayerController : MonoBehaviour
 			yield return new WaitForEndOfFrame();
 		}
 		EventManager.Instance.TriggerEvent(new PunchHolding(gameObject, PlayerNumber, RightHand.transform));
-
-		//starttimer_meleeHold = true;
 	}
 
 	IEnumerator _meleePunchLeftHandAnimation(HingeJoint LeftHandhj, float time)
@@ -494,6 +507,7 @@ public class PlayerController : MonoBehaviour
 			yield return new WaitForEndOfFrame();
 		}
 	}
+
 	#endregion
 
 	#region Movment States
@@ -582,6 +596,32 @@ public class PlayerController : MonoBehaviour
 			Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
 			Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
 			Context.transform.rotation = tr;
+		}
+	}
+
+	private class StunMovementState : MovementState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context.LegSwingReference.GetComponent<Animator>().enabled = false;
+			Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
+			EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform));
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Time.time > Context._stunTimer)
+			{
+				TransitionTo<IdleState>();
+			}
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			EventManager.Instance.TriggerEvent(new PlayerUnStunned(Context.gameObject, Context.PlayerNumber));
 		}
 	}
 
@@ -719,6 +759,7 @@ public class PlayerController : MonoBehaviour
 				return;
 			}
 		}
+
 	}
 
 	private class PickingState : ActionState
@@ -1011,6 +1052,25 @@ public class PlayerController : MonoBehaviour
 			if (_RightTriggerUp)
 			{
 				Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+			}
+		}
+	}
+
+	private class StunActionState : ActionState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context._dropHandObject();
+			Context._resetBodyAnimation();
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Time.time > Context._stunTimer)
+			{
+				TransitionTo<IdleActionState>();
 			}
 		}
 	}

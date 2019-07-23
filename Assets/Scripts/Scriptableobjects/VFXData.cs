@@ -20,5 +20,8 @@ public class VFXData : ScriptableObject
 	public GameObject DuckMeleeChargingVFX;
 	public GameObject DuckUltimateVFX;
 	public GameObject BazookaExplosionVFX;
-	public GameObject BlockVFX;
+	public GameObject ChickenBlockVFX;
+	public GameObject DuckBlockVFX;
+	public GameObject StunnedVFX;
+	public GameObject SlowedVFX;
 }

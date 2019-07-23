@@ -18,10 +18,6 @@ public class VFXManager
 		Vector3 hittedPos = ph.Hitted.transform.position;
 		Vector3 force = ph.Force;
 		GameObject par = _instantiateVFX(VFXDataStore.HitVFX, hittedPos, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
-		//ParticleSystem.MainModule psmain = par.GetComponent<ParticleSystem>().main;
-		//ParticleSystem.MainModule psmain2 = par.transform.GetChild(0).GetComponent<ParticleSystem>().main;
-		//psmain.maxParticles = (int)Mathf.Round((9f / 51005f) * force.magnitude * force.magnitude);
-		//psmain2.maxParticles = (int)Mathf.Round(12f / 255025f * force.magnitude * force.magnitude);
 	}
 
 	private void _onPlayerDied(PlayerDied pd)
@@ -71,10 +67,11 @@ public class VFXManager
 
 	private void _onBlockStart(BlockStart bs)
 	{
+		GameObject VFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockVFX : VFXDataStore.DuckBlockVFX;
 		GameObject BlockVFXHolder = bs.Player.GetComponent<PlayerController>().BlockVFXHolder;
 		if (BlockVFXHolder == null)
 		{
-			bs.Player.GetComponent<PlayerController>().BlockVFXHolder = GameObject.Instantiate(VFXDataStore.BlockVFX, bs.Player.transform);
+			bs.Player.GetComponent<PlayerController>().BlockVFXHolder = GameObject.Instantiate(VFX, bs.Player.transform);
 		}
 		bs.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(true);
 	}
@@ -116,6 +113,33 @@ public class VFXManager
 	{
 		_instantiateVFX(VFXDataStore.BazookaExplosionVFX, bb.BazookaGun.transform.position, VFXDataStore.BazookaExplosionVFX.transform.rotation);
 	}
+
+	private void _onPlayerStunned(PlayerStunned ps)
+	{
+		if (ps.Player.GetComponent<PlayerController>().StunVFXHolder == null)
+			ps.Player.GetComponent<PlayerController>().StunVFXHolder = GameObject.Instantiate(VFXDataStore.StunnedVFX, ps.PlayerHead, false);
+		ps.Player.GetComponent<PlayerController>().StunVFXHolder.SetActive(true);
+	}
+
+	private void _onPlayerUnStunned(PlayerUnStunned ps)
+	{
+		ps.Player.GetComponent<PlayerController>().StunVFXHolder.SetActive(false);
+	}
+
+	private void _onPlayerSlowed(PlayerSlowed ps)
+	{
+		if (ps.Player.GetComponent<PlayerController>().SlowVFXHolder == null)
+		{
+			ps.Player.GetComponent<PlayerController>().SlowVFXHolder = GameObject.Instantiate(VFXDataStore.SlowedVFX, ps.PlayerFeet.transform, false);
+			ps.Player.GetComponent<PlayerController>().SlowVFXHolder.transform.rotation = VFXDataStore.SlowedVFX.transform.rotation;
+		}
+		ps.Player.GetComponent<PlayerController>().SlowVFXHolder.SetActive(true);
+	}
+
+	private void _onPlayerUnslowed(PlayerUnslowed pu)
+	{
+		pu.Player.GetComponent<PlayerController>().SlowVFXHolder.SetActive(false);
+	}
 	#endregion
 
 	private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -139,6 +163,10 @@ public class VFXManager
 		EventManager.Instance.AddHandler<BazookaBombed>(_onBazookaBombed);
 		EventManager.Instance.AddHandler<BlockStart>(_onBlockStart);
 		EventManager.Instance.AddHandler<BlockEnd>(_onBlockEnd);
+		EventManager.Instance.AddHandler<PlayerStunned>(_onPlayerStunned);
+		EventManager.Instance.AddHandler<PlayerUnStunned>(_onPlayerUnStunned);
+		EventManager.Instance.AddHandler<PlayerSlowed>(_onPlayerSlowed);
+		EventManager.Instance.AddHandler<PlayerUnslowed>(_onPlayerUnslowed);
 	}
 
 	private void OnDisable()
@@ -156,6 +184,10 @@ public class VFXManager
 		EventManager.Instance.RemoveHandler<BazookaBombed>(_onBazookaBombed);
 		EventManager.Instance.RemoveHandler<BlockStart>(_onBlockStart);
 		EventManager.Instance.RemoveHandler<BlockEnd>(_onBlockEnd);
+		EventManager.Instance.RemoveHandler<PlayerStunned>(_onPlayerStunned);
+		EventManager.Instance.RemoveHandler<PlayerUnStunned>(_onPlayerUnStunned);
+		EventManager.Instance.RemoveHandler<PlayerSlowed>(_onPlayerSlowed);
+		EventManager.Instance.RemoveHandler<PlayerUnslowed>(_onPlayerUnslowed);
 	}
 
 	public void Destory()

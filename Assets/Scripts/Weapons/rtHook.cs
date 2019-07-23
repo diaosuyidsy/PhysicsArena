@@ -125,10 +125,6 @@ public class rtHook : WeaponBase
 				_hookmaxPos = new Vector3(_hookmax.transform.position.x, _hookmax.transform.position.y, _hookmax.transform.position.z);
 				// Also need to make hook out of parent
 				_hook.transform.parent = null;
-
-				// Statistics: Record the player has used the hook one time
-				//_addToHookTime();
-				// End Statistics
 				EventManager.Instance.TriggerEvent(new HookGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
 			}
 		}
@@ -156,26 +152,11 @@ public class rtHook : WeaponBase
 		}
 	}
 
-	//private void _addToHookTime()
-	//{
-	//	int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
-	//	GameManager.GM.HookGunUseTimes[playernum]++;
-	//}
-
-	//private void _addToHookSuccessTime()
-	//{
-	//	int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
-	//	GameManager.GM.HookGunSuccessTimes[playernum]++;
-	//}
-
 	public void HookOnHit(GameObject hit)
 	{
 		_hookState = State.OnTarget;
 		Hooked = hit;
-		//Statistics
-		Hooked.GetComponent<PlayerController>().Mark(GetComponent<GunPositionControl>().Owner);
-		//_addToHookSuccessTime();
-		//End
+		Hooked.GetComponent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner);
 		foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
 		{
 			rb.isKinematic = true;

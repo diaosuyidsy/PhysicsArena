@@ -92,12 +92,8 @@ public class rtSuck : WeaponBase
 
 		foreach (GameObject go in gos)
 		{
-			go.GetComponent<Rigidbody>().AddForce((_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * WeaponDataStore.SuckGunDataStore.SuckStrength, ForceMode.Impulse);
-			// Statistics: Add kill marker
-			go.GetComponent<PlayerController>().Mark(_gpc.Owner);
-			// Statistics: Add every player he sucked into statistics
-			//_addToSuckedTimes();
-			// End Statistics
+			Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * WeaponDataStore.SuckGunDataStore.SuckStrength;
+			go.GetComponent<PlayerController>().OnImpact(force, ForceMode.Impulse, _gpc.Owner);
 		}
 		yield return new WaitForSeconds(0.3f);
 		////Second prototype

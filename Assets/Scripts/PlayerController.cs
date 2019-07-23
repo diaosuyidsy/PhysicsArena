@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour
 	[Header("Player Body Setting Section")]
 	public GameObject LegSwingReference;
 	public GameObject Chest;
+	public GameObject Head;
 	[Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
 	public GameObject[] LeftArms;
 	[Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
@@ -23,8 +24,8 @@ public class PlayerController : MonoBehaviour
 	[HideInInspector] public GameObject HandObject;
 	[HideInInspector] public GameObject MeleeVFXHolder;
 	[HideInInspector] public GameObject BlockVFXHolder;
-	[HideInInspector] public GameObject EnemyWhoHitPlayer;
-	private float _playerMarkedTime;
+	[HideInInspector] public GameObject StunVFXHolder;
+	[HideInInspector] public GameObject SlowVFXHolder;
 
 	#region Private Variables
 	private Player _player;
@@ -41,9 +42,34 @@ public class PlayerController : MonoBehaviour
 	private HingeJoint _rightArmhj;
 	private HingeJoint _leftHandhj;
 	private HingeJoint _rightHandhj;
+	private GameObject _enemyWhoHitPlayer;
+	private float _playerMarkedTime;
+	IEnumerator _startSlow;
 
 	private FSM<PlayerController> _movementFSM;
 	private FSM<PlayerController> _actionFSM;
+	#endregion
+
+	#region Status Variables
+	private float _stunTimer;
+	private float _slowTimer;
+	private float _walkSpeedMultiplier = 1f;
+	private float _permaSlowWalkSpeedMultiplier = 1f;
+	private int _permaSlow;
+	private float _walkSpeed
+	{
+		get
+		{
+			if (_permaSlow > 0 && Time.time > _slowTimer)
+				return _permaSlowWalkSpeedMultiplier;
+			else if (_permaSlow > 0 && Time.time < _slowTimer)
+				return Mathf.Max(_permaSlowWalkSpeedMultiplier, _walkSpeedMultiplier);
+			else if (_permaSlow == 0 && Time.time > _slowTimer)
+				return 1f;
+			else return _walkSpeedMultiplier;
+		}
+	}
+
 	#endregion
 
 	private void Awake()
@@ -96,7 +122,7 @@ public class PlayerController : MonoBehaviour
 		{
 			((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
 			((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
-			EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, EnemyWhoHitPlayer, Time.time < _playerMarkedTime + 3f));
+			EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _enemyWhoHitPlayer, Time.time < _playerMarkedTime + 3f));
 		}
 	}
 
@@ -104,43 +130,83 @@ public class PlayerController : MonoBehaviour
 	public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
 	{
 		// First check if the player could block the attack
-		if (_blockable && _angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+		if (_blockable &&
+			_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
+			_angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
 		{
 			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
-			// Statistics: Block Success
-			//if (PlayerNumber < GameManager.GM.BlockTimes.Count)
-			//{
-			//	GameManager.GM.BlockTimes[PlayerNumber]++;
-			//}
-			//else
-			//{
-			//	Debug.LogError("Something is wrong with the controller number");
-			//}
-			// Statistics: Kill
-			//sender.GetComponentInParent<PlayerController1>().Mark(gameObject);
-			// End Statistics
 		}
 		else // Player is hit cause he could not block
 		{
 			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
-
-			_rb.AddForce(force, ForceMode.Impulse);
+			OnImpact(force, ForceMode.Impulse, sender);
 		}
 	}
 
-	public void Mark(GameObject enforcer)
+	/// <summary>
+	/// This function is called when enemies want to impact the player
+	/// </summary>
+	/// <param name="force">The amount of force</param>
+	/// <param name="forcemode">Force mode</param>
+	/// <param name="enforcer">who is the impactor</param>
+	public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer)
 	{
-		EnemyWhoHitPlayer = enforcer;
+		_rb.AddForce(force, forcemode);
+		OnImpact(enforcer);
+	}
+
+	public void OnImpact(GameObject enforcer)
+	{
+		_enemyWhoHitPlayer = enforcer;
 		_playerMarkedTime = Time.time;
+	}
+
+	public void OnImpact(Status status)
+	{
+		if (status.GetType().Equals(typeof(StunEffect)))
+		{
+			if (status.Duration < _stunTimer - Time.time) return;
+			_stunTimer = Time.time + status.Duration;
+			_movementFSM.TransitionTo<StunMovementState>();
+			_actionFSM.TransitionTo<StunActionState>();
+		}
+		else if (status.GetType().Equals(typeof(SlowEffect)))
+		{
+			if (1f - _walkSpeedMultiplier > status.Potency) return;
+			/// If Slow Potency are similar
+			/// Refresh the timer if duration is longer
+			/// If Potency is bigger, then refresh everything
+			if (Mathf.Approximately(1f - _walkSpeedMultiplier, status.Potency))
+			{
+				_slowTimer = _slowTimer - Time.time > status.Duration ? _slowTimer : Time.time + status.Duration;
+			}
+			else
+			{
+				_slowTimer = Time.time + status.Duration;
+				_walkSpeedMultiplier = 1f - status.Potency;
+			}
+		}
+		else if (status.GetType().Equals(typeof(PermaSlowEffect)))
+		{
+			_permaSlow++;
+			EventManager.Instance.TriggerEvent(new PlayerSlowed(gameObject, PlayerNumber, OnDeathHidden[1]));
+			if (1f - _permaSlowWalkSpeedMultiplier > status.Potency) return;
+			else
+			{
+				_permaSlowWalkSpeedMultiplier = 1f - status.Potency;
+			}
+		}
+		else if (status.GetType().Equals(typeof(RemovePermaSlowEffect)))
+		{
+			_permaSlow--;
+			if (_permaSlow == 0) EventManager.Instance.TriggerEvent(new PlayerUnslowed(gameObject, PlayerNumber, OnDeathHidden[1]));
+		}
 	}
 
 	public void ForceDropHandObject()
 	{
-		if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)) ||
-			_actionFSM.CurrentState.GetType().BaseType.Equals(typeof(WeaponActionState)))
+		if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
 			_actionFSM.TransitionTo<IdleActionState>();
-		if (_movementFSM.CurrentState.GetType().BaseType.Equals(typeof(BazookaMovementState)))
-			_movementFSM.TransitionTo<IdleState>();
 	}
 
 	/// <summary>
@@ -154,6 +220,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	#region Helper Method
 	private string _getGroundTag()
 	{
 		RaycastHit hit;
@@ -191,8 +258,6 @@ public class PlayerController : MonoBehaviour
 		}
 		// Nullify the holder
 		HandObject = null;
-		// Set Auxillary Aim to false
-		//_auxillaryRotationLock = false;
 	}
 
 	private void _helpAim(float maxangle)
@@ -233,6 +298,7 @@ public class PlayerController : MonoBehaviour
 		RaycastHit hit;
 		return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
 	}
+	#endregion
 
 	#region Animations
 	private void _pickAnimation()
@@ -431,8 +497,6 @@ public class PlayerController : MonoBehaviour
 			yield return new WaitForEndOfFrame();
 		}
 		EventManager.Instance.TriggerEvent(new PunchHolding(gameObject, PlayerNumber, RightHand.transform));
-
-		//starttimer_meleeHold = true;
 	}
 
 	IEnumerator _meleePunchLeftHandAnimation(HingeJoint LeftHandhj, float time)
@@ -495,6 +559,7 @@ public class PlayerController : MonoBehaviour
 			yield return new WaitForEndOfFrame();
 		}
 	}
+
 	#endregion
 
 	#region Movment States
@@ -520,6 +585,7 @@ public class PlayerController : MonoBehaviour
 			{
 				Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);
 			}
+			Context.LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", Context._walkSpeed);
 		}
 
 		public override void LateUpdate()
@@ -565,7 +631,7 @@ public class PlayerController : MonoBehaviour
 		public override void FixedUpdate()
 		{
 			bool isonground = Context._isGrounded();
-			Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed;
+			Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed * Context._walkSpeed;
 			Vector3 velocityChange = targetVelocity - Context._rb.velocity;
 			velocityChange.x = Mathf.Clamp(velocityChange.x, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
 			velocityChange.z = Mathf.Clamp(velocityChange.z, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
@@ -583,6 +649,32 @@ public class PlayerController : MonoBehaviour
 			Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
 			Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
 			Context.transform.rotation = tr;
+		}
+	}
+
+	private class StunMovementState : MovementState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context.LegSwingReference.GetComponent<Animator>().enabled = false;
+			Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
+			EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform));
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Time.time > Context._stunTimer)
+			{
+				TransitionTo<IdleState>();
+			}
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			EventManager.Instance.TriggerEvent(new PlayerUnStunned(Context.gameObject, Context.PlayerNumber));
 		}
 	}
 
@@ -720,6 +812,7 @@ public class PlayerController : MonoBehaviour
 				return;
 			}
 		}
+
 	}
 
 	private class PickingState : ActionState
@@ -1012,6 +1105,25 @@ public class PlayerController : MonoBehaviour
 			if (_RightTriggerUp)
 			{
 				Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+			}
+		}
+	}
+
+	private class StunActionState : ActionState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context._dropHandObject();
+			Context._resetBodyAnimation();
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Time.time > Context._stunTimer)
+			{
+				TransitionTo<IdleActionState>();
 			}
 		}
 	}

@@ -54,11 +54,17 @@ public class PlayerController : MonoBehaviour
 	private float _stunTimer;
 	private float _slowTimer;
 	private float _walkSpeedMultiplier = 1f;
+	private float _permaSlowWalkSpeedMultiplier = 1f;
+	private bool _permaSlow;
 	private float _walkSpeed
 	{
 		get
 		{
-			if (Time.time > _slowTimer)
+			if (_permaSlow && Time.time > _slowTimer)
+				return _permaSlowWalkSpeedMultiplier;
+			else if (_permaSlow && Time.time < _slowTimer)
+				return Mathf.Max(_permaSlowWalkSpeedMultiplier, _walkSpeedMultiplier);
+			else if (!_permaSlow && Time.time > _slowTimer)
 				return 1f;
 			else return _walkSpeedMultiplier;
 		}
@@ -164,22 +170,22 @@ public class PlayerController : MonoBehaviour
 			_movementFSM.TransitionTo<StunMovementState>();
 			_actionFSM.TransitionTo<StunActionState>();
 		}
-		//else if (status.GetType().Equals(typeof(SlowEffect)))
-		//{
-		//	if (1f - _walkSpeedMultiplier > status.Potency) return;
-		//	/// If Slow Potency are similar
-		//	/// Refresh the timer if duration is longer
-		//	/// If Potency is bigger, then refresh everything
-		//	if (Mathf.Approximately(1f - _walkSpeedMultiplier, status.Potency))
-		//	{
-		//		_slowTimer = _slowTimer - Time.time > status.Duration ? _slowTimer : Time.time + status.Duration;
-		//	}
-		//	else
-		//	{
-		//		_slowTimer = Time.time + status.Duration;
-		//		_walkSpeedMultiplier = 1f - status.Potency;
-		//	}
-		//}
+		else if (status.GetType().Equals(typeof(SlowEffect)))
+		{
+			if (1f - _walkSpeedMultiplier > status.Potency) return;
+			/// If Slow Potency are similar
+			/// Refresh the timer if duration is longer
+			/// If Potency is bigger, then refresh everything
+			if (Mathf.Approximately(1f - _walkSpeedMultiplier, status.Potency))
+			{
+				_slowTimer = _slowTimer - Time.time > status.Duration ? _slowTimer : Time.time + status.Duration;
+			}
+			else
+			{
+				_slowTimer = Time.time + status.Duration;
+				_walkSpeedMultiplier = 1f - status.Potency;
+			}
+		}
 	}
 
 	public void ForceDropHandObject()

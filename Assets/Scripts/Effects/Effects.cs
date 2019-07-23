@@ -21,6 +21,13 @@ public class SlowEffect : Status
 	}
 }
 
+public class PermaSlowEffect : Status
+{
+	public PermaSlowEffect(float duration, float potency) : base(duration, potency)
+	{
+	}
+}
+
 public class StunEffect : Status
 {
 	public StunEffect(float duration, float potency) : base(duration, potency)

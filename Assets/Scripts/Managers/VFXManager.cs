@@ -129,8 +129,11 @@ public class VFXManager
 	private void _onPlayerSlowed(PlayerSlowed ps)
 	{
 		if (ps.Player.GetComponent<PlayerController>().SlowVFXHolder == null)
+		{
 			ps.Player.GetComponent<PlayerController>().SlowVFXHolder = GameObject.Instantiate(VFXDataStore.SlowedVFX, ps.PlayerFeet.transform, false);
-		ps.Player.GetComponent<PlayerController>().SlowVFXHolder.SetActive(false);
+			ps.Player.GetComponent<PlayerController>().SlowVFXHolder.transform.rotation = VFXDataStore.SlowedVFX.transform.rotation;
+		}
+		ps.Player.GetComponent<PlayerController>().SlowVFXHolder.SetActive(true);
 	}
 
 	private void _onPlayerUnslowed(PlayerUnslowed pu)
@@ -162,6 +165,8 @@ public class VFXManager
 		EventManager.Instance.AddHandler<BlockEnd>(_onBlockEnd);
 		EventManager.Instance.AddHandler<PlayerStunned>(_onPlayerStunned);
 		EventManager.Instance.AddHandler<PlayerUnStunned>(_onPlayerUnStunned);
+		EventManager.Instance.AddHandler<PlayerSlowed>(_onPlayerSlowed);
+		EventManager.Instance.AddHandler<PlayerUnslowed>(_onPlayerUnslowed);
 	}
 
 	private void OnDisable()
@@ -181,6 +186,8 @@ public class VFXManager
 		EventManager.Instance.RemoveHandler<BlockEnd>(_onBlockEnd);
 		EventManager.Instance.RemoveHandler<PlayerStunned>(_onPlayerStunned);
 		EventManager.Instance.RemoveHandler<PlayerUnStunned>(_onPlayerUnStunned);
+		EventManager.Instance.RemoveHandler<PlayerSlowed>(_onPlayerSlowed);
+		EventManager.Instance.RemoveHandler<PlayerUnslowed>(_onPlayerUnslowed);
 	}
 
 	public void Destory()

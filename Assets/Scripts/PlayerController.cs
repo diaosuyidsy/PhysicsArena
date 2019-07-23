@@ -55,16 +55,16 @@ public class PlayerController : MonoBehaviour
 	private float _slowTimer;
 	private float _walkSpeedMultiplier = 1f;
 	private float _permaSlowWalkSpeedMultiplier = 1f;
-	private bool _permaSlow;
+	private int _permaSlow;
 	private float _walkSpeed
 	{
 		get
 		{
-			if (_permaSlow && Time.time > _slowTimer)
+			if (_permaSlow > 0 && Time.time > _slowTimer)
 				return _permaSlowWalkSpeedMultiplier;
-			else if (_permaSlow && Time.time < _slowTimer)
+			else if (_permaSlow > 0 && Time.time < _slowTimer)
 				return Mathf.Max(_permaSlowWalkSpeedMultiplier, _walkSpeedMultiplier);
-			else if (!_permaSlow && Time.time > _slowTimer)
+			else if (_permaSlow == 0 && Time.time > _slowTimer)
 				return 1f;
 			else return _walkSpeedMultiplier;
 		}
@@ -185,6 +185,21 @@ public class PlayerController : MonoBehaviour
 				_slowTimer = Time.time + status.Duration;
 				_walkSpeedMultiplier = 1f - status.Potency;
 			}
+		}
+		else if (status.GetType().Equals(typeof(PermaSlowEffect)))
+		{
+			_permaSlow++;
+			EventManager.Instance.TriggerEvent(new PlayerSlowed(gameObject, PlayerNumber, OnDeathHidden[1]));
+			if (1f - _permaSlowWalkSpeedMultiplier > status.Potency) return;
+			else
+			{
+				_permaSlowWalkSpeedMultiplier = 1f - status.Potency;
+			}
+		}
+		else if (status.GetType().Equals(typeof(RemovePermaSlowEffect)))
+		{
+			_permaSlow--;
+			if (_permaSlow == 0) EventManager.Instance.TriggerEvent(new PlayerUnslowed(gameObject, PlayerNumber, OnDeathHidden[1]));
 		}
 	}
 
@@ -570,6 +585,7 @@ public class PlayerController : MonoBehaviour
 			{
 				Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);
 			}
+			Context.LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", Context._walkSpeed);
 		}
 
 		public override void LateUpdate()
@@ -615,7 +631,7 @@ public class PlayerController : MonoBehaviour
 		public override void FixedUpdate()
 		{
 			bool isonground = Context._isGrounded();
-			Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed;
+			Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed * Context._walkSpeed;
 			Vector3 velocityChange = targetVelocity - Context._rb.velocity;
 			velocityChange.x = Mathf.Clamp(velocityChange.x, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
 			velocityChange.z = Mathf.Clamp(velocityChange.z, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);

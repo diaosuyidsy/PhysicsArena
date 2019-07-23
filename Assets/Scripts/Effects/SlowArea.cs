@@ -7,24 +7,15 @@ public class SlowArea : MonoBehaviour
 	[Range(0f, 1f)]
 	public float SlowAmount;
 
-	private SlowEffect _se;
-
-	private void Awake()
-	{
-		_se = new SlowEffect(50f, SlowAmount);
-	}
-
-	private void OnTriggerStay(Collider other)
+	private void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.GetComponent<PlayerController>() != null)
-		{
-			other.gameObject.GetComponent<PlayerController>().OnImpact(_se);
-			print("Hello");
-		}
+			other.gameObject.GetComponent<PlayerController>().OnImpact(new PermaSlowEffect(0f, SlowAmount));
 	}
 
 	private void OnTriggerExit(Collider other)
 	{
-
+		if (other.gameObject.GetComponent<PlayerController>() != null)
+			other.gameObject.GetComponent<PlayerController>().OnImpact(new RemovePermaSlowEffect(0f, 0f));
 	}
 }

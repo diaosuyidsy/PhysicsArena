@@ -125,6 +125,18 @@ public class VFXManager
 	{
 		ps.Player.GetComponent<PlayerController>().StunVFXHolder.SetActive(false);
 	}
+
+	private void _onPlayerSlowed(PlayerSlowed ps)
+	{
+		if (ps.Player.GetComponent<PlayerController>().SlowVFXHolder == null)
+			ps.Player.GetComponent<PlayerController>().SlowVFXHolder = GameObject.Instantiate(VFXDataStore.SlowedVFX, ps.PlayerFeet.transform, false);
+		ps.Player.GetComponent<PlayerController>().SlowVFXHolder.SetActive(false);
+	}
+
+	private void _onPlayerUnslowed(PlayerUnslowed pu)
+	{
+		pu.Player.GetComponent<PlayerController>().SlowVFXHolder.SetActive(false);
+	}
 	#endregion
 
 	private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)

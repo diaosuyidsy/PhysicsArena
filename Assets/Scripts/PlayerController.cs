@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
 	[HideInInspector] public GameObject MeleeVFXHolder;
 	[HideInInspector] public GameObject BlockVFXHolder;
 	[HideInInspector] public GameObject StunVFXHolder;
+	[HideInInspector] public GameObject SlowVFXHolder;
 
 	#region Private Variables
 	private Player _player;
@@ -43,6 +44,7 @@ public class PlayerController : MonoBehaviour
 	private HingeJoint _rightHandhj;
 	private GameObject _enemyWhoHitPlayer;
 	private float _playerMarkedTime;
+	IEnumerator _startSlow;
 
 	private FSM<PlayerController> _movementFSM;
 	private FSM<PlayerController> _actionFSM;
@@ -50,6 +52,18 @@ public class PlayerController : MonoBehaviour
 
 	#region Status Variables
 	private float _stunTimer;
+	private float _slowTimer;
+	private float _walkSpeedMultiplier = 1f;
+	private float _walkSpeed
+	{
+		get
+		{
+			if (Time.time > _slowTimer)
+				return 1f;
+			else return _walkSpeedMultiplier;
+		}
+	}
+
 	#endregion
 
 	private void Awake()
@@ -145,10 +159,27 @@ public class PlayerController : MonoBehaviour
 	{
 		if (status.GetType().Equals(typeof(StunEffect)))
 		{
+			if (status.Duration < _stunTimer - Time.time) return;
 			_stunTimer = Time.time + status.Duration;
 			_movementFSM.TransitionTo<StunMovementState>();
 			_actionFSM.TransitionTo<StunActionState>();
 		}
+		//else if (status.GetType().Equals(typeof(SlowEffect)))
+		//{
+		//	if (1f - _walkSpeedMultiplier > status.Potency) return;
+		//	/// If Slow Potency are similar
+		//	/// Refresh the timer if duration is longer
+		//	/// If Potency is bigger, then refresh everything
+		//	if (Mathf.Approximately(1f - _walkSpeedMultiplier, status.Potency))
+		//	{
+		//		_slowTimer = _slowTimer - Time.time > status.Duration ? _slowTimer : Time.time + status.Duration;
+		//	}
+		//	else
+		//	{
+		//		_slowTimer = Time.time + status.Duration;
+		//		_walkSpeedMultiplier = 1f - status.Potency;
+		//	}
+		//}
 	}
 
 	public void ForceDropHandObject()

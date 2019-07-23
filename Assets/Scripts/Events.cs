@@ -93,6 +93,35 @@ public class PlayerRespawned : GameEvent
 	}
 }
 
+public class PlayerSlowed : GameEvent
+{
+	public PlayerSlowed(GameObject player, int playerNumber, GameObject playerFeet)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+		PlayerFeet = playerFeet;
+	}
+
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+	public GameObject PlayerFeet { get; }
+}
+
+public class PlayerUnslowed : GameEvent
+{
+	public PlayerUnslowed(GameObject player, int playerNumber, GameObject playerFeet)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+		PlayerFeet = playerFeet;
+	}
+
+	public GameObject Player { get; }
+	public int PlayerNumber { get; }
+	public GameObject PlayerFeet { get; }
+}
+
+
 public class ObjectDespawned : GameEvent
 {
 	public GameObject Obj { get; }

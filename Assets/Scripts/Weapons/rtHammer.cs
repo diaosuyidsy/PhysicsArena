@@ -14,6 +14,7 @@ public class rtHammer : WeaponBase
 	private HammerState _hammerState = HammerState.Idle;
 	private Player _player;
 	private float _curTravelTime;
+	private float _distToGround;
 	private float _HLAxis { get { return _player.GetAxis("Move Horizontal"); } }
 	private float _VLAxis { get { return _player.GetAxis("Move Vertical"); } }
 
@@ -42,7 +43,7 @@ public class rtHammer : WeaponBase
 				transform.eulerAngles = transeuler;
 			}
 			RaycastHit hit;
-			if (Physics.SphereCast(transform.position, 0.3f, -transform.forward, out hit, 0.3f, WeaponDataStore.HammerDataStore.CanCollideLayer))
+			if (Physics.SphereCast(_gpc.Owner.transform.position, 0.3f, -transform.forward, out hit, 0.3f, WeaponDataStore.HammerDataStore.CanCollideLayer))
 			{
 				_onWeaponUsedOnce();
 				_hammerState = HammerState.Idle;
@@ -66,8 +67,8 @@ public class rtHammer : WeaponBase
 		{
 			_player = ReInput.players.GetPlayer(_gpc.Owner.GetComponent<PlayerController>().PlayerNumber);
 			_gpc.FollowHand = false;
-			_hammerState = HammerState.Out;
 			GetComponent<SphereCollider>().radius = WeaponDataStore.HammerDataStore.CollisionRange;
+			_hammerState = HammerState.Out;
 		}
 	}
 

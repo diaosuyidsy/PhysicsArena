@@ -22,6 +22,7 @@ public class rtHammer : WeaponBase
 		base.Awake();
 		_ammo = WeaponDataStore.HammerDataStore.MaxAmmo;
 	}
+
 	private void Update()
 	{
 		if (_hammerState == HammerState.Out)
@@ -40,6 +41,22 @@ public class rtHammer : WeaponBase
 				transeuler.y = Mathf.LerpAngle(transeuler.y, Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Time.deltaTime * WeaponDataStore.HammerDataStore.RotationSpeed);
 				transform.eulerAngles = transeuler;
 			}
+			RaycastHit hit;
+			if (Physics.SphereCast(transform.position, 0.3f, -transform.forward, out hit, 0.3f, WeaponDataStore.HammerDataStore.CanCollideLayer))
+			{
+				_onWeaponUsedOnce();
+				_hammerState = HammerState.Idle;
+				_gpc.Owner.GetComponent<PlayerController>().OnImpact(new StunEffect(0.5f, 0f));
+				return;
+			}
+		}
+	}
+
+	private void FixedUpdate()
+	{
+		if (_hammerState == HammerState.Out && !Physics.Raycast(transform.position, Vector3.down, _gpc.Owner.GetComponent<CapsuleCollider>().bounds.extents.y, WeaponDataStore.HammerDataStore.CanCollideLayer))
+		{
+			transform.position += new Vector3(0f, 0.5f * Physics.gravity.y * Time.fixedDeltaTime * Time.fixedDeltaTime * 10f);
 		}
 	}
 
@@ -50,6 +67,7 @@ public class rtHammer : WeaponBase
 			_player = ReInput.players.GetPlayer(_gpc.Owner.GetComponent<PlayerController>().PlayerNumber);
 			_gpc.FollowHand = false;
 			_hammerState = HammerState.Out;
+			GetComponent<SphereCollider>().radius = WeaponDataStore.HammerDataStore.CollisionRange;
 		}
 	}
 
@@ -60,5 +78,24 @@ public class rtHammer : WeaponBase
 		_curTravelTime = 0f;
 		_player = null;
 		_gpc.FollowHand = true;
+		_gpc.CanBePickedUp = true;
+	}
+
+	protected override void OnTriggerEnter(Collider other)
+	{
+		base.OnTriggerEnter(other);
+		if (_hammerState == HammerState.Out &&
+			other.tag.Contains("Team") &&
+			other.gameObject != _gpc.Owner &&
+			other.gameObject.GetComponent<PlayerController>() != null)
+		{
+			Vector3 dir = other.transform.position - transform.position;
+			if (Vector3.Angle(-transform.forward, dir) < WeaponDataStore.HammerDataStore.CollisionAngle)
+			{
+				dir = dir.normalized;
+				dir.y = WeaponDataStore.HammerDataStore.UpwardMultiplier;
+				other.gameObject.GetComponent<PlayerController>().OnImpact(dir * WeaponDataStore.HammerDataStore.CollideForce, ForceMode.Impulse, _gpc.Owner);
+			}
+		}
 	}
 }

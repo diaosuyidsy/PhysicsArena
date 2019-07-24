@@ -205,8 +205,11 @@ public class PlayerController : MonoBehaviour
 
 	public void ForceDropHandObject()
 	{
-		if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+		if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState))
+			|| _actionFSM.CurrentState.GetType().Equals(typeof(HammerActionState)))
 			_actionFSM.TransitionTo<IdleActionState>();
+		if (_movementFSM.CurrentState.GetType().Equals(typeof(HammerMovementOutState)))
+			_movementFSM.TransitionTo<IdleState>();
 	}
 
 	/// <summary>
@@ -733,6 +736,7 @@ public class PlayerController : MonoBehaviour
 			_diff = Context.HandObject.transform.position - Context.transform.position;
 			_rotDiff = Context.HandObject.transform.eulerAngles - Context.transform.eulerAngles;
 			Context.LegSwingReference.GetComponent<Animator>().enabled = false;
+			Context.LegSwingReference.transform.rotation = Quaternion.identity;
 			Context._hammerOutAnimation();
 		}
 

@@ -49,7 +49,7 @@ public abstract class WeaponBase : MonoBehaviour
 		}
 	}
 
-	protected void OnTriggerEnter(Collider other)
+	protected virtual void OnTriggerEnter(Collider other)
 	{
 		if (other.CompareTag("DeathZone"))
 		{

@@ -35045,6 +35045,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1453458300}
   - component: {fileID: 1453458301}
+  - component: {fileID: 1453458305}
   - component: {fileID: 1453458302}
   - component: {fileID: 1453458304}
   - component: {fileID: 1453458303}
@@ -35131,6 +35132,19 @@ MonoBehaviour:
   VerticalOffset: 0
   CanBePickedUp: 1
   FollowHand: 1
+--- !u!135 &1453458305
+SphereCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453458299}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.7
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &1465039417
 PrefabInstance:
   m_ObjectHideFlags: 0

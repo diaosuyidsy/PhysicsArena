@@ -7,12 +7,12 @@ public class GunPositionControl : MonoBehaviour
 	[HideInInspector]
 	public GameObject Owner;
 	[Tooltip("This Angle is for weapon z axis angle")]
-	public float DownAngle = 10f;
+	public float DownAngle = 0f;
 	[Tooltip("This Angle is for weapon y axis angle offset, normally it's 90f")]
-	public float FaceAngleOffset = 90f;
+	public float FaceAngleOffset = 0f;
 	public float XOffset = 0f;
 
-	public float VerticalOffset = 10f;
+	public float VerticalOffset = 0f;
 	[HideInInspector]
 	public bool CanBePickedUp = true;
 	[HideInInspector]
@@ -29,7 +29,6 @@ public class GunPositionControl : MonoBehaviour
 		{
 			lh = Owner.GetComponent<PlayerController>().LeftHand;
 			rh = Owner.GetComponent<PlayerController>().RightHand;
-			//transform.position = (lh.transform.position + rh.transform.position) / 2f;
 			targetposition = (lh.transform.position + rh.transform.position) / 2f;
 			transform.position = new Vector3(targetposition.x, targetposition.y + VerticalOffset, targetposition.z);
 			transform.eulerAngles = new Vector3(XOffset, Owner.transform.eulerAngles.y + FaceAngleOffset, DownAngle);

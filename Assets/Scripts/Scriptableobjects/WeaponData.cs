@@ -10,6 +10,7 @@ public class WeaponData : ScriptableObject
 	public HookGunData HookGunDataStore;
 	public FistGunData FistGunDataStore;
 	public BazookaData BazookaDataStore;
+	public HammerData HammerDataStore;
 
 	public float WeaponSpawnCD = 12f;
 	public LayerMask Ground;

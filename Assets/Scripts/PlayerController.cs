@@ -387,6 +387,13 @@ public class PlayerController : MonoBehaviour
 		Arm2hj.limits = lm2;
 	}
 
+	private void _hammerOutAnimation()
+	{
+		JointSpring js = _chesthj.spring;
+		js.targetPosition = 30f;
+		_chesthj.spring = js;
+	}
+
 	IEnumerator _pickUpAnimation(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
 	{
 		float elapesdTime = 0f;
@@ -678,8 +685,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	private class BazookaMovementState : MovementState { }
-	private class BazookaMovmentAimState : BazookaMovementState
+	private class BazookaMovmentAimState : MovementState
 	{
 		public override void OnEnter()
 		{
@@ -698,7 +704,7 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	private class BazookaMovementLaunchState : BazookaMovementState
+	private class BazookaMovementLaunchState : MovementState
 	{
 		private Vector3 _diff;
 
@@ -715,6 +721,36 @@ public class PlayerController : MonoBehaviour
 			Context.transform.position = Context.HandObject.transform.position - _diff;
 		}
 	}
+
+	private class HammerMovementOutState : MovementState
+	{
+		private Vector3 _diff;
+		private Vector3 _rotDiff;
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			_diff = Context.HandObject.transform.position - Context.transform.position;
+			_rotDiff = Context.HandObject.transform.eulerAngles - Context.transform.eulerAngles;
+			Context.LegSwingReference.GetComponent<Animator>().enabled = false;
+			Context._hammerOutAnimation();
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			Context.transform.position = Context.HandObject.transform.position + -Context.HandObject.transform.forward * _diff.magnitude;
+			Context.transform.eulerAngles = Context.HandObject.transform.eulerAngles + _rotDiff;
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			Context.LegSwingReference.GetComponent<Animator>().enabled = true;
+			Context._resetSpineAnimation();
+		}
+	}
+
 
 	private class DeadState : FSM<PlayerController>.State
 	{
@@ -874,6 +910,7 @@ public class PlayerController : MonoBehaviour
 			{
 				case "Hook":
 				case "FistGun":
+				case "Hammer":
 					_lefthandcoroutine = Context._pickUpHalfAnimation(Context._leftArmhj, 0.1f);
 					_righthandcoroutine = Context._pickUpHalfAnimation(Context._rightArmhj, 0.1f);
 					break;
@@ -910,6 +947,10 @@ public class PlayerController : MonoBehaviour
 					case "Bazooka":
 						Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
 						TransitionTo<BazookaActionState>();
+						break;
+					case "Hammer":
+						Context._movementFSM.TransitionTo<HammerMovementOutState>();
+						TransitionTo<HammerActionState>();
 						break;
 				}
 			}
@@ -1107,6 +1148,11 @@ public class PlayerController : MonoBehaviour
 				Context.HandObject.GetComponent<WeaponBase>().Fire(false);
 			}
 		}
+	}
+
+	private class HammerActionState : WeaponActionState
+	{
+
 	}
 
 	private class StunActionState : ActionState

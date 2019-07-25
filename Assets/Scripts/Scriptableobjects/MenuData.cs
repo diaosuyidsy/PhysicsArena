@@ -86,5 +86,29 @@ public class MenuData : ScriptableObject
 	public float FirstMenuQuitMoveInDelay = 0f;
 	public Ease FirstMenuQuitMoveInEase;
 
+	[Header("Mode Select Setting")]
+	public Color ModeNormalColor;
+	public Color ModeSelectedBlinkColor;
+	public float ModeSelectedBlinkDurition = 0.1f;
+	public float ModeSelectedBlinkTime = 5f;
+	[Tooltip("Indicates the power in time of the ease, and must be between -1 and 1. 0 is balanced, 1 fully weakens the ease in time, -1 starts the ease fully weakened and gives it power towards the end.")]
+	public float ModeSelectedBlinkPeriod = 0f;
+
+	public float ModeImageMoveDuration = 0.3f;
+	public float ModeImageMoveDelay = 0f;
+	public Ease ModeImageMoveEase;
+
+	public float ModeMapMoveInDuration = 0.3f;
+	public float ModeMapMoveInDelay = 0f;
+	public Ease ModeMapMoveInEase;
+
+	public float ModePanelSelectedZoomDuration = 0.2f;
+	public Ease ModePanelSelectedZoomEase;
+
+	public float MapMoveDuration = 0.2f;
+	public Ease MapMoveEase;
+
+	public Color SelectedMapColor;
+	public Color UnselectedMapColor;
 
 }

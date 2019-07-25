@@ -80,6 +80,251 @@ public class Menu : MonoBehaviour
 		}
 	}
 
+	private abstract class ModeMenuState : MenuState
+	{
+
+	}
+
+	private abstract class MapSelectState : ModeMenuState
+	{
+		protected Transform _Mask;
+		protected Transform _MapPage;
+		protected int _MapIndex;
+		protected bool _finishedmove;
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			_finishedmove = true;
+			_MapIndex = 0;
+			_MapPage.GetChild(0).GetComponent<Image>().color = _MenuData.SelectedMapColor;
+			for (int i = 1; i < _MapPage.childCount; i++)
+			{
+				_MapPage.GetChild(i).GetComponent<Image>().color = _MenuData.UnselectedMapColor;
+			}
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_VLAxisRaw > 0.2f && !_vAxisInUse && _MapIndex < _MapPage.childCount - 1 && _finishedmove)
+			{
+				_finishedmove = false;
+				_MapPage.GetChild(_MapIndex++).GetComponent<Image>().color = _MenuData.UnselectedMapColor;
+				_MapPage.DOLocalMoveY(60f, _MenuData.MapMoveDuration).
+					SetEase(_MenuData.MapMoveEase).
+					SetRelative(true).
+					OnComplete(() =>
+					{
+						if (_MapIndex < _MapPage.childCount)
+							_MapPage.GetChild(_MapIndex).GetComponent<Image>().color = _MenuData.SelectedMapColor;
+						_finishedmove = true;
+					});
+				return;
+			}
+
+			if (_VLAxisRaw < -0.2f && !_vAxisInUse && _MapIndex > 0 && _finishedmove)
+			{
+				_finishedmove = false;
+				_MapPage.GetChild(_MapIndex--).GetComponent<Image>().color = _MenuData.UnselectedMapColor;
+				_MapPage.DOLocalMoveY(-60f, _MenuData.MapMoveDuration).
+					SetEase(_MenuData.MapMoveEase).
+					SetRelative(true).
+					OnComplete(() =>
+					{
+						if (_MapIndex >= 0)
+							_MapPage.GetChild(_MapIndex).GetComponent<Image>().color = _MenuData.SelectedMapColor;
+						_finishedmove = true;
+					});
+				return;
+			}
+
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			_Mask.Find("MainPage").DOLocalMoveY(0f, _MenuData.ModeImageMoveDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
+			_Mask.Find("MapPage").DOLocalMoveY(-110.6f, _MenuData.ModeMapMoveInDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
+			Context._brawlMode.DOLocalMove(new Vector3(449f, -38f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			Context._brawlMode.DOScale(new Vector3(1.74f, 1.74f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+
+			Context._cartMode.DOLocalMove(new Vector3(-452f, -38f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			Context._cartMode.DOScale(new Vector3(1.74f, 1.74f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+		}
+	}
+
+	private class BrawlMapSelectState : MapSelectState
+	{
+		public override void Init()
+		{
+			base.Init();
+			_Mask = Context._brawlMode.Find("Mask");
+			_MapPage = Context._brawlMode.Find("Mask").Find("MapPage");
+			Debug.Assert(_MapPage != null);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_BDown)
+				TransitionTo<BrawlModeState>();
+		}
+	}
+
+	private class CartMapSelectState : MapSelectState
+	{
+		public override void Init()
+		{
+			base.Init();
+			_Mask = Context._cartMode.Find("Mask");
+			_MapPage = Context._cartMode.Find("Mask").Find("MapPage");
+			Debug.Assert(_MapPage != null);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_BDown)
+				TransitionTo<CarModeState>();
+		}
+	}
+
+	private abstract class ModeToMapSelectTransition : ModeMenuState
+	{
+		protected GameObject _Mode;
+		protected GameObject _WholeMask;
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			_WholeMask.SetActive(false);
+			_Mode.GetComponent<Image>().DOColor(_MenuData.ModeSelectedBlinkColor, _MenuData.ModeSelectedBlinkDurition).
+				SetEase(Ease.Flash, _MenuData.ModeSelectedBlinkTime, _MenuData.ModeSelectedBlinkPeriod).
+				OnComplete(() =>
+				{
+					_Mode.transform.Find("Mask").Find("MainPage").DOLocalMoveY(140f, _MenuData.ModeImageMoveDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
+					_Mode.transform.Find("Mask").Find("MapPage").DOLocalMoveY(-20f, _MenuData.ModeMapMoveInDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
+					_OnBlinkComplete();
+				});
+		}
+
+		protected virtual void _OnBlinkComplete()
+		{
+		}
+
+	}
+
+	private class BrawlModeToMapSelectTransition : ModeToMapSelectTransition
+	{
+		public override void Init()
+		{
+			base.Init();
+			_Mode = Context._brawlMode.gameObject;
+			_WholeMask = Context._brawlMode.Find("WholeMask").gameObject;
+		}
+
+		protected override void _OnBlinkComplete()
+		{
+			base._OnBlinkComplete();
+			_Mode.transform.DOLocalMove(new Vector3(5f, 1f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			_Mode.transform.DOScale(new Vector3(2.3f, 2.3f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+
+			Context._cartMode.DOLocalMove(new Vector3(-723f, -266f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			Context._cartMode.transform.DOScale(new Vector3(1f, 1f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase).
+				OnComplete(() =>
+				{
+					TransitionTo<BrawlMapSelectState>();
+				});
+		}
+	}
+
+	private class CartModeToMapSelectTransition : ModeToMapSelectTransition
+	{
+		public override void Init()
+		{
+			base.Init();
+			_Mode = Context._cartMode.gameObject;
+			_WholeMask = Context._cartMode.Find("WholeMask").gameObject;
+		}
+
+		protected override void _OnBlinkComplete()
+		{
+			base._OnBlinkComplete();
+			_Mode.transform.DOLocalMove(new Vector3(5f, 1f), _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
+			_Mode.transform.DOScale(new Vector3(2.3f, 2.3f), _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
+
+			Context._brawlMode.DOLocalMove(new Vector3(736f, -266f), _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
+			Context._brawlMode.transform.DOScale(new Vector3(1f, 1f), _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad).
+				OnComplete(() =>
+				{
+					TransitionTo<CartMapSelectState>();
+				});
+		}
+	}
+
+	private abstract class ModeSelectState : ModeMenuState
+	{
+		protected GameObject _wholeMask;
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			_wholeMask.SetActive(false);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_BDown)
+				TransitionTo<ModeMenuToFirstMenuTransition>();
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			_wholeMask.SetActive(true);
+		}
+	}
+
+	private class BrawlModeState : ModeSelectState
+	{
+		public override void Init()
+		{
+			base.Init();
+			_wholeMask = Context._brawlMode.Find("WholeMask").gameObject;
+			Debug.Assert(_wholeMask != null);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_HLAxisRaw < -0.2f && !_hAxisInUse)
+				TransitionTo<CarModeState>();
+			if (_ADown)
+				TransitionTo<BrawlModeToMapSelectTransition>();
+		}
+	}
+
+	private class CarModeState : ModeSelectState
+	{
+		public override void Init()
+		{
+			base.Init();
+			_wholeMask = Context._cartMode.Find("WholeMask").gameObject;
+			Debug.Assert(_wholeMask != null);
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_HLAxisRaw > 0.2f && !_hAxisInUse)
+				TransitionTo<BrawlModeState>();
+			if (_ADown)
+				TransitionTo<CartModeToMapSelectTransition>();
+		}
+	}
+
 	private abstract class FisrtMenuState : MenuState
 	{
 		protected bool _finishedEnter = false;
@@ -105,27 +350,6 @@ public class Menu : MonoBehaviour
 		{
 			base.OnExit();
 			_menuItem.GetComponent<TextMeshProUGUI>().color = Context.MenuData.NormalFontColor;
-		}
-	}
-
-	private abstract class ModeMenuState : MenuState
-	{
-
-	}
-
-	private class CarModeState : ModeMenuState
-	{
-		public override void OnEnter()
-		{
-			base.OnEnter();
-
-		}
-
-		public override void Update()
-		{
-			base.Update();
-			if (_BDown)
-				TransitionTo<ModeMenuToFirstMenuTransition>();
 		}
 	}
 

@@ -33,9 +33,9 @@ public class rtFist : WeaponBase
 			Vector3 nextPos = (_maxDistance - _fistDup.transform.position).normalized;
 			_fistDup.transform.Translate(nextPos * Time.deltaTime * WeaponDataStore.FistGunDataStore.FistSpeed, Space.World);
 			RaycastHit hit;
-			if (Physics.SphereCast(_fistDup.transform.position, 0.3f, _fistDup.transform.forward, out hit, 0.1f, Services.Config.ConfigData.AllPlayerLayer))
+			if (Physics.SphereCast(_fistDup.transform.position, 0.3f, -_fistDup.transform.right, out hit, 0.1f, Services.Config.ConfigData.AllPlayerLayer))
 			{
-				hit.collider.GetComponentInParent<PlayerController>().OnImpact(_fistDup.transform.up * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _gpc.Owner);
+				hit.collider.GetComponentInParent<PlayerController>().OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _gpc.Owner);
 				_switchToRecharge();
 				return;
 			}

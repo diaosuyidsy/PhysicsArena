@@ -152,4 +152,7 @@ public class MenuData : ScriptableObject
 	public Vector3 EggActivatedScale;
 
 	public Color HoverImageColor;
+	public Color[] HoleCursorveHoverColor;
+	public Color HoleNormalColor;
+	public Color[] HoleSelectedColor;
 }

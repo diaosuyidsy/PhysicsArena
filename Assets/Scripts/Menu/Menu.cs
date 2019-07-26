@@ -291,15 +291,24 @@ public class Menu : MonoBehaviour
 				}
 				Context._3rdMenuHoleImages[_cursorIndex].GetChild(siblingindex).gameObject.SetActive(true);
 				Context._3rdMenuHoleImages[_cursorIndex].GetChild(siblingindex).GetComponent<Image>().color = _MenuData.HoverImageColor;
+				// Also Change Hole Color to related color
+				Context._3rdMenuHolders[_cursorIndex].GetComponent<Image>().color = _MenuData.HoleCursorveHoverColor[siblingindex];
+				// Hide the indicators
+				Context._3rdMenuIndicators[_cursorIndex].gameObject.SetActive(false);
 			}
 			else if (_cursorPreviousScannedEgg[_cursorIndex] != -1)
 			{
 				_whoScannedEgg[_cursorPreviousScannedEgg[_cursorIndex]][_cursorIndex] = false;
 				_cursorPreviousScannedEgg[_cursorIndex] = -1;
+				// Disable all grey images
 				for (int i = 0; i < 6; i++)
 				{
 					Context._3rdMenuHoleImages[_cursorIndex].GetChild(i).gameObject.SetActive(false);
 				}
+				// Change Hole Image to normal
+				Context._3rdMenuHolders[_cursorIndex].GetComponent<Image>().color = _MenuData.HoleNormalColor;
+				// Show the indicators
+				Context._3rdMenuIndicators[_cursorIndex].gameObject.SetActive(true);
 			}
 		}
 

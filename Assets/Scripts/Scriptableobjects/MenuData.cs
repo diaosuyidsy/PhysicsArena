@@ -150,4 +150,6 @@ public class MenuData : ScriptableObject
 	public Color EggNormalOutlineColor;
 	public Color EggCursorOverOutlineColor;
 	public Vector3 EggActivatedScale;
+
+	public Color HoverImageColor;
 }

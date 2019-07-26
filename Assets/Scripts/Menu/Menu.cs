@@ -31,6 +31,7 @@ public class Menu : MonoBehaviour
 	private Transform _eggHolder;
 	private Transform[] _eggs;
 	private Transform[] _3rdMenuCharacterImages;
+	private Transform[] _3rdMenuHoleImages;
 
 	private Player _mainPlayer;
 	private FSM<Menu> _menuFSM;
@@ -59,6 +60,7 @@ public class Menu : MonoBehaviour
 		_eggs = new Transform[6];
 		_eggHolder = GameObject.Find("Eggs").transform;
 		_3rdMenuCharacterImages = new Transform[6];
+		_3rdMenuHoleImages = new Transform[6];
 		for (int i = 0; i < 6; i++)
 		{
 			_3rdMenuHolders[i] = _3rdMenu.Find("Holes").GetChild(i);
@@ -68,6 +70,7 @@ public class Menu : MonoBehaviour
 			_3rdMenuCursorsOriginalLocalPosition[i] = new Vector3(_3rdMenuCursors[i].localPosition.x, _3rdMenuCursors[i].localPosition.y, _3rdMenuCursors[i].localPosition.z);
 			_eggs[i] = _eggHolder.GetChild(i);
 			_3rdMenuCharacterImages[i] = _3rdMenu.Find("CharacterImage").GetChild(i);
+			_3rdMenuHoleImages[i] = _3rdMenu.Find("HoleImage").GetChild(i);
 		}
 		Debug.Assert(_selectingBar != null);
 		Debug.Assert(_selectedBar != null);
@@ -121,7 +124,7 @@ public class Menu : MonoBehaviour
 			Context._cartMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
 				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.CartPanelMoveOutDelay);
 			Context._2ndMenuTitle.DOText("", _MenuData.PanelMoveOutDuration).SetDelay(_MenuData.TextMoveOutDelay);
-			Context._camera.DOLocalMoveX(16.25f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
+			Context._camera.DOLocalMoveX(15.58f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
 				.SetEase(_MenuData.CameraToCharacterSelectionMoveEase);
 			Context._3rdMenuTitle.DOText("Character Selection", _MenuData.ThirdMenuTitleMoveInDuration).SetDelay(_MenuData.ThirdMenuTitleMoveInDelay).OnComplete(() =>
 			{
@@ -129,10 +132,10 @@ public class Menu : MonoBehaviour
 			});
 			for (int i = 0; i < 6; i++)
 			{
-				Context._3rdMenuHolders[i].DOLocalMoveY(297f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
+				Context._3rdMenuHolders[i].DOLocalMoveX(-763f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
 					SetEase(_MenuData.ThirdMenuHolderMoveInEase).
 					SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
-				Context._3rdMenuPrompts[i].DOLocalMoveY(297f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
+				Context._3rdMenuPrompts[i].DOLocalMoveX(-763f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
 					SetEase(_MenuData.ThirdMenuHolderMoveInEase).
 					SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
 			}
@@ -146,10 +149,10 @@ public class Menu : MonoBehaviour
 			base.OnEnter();
 			for (int i = 0; i < 6; i++)
 			{
-				Context._3rdMenuHolders[i].DOLocalMoveY(814f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+				Context._3rdMenuHolders[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
 					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
 					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
-				Context._3rdMenuPrompts[i].DOLocalMoveY(814f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+				Context._3rdMenuPrompts[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
 					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
 					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
 			}
@@ -240,7 +243,7 @@ public class Menu : MonoBehaviour
 				theEggChild.localScale = Vector3.one;
 				theEggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", _MenuData.EggNormalOutlineColor);
 				_eggState[eggIndex] = false;
-				Context._3rdMenuCharacterImages[eggIndex].gameObject.SetActive(false);
+				Context._3rdMenuCharacterImages[eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
 			}
 			/// If egg is not activated && 1 or more cursor is on it
 			/// Activate it
@@ -255,7 +258,7 @@ public class Menu : MonoBehaviour
 						theEggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", _MenuData.EggCursorOverOutlineColor);
 						theEggChild.GetComponent<DOTweenAnimation>().DORestart();
 						_eggState[eggIndex] = true;
-						Context._3rdMenuCharacterImages[eggIndex].gameObject.SetActive(true);
+						Context._3rdMenuCharacterImages[eggIndex].GetComponent<DOTweenAnimation>().DOPlayForward();
 						return;
 					}
 				}
@@ -273,17 +276,30 @@ public class Menu : MonoBehaviour
 				/// If cursor's last casted target is not this egg, 
 				/// Not that egg
 				int siblingindex = hit.transform.GetSiblingIndex();
+				if (_cursorPreviousScannedEgg[_cursorIndex] == siblingindex) return;
 				if (_cursorPreviousScannedEgg[_cursorIndex] != -1 && _cursorPreviousScannedEgg[_cursorIndex] != siblingindex)
 				{
 					_whoScannedEgg[_cursorPreviousScannedEgg[_cursorIndex]][_cursorIndex] = false;
 				}
 				_whoScannedEgg[siblingindex][_cursorIndex] = true;
 				_cursorPreviousScannedEgg[_cursorIndex] = siblingindex;
+				// Show Grey image on hole
+				for (int i = 0; i < 6; i++)
+				{
+					if (i != siblingindex)
+						Context._3rdMenuHoleImages[_cursorIndex].GetChild(i).gameObject.SetActive(false);
+				}
+				Context._3rdMenuHoleImages[_cursorIndex].GetChild(siblingindex).gameObject.SetActive(true);
+				Context._3rdMenuHoleImages[_cursorIndex].GetChild(siblingindex).GetComponent<Image>().color = _MenuData.HoverImageColor;
 			}
 			else if (_cursorPreviousScannedEgg[_cursorIndex] != -1)
 			{
 				_whoScannedEgg[_cursorPreviousScannedEgg[_cursorIndex]][_cursorIndex] = false;
 				_cursorPreviousScannedEgg[_cursorIndex] = -1;
+				for (int i = 0; i < 6; i++)
+				{
+					Context._3rdMenuHoleImages[_cursorIndex].GetChild(i).gameObject.SetActive(false);
+				}
 			}
 		}
 

@@ -47,7 +47,7 @@ MonoBehaviour:
   SecondMenuBrawlModeEase: 6
   SecondMenuTitleMoveTime: 0.4
   SecondMenuTitleMoveDelay: 1.4
-  SecondMenuTitleString: Press A To Select
+  SecondMenuTitleString: Mode Selection
   SecondMenuTitleMoveOutTime: 0.5
   SecondMenuTitleMoveOutDelay: 0
   SecondMenuCarModeMoveOutTime: 0.5
@@ -83,6 +83,63 @@ MonoBehaviour:
   ModePanelSelectedZoomDuration: 0.3
   ModePanelSelectedZoomEase: 6
   MapMoveDuration: 0.2
-  MapMoveEase: 0
+  MapMoveEase: 6
   SelectedMapColor: {r: 1, g: 1, b: 1, a: 1}
   UnselectedMapColor: {r: 0.4528302, g: 0.4528302, b: 0.4528302, a: 1}
+  PanelMoveOutDuration: 0.5
+  PanelMoveOutEase: 6
+  BrawlPanelMoveOutDelay: 0.7
+  CartPanelMoveOutDelay: 0.5
+  TextMoveOutDelay: 0.2
+  CameraToCharacterSelectionMoveDuration: 1
+  CameraToCharacterSelectionMoveDelay: 1
+  CameraToCharacterSelectionMoveEase: 6
+  ThirdMenuTitleMoveInDuration: 0.2
+  ThirdMenuTitleMoveInDelay: 1.8
+  ThirdMenuHolderMoveInDuration:
+  - 0.2
+  - 0.2
+  - 0.2
+  - 0.2
+  - 0.2
+  - 0.2
+  ThirdMenuHolderMoveInDelay:
+  - 1.8
+  - 1.9
+  - 2
+  - 2.1
+  - 2.2
+  - 2.3
+  ThirdMenuHolderMoveInEase: 15
+  ThirdMenuHolderMoveOutDuration:
+  - 0.2
+  - 0.2
+  - 0.2
+  - 0.2
+  - 0.2
+  - 0.2
+  ThirdMenuHolderMoveOutDelay:
+  - 0.5
+  - 0.4
+  - 0.3
+  - 0.2
+  - 0.1
+  - 0
+  ThirdMenuHolderMoveOutEase: 6
+  ThirdMenuTitleMoveOutDuration: 0
+  ThirdMenuTitleMoveOutDelay: 0.2
+  CameraFromCharacterSelectionToModeSelectMoveDuration: 1
+  CameraFromCharacterSelectionToModeSelectMoveDelay: 0.6
+  CameraFromCharacterSelectionToModeSelectMoveEase: 6
+  CursorMoveSpeed: 800
+  EggLayer:
+    serializedVersion: 2
+    m_Bits: 2097152
+  EggActivationDuration: 0.3
+  EggShakeStrength: 20
+  EggShakeVibrato: 30
+  EggShakeRandomness: 90
+  EggShakeEase: 0
+  EggNormalOutlineColor: {r: 1, g: 1, b: 1, a: 1}
+  EggCursorOverOutlineColor: {r: 1, g: 0.959195, b: 0, a: 1}
+  EggActivatedScale: {x: 1.1, y: 1.1, z: 1.1}

@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public class Menu : MonoBehaviour
 {
 	public MenuData MenuData;
+	public string MapName { get; set; }
 	private Transform _selectingBar;
 	private Transform _selectedBar;
 	private GameObject _play;
@@ -19,7 +20,17 @@ public class Menu : MonoBehaviour
 	private Transform _cartMode;
 	private Transform _brawlMode;
 	private Transform _2ndMenu;
+	private Transform _3rdMenu;
 	private TextMeshProUGUI _2ndMenuTitle;
+	private TextMeshProUGUI _3rdMenuTitle;
+	private Transform[] _3rdMenuHolders;
+	private Transform[] _3rdMenuPrompts;
+	private Transform[] _3rdMenuCursors;
+	private Transform[] _3rdMenuIndicators;
+	private Vector3[] _3rdMenuCursorsOriginalLocalPosition;
+	private Transform _eggHolder;
+	private Transform[] _eggs;
+	private Transform[] _3rdMenuCharacterImages;
 
 	private Player _mainPlayer;
 	private FSM<Menu> _menuFSM;
@@ -38,6 +49,26 @@ public class Menu : MonoBehaviour
 		_brawlMode = _2ndMenu.Find("BrawlMode");
 		_2ndMenuTitle = _2ndMenu.Find("Title").GetComponent<TextMeshProUGUI>();
 		_camera = Camera.main.transform;
+		_3rdMenu = transform.Find("3rdMenu");
+		_3rdMenuTitle = _3rdMenu.Find("Title").GetComponent<TextMeshProUGUI>();
+		_3rdMenuHolders = new Transform[6];
+		_3rdMenuPrompts = new Transform[6];
+		_3rdMenuCursors = new Transform[6];
+		_3rdMenuIndicators = new Transform[6];
+		_3rdMenuCursorsOriginalLocalPosition = new Vector3[6];
+		_eggs = new Transform[6];
+		_eggHolder = GameObject.Find("Eggs").transform;
+		_3rdMenuCharacterImages = new Transform[6];
+		for (int i = 0; i < 6; i++)
+		{
+			_3rdMenuHolders[i] = _3rdMenu.Find("Holes").GetChild(i);
+			_3rdMenuPrompts[i] = _3rdMenu.Find("PromptTexts").GetChild(i);
+			_3rdMenuCursors[i] = _3rdMenu.Find("Cursors").GetChild(i);
+			_3rdMenuIndicators[i] = _3rdMenu.Find("Indicators").GetChild(i);
+			_3rdMenuCursorsOriginalLocalPosition[i] = new Vector3(_3rdMenuCursors[i].localPosition.x, _3rdMenuCursors[i].localPosition.y, _3rdMenuCursors[i].localPosition.z);
+			_eggs[i] = _eggHolder.GetChild(i);
+			_3rdMenuCharacterImages[i] = _3rdMenu.Find("CharacterImage").GetChild(i);
+		}
 		Debug.Assert(_selectingBar != null);
 		Debug.Assert(_selectedBar != null);
 		Debug.Assert(_play != null);
@@ -77,6 +108,265 @@ public class Menu : MonoBehaviour
 			base.Update();
 			if (_VLAxisRaw == 0f) _vAxisInUse = false;
 			if (_HLAxisRaw == 0f) _hAxisInUse = false;
+		}
+	}
+
+	private class MapToCharacterSelectionTransition : MenuState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context._brawlMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
+				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.BrawlPanelMoveOutDelay);
+			Context._cartMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
+				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.CartPanelMoveOutDelay);
+			Context._2ndMenuTitle.DOText("", _MenuData.PanelMoveOutDuration).SetDelay(_MenuData.TextMoveOutDelay);
+			Context._camera.DOLocalMoveX(16.25f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
+				.SetEase(_MenuData.CameraToCharacterSelectionMoveEase);
+			Context._3rdMenuTitle.DOText("Character Selection", _MenuData.ThirdMenuTitleMoveInDuration).SetDelay(_MenuData.ThirdMenuTitleMoveInDelay).OnComplete(() =>
+			{
+				TransitionTo<CharacterSelectionState>();
+			});
+			for (int i = 0; i < 6; i++)
+			{
+				Context._3rdMenuHolders[i].DOLocalMoveY(297f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveInEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
+				Context._3rdMenuPrompts[i].DOLocalMoveY(297f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveInEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
+			}
+		}
+	}
+
+	private class CharacterSelectionToMapTransition : MenuState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			for (int i = 0; i < 6; i++)
+			{
+				Context._3rdMenuHolders[i].DOLocalMoveY(814f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+				Context._3rdMenuPrompts[i].DOLocalMoveY(814f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+			}
+			Context._3rdMenuTitle.DOText("", _MenuData.ThirdMenuTitleMoveOutDuration).SetDelay(_MenuData.ThirdMenuTitleMoveOutDelay);
+			Context._camera.DOLocalMoveX(4.3f, _MenuData.CameraFromCharacterSelectionToModeSelectMoveDuration).SetEase(_MenuData.CameraFromCharacterSelectionToModeSelectMoveEase).
+				SetDelay(_MenuData.CameraFromCharacterSelectionToModeSelectMoveDelay);
+			Context._cartMode.DOLocalMoveY(-38f, _MenuData.SecondMenuCarModeMoveTime).SetEase(_MenuData.SecondMenuCarModeEase).SetDelay(_MenuData.SecondMenuCarModeMoveDelay);
+			Context._brawlMode.DOLocalMoveY(-38f, _MenuData.SecondMenuBrawlModeMoveTime).SetEase(_MenuData.SecondMenuBrawlModeEase).SetDelay(_MenuData.SecondMenuBrawlModeMoveDelay);
+			Context._2ndMenuTitle.DOText(_MenuData.SecondMenuTitleString, _MenuData.SecondMenuTitleMoveTime).SetDelay(_MenuData.SecondMenuTitleMoveDelay).OnComplete(() =>
+			{
+				TransitionTo<CarModeState>();
+			});
+		}
+	}
+
+	private class CharacterSelectionState : MenuState
+	{
+		private List<PlayerMap> _playerMap;
+		private int _gamePlayerIdCounter;
+		private bool[] _slotsTaken;
+		private bool[][] _whoScannedEgg;
+		private Camera _mainCamera;
+		private int[] _cursorPreviousScannedEgg;
+		private bool[] _eggState;
+
+		public override void Init()
+		{
+			base.Init();
+			_playerMap = new List<PlayerMap>();
+			_slotsTaken = new bool[6];
+			_whoScannedEgg = new bool[6][];
+			for (int i = 0; i < 6; i++)
+			{
+				_whoScannedEgg[i] = new bool[6];
+			}
+			_mainCamera = Camera.main;
+			_cursorPreviousScannedEgg = new int[] { -1, -1, -1, -1, -1, -1 };
+			_eggState = new bool[6];
+		}
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_BDown && _playerMap.Count == 0)
+				TransitionTo<CharacterSelectionToMapTransition>();
+			for (int i = 0; i < ReInput.players.playerCount; i++)
+			{
+				if (ReInput.players.GetPlayer(i).GetButtonDown("JoinGame"))
+					_assignNextPlayer(i);
+				if (ReInput.players.GetPlayer(i).GetButtonDown("Block"))
+					_unassignPlayer(i);
+			}
+
+			foreach (PlayerMap _pm in _playerMap)
+			{
+				_controlCursor(_pm);
+			}
+
+			for (int i = 0; i < 6; i++)
+			{
+				if (Context._3rdMenuCursors[i].gameObject.activeSelf)
+					_cursorCast(Context._3rdMenuCursors[i].position, i);
+			}
+
+			for (int i = 0; i < 6; i++)
+			{
+				_eggStateUpdate(i);
+			}
+		}
+
+		private void _eggStateUpdate(int eggIndex)
+		{
+			/// If egg is activated && no cursor is on it
+			/// Deactivate it
+			Transform theEggChild = Context._eggs[eggIndex].GetChild(0);
+			if (_eggState[eggIndex])
+			{
+				for (int i = 0; i < 6; i++)
+				{
+					if (_whoScannedEgg[eggIndex][i]) return;
+				}
+				/// Deactivation
+				theEggChild.localScale = Vector3.one;
+				theEggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", _MenuData.EggNormalOutlineColor);
+				_eggState[eggIndex] = false;
+				Context._3rdMenuCharacterImages[eggIndex].gameObject.SetActive(false);
+			}
+			/// If egg is not activated && 1 or more cursor is on it
+			/// Activate it
+			else
+			{
+				for (int i = 0; i < 6; i++)
+				{
+					if (_whoScannedEgg[eggIndex][i])
+					{
+						/// Activation
+						theEggChild.localScale = _MenuData.EggActivatedScale;
+						theEggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", _MenuData.EggCursorOverOutlineColor);
+						theEggChild.GetComponent<DOTweenAnimation>().DORestart();
+						_eggState[eggIndex] = true;
+						Context._3rdMenuCharacterImages[eggIndex].gameObject.SetActive(true);
+						return;
+					}
+				}
+			}
+		}
+
+		private void _cursorCast(Vector3 pos, int _cursorIndex)
+		{
+			RaycastHit hit;
+			Ray ray = _mainCamera.ScreenPointToRay(pos);
+
+			/// If cursor Casted to a egg
+			if (Physics.Raycast(ray, out hit, 100f, _MenuData.EggLayer))
+			{
+				/// If cursor's last casted target is not this egg, 
+				/// Not that egg
+				int siblingindex = hit.transform.GetSiblingIndex();
+				if (_cursorPreviousScannedEgg[_cursorIndex] != -1 && _cursorPreviousScannedEgg[_cursorIndex] != siblingindex)
+				{
+					_whoScannedEgg[_cursorPreviousScannedEgg[_cursorIndex]][_cursorIndex] = false;
+				}
+				_whoScannedEgg[siblingindex][_cursorIndex] = true;
+				_cursorPreviousScannedEgg[_cursorIndex] = siblingindex;
+			}
+			else if (_cursorPreviousScannedEgg[_cursorIndex] != -1)
+			{
+				_whoScannedEgg[_cursorPreviousScannedEgg[_cursorIndex]][_cursorIndex] = false;
+				_cursorPreviousScannedEgg[_cursorIndex] = -1;
+			}
+		}
+
+		private void _controlCursor(PlayerMap playermap)
+		{
+			float HLAxis = ReInput.players.GetPlayer(playermap.RewiredPlayerID).GetAxis("Move Horizontal");
+			float VLAxis = ReInput.players.GetPlayer(playermap.RewiredPlayerID).GetAxis("Move Vertical");
+			Transform cursor = Context._3rdMenuCursors[playermap.GamePlayerID];
+			cursor.localPosition += new Vector3(HLAxis, -VLAxis) * Time.deltaTime * _MenuData.CursorMoveSpeed;
+		}
+
+		private void _assignNextPlayer(int rewiredPlayerId)
+		{
+			if (_playerMap.Count >= 6) { return; }
+
+			int gamePlayerId = _getNextGamePlayerId();
+			if (gamePlayerId == 7) return;
+			_playerMap.Add(new PlayerMap(rewiredPlayerId, gamePlayerId));
+
+			Player rewiredPlayer = ReInput.players.GetPlayer(rewiredPlayerId);
+
+			rewiredPlayer.controllers.maps.SetMapsEnabled(false, "Assignment");
+			Context._3rdMenuCursors[gamePlayerId].gameObject.SetActive(true);
+			Context._3rdMenuIndicators[gamePlayerId].gameObject.SetActive(true);
+			Context._3rdMenuPrompts[gamePlayerId].gameObject.SetActive(false);
+		}
+
+		private void _unassignPlayer(int rewiredPlayerId)
+		{
+			int gamePlayerId = -1;
+			int playerMapIndex = -1;
+			for (int i = 0; i < _playerMap.Count; i++)
+			{
+				if (_playerMap[i].RewiredPlayerID == rewiredPlayerId)
+				{
+					gamePlayerId = _playerMap[i].GamePlayerID;
+					playerMapIndex = i;
+					break;
+				}
+			}
+			if (gamePlayerId == -1) return;
+			/// Also need to Disable the Cursor Related Data
+			if (_cursorPreviousScannedEgg[gamePlayerId] != -1)
+				_whoScannedEgg[_cursorPreviousScannedEgg[gamePlayerId]][gamePlayerId] = false;
+			_cursorPreviousScannedEgg[gamePlayerId] = -1;
+			Context._3rdMenuCursors[gamePlayerId].localPosition = Context._3rdMenuCursorsOriginalLocalPosition[gamePlayerId];
+			Context._3rdMenuCursors[gamePlayerId].gameObject.SetActive(false);
+			Context._3rdMenuIndicators[gamePlayerId].gameObject.SetActive(false);
+			Context._3rdMenuPrompts[gamePlayerId].gameObject.SetActive(true);
+
+			ReInput.players.GetPlayer(rewiredPlayerId).controllers.maps.SetMapsEnabled(true, "Assignment");
+			_playerMap.RemoveAt(playerMapIndex);
+			_slotsTaken[gamePlayerId] = false;
+		}
+
+		private int _getNextGamePlayerId()
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				if (!_slotsTaken[i])
+				{
+					_slotsTaken[i] = true;
+					return i;
+				}
+			}
+			return 7;
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+		}
+
+		private class PlayerMap
+		{
+			public int RewiredPlayerID;
+			public int GamePlayerID;
+
+			public PlayerMap(int rewiredPlayerID, int gamePlayerID)
+			{
+				RewiredPlayerID = rewiredPlayerID;
+				GamePlayerID = gamePlayerID;
+			}
 		}
 	}
 
@@ -139,6 +429,11 @@ public class Menu : MonoBehaviour
 				return;
 			}
 
+			if (_ADown)
+			{
+				Context.MapName = _MapPage.GetChild(_MapIndex).name;
+				TransitionTo<MapToCharacterSelectionTransition>();
+			}
 		}
 
 		public override void OnExit()

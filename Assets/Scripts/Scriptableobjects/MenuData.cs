@@ -111,4 +111,43 @@ public class MenuData : ScriptableObject
 	public Color SelectedMapColor;
 	public Color UnselectedMapColor;
 
+	[Header("Mode Select To Character Select Setting")]
+	public float PanelMoveOutDuration = 0.2f;
+	public Ease PanelMoveOutEase;
+
+	public float BrawlPanelMoveOutDelay = 0.4f;
+	public float CartPanelMoveOutDelay = 0.2f;
+	public float TextMoveOutDelay = 0.2f;
+
+	public float CameraToCharacterSelectionMoveDuration = 0.5f;
+	public float CameraToCharacterSelectionMoveDelay = 0.4f;
+	public Ease CameraToCharacterSelectionMoveEase;
+
+	public float ThirdMenuTitleMoveInDuration = 0.2f;
+	public float ThirdMenuTitleMoveInDelay = 1f;
+
+	public float[] ThirdMenuHolderMoveInDuration;
+	public float[] ThirdMenuHolderMoveInDelay;
+	public Ease ThirdMenuHolderMoveInEase;
+
+	[Header("Character Select To Mode Select")]
+	public float[] ThirdMenuHolderMoveOutDuration;
+	public float[] ThirdMenuHolderMoveOutDelay;
+	public Ease ThirdMenuHolderMoveOutEase;
+
+	public float ThirdMenuTitleMoveOutDuration;
+	public float ThirdMenuTitleMoveOutDelay;
+
+	public float CameraFromCharacterSelectionToModeSelectMoveDuration = 1f;
+	public float CameraFromCharacterSelectionToModeSelectMoveDelay = 1f;
+	public Ease CameraFromCharacterSelectionToModeSelectMoveEase;
+
+	[Header("Character Select Setting")]
+	public float CursorMoveSpeed = 10f;
+
+	public LayerMask EggLayer;
+
+	public Color EggNormalOutlineColor;
+	public Color EggCursorOverOutlineColor;
+	public Vector3 EggActivatedScale;
 }

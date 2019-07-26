@@ -114,60 +114,7 @@ public class Menu : MonoBehaviour
 		}
 	}
 
-	private class MapToCharacterSelectionTransition : MenuState
-	{
-		public override void OnEnter()
-		{
-			base.OnEnter();
-			Context._brawlMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
-				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.BrawlPanelMoveOutDelay);
-			Context._cartMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
-				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.CartPanelMoveOutDelay);
-			Context._2ndMenuTitle.DOText("", _MenuData.PanelMoveOutDuration).SetDelay(_MenuData.TextMoveOutDelay);
-			Context._camera.DOLocalMoveX(15.58f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
-				.SetEase(_MenuData.CameraToCharacterSelectionMoveEase);
-			Context._3rdMenuTitle.DOText("Character Selection", _MenuData.ThirdMenuTitleMoveInDuration).SetDelay(_MenuData.ThirdMenuTitleMoveInDelay).OnComplete(() =>
-			{
-				TransitionTo<CharacterSelectionState>();
-			});
-			for (int i = 0; i < 6; i++)
-			{
-				Context._3rdMenuHolders[i].DOLocalMoveX(-763f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
-					SetEase(_MenuData.ThirdMenuHolderMoveInEase).
-					SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
-				Context._3rdMenuPrompts[i].DOLocalMoveX(-763f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
-					SetEase(_MenuData.ThirdMenuHolderMoveInEase).
-					SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
-			}
-		}
-	}
-
-	private class CharacterSelectionToMapTransition : MenuState
-	{
-		public override void OnEnter()
-		{
-			base.OnEnter();
-			for (int i = 0; i < 6; i++)
-			{
-				Context._3rdMenuHolders[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
-					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
-					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
-				Context._3rdMenuPrompts[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
-					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
-					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
-			}
-			Context._3rdMenuTitle.DOText("", _MenuData.ThirdMenuTitleMoveOutDuration).SetDelay(_MenuData.ThirdMenuTitleMoveOutDelay);
-			Context._camera.DOLocalMoveX(4.3f, _MenuData.CameraFromCharacterSelectionToModeSelectMoveDuration).SetEase(_MenuData.CameraFromCharacterSelectionToModeSelectMoveEase).
-				SetDelay(_MenuData.CameraFromCharacterSelectionToModeSelectMoveDelay);
-			Context._cartMode.DOLocalMoveY(-38f, _MenuData.SecondMenuCarModeMoveTime).SetEase(_MenuData.SecondMenuCarModeEase).SetDelay(_MenuData.SecondMenuCarModeMoveDelay);
-			Context._brawlMode.DOLocalMoveY(-38f, _MenuData.SecondMenuBrawlModeMoveTime).SetEase(_MenuData.SecondMenuBrawlModeEase).SetDelay(_MenuData.SecondMenuBrawlModeMoveDelay);
-			Context._2ndMenuTitle.DOText(_MenuData.SecondMenuTitleString, _MenuData.SecondMenuTitleMoveTime).SetDelay(_MenuData.SecondMenuTitleMoveDelay).OnComplete(() =>
-			{
-				TransitionTo<CarModeState>();
-			});
-		}
-	}
-
+	#region 3rd Menu States
 	private class CharacterSelectionState : MenuState
 	{
 		private List<PlayerMap> _playerMap;
@@ -312,6 +259,15 @@ public class Menu : MonoBehaviour
 			}
 		}
 
+		// Handles a cursor Press
+		private void _cursorPress(PlayerMap playermap, Vector3 pos, int _cursorIndex)
+		{
+			/// if cursor not activated, return
+			if (!Context._3rdMenuCursors[_cursorIndex].gameObject.activeSelf) return;
+			bool adown = ReInput.players.GetPlayer(playermap.RewiredPlayerID).GetButtonDown("Jump");
+
+		}
+
 		private void _controlCursor(PlayerMap playermap)
 		{
 			float HLAxis = ReInput.players.GetPlayer(playermap.RewiredPlayerID).GetAxis("Move Horizontal");
@@ -394,7 +350,65 @@ public class Menu : MonoBehaviour
 			}
 		}
 	}
+	#endregion
 
+	#region 2nd - 3rd Menu Transition States
+	private class MapToCharacterSelectionTransition : MenuState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context._brawlMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
+				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.BrawlPanelMoveOutDelay);
+			Context._cartMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
+				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.CartPanelMoveOutDelay);
+			Context._2ndMenuTitle.DOText("", _MenuData.PanelMoveOutDuration).SetDelay(_MenuData.TextMoveOutDelay);
+			Context._camera.DOLocalMoveX(15.58f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
+				.SetEase(_MenuData.CameraToCharacterSelectionMoveEase);
+			Context._3rdMenuTitle.DOText("Character Selection", _MenuData.ThirdMenuTitleMoveInDuration).SetDelay(_MenuData.ThirdMenuTitleMoveInDelay).OnComplete(() =>
+			{
+				TransitionTo<CharacterSelectionState>();
+			});
+			for (int i = 0; i < 6; i++)
+			{
+				Context._3rdMenuHolders[i].DOLocalMoveX(-763f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveInEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
+				Context._3rdMenuPrompts[i].DOLocalMoveX(-763f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveInEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
+			}
+		}
+	}
+
+	private class CharacterSelectionToMapTransition : MenuState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			for (int i = 0; i < 6; i++)
+			{
+				Context._3rdMenuHolders[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+				Context._3rdMenuPrompts[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+			}
+			Context._3rdMenuTitle.DOText("", _MenuData.ThirdMenuTitleMoveOutDuration).SetDelay(_MenuData.ThirdMenuTitleMoveOutDelay);
+			Context._camera.DOLocalMoveX(4.3f, _MenuData.CameraFromCharacterSelectionToModeSelectMoveDuration).SetEase(_MenuData.CameraFromCharacterSelectionToModeSelectMoveEase).
+				SetDelay(_MenuData.CameraFromCharacterSelectionToModeSelectMoveDelay);
+			Context._cartMode.DOLocalMoveY(-38f, _MenuData.SecondMenuCarModeMoveTime).SetEase(_MenuData.SecondMenuCarModeEase).SetDelay(_MenuData.SecondMenuCarModeMoveDelay);
+			Context._brawlMode.DOLocalMoveY(-38f, _MenuData.SecondMenuBrawlModeMoveTime).SetEase(_MenuData.SecondMenuBrawlModeEase).SetDelay(_MenuData.SecondMenuBrawlModeMoveDelay);
+			Context._2ndMenuTitle.DOText(_MenuData.SecondMenuTitleString, _MenuData.SecondMenuTitleMoveTime).SetDelay(_MenuData.SecondMenuTitleMoveDelay).OnComplete(() =>
+			{
+				TransitionTo<CarModeState>();
+			});
+		}
+	}
+	#endregion
+
+	#region 2nd Menu States
 	private abstract class ModeMenuState : MenuState
 	{
 
@@ -644,54 +658,9 @@ public class Menu : MonoBehaviour
 				TransitionTo<CartModeToMapSelectTransition>();
 		}
 	}
+	#endregion
 
-	private abstract class FisrtMenuState : MenuState
-	{
-		protected bool _finishedEnter = false;
-		protected float _yValue;
-		protected GameObject _menuItem;
-
-		public override void OnEnter()
-		{
-			base.OnEnter();
-			Context._selectedBar.GetComponent<Image>().enabled = false;
-			Context._selectingBar.GetComponent<Image>().enabled = true;
-			_finishedEnter = false;
-			Context._selectedBar.DOLocalMoveY(_yValue, 0f);
-			Context._selectingBar.DOLocalMoveY(_yValue, _MenuData.FirstMenuSelectionTransitionDuration).SetEase(_MenuData.FirstMenuSelectionEase).
-				OnComplete(() =>
-				{
-					_menuItem.GetComponent<TextMeshProUGUI>().color = Context.MenuData.SelectingFontColor;
-					_finishedEnter = true;
-				});
-		}
-
-		public override void OnExit()
-		{
-			base.OnExit();
-			_menuItem.GetComponent<TextMeshProUGUI>().color = Context.MenuData.NormalFontColor;
-		}
-	}
-
-	private class FirstMenuPlayState : FisrtMenuState
-	{
-		public override void Init()
-		{
-			base.Init();
-			_yValue = -4.3f;
-			_menuItem = Context._play;
-		}
-
-		public override void Update()
-		{
-			base.Update();
-			if (_VLAxisRaw > 0.2f && !_vAxisInUse && _finishedEnter)
-				TransitionTo<FirstMenuSettingState>();
-			if (_ADown)
-				TransitionTo<FirstMenuToModeMenuTransition>();
-		}
-	}
-
+	#region 1st - 2nd Menu Transition States
 	private class FirstMenuToModeMenuTransition : MenuState
 	{
 		public override void OnEnter()
@@ -767,6 +736,55 @@ public class Menu : MonoBehaviour
 				});
 		}
 	}
+	#endregion
+
+	#region 1st Menu States
+	private abstract class FisrtMenuState : MenuState
+	{
+		protected bool _finishedEnter = false;
+		protected float _yValue;
+		protected GameObject _menuItem;
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context._selectedBar.GetComponent<Image>().enabled = false;
+			Context._selectingBar.GetComponent<Image>().enabled = true;
+			_finishedEnter = false;
+			Context._selectedBar.DOLocalMoveY(_yValue, 0f);
+			Context._selectingBar.DOLocalMoveY(_yValue, _MenuData.FirstMenuSelectionTransitionDuration).SetEase(_MenuData.FirstMenuSelectionEase).
+				OnComplete(() =>
+				{
+					_menuItem.GetComponent<TextMeshProUGUI>().color = Context.MenuData.SelectingFontColor;
+					_finishedEnter = true;
+				});
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			_menuItem.GetComponent<TextMeshProUGUI>().color = Context.MenuData.NormalFontColor;
+		}
+	}
+
+	private class FirstMenuPlayState : FisrtMenuState
+	{
+		public override void Init()
+		{
+			base.Init();
+			_yValue = -4.3f;
+			_menuItem = Context._play;
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_VLAxisRaw > 0.2f && !_vAxisInUse && _finishedEnter)
+				TransitionTo<FirstMenuSettingState>();
+			if (_ADown)
+				TransitionTo<FirstMenuToModeMenuTransition>();
+		}
+	}
 
 	private class FirstMenuSettingState : FisrtMenuState
 	{
@@ -812,4 +830,5 @@ public class Menu : MonoBehaviour
 			}
 		}
 	}
+	#endregion
 }

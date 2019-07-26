@@ -32,20 +32,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!136 &2335392935732574555
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6001352812070740143}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  m_Radius: 0.22194685
-  m_Height: 0.62264234
-  m_Direction: 0
-  m_Center: {x: -0.56893635, y: -0.052320663, z: 0.100968234}
 --- !u!54 &2335392935732574554
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -62,6 +48,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &2335392935732574555
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6001352812070740143}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.22194685
+  m_Height: 0.62264234
+  m_Direction: 0
+  m_Center: {x: -0.56893635, y: -0.052320663, z: 0.100968234}
 --- !u!1001 &2335392935732574630
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -133,6 +133,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Fist
+      objectReference: {fileID: 0}
+    - target: {fileID: -2939698702794175196, guid: 04805f8ca55b89e4285bc265fbc71f50,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6170691680604211204, guid: 04805f8ca55b89e4285bc265fbc71f50,
         type: 3}
@@ -230,6 +235,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: FistGunBody
       objectReference: {fileID: 0}
+    - target: {fileID: -5982317671917873857, guid: 8e06ce9daff218445b1ecd9dc5898462,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -369348217905469127, guid: 8e06ce9daff218445b1ecd9dc5898462,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -238,6 +248,11 @@ PrefabInstance:
     - target: {fileID: 1836953916503364157, guid: 8e06ce9daff218445b1ecd9dc5898462,
         type: 3}
       propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1666095514690725240, guid: 8e06ce9daff218445b1ecd9dc5898462,
+        type: 3}
+      propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

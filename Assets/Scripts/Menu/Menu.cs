@@ -181,7 +181,6 @@ public class Menu : MonoBehaviour
 		private void _onCursorChange(int _change, int index)
 		{
 			_eggCursors[index] += _change;
-			print(index + " Egg has " + _eggCursors[index] + "Cursors on it");
 			if (_eggCursors[index] > 0 && _eggsFSM[index].CurrentState.GetType().Equals(typeof(EggNormalState))) _eggsFSM[index].TransitionTo<EggHoveredState>();
 			else if (_eggCursors[index] == 0 && _eggsFSM[index].CurrentState.GetType().Equals(typeof(EggHoveredState))) _eggsFSM[index].TransitionTo<EggNormalState>();
 		}
@@ -482,11 +481,6 @@ public class Menu : MonoBehaviour
 
 		private class SelectedToUnselectedTransition : PlayerState
 		{
-			public override void OnExit()
-			{
-				base.OnExit();
-				/// Cursor Appear
-			}
 		}
 
 		private class SelectedState : PlayerState
@@ -511,6 +505,12 @@ public class Menu : MonoBehaviour
 			protected int _eggIndex;
 			protected Transform _eggChild;
 
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				print(GetType().Name);
+			}
+
 			public override void Init()
 			{
 				base.Init();
@@ -524,7 +524,6 @@ public class Menu : MonoBehaviour
 			public override void OnEnter()
 			{
 				base.OnEnter();
-				print("Egg Normal State Entered");
 				_eggChild.localScale = Vector3.one;
 				_eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggNormalOutlineColor);
 				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
@@ -574,22 +573,21 @@ public class Menu : MonoBehaviour
 			public override void OnEnter()
 			{
 				base.OnEnter();
-				//Sequence seq = DOTween.Sequence();
-				//seq.AppendInterval(2f);
-				//seq.AppendCallback(() =>
-				//{
-				/// Reset Chicken Position, Animation
-				/// Reset Egg Position, LocalScale
-				/// Reset Egg Children Scale, Shader Color
-				/// Reset _eggCursors
-				Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
-				Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
-				Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
-				Context._eggCursors[_eggIndex] = 0;
-				print("Chicken To Egg Transition");
-				TransitionTo<EggNormalState>();
-				Context._playersFSM[Context._eggSelectedCursorIndex[_eggIndex]].TransitionTo<UnselectingState>();
-				//});
+				Sequence seq = DOTween.Sequence();
+				seq.AppendInterval(1f);
+				seq.AppendCallback(() =>
+				{
+					/// Reset Chicken Position, Animation
+					/// Reset Egg Position, LocalScale
+					/// Reset Egg Children Scale, Shader Color
+					/// Reset _eggCursors
+					Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
+					Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
+					Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
+					Context._eggCursors[_eggIndex] = 0;
+					Context._playersFSM[Context._eggSelectedCursorIndex[_eggIndex]].TransitionTo<UnselectingState>();
+					TransitionTo<EggNormalState>();
+				});
 			}
 		}
 
@@ -601,7 +599,6 @@ public class Menu : MonoBehaviour
 				/// Since now chicken has landed
 				/// Switch Cursor to Selected state
 				int playerindex = Context._eggSelectedCursorIndex[_eggIndex];
-				print("Chicken State Now");
 				Context._playersFSM[playerindex].TransitionTo<SelectedState>();
 			}
 		}

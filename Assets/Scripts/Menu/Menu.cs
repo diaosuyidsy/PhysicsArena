@@ -118,36 +118,77 @@ public class Menu : MonoBehaviour
 	private class CharacterSelectionState : MenuState
 	{
 		private List<PlayerMap> _playerMap;
-		private int _gamePlayerIdCounter;
-		private bool[] _slotsTaken;
-		private bool[][] _whoScannedEgg;
 		private Camera _mainCamera;
-		private int[] _cursorPreviousScannedEgg;
-		private bool[] _eggState;
+
+		private int[] _eggCursors;
+
+		/// <summary>
+		/// Index of players means the slot holes from 1-6
+		/// Not the rewired id
+		/// </summary>
+		private FSM<CharacterSelectionState>[] _playersFSM;
+		private FSM<CharacterSelectionState>[] _eggsFSM;
 
 		public override void Init()
 		{
 			base.Init();
 			_playerMap = new List<PlayerMap>();
-			_slotsTaken = new bool[6];
-			_whoScannedEgg = new bool[6][];
+			_mainCamera = Camera.main;
+
+			_playersFSM = new FSM<CharacterSelectionState>[6];
+			_eggsFSM = new FSM<CharacterSelectionState>[6];
+			_eggCursors = new int[6];
 			for (int i = 0; i < 6; i++)
 			{
-				_whoScannedEgg[i] = new bool[6];
+				_eggsFSM[i] = new FSM<CharacterSelectionState>(this);
+				_eggsFSM[i].TransitionTo<EggNormalState>();
 			}
-			_mainCamera = Camera.main;
-			_cursorPreviousScannedEgg = new int[] { -1, -1, -1, -1, -1, -1 };
-			_eggState = new bool[6];
 		}
 
-		public override void OnEnter()
+		private void _onCursorChange(int _change, int index)
 		{
-			base.OnEnter();
+			_eggCursors[index] += _change;
+			if (_eggCursors[index] > 0 && _eggsFSM[index].CurrentState.GetType().Equals(typeof(EggNormalState))) _eggsFSM[index].TransitionTo<EggHoveredState>();
+			else if (_eggCursors[index] == 0 && _eggsFSM[index].CurrentState.GetType().Equals(typeof(EggHoveredState))) _eggsFSM[index].TransitionTo<EggNormalState>();
+		}
+
+		private PlayerMap _getPlayerFSMIndex(FSM<CharacterSelectionState> fsm)
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				if (_playersFSM[i] != null && _playersFSM[i] == fsm)
+				{
+					foreach (PlayerMap _pm in _playerMap)
+					{
+						if (_pm.GamePlayerID == i)
+							return _pm;
+					}
+				}
+			}
+			return null;
+		}
+
+		private int _getEggFSMIndex(FSM<CharacterSelectionState> fsm)
+		{
+			for (int i = 0; i < 6; i++)
+			{
+				if (_eggsFSM[i] != null && _eggsFSM[i] == fsm)
+				{
+					return i;
+				}
+			}
+			return -1;
 		}
 
 		public override void Update()
 		{
 			base.Update();
+			for (int i = 0; i < 6; i++)
+			{
+				if (_playersFSM[i] != null)
+					_playersFSM[i].Update();
+				_eggsFSM[i].Update();
+			}
 			if (_BDown && _playerMap.Count == 0)
 				TransitionTo<CharacterSelectionToMapTransition>();
 			for (int i = 0; i < ReInput.players.playerCount; i++)
@@ -157,123 +198,6 @@ public class Menu : MonoBehaviour
 				if (ReInput.players.GetPlayer(i).GetButtonDown("Block"))
 					_unassignPlayer(i);
 			}
-
-			foreach (PlayerMap _pm in _playerMap)
-			{
-				_controlCursor(_pm);
-			}
-
-			for (int i = 0; i < 6; i++)
-			{
-				if (Context._3rdMenuCursors[i].gameObject.activeSelf)
-					_cursorCast(Context._3rdMenuCursors[i].position, i);
-			}
-
-			for (int i = 0; i < 6; i++)
-			{
-				_eggStateUpdate(i);
-			}
-		}
-
-		private void _eggStateUpdate(int eggIndex)
-		{
-			/// If egg is activated && no cursor is on it
-			/// Deactivate it
-			Transform theEggChild = Context._eggs[eggIndex].GetChild(0);
-			if (_eggState[eggIndex])
-			{
-				for (int i = 0; i < 6; i++)
-				{
-					if (_whoScannedEgg[eggIndex][i]) return;
-				}
-				/// Deactivation
-				theEggChild.localScale = Vector3.one;
-				theEggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", _MenuData.EggNormalOutlineColor);
-				_eggState[eggIndex] = false;
-				Context._3rdMenuCharacterImages[eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
-			}
-			/// If egg is not activated && 1 or more cursor is on it
-			/// Activate it
-			else
-			{
-				for (int i = 0; i < 6; i++)
-				{
-					if (_whoScannedEgg[eggIndex][i])
-					{
-						/// Activation
-						theEggChild.localScale = _MenuData.EggActivatedScale;
-						theEggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", _MenuData.EggCursorOverOutlineColor);
-						theEggChild.GetComponent<DOTweenAnimation>().DORestart();
-						_eggState[eggIndex] = true;
-						Context._3rdMenuCharacterImages[eggIndex].GetComponent<DOTweenAnimation>().DOPlayForward();
-						return;
-					}
-				}
-			}
-		}
-
-		private void _cursorCast(Vector3 pos, int _cursorIndex)
-		{
-			RaycastHit hit;
-			Ray ray = _mainCamera.ScreenPointToRay(pos);
-
-			/// If cursor Casted to a egg
-			if (Physics.Raycast(ray, out hit, 100f, _MenuData.EggLayer))
-			{
-				/// If cursor's last casted target is not this egg, 
-				/// Not that egg
-				int siblingindex = hit.transform.GetSiblingIndex();
-				if (_cursorPreviousScannedEgg[_cursorIndex] == siblingindex) return;
-				if (_cursorPreviousScannedEgg[_cursorIndex] != -1 && _cursorPreviousScannedEgg[_cursorIndex] != siblingindex)
-				{
-					_whoScannedEgg[_cursorPreviousScannedEgg[_cursorIndex]][_cursorIndex] = false;
-				}
-				_whoScannedEgg[siblingindex][_cursorIndex] = true;
-				_cursorPreviousScannedEgg[_cursorIndex] = siblingindex;
-				// Show Grey image on hole
-				for (int i = 0; i < 6; i++)
-				{
-					if (i != siblingindex)
-						Context._3rdMenuHoleImages[_cursorIndex].GetChild(i).gameObject.SetActive(false);
-				}
-				Context._3rdMenuHoleImages[_cursorIndex].GetChild(siblingindex).gameObject.SetActive(true);
-				Context._3rdMenuHoleImages[_cursorIndex].GetChild(siblingindex).GetComponent<Image>().color = _MenuData.HoverImageColor;
-				// Also Change Hole Color to related color
-				Context._3rdMenuHolders[_cursorIndex].GetComponent<Image>().color = _MenuData.HoleCursorveHoverColor[siblingindex];
-				// Hide the indicators
-				Context._3rdMenuIndicators[_cursorIndex].gameObject.SetActive(false);
-			}
-			else if (_cursorPreviousScannedEgg[_cursorIndex] != -1)
-			{
-				_whoScannedEgg[_cursorPreviousScannedEgg[_cursorIndex]][_cursorIndex] = false;
-				_cursorPreviousScannedEgg[_cursorIndex] = -1;
-				// Disable all grey images
-				for (int i = 0; i < 6; i++)
-				{
-					Context._3rdMenuHoleImages[_cursorIndex].GetChild(i).gameObject.SetActive(false);
-				}
-				// Change Hole Image to normal
-				Context._3rdMenuHolders[_cursorIndex].GetComponent<Image>().color = _MenuData.HoleNormalColor;
-				// Show the indicators
-				Context._3rdMenuIndicators[_cursorIndex].gameObject.SetActive(true);
-			}
-		}
-
-		// Handles a cursor Press
-		private void _cursorPress(PlayerMap playermap, Vector3 pos, int _cursorIndex)
-		{
-			/// if cursor not activated, return
-			if (!Context._3rdMenuCursors[_cursorIndex].gameObject.activeSelf) return;
-			bool adown = ReInput.players.GetPlayer(playermap.RewiredPlayerID).GetButtonDown("Jump");
-
-		}
-
-		private void _controlCursor(PlayerMap playermap)
-		{
-			float HLAxis = ReInput.players.GetPlayer(playermap.RewiredPlayerID).GetAxis("Move Horizontal");
-			float VLAxis = ReInput.players.GetPlayer(playermap.RewiredPlayerID).GetAxis("Move Vertical");
-			Transform cursor = Context._3rdMenuCursors[playermap.GamePlayerID];
-			cursor.localPosition += new Vector3(HLAxis, -VLAxis) * Time.deltaTime * _MenuData.CursorMoveSpeed;
 		}
 
 		private void _assignNextPlayer(int rewiredPlayerId)
@@ -283,13 +207,11 @@ public class Menu : MonoBehaviour
 			int gamePlayerId = _getNextGamePlayerId();
 			if (gamePlayerId == 7) return;
 			_playerMap.Add(new PlayerMap(rewiredPlayerId, gamePlayerId));
-
+			_playersFSM[gamePlayerId] = new FSM<CharacterSelectionState>(this);
+			_playersFSM[gamePlayerId].TransitionTo<UnselectingState>();
 			Player rewiredPlayer = ReInput.players.GetPlayer(rewiredPlayerId);
 
 			rewiredPlayer.controllers.maps.SetMapsEnabled(false, "Assignment");
-			Context._3rdMenuCursors[gamePlayerId].gameObject.SetActive(true);
-			Context._3rdMenuIndicators[gamePlayerId].gameObject.SetActive(true);
-			Context._3rdMenuPrompts[gamePlayerId].gameObject.SetActive(false);
 		}
 
 		private void _unassignPlayer(int rewiredPlayerId)
@@ -306,36 +228,23 @@ public class Menu : MonoBehaviour
 				}
 			}
 			if (gamePlayerId == -1) return;
-			/// Also need to Disable the Cursor Related Data
-			if (_cursorPreviousScannedEgg[gamePlayerId] != -1)
-				_whoScannedEgg[_cursorPreviousScannedEgg[gamePlayerId]][gamePlayerId] = false;
-			_cursorPreviousScannedEgg[gamePlayerId] = -1;
-			Context._3rdMenuCursors[gamePlayerId].localPosition = Context._3rdMenuCursorsOriginalLocalPosition[gamePlayerId];
-			Context._3rdMenuCursors[gamePlayerId].gameObject.SetActive(false);
-			Context._3rdMenuIndicators[gamePlayerId].gameObject.SetActive(false);
-			Context._3rdMenuPrompts[gamePlayerId].gameObject.SetActive(true);
 
 			ReInput.players.GetPlayer(rewiredPlayerId).controllers.maps.SetMapsEnabled(true, "Assignment");
 			_playerMap.RemoveAt(playerMapIndex);
-			_slotsTaken[gamePlayerId] = false;
+			_playersFSM[gamePlayerId].CurrentState.CleanUp();
+			_playersFSM[gamePlayerId] = null;
 		}
 
 		private int _getNextGamePlayerId()
 		{
 			for (int i = 0; i < 6; i++)
 			{
-				if (!_slotsTaken[i])
+				if (_playersFSM[i] == null)
 				{
-					_slotsTaken[i] = true;
 					return i;
 				}
 			}
 			return 7;
-		}
-
-		public override void OnExit()
-		{
-			base.OnExit();
 		}
 
 		private class PlayerMap
@@ -347,6 +256,199 @@ public class Menu : MonoBehaviour
 			{
 				RewiredPlayerID = rewiredPlayerID;
 				GamePlayerID = gamePlayerID;
+			}
+		}
+
+		private abstract class PlayerState : FSM<CharacterSelectionState>.State
+		{
+			protected int _gamePlayerIndex { get; private set; }
+			protected int _rewiredPlayerIndex { get; private set; }
+
+			public override void Init()
+			{
+				base.Init();
+				_gamePlayerIndex = Context._getPlayerFSMIndex(Parent).GamePlayerID;
+				_rewiredPlayerIndex = Context._getPlayerFSMIndex(Parent).RewiredPlayerID;
+			}
+		}
+
+		private abstract class ControllableState : PlayerState
+		{
+			protected Vector3 _CursorPos { get { return Context.Context._3rdMenuCursors[_gamePlayerIndex].position; } }
+
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				Context.Context._3rdMenuCursors[_gamePlayerIndex].gameObject.SetActive(true);
+				Context.Context._3rdMenuPrompts[_gamePlayerIndex].gameObject.SetActive(false);
+			}
+
+			public override void Update()
+			{
+				base.Update();
+				float HLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxis("Move Horizontal");
+				float VLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxis("Move Vertical");
+				Transform cursor = Context.Context._3rdMenuCursors[_gamePlayerIndex];
+				cursor.localPosition += new Vector3(HLAxis, -VLAxis) * Time.deltaTime * Context._MenuData.CursorMoveSpeed;
+			}
+
+			public override void CleanUp()
+			{
+				base.CleanUp();
+				Context.Context._3rdMenuCursors[_gamePlayerIndex].localPosition = Context.Context._3rdMenuCursorsOriginalLocalPosition[_gamePlayerIndex];
+				Context.Context._3rdMenuCursors[_gamePlayerIndex].gameObject.SetActive(false);
+				Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+				Context.Context._3rdMenuPrompts[_gamePlayerIndex].gameObject.SetActive(true);
+			}
+		}
+
+		private class UnselectingState : ControllableState
+		{
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(true);
+				// Disable all grey images
+				for (int i = 0; i < 6; i++)
+				{
+					Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(i).gameObject.SetActive(false);
+				}
+				// Change Hole Image to normal
+				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleNormalColor;
+			}
+
+			public override void Update()
+			{
+				base.Update();
+				RaycastHit hit;
+				Ray ray = Context._mainCamera.ScreenPointToRay(_CursorPos);
+
+				/// If cursor Casted to a egg
+				if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+				{
+					TransitionTo<HoveringState>();
+					return;
+				}
+			}
+		}
+
+		private class HoveringState : ControllableState
+		{
+			private int _castedEggSiblingIndex;
+
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+				RaycastHit hit;
+				Ray ray = Context._mainCamera.ScreenPointToRay(_CursorPos);
+
+				/// If cursor Casted to a egg
+				if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+				{
+					_castedEggSiblingIndex = hit.transform.GetSiblingIndex();
+					Context._onCursorChange(1, _castedEggSiblingIndex);
+					/// Show Grey image on hole
+					Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(true);
+					Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).GetComponent<Image>().color = Context._MenuData.HoverImageColor;
+
+					//// Also Change Hole Color to related color
+					Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleCursorveHoverColor[_castedEggSiblingIndex];
+					//// Hide the indicators
+					Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+				}
+
+			}
+
+			public override void Update()
+			{
+				base.Update();
+				RaycastHit hit;
+				Ray ray = Context._mainCamera.ScreenPointToRay(_CursorPos);
+
+				/// If cursor Casted to an egg
+				if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+				{
+					if (hit.transform.GetSiblingIndex() != _castedEggSiblingIndex)
+					{
+						TransitionTo<HoveringState>();
+						return;
+					}
+					else
+					{
+						if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Jump"))
+						{
+							TransitionTo<SelectedState>();
+							return;
+						}
+					}
+				}
+				else
+				{
+					TransitionTo<UnselectingState>();
+					return;
+				}
+			}
+
+			public override void CleanUp()
+			{
+				base.CleanUp();
+				Context._onCursorChange(-1, _castedEggSiblingIndex);
+				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleNormalColor;
+			}
+
+			public override void OnExit()
+			{
+				base.OnExit();
+				Context._onCursorChange(-1, _castedEggSiblingIndex);
+				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+			}
+		}
+
+		private class SelectedState : PlayerState
+		{
+			public override void Update()
+			{
+				base.Update();
+				if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Block"))
+					TransitionTo<HoveringState>();
+			}
+		}
+
+		private abstract class EggState : FSM<CharacterSelectionState>.State
+		{
+			protected int _eggIndex;
+			protected Transform _eggChild;
+
+			public override void Init()
+			{
+				base.Init();
+				_eggIndex = Context._getEggFSMIndex(Parent);
+				_eggChild = Context.Context._eggs[_eggIndex].GetChild(0);
+			}
+		}
+
+		private class EggNormalState : EggState
+		{
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				_eggChild.localScale = Vector3.one;
+				_eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggNormalOutlineColor);
+				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
+			}
+		}
+
+		private class EggHoveredState : EggState
+		{
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				_eggChild.localScale = Context._MenuData.EggActivatedScale;
+				_eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggCursorOverOutlineColor);
+				_eggChild.GetComponent<DOTweenAnimation>().DORestart();
+				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayForward();
 			}
 		}
 	}

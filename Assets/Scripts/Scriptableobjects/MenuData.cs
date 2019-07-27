@@ -6,14 +6,14 @@ using DG.Tweening;
 [CreateAssetMenu(fileName = "MenuData", menuName = "ScriptableObjects/MenuData", order = 1)]
 public class MenuData : ScriptableObject
 {
-	[Header("Setting within first menu")]
+	[Header("First Menu Setting")]
 	public Color SelectingFontColor;
 	public Color NormalFontColor;
 	public Color SelectedFontColor;
 	public Ease FirstMenuSelectionEase;
 	public float FirstMenuSelectionTransitionDuration = 0.05f;
 
-	[Header("Setting from first menu to second menu")]
+	[Header("First Menu to Second Menu Setting")]
 	public float FirstMenuSelectedBlinkDurition = 0.1f;
 	public float FirstMenuSelectedBlinkTime = 5f;
 	[Tooltip("Indicates the power in time of the ease, and must be between -1 and 1. 0 is balanced, 1 fully weakens the ease in time, -1 starts the ease fully weakened and gives it power towards the end.")]
@@ -55,7 +55,7 @@ public class MenuData : ScriptableObject
 	public float SecondMenuTitleMoveDelay = 0.4f;
 	public string SecondMenuTitleString = "Press A To Select";
 
-	[Header("Setting from second menu to first menu")]
+	[Header("Second Menu to First Menu Setting")]
 
 	public float SecondMenuTitleMoveOutTime = 0.5f;
 	public float SecondMenuTitleMoveOutDelay = 0f;
@@ -130,7 +130,7 @@ public class MenuData : ScriptableObject
 	public float[] ThirdMenuHolderMoveInDelay;
 	public Ease ThirdMenuHolderMoveInEase;
 
-	[Header("Character Select To Mode Select")]
+	[Header("Character Select To Mode Select Setting")]
 	public float[] ThirdMenuHolderMoveOutDuration;
 	public float[] ThirdMenuHolderMoveOutDelay;
 	public Ease ThirdMenuHolderMoveOutEase;
@@ -155,4 +155,23 @@ public class MenuData : ScriptableObject
 	public Color[] HoleCursorveHoverColor;
 	public Color HoleNormalColor;
 	public Color[] HoleSelectedColor;
+
+	[Header("Egg To Chicken Transition Setting")]
+	public float ETC_EggShakeDuration = 0.5f;
+	public Vector3 ETC_EggShakeStrength;
+	public int ETC_EggShakeVibrato = 30;
+
+	public float ETC_EggMoveYAmount = 15f;
+	public float ETC_EggMoveYDuration = 0.35f;
+	public AnimationCurve ETC_EggMoveYAnimationCurve;
+
+	public Vector3 ETC_EggScaleAmount;
+	public float ETC_EggScaleDuration;
+	public AnimationCurve ETC_EggScaleAnimationCurve;
+
+	public float ETC_ChickenMoveYDuration = 0.5f;
+	public Ease ETC_ChickenMoveYEase;
+	public float ETC_ChickenMoveYDelay = 0.3f;
+	public GameObject ETC_ChickenLandVFX;
+	public Vector3 ETC_ChickenLandVFXOffset;
 }

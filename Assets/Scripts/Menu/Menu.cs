@@ -30,8 +30,13 @@ public class Menu : MonoBehaviour
 	private Vector3[] _3rdMenuCursorsOriginalLocalPosition;
 	private Transform _eggHolder;
 	private Transform[] _eggs;
+	private Vector3[] _eggsOriginalLocalPosition;
+	private Vector3[] _eggsOriginalLocalScale;
 	private Transform[] _3rdMenuCharacterImages;
 	private Transform[] _3rdMenuHoleImages;
+	private Transform[] _chickens;
+	private Vector3[] _chickenOriginalLocalPosition;
+	private Transform _chickenHolder;
 
 	private Player _mainPlayer;
 	private FSM<Menu> _menuFSM;
@@ -48,6 +53,7 @@ public class Menu : MonoBehaviour
 		_2ndMenu = transform.Find("2ndMenu");
 		_cartMode = _2ndMenu.Find("CartMode");
 		_brawlMode = _2ndMenu.Find("BrawlMode");
+		_chickenHolder = GameObject.Find("Chickens").transform;
 		_2ndMenuTitle = _2ndMenu.Find("Title").GetComponent<TextMeshProUGUI>();
 		_camera = Camera.main.transform;
 		_3rdMenu = transform.Find("3rdMenu");
@@ -56,11 +62,15 @@ public class Menu : MonoBehaviour
 		_3rdMenuPrompts = new Transform[6];
 		_3rdMenuCursors = new Transform[6];
 		_3rdMenuIndicators = new Transform[6];
+		_chickens = new Transform[6];
 		_3rdMenuCursorsOriginalLocalPosition = new Vector3[6];
 		_eggs = new Transform[6];
+		_eggsOriginalLocalPosition = new Vector3[6];
+		_eggsOriginalLocalScale = new Vector3[6];
 		_eggHolder = GameObject.Find("Eggs").transform;
 		_3rdMenuCharacterImages = new Transform[6];
 		_3rdMenuHoleImages = new Transform[6];
+		_chickenOriginalLocalPosition = new Vector3[6];
 		for (int i = 0; i < 6; i++)
 		{
 			_3rdMenuHolders[i] = _3rdMenu.Find("Holes").GetChild(i);
@@ -69,8 +79,12 @@ public class Menu : MonoBehaviour
 			_3rdMenuIndicators[i] = _3rdMenu.Find("Indicators").GetChild(i);
 			_3rdMenuCursorsOriginalLocalPosition[i] = new Vector3(_3rdMenuCursors[i].localPosition.x, _3rdMenuCursors[i].localPosition.y, _3rdMenuCursors[i].localPosition.z);
 			_eggs[i] = _eggHolder.GetChild(i);
+			_eggsOriginalLocalPosition[i] = new Vector3(_eggs[i].localPosition.x, _eggs[i].localPosition.y, _eggs[i].localPosition.z);
+			_eggsOriginalLocalScale[i] = new Vector3(_eggs[i].localScale.x, _eggs[i].localScale.y, _eggs[i].localScale.z);
 			_3rdMenuCharacterImages[i] = _3rdMenu.Find("CharacterImage").GetChild(i);
 			_3rdMenuHoleImages[i] = _3rdMenu.Find("HoleImage").GetChild(i);
+			_chickens[i] = _chickenHolder.GetChild(i);
+			_chickenOriginalLocalPosition[i] = new Vector3(_chickens[i].localPosition.x, _chickens[i].localPosition.y, _chickens[i].localPosition.z);
 		}
 		Debug.Assert(_selectingBar != null);
 		Debug.Assert(_selectedBar != null);
@@ -87,6 +101,11 @@ public class Menu : MonoBehaviour
 	private void Update()
 	{
 		_menuFSM.Update();
+	}
+
+	private void LateUpdate()
+	{
+		_menuFSM.LateUpdate();
 	}
 
 	private abstract class MenuState : FSM<Menu>.State
@@ -120,7 +139,19 @@ public class Menu : MonoBehaviour
 		private List<PlayerMap> _playerMap;
 		private Camera _mainCamera;
 
+		/// <summary>
+		/// How many cursors are on a egg
+		/// index means the egg index
+		/// int means the cursor count
+		/// </summary>
 		private int[] _eggCursors;
+		/// <summary>
+		/// Which Cursor Selected which egg
+		/// Index means the cursor index
+		/// int means the egg index;
+		/// </summary>
+		private int[] _cursorSelectedEggIndex;
+		private int[] _eggSelectedCursorIndex;
 
 		/// <summary>
 		/// Index of players means the slot holes from 1-6
@@ -138,6 +169,8 @@ public class Menu : MonoBehaviour
 			_playersFSM = new FSM<CharacterSelectionState>[6];
 			_eggsFSM = new FSM<CharacterSelectionState>[6];
 			_eggCursors = new int[6];
+			_cursorSelectedEggIndex = new int[6];
+			_eggSelectedCursorIndex = new int[6];
 			for (int i = 0; i < 6; i++)
 			{
 				_eggsFSM[i] = new FSM<CharacterSelectionState>(this);
@@ -148,6 +181,7 @@ public class Menu : MonoBehaviour
 		private void _onCursorChange(int _change, int index)
 		{
 			_eggCursors[index] += _change;
+			print(index + " Egg has " + _eggCursors[index] + "Cursors on it");
 			if (_eggCursors[index] > 0 && _eggsFSM[index].CurrentState.GetType().Equals(typeof(EggNormalState))) _eggsFSM[index].TransitionTo<EggHoveredState>();
 			else if (_eggCursors[index] == 0 && _eggsFSM[index].CurrentState.GetType().Equals(typeof(EggHoveredState))) _eggsFSM[index].TransitionTo<EggNormalState>();
 		}
@@ -180,23 +214,35 @@ public class Menu : MonoBehaviour
 			return -1;
 		}
 
+		private int _getGamePlayerIDFromRewiredId(int rewiredID)
+		{
+			foreach (PlayerMap pm in _playerMap)
+			{
+				if (pm.RewiredPlayerID == rewiredID)
+					return pm.GamePlayerID;
+			}
+			return -1;
+		}
+
 		public override void Update()
 		{
 			base.Update();
-			for (int i = 0; i < 6; i++)
-			{
-				if (_playersFSM[i] != null)
-					_playersFSM[i].Update();
-				_eggsFSM[i].Update();
-			}
+
 			if (_BDown && _playerMap.Count == 0)
 				TransitionTo<CharacterSelectionToMapTransition>();
 			for (int i = 0; i < ReInput.players.playerCount; i++)
 			{
 				if (ReInput.players.GetPlayer(i).GetButtonDown("JoinGame"))
 					_assignNextPlayer(i);
-				if (ReInput.players.GetPlayer(i).GetButtonDown("Block"))
+				if (ReInput.players.GetPlayer(i).GetButtonDown("Block") &&
+					_playersFSM[_getGamePlayerIDFromRewiredId(i)].CurrentState.GetType().BaseType.Equals(typeof(ControllableState)))
 					_unassignPlayer(i);
+			}
+			for (int i = 0; i < 6; i++)
+			{
+				if (_playersFSM[i] != null)
+					_playersFSM[i].Update();
+				_eggsFSM[i].Update();
 			}
 		}
 
@@ -259,10 +305,17 @@ public class Menu : MonoBehaviour
 			}
 		}
 
+		#region Player Cursor States
 		private abstract class PlayerState : FSM<CharacterSelectionState>.State
 		{
 			protected int _gamePlayerIndex { get; private set; }
 			protected int _rewiredPlayerIndex { get; private set; }
+
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				print(GetType().Name);
+			}
 
 			public override void Init()
 			{
@@ -366,11 +419,13 @@ public class Menu : MonoBehaviour
 				RaycastHit hit;
 				Ray ray = Context._mainCamera.ScreenPointToRay(_CursorPos);
 
-				/// If cursor Casted to an egg
+				/// If cursor Casted to another egg
 				if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
 				{
 					if (hit.transform.GetSiblingIndex() != _castedEggSiblingIndex)
 					{
+						Context._onCursorChange(-1, _castedEggSiblingIndex);
+						Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
 						TransitionTo<HoveringState>();
 						return;
 					}
@@ -378,13 +433,20 @@ public class Menu : MonoBehaviour
 					{
 						if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Jump"))
 						{
-							TransitionTo<SelectedState>();
+							/// Record this cursor selected which egg
+							Context._cursorSelectedEggIndex[_gamePlayerIndex] = _castedEggSiblingIndex;
+							Context._eggSelectedCursorIndex[_castedEggSiblingIndex] = _gamePlayerIndex;
+
+							TransitionTo<HoverToSelectedTransition>();
+							Context._eggsFSM[_castedEggSiblingIndex].TransitionTo<EggToChickenTransition>();
 							return;
 						}
 					}
 				}
 				else
 				{
+					Context._onCursorChange(-1, _castedEggSiblingIndex);
+					Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
 					TransitionTo<UnselectingState>();
 					return;
 				}
@@ -396,13 +458,34 @@ public class Menu : MonoBehaviour
 				Context._onCursorChange(-1, _castedEggSiblingIndex);
 				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
 				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleNormalColor;
+				print("Clean Up");
 			}
+		}
 
+		private class HoverToSelectedTransition : PlayerState
+		{
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				/// 1. Disable Cursor
+				/// 2. Reset Cursor
+				/// 3. Changed Color of Holes
+				/// 4. Change Color of Hole Images
+				/// 5. Maybe display a little VFX and sound; TODO
+				int castedEggIndex = Context._cursorSelectedEggIndex[_gamePlayerIndex];
+				Context.Context._3rdMenuCursors[_gamePlayerIndex].localPosition = Context.Context._3rdMenuCursorsOriginalLocalPosition[_gamePlayerIndex];
+				Context.Context._3rdMenuCursors[_gamePlayerIndex].gameObject.SetActive(false);
+				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(castedEggIndex).GetComponent<Image>().color = Color.white;
+				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleSelectedColor[castedEggIndex];
+			}
+		}
+
+		private class SelectedToUnselectedTransition : PlayerState
+		{
 			public override void OnExit()
 			{
 				base.OnExit();
-				Context._onCursorChange(-1, _castedEggSiblingIndex);
-				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+				/// Cursor Appear
 			}
 		}
 
@@ -412,10 +495,17 @@ public class Menu : MonoBehaviour
 			{
 				base.Update();
 				if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Block"))
-					TransitionTo<HoveringState>();
+				{
+					Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<ChickenToEggTransition>();
+					TransitionTo<SelectedToUnselectedTransition>();
+					return;
+				}
 			}
 		}
 
+		#endregion
+
+		#region Egg States
 		private abstract class EggState : FSM<CharacterSelectionState>.State
 		{
 			protected int _eggIndex;
@@ -434,6 +524,7 @@ public class Menu : MonoBehaviour
 			public override void OnEnter()
 			{
 				base.OnEnter();
+				print("Egg Normal State Entered");
 				_eggChild.localScale = Vector3.one;
 				_eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggNormalOutlineColor);
 				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
@@ -451,6 +542,70 @@ public class Menu : MonoBehaviour
 				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayForward();
 			}
 		}
+
+		private class EggToChickenTransition : EggState
+		{
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
+				Context.Context._eggs[_eggIndex].DOShakeRotation(Context._MenuData.ETC_EggShakeDuration, Context._MenuData.ETC_EggShakeStrength, Context._MenuData.ETC_EggShakeVibrato).
+					OnComplete(() =>
+					{
+						Context.Context._eggs[_eggIndex].DOScale(Context._MenuData.ETC_EggScaleAmount, Context._MenuData.ETC_EggScaleDuration).SetEase(Context._MenuData.ETC_EggScaleAnimationCurve);
+						Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve).
+						OnComplete(() =>
+						{
+							Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.14f, Context._MenuData.ETC_ChickenMoveYDuration).
+							SetEase(Context._MenuData.ETC_ChickenMoveYEase).
+							SetDelay(Context._MenuData.ETC_ChickenMoveYDelay).OnComplete(() =>
+							{
+								Instantiate(Context._MenuData.ETC_ChickenLandVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenLandVFXOffset, Context._MenuData.ETC_ChickenLandVFX.transform.rotation);
+								TransitionTo<ChickenState>();
+								return;
+							});
+						});
+					});
+			}
+		}
+
+		private class ChickenToEggTransition : EggState
+		{
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				//Sequence seq = DOTween.Sequence();
+				//seq.AppendInterval(2f);
+				//seq.AppendCallback(() =>
+				//{
+				/// Reset Chicken Position, Animation
+				/// Reset Egg Position, LocalScale
+				/// Reset Egg Children Scale, Shader Color
+				/// Reset _eggCursors
+				Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
+				Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
+				Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
+				Context._eggCursors[_eggIndex] = 0;
+				print("Chicken To Egg Transition");
+				TransitionTo<EggNormalState>();
+				Context._playersFSM[Context._eggSelectedCursorIndex[_eggIndex]].TransitionTo<UnselectingState>();
+				//});
+			}
+		}
+
+		private class ChickenState : EggState
+		{
+			public override void OnEnter()
+			{
+				base.OnEnter();
+				/// Since now chicken has landed
+				/// Switch Cursor to Selected state
+				int playerindex = Context._eggSelectedCursorIndex[_eggIndex];
+				print("Chicken State Now");
+				Context._playersFSM[playerindex].TransitionTo<SelectedState>();
+			}
+		}
+		#endregion
 	}
 	#endregion
 

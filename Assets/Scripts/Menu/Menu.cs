@@ -547,6 +547,7 @@ public class Menu : MonoBehaviour
 			public override void OnEnter()
 			{
 				base.OnEnter();
+				Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Enter");
 				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
 				Context.Context._eggs[_eggIndex].DOShakeRotation(Context._MenuData.ETC_EggShakeDuration, Context._MenuData.ETC_EggShakeStrength, Context._MenuData.ETC_EggShakeVibrato).
 					OnComplete(() =>
@@ -555,10 +556,11 @@ public class Menu : MonoBehaviour
 						Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve).
 						OnComplete(() =>
 						{
-							Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.14f, Context._MenuData.ETC_ChickenMoveYDuration).
+							Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.5f, Context._MenuData.ETC_ChickenMoveYDuration).
 							SetEase(Context._MenuData.ETC_ChickenMoveYEase).
 							SetDelay(Context._MenuData.ETC_ChickenMoveYDelay).OnComplete(() =>
 							{
+								Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Pose");
 								Instantiate(Context._MenuData.ETC_ChickenLandVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenLandVFXOffset, Context._MenuData.ETC_ChickenLandVFX.transform.rotation);
 								TransitionTo<ChickenState>();
 								return;
@@ -581,6 +583,7 @@ public class Menu : MonoBehaviour
 					/// Reset Egg Position, LocalScale
 					/// Reset Egg Children Scale, Shader Color
 					/// Reset _eggCursors
+					Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Reset");
 					Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
 					Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
 					Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];

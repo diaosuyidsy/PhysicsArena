@@ -228,7 +228,10 @@ public class Menu : MonoBehaviour
 			base.Update();
 
 			if (_BDown && _playerMap.Count == 0)
+			{
 				TransitionTo<CharacterSelectionToMapTransition>();
+				return;
+			}
 			for (int i = 0; i < ReInput.players.playerCount; i++)
 			{
 				if (ReInput.players.GetPlayer(i).GetButtonDown("JoinGame"))
@@ -548,6 +551,7 @@ public class Menu : MonoBehaviour
 			{
 				base.OnEnter();
 				Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Enter");
+				Context.Context._eggs[_eggIndex].GetComponent<Collider>().enabled = false;
 				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
 				Context.Context._eggs[_eggIndex].DOShakeRotation(Context._MenuData.ETC_EggShakeDuration, Context._MenuData.ETC_EggShakeStrength, Context._MenuData.ETC_EggShakeVibrato).
 					OnComplete(() =>
@@ -556,6 +560,7 @@ public class Menu : MonoBehaviour
 						Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve).
 						OnComplete(() =>
 						{
+							Context.Context._eggs[_eggIndex].GetComponent<Collider>().enabled = true;
 							Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.5f, Context._MenuData.ETC_ChickenMoveYDuration).
 							SetEase(Context._MenuData.ETC_ChickenMoveYEase).
 							SetDelay(Context._MenuData.ETC_ChickenMoveYDelay).OnComplete(() =>
@@ -620,7 +625,7 @@ public class Menu : MonoBehaviour
 			Context._cartMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
 				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.CartPanelMoveOutDelay);
 			Context._2ndMenuTitle.DOText("", _MenuData.PanelMoveOutDuration).SetDelay(_MenuData.TextMoveOutDelay);
-			Context._camera.DOLocalMoveX(15.58f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
+			Context._camera.DOLocalMoveX(16f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
 				.SetEase(_MenuData.CameraToCharacterSelectionMoveEase);
 			Context._3rdMenuTitle.DOText("Character Selection", _MenuData.ThirdMenuTitleMoveInDuration).SetDelay(_MenuData.ThirdMenuTitleMoveInDelay).OnComplete(() =>
 			{

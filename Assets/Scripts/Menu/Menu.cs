@@ -108,6 +108,11 @@ public class Menu : MonoBehaviour
 		_menuFSM.LateUpdate();
 	}
 
+	private void OnDisable()
+	{
+		_menuFSM.CurrentState.CleanUp();
+	}
+
 	private abstract class MenuState : FSM<Menu>.State
 	{
 		protected float _VLAxisRaw { get { return Context._mainPlayer.GetAxisRaw("Move Vertical"); } }
@@ -178,6 +183,41 @@ public class Menu : MonoBehaviour
 			}
 		}
 
+		public override void Update()
+		{
+			base.Update();
+
+			if (_BDown && _playerMap.Count == 0)
+			{
+				TransitionTo<CharacterSelectionToMapTransition>();
+				return;
+			}
+			for (int i = 0; i < ReInput.players.playerCount; i++)
+			{
+				if (ReInput.players.GetPlayer(i).GetButtonDown("JoinGame"))
+					_assignNextPlayer(i);
+				if (ReInput.players.GetPlayer(i).GetButtonDown("Block") &&
+					_playersFSM[_getGamePlayerIDFromRewiredId(i)].CurrentState.GetType().BaseType.Equals(typeof(ControllableState)))
+					_unassignPlayer(i);
+			}
+			for (int i = 0; i < 6; i++)
+			{
+				if (_playersFSM[i] != null)
+					_playersFSM[i].Update();
+				_eggsFSM[i].Update();
+			}
+		}
+
+		public override void CleanUp()
+		{
+			base.CleanUp();
+			for (int i = 0; i < 6; i++)
+			{
+				if (_playersFSM[i] != null) _playersFSM[i].CurrentState.CleanUp();
+				if (_eggsFSM[i] != null) _eggsFSM[i].CurrentState.CleanUp();
+			}
+		}
+
 		private void _onCursorChange(int _change, int index)
 		{
 			_eggCursors[index] += _change;
@@ -223,36 +263,13 @@ public class Menu : MonoBehaviour
 			return -1;
 		}
 
-		public override void Update()
-		{
-			base.Update();
-
-			if (_BDown && _playerMap.Count == 0)
-			{
-				TransitionTo<CharacterSelectionToMapTransition>();
-				return;
-			}
-			for (int i = 0; i < ReInput.players.playerCount; i++)
-			{
-				if (ReInput.players.GetPlayer(i).GetButtonDown("JoinGame"))
-					_assignNextPlayer(i);
-				if (ReInput.players.GetPlayer(i).GetButtonDown("Block") &&
-					_playersFSM[_getGamePlayerIDFromRewiredId(i)].CurrentState.GetType().BaseType.Equals(typeof(ControllableState)))
-					_unassignPlayer(i);
-			}
-			for (int i = 0; i < 6; i++)
-			{
-				if (_playersFSM[i] != null)
-					_playersFSM[i].Update();
-				_eggsFSM[i].Update();
-			}
-		}
-
 		private void _assignNextPlayer(int rewiredPlayerId)
 		{
+			print("assign Next Player");
 			if (_playerMap.Count >= 6) { return; }
 
 			int gamePlayerId = _getNextGamePlayerId();
+			print(gamePlayerId);
 			if (gamePlayerId == 7) return;
 			_playerMap.Add(new PlayerMap(rewiredPlayerId, gamePlayerId));
 			_playersFSM[gamePlayerId] = new FSM<CharacterSelectionState>(this);
@@ -313,17 +330,38 @@ public class Menu : MonoBehaviour
 			protected int _gamePlayerIndex { get; private set; }
 			protected int _rewiredPlayerIndex { get; private set; }
 
+			public override void Init()
+			{
+				base.Init();
+				ReInput.ControllerPreDisconnectEvent += _onControllerDisconnected;
+				_gamePlayerIndex = Context._getPlayerFSMIndex(Parent).GamePlayerID;
+				_rewiredPlayerIndex = Context._getPlayerFSMIndex(Parent).RewiredPlayerID;
+			}
+
 			public override void OnEnter()
 			{
 				base.OnEnter();
 				print(GetType().Name);
 			}
 
-			public override void Init()
+			protected virtual void _onControllerDisconnected(ControllerStatusChangedEventArgs args)
 			{
-				base.Init();
-				_gamePlayerIndex = Context._getPlayerFSMIndex(Parent).GamePlayerID;
-				_rewiredPlayerIndex = Context._getPlayerFSMIndex(Parent).RewiredPlayerID;
+				int rewiredId = args.controllerId;
+				if (_rewiredPlayerIndex != rewiredId) return;
+				Context._unassignPlayer(rewiredId);
+				return;
+			}
+
+			public override void CleanUp()
+			{
+				base.CleanUp();
+				ReInput.ControllerPreDisconnectEvent -= _onControllerDisconnected;
+				Context.Context._3rdMenuCursors[_gamePlayerIndex].localPosition = Context.Context._3rdMenuCursorsOriginalLocalPosition[_gamePlayerIndex];
+				Context.Context._3rdMenuCursors[_gamePlayerIndex].gameObject.SetActive(false);
+				Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+				Context.Context._3rdMenuPrompts[_gamePlayerIndex].gameObject.SetActive(true);
+				for (int i = 0; i < 6; i++) { Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(i).gameObject.SetActive(false); }
+				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleNormalColor;
 			}
 		}
 
@@ -345,15 +383,6 @@ public class Menu : MonoBehaviour
 				float VLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxis("Move Vertical");
 				Transform cursor = Context.Context._3rdMenuCursors[_gamePlayerIndex];
 				cursor.localPosition += new Vector3(HLAxis, -VLAxis) * Time.deltaTime * Context._MenuData.CursorMoveSpeed;
-			}
-
-			public override void CleanUp()
-			{
-				base.CleanUp();
-				Context.Context._3rdMenuCursors[_gamePlayerIndex].localPosition = Context.Context._3rdMenuCursorsOriginalLocalPosition[_gamePlayerIndex];
-				Context.Context._3rdMenuCursors[_gamePlayerIndex].gameObject.SetActive(false);
-				Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
-				Context.Context._3rdMenuPrompts[_gamePlayerIndex].gameObject.SetActive(true);
 			}
 		}
 
@@ -412,7 +441,6 @@ public class Menu : MonoBehaviour
 					//// Hide the indicators
 					Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
 				}
-
 			}
 
 			public override void Update()
@@ -458,8 +486,6 @@ public class Menu : MonoBehaviour
 			{
 				base.CleanUp();
 				Context._onCursorChange(-1, _castedEggSiblingIndex);
-				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
-				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleNormalColor;
 			}
 		}
 
@@ -474,7 +500,6 @@ public class Menu : MonoBehaviour
 				/// 4. Change Color of Hole Images
 				/// 5. Maybe display a little VFX and sound; TODO
 				int castedEggIndex = Context._cursorSelectedEggIndex[_gamePlayerIndex];
-				//Context.Context._3rdMenuCursors[_gamePlayerIndex].localPosition = Context.Context._3rdMenuCursorsOriginalLocalPosition[_gamePlayerIndex];
 				Context.Context._3rdMenuCursors[_gamePlayerIndex].gameObject.SetActive(false);
 				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(castedEggIndex).GetComponent<Image>().color = Color.white;
 				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleSelectedColor[castedEggIndex];
@@ -492,8 +517,8 @@ public class Menu : MonoBehaviour
 				base.Update();
 				if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Block"))
 				{
-					Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<ChickenToEggTransition>();
-					TransitionTo<SelectedToUnselectedTransition>();
+					Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<EggNormalState>();
+					TransitionTo<UnselectingState>();
 					return;
 				}
 			}
@@ -507,17 +532,28 @@ public class Menu : MonoBehaviour
 			protected int _eggIndex;
 			protected Transform _eggChild;
 
+			public override void Init()
+			{
+				base.Init();
+				_eggIndex = Context._getEggFSMIndex(Parent);
+				_eggChild = Context.Context._eggs[_eggIndex].GetChild(0);
+				ReInput.ControllerPreDisconnectEvent += _onControllerDisconnected;
+			}
+
 			public override void OnEnter()
 			{
 				base.OnEnter();
 				print(GetType().Name);
 			}
 
-			public override void Init()
+			protected virtual void _onControllerDisconnected(ControllerStatusChangedEventArgs args)
 			{
-				base.Init();
-				_eggIndex = Context._getEggFSMIndex(Parent);
-				_eggChild = Context.Context._eggs[_eggIndex].GetChild(0);
+			}
+
+			public override void CleanUp()
+			{
+				base.CleanUp();
+				ReInput.ControllerPreDisconnectEvent -= _onControllerDisconnected;
 			}
 		}
 
@@ -547,55 +583,42 @@ public class Menu : MonoBehaviour
 
 		private class EggToChickenTransition : EggState
 		{
+			private Sequence _sequence;
+
 			public override void OnEnter()
 			{
 				base.OnEnter();
 				Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Enter");
 				Context.Context._eggs[_eggIndex].GetComponent<Collider>().enabled = false;
 				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
-				Context.Context._eggs[_eggIndex].DOShakeRotation(Context._MenuData.ETC_EggShakeDuration, Context._MenuData.ETC_EggShakeStrength, Context._MenuData.ETC_EggShakeVibrato).
-					OnComplete(() =>
-					{
-						Context.Context._eggs[_eggIndex].DOScale(Context._MenuData.ETC_EggScaleAmount, Context._MenuData.ETC_EggScaleDuration).SetEase(Context._MenuData.ETC_EggScaleAnimationCurve);
-						Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve).
-						OnComplete(() =>
-						{
-							Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.5f, Context._MenuData.ETC_ChickenMoveYDuration).
+				_sequence = DOTween.Sequence();
+				_sequence.Append(Context.Context._eggs[_eggIndex].DOShakeRotation(Context._MenuData.ETC_EggShakeDuration, Context._MenuData.ETC_EggShakeStrength, Context._MenuData.ETC_EggShakeVibrato));
+				_sequence.Append(Context.Context._eggs[_eggIndex].DOScale(Context._MenuData.ETC_EggScaleAmount, Context._MenuData.ETC_EggScaleDuration).SetEase(Context._MenuData.ETC_EggScaleAnimationCurve));
+				_sequence.Join(Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve));
+				_sequence.Append(Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.5f, Context._MenuData.ETC_ChickenMoveYDuration).
 							SetEase(Context._MenuData.ETC_ChickenMoveYEase).
-							SetDelay(Context._MenuData.ETC_ChickenMoveYDelay).OnComplete(() =>
-							{
-								Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Pose");
-								Instantiate(Context._MenuData.ETC_ChickenLandVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenLandVFXOffset, Context._MenuData.ETC_ChickenLandVFX.transform.rotation);
-								TransitionTo<ChickenState>();
-								return;
-							});
-						});
-					});
-			}
-		}
-
-		private class ChickenToEggTransition : EggState
-		{
-			public override void OnEnter()
-			{
-				base.OnEnter();
-				Sequence seq = DOTween.Sequence();
-				Instantiate(Context._MenuData.ETC_ChickenDisappearVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenDisapperavFXOffset, Context._MenuData.ETC_ChickenDisappearVFX.transform.rotation);
-				seq.AppendInterval(0f);
-				seq.AppendCallback(() =>
+							SetDelay(Context._MenuData.ETC_ChickenMoveYDelay));
+				_sequence.AppendCallback(() =>
 				{
-					/// Reset Chicken Position, Animation
-					/// Reset Egg Position, LocalScale
-					/// Reset Egg Children Scale, Shader Color
-					/// Reset _eggCursors
-					Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Reset");
-					Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
-					Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
-					Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
-					Context._eggCursors[_eggIndex] = 0;
-					Context._playersFSM[Context._eggSelectedCursorIndex[_eggIndex]].TransitionTo<UnselectingState>();
-					TransitionTo<EggNormalState>();
+					Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Pose");
+					Instantiate(Context._MenuData.ETC_ChickenLandVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenLandVFXOffset, Context._MenuData.ETC_ChickenLandVFX.transform.rotation);
+					TransitionTo<ChickenState>();
+					return;
 				});
+			}
+
+			protected override void _onControllerDisconnected(ControllerStatusChangedEventArgs args)
+			{
+				base._onControllerDisconnected(args);
+				if (_eggIndex != Context._cursorSelectedEggIndex[args.controllerId]) return;
+				_sequence.Kill();
+				Instantiate(Context._MenuData.ETC_ChickenDisappearVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenDisapperavFXOffset, Context._MenuData.ETC_ChickenDisappearVFX.transform.rotation);
+				Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Reset");
+				Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
+				Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
+				Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
+				Context._eggCursors[_eggIndex] = 0;
+				TransitionTo<EggNormalState>();
 			}
 		}
 
@@ -608,6 +631,28 @@ public class Menu : MonoBehaviour
 				/// Switch Cursor to Selected state
 				int playerindex = Context._eggSelectedCursorIndex[_eggIndex];
 				Context._playersFSM[playerindex].TransitionTo<SelectedState>();
+			}
+
+			protected override void _onControllerDisconnected(ControllerStatusChangedEventArgs args)
+			{
+				base._onControllerDisconnected(args);
+				if (_eggIndex != Context._cursorSelectedEggIndex[args.controllerId]) return;
+				TransitionTo<EggNormalState>();
+			}
+
+			public override void OnExit()
+			{
+				base.OnExit();
+				Instantiate(Context._MenuData.ETC_ChickenDisappearVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenDisapperavFXOffset, Context._MenuData.ETC_ChickenDisappearVFX.transform.rotation);
+				/// Reset Chicken Position, Animation
+				/// Reset Egg Position, LocalScale
+				/// Reset Egg Children Scale, Shader Color
+				/// Reset _eggCursors
+				Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Reset");
+				Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
+				Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
+				Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
+				Context._eggCursors[_eggIndex] = 0;
 			}
 		}
 		#endregion

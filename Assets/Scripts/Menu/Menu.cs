@@ -460,7 +460,6 @@ public class Menu : MonoBehaviour
 				Context._onCursorChange(-1, _castedEggSiblingIndex);
 				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
 				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleNormalColor;
-				print("Clean Up");
 			}
 		}
 
@@ -475,7 +474,7 @@ public class Menu : MonoBehaviour
 				/// 4. Change Color of Hole Images
 				/// 5. Maybe display a little VFX and sound; TODO
 				int castedEggIndex = Context._cursorSelectedEggIndex[_gamePlayerIndex];
-				Context.Context._3rdMenuCursors[_gamePlayerIndex].localPosition = Context.Context._3rdMenuCursorsOriginalLocalPosition[_gamePlayerIndex];
+				//Context.Context._3rdMenuCursors[_gamePlayerIndex].localPosition = Context.Context._3rdMenuCursorsOriginalLocalPosition[_gamePlayerIndex];
 				Context.Context._3rdMenuCursors[_gamePlayerIndex].gameObject.SetActive(false);
 				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(castedEggIndex).GetComponent<Image>().color = Color.white;
 				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleSelectedColor[castedEggIndex];
@@ -527,6 +526,7 @@ public class Menu : MonoBehaviour
 			public override void OnEnter()
 			{
 				base.OnEnter();
+				Context.Context._eggs[_eggIndex].GetComponent<Collider>().enabled = true;
 				_eggChild.localScale = Vector3.one;
 				_eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggNormalOutlineColor);
 				Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
@@ -560,7 +560,6 @@ public class Menu : MonoBehaviour
 						Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve).
 						OnComplete(() =>
 						{
-							Context.Context._eggs[_eggIndex].GetComponent<Collider>().enabled = true;
 							Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.5f, Context._MenuData.ETC_ChickenMoveYDuration).
 							SetEase(Context._MenuData.ETC_ChickenMoveYEase).
 							SetDelay(Context._MenuData.ETC_ChickenMoveYDelay).OnComplete(() =>
@@ -581,7 +580,8 @@ public class Menu : MonoBehaviour
 			{
 				base.OnEnter();
 				Sequence seq = DOTween.Sequence();
-				seq.AppendInterval(1f);
+				Instantiate(Context._MenuData.ETC_ChickenDisappearVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenDisapperavFXOffset, Context._MenuData.ETC_ChickenDisappearVFX.transform.rotation);
+				seq.AppendInterval(0f);
 				seq.AppendCallback(() =>
 				{
 					/// Reset Chicken Position, Animation

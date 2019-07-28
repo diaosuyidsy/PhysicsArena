@@ -174,4 +174,7 @@ public class MenuData : ScriptableObject
 	public float ETC_ChickenMoveYDelay = 0.3f;
 	public GameObject ETC_ChickenLandVFX;
 	public Vector3 ETC_ChickenLandVFXOffset;
+
+	public GameObject ETC_ChickenDisappearVFX;
+	public Vector3 ETC_ChickenDisapperavFXOffset;
 }

@@ -115,10 +115,54 @@ public class Menu : MonoBehaviour
 
 	private abstract class MenuState : FSM<Menu>.State
 	{
-		protected float _VLAxisRaw { get { return Context._mainPlayer.GetAxisRaw("Move Vertical"); } }
-		protected float _HLAxisRaw { get { return Context._mainPlayer.GetAxisRaw("Move Horizontal"); } }
-		protected bool _ADown { get { return Context._mainPlayer.GetButtonDown("Jump"); } }
-		protected bool _BDown { get { return Context._mainPlayer.GetButtonDown("Block"); } }
+		protected float _VLAxisRaw
+		{
+			get
+			{
+				float result = 0f;
+				for (int i = 0; i < ReInput.players.playerCount; i++)
+				{
+					result = ReInput.players.GetPlayer(i).GetAxisRaw("Move Vertical");
+					if (!Mathf.Approximately(0f, result)) return result;
+				}
+				return result;
+			}
+		}
+		protected float _HLAxisRaw
+		{
+			get
+			{
+				float result = 0f;
+				for (int i = 0; i < ReInput.players.playerCount; i++)
+				{
+					result = ReInput.players.GetPlayer(i).GetAxisRaw("Move Horizontal");
+					if (!Mathf.Approximately(0f, result)) return result;
+				}
+				return result;
+			}
+		}
+		protected bool _ADown
+		{
+			get
+			{
+				for (int i = 0; i < ReInput.players.playerCount; i++)
+				{
+					if (ReInput.players.GetPlayer(i).GetButtonDown("Jump")) return true;
+				}
+				return false;
+			}
+		}
+		protected bool _BDown
+		{
+			get
+			{
+				for (int i = 0; i < ReInput.players.playerCount; i++)
+				{
+					if (ReInput.players.GetPlayer(i).GetButtonDown("Block")) return true;
+				}
+				return false;
+			}
+		}
 		protected bool _vAxisInUse = true;
 		protected bool _hAxisInUse = true;
 		protected MenuData _MenuData { get { return Context.MenuData; } }
@@ -197,6 +241,7 @@ public class Menu : MonoBehaviour
 				if (ReInput.players.GetPlayer(i).GetButtonDown("JoinGame"))
 					_assignNextPlayer(i);
 				if (ReInput.players.GetPlayer(i).GetButtonDown("Block") &&
+					_isRewiredPlayerInGame(i) &&
 					_playersFSM[_getGamePlayerIDFromRewiredId(i)].CurrentState.GetType().BaseType.Equals(typeof(ControllableState)))
 					_unassignPlayer(i);
 			}
@@ -218,6 +263,14 @@ public class Menu : MonoBehaviour
 			}
 		}
 
+		private bool _isRewiredPlayerInGame(int rewiredID)
+		{
+			foreach (PlayerMap pm in _playerMap)
+			{
+				if (pm.RewiredPlayerID == rewiredID) return true;
+			}
+			return false;
+		}
 		private void _onCursorChange(int _change, int index)
 		{
 			_eggCursors[index] += _change;
@@ -336,12 +389,6 @@ public class Menu : MonoBehaviour
 				ReInput.ControllerPreDisconnectEvent += _onControllerDisconnected;
 				_gamePlayerIndex = Context._getPlayerFSMIndex(Parent).GamePlayerID;
 				_rewiredPlayerIndex = Context._getPlayerFSMIndex(Parent).RewiredPlayerID;
-			}
-
-			public override void OnEnter()
-			{
-				base.OnEnter();
-				print(GetType().Name);
 			}
 
 			protected virtual void _onControllerDisconnected(ControllerStatusChangedEventArgs args)
@@ -538,12 +585,6 @@ public class Menu : MonoBehaviour
 				_eggIndex = Context._getEggFSMIndex(Parent);
 				_eggChild = Context.Context._eggs[_eggIndex].GetChild(0);
 				ReInput.ControllerPreDisconnectEvent += _onControllerDisconnected;
-			}
-
-			public override void OnEnter()
-			{
-				base.OnEnter();
-				print(GetType().Name);
 			}
 
 			protected virtual void _onControllerDisconnected(ControllerStatusChangedEventArgs args)

@@ -107,7 +107,7 @@ public class Menu : MonoBehaviour
 		_menuFSM.Update();
 	}
 
-	private void OnDisable()
+	private void OnDestroy()
 	{
 		_menuFSM.CurrentState.CleanUp();
 	}
@@ -180,6 +180,32 @@ public class Menu : MonoBehaviour
 			if (_HLAxisRaw == 0f) _hAxisInUse = false;
 		}
 	}
+
+	#region Loading State
+	private class LoadingState : MenuState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context.StartCoroutine(_loadScene());
+		}
+
+		IEnumerator _loadScene()
+		{
+			AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.MapName);
+			asyncload.allowSceneActivation = false;
+			while (!asyncload.isDone)
+			{
+				if (asyncload.progress >= 0.9f)
+				{
+					if (_ADown)
+						asyncload.allowSceneActivation = true;
+				}
+				yield return null;
+			}
+		}
+	}
+	#endregion
 
 	#region 3rd Menu States
 	private class CharacterSelectionState : MenuState
@@ -270,7 +296,8 @@ public class Menu : MonoBehaviour
 			base.Update();
 			if (_ADown && _playerMap.Count >= 2 && _blueEggsSelectedAmount > 0 && _redEggsSelectedAmount > 0)
 			{
-				Context.StartCoroutine(_loadScene());
+				TransitionTo<LoadingState>();
+				return;
 			}
 			if (_BDown && _playerMap.Count == 0)
 			{
@@ -301,15 +328,6 @@ public class Menu : MonoBehaviour
 			{
 				if (_playersFSM[i] != null) _playersFSM[i].CurrentState.CleanUp();
 				if (_eggsFSM[i] != null) _eggsFSM[i].CurrentState.CleanUp();
-			}
-		}
-
-		IEnumerator _loadScene()
-		{
-			AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.MapName);
-			while (!asyncload.isDone)
-			{
-				yield return null;
 			}
 		}
 
@@ -712,6 +730,7 @@ public class Menu : MonoBehaviour
 							SetDelay(Context._MenuData.ETC_ChickenMoveYDelay));
 				_sequence.AppendCallback(() =>
 				{
+					Context.Context._camera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
 					Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Pose");
 					Instantiate(Context._MenuData.ETC_ChickenLandVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenLandVFXOffset, Context._MenuData.ETC_ChickenLandVFX.transform.rotation);
 					TransitionTo<ChickenState>();

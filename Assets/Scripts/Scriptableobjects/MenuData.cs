@@ -130,6 +130,15 @@ public class MenuData : ScriptableObject
 	public float[] ThirdMenuHolderMoveInDelay;
 	public Ease ThirdMenuHolderMoveInEase;
 
+	public Vector3 InstantiatedMapFinalScale;
+	public float InstantiatedMapScaleDuration = 1f;
+	public Ease InstantiatedMapScaleEase;
+
+	public Color InstantiaedMapColor;
+	public float InstantiatedMapColorDuration = 1f;
+	public Ease InstantiatedMapColorEase;
+
+
 	[Header("Character Select To Mode Select Setting")]
 	public float[] ThirdMenuHolderMoveOutDuration;
 	public float[] ThirdMenuHolderMoveOutDelay;

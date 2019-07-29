@@ -37,6 +37,7 @@ public class Menu : MonoBehaviour
 	private Transform[] _chickens;
 	private Vector3[] _chickenOriginalLocalPosition;
 	private Transform _chickenHolder;
+	private GameObject _chosenMapImage;
 
 	private Player _mainPlayer;
 	private FSM<Menu> _menuFSM;
@@ -101,11 +102,6 @@ public class Menu : MonoBehaviour
 	private void Update()
 	{
 		_menuFSM.Update();
-	}
-
-	private void LateUpdate()
-	{
-		_menuFSM.LateUpdate();
 	}
 
 	private void OnDisable()
@@ -318,11 +314,9 @@ public class Menu : MonoBehaviour
 
 		private void _assignNextPlayer(int rewiredPlayerId)
 		{
-			print("assign Next Player");
 			if (_playerMap.Count >= 6) { return; }
 
 			int gamePlayerId = _getNextGamePlayerId();
-			print(gamePlayerId);
 			if (gamePlayerId == 7) return;
 			_playerMap.Add(new PlayerMap(rewiredPlayerId, gamePlayerId));
 			_playersFSM[gamePlayerId] = new FSM<CharacterSelectionState>(this);
@@ -706,10 +700,33 @@ public class Menu : MonoBehaviour
 		public override void OnEnter()
 		{
 			base.OnEnter();
+			GameObject _instantiaedMap = Instantiate(Context._chosenMapImage, Context.transform, true);
+			_instantiaedMap.transform.DOScale(_MenuData.InstantiatedMapFinalScale, _MenuData.InstantiatedMapScaleDuration).SetEase(_MenuData.InstantiatedMapScaleEase).SetRelative(true);
+			_instantiaedMap.GetComponent<Image>().DOColor(_MenuData.InstantiaedMapColor, _MenuData.InstantiatedMapColorDuration).SetEase(_MenuData.InstantiatedMapColorEase).
+				OnComplete(() =>
+				{
+					Destroy(_instantiaedMap);
+				});
 			Context._brawlMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
-				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.BrawlPanelMoveOutDelay);
+				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.BrawlPanelMoveOutDelay).
+				OnComplete(() =>
+				{
+					Context._brawlMode.DOLocalMoveX(449f, 0);
+					Context._brawlMode.DOScale(new Vector3(1.74f, 1.74f), 0);
+					Context._brawlMode.Find("Mask").Find("MainPage").DOLocalMoveY(0f, 0);
+					Context._brawlMode.Find("Mask").Find("MapPage").DOLocalMoveY(-110.6f, 0);
+					Context._brawlMode.Find("WholeMask").gameObject.SetActive(true);
+				});
 			Context._cartMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
-				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.CartPanelMoveOutDelay);
+				SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.CartPanelMoveOutDelay).
+				OnComplete(() =>
+				{
+					Context._cartMode.DOLocalMoveX(-452f, 0);
+					Context._cartMode.DOScale(new Vector3(1.74f, 1.74f), 0);
+					Context._cartMode.Find("Mask").Find("MainPage").DOLocalMoveY(0f, 0);
+					Context._cartMode.Find("Mask").Find("MapPage").DOLocalMoveY(-110.6f, 0);
+					Context._cartMode.Find("WholeMask").gameObject.SetActive(true);
+				});
 			Context._2ndMenuTitle.DOText("", _MenuData.PanelMoveOutDuration).SetDelay(_MenuData.TextMoveOutDelay);
 			Context._camera.DOLocalMoveX(16f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
 				.SetEase(_MenuData.CameraToCharacterSelectionMoveEase);
@@ -759,7 +776,11 @@ public class Menu : MonoBehaviour
 	#region 2nd Menu States
 	private abstract class ModeMenuState : MenuState
 	{
-
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			print(GetType().Name);
+		}
 	}
 
 	private abstract class MapSelectState : ModeMenuState
@@ -818,21 +839,10 @@ public class Menu : MonoBehaviour
 
 			if (_ADown)
 			{
+				Context._chosenMapImage = _MapPage.GetChild(_MapIndex).gameObject;
 				Context.MapName = _MapPage.GetChild(_MapIndex).name;
 				TransitionTo<MapToCharacterSelectionTransition>();
 			}
-		}
-
-		public override void OnExit()
-		{
-			base.OnExit();
-			_Mask.Find("MainPage").DOLocalMoveY(0f, _MenuData.ModeImageMoveDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
-			_Mask.Find("MapPage").DOLocalMoveY(-110.6f, _MenuData.ModeMapMoveInDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
-			Context._brawlMode.DOLocalMove(new Vector3(449f, -38f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
-			Context._brawlMode.DOScale(new Vector3(1.74f, 1.74f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
-
-			Context._cartMode.DOLocalMove(new Vector3(-452f, -38f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
-			Context._cartMode.DOScale(new Vector3(1.74f, 1.74f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
 		}
 	}
 
@@ -948,11 +958,19 @@ public class Menu : MonoBehaviour
 	private abstract class ModeSelectState : ModeMenuState
 	{
 		protected GameObject _wholeMask;
+		protected Transform _Mask;
 
 		public override void OnEnter()
 		{
 			base.OnEnter();
 			_wholeMask.SetActive(false);
+			_Mask.Find("MainPage").DOLocalMoveY(0f, _MenuData.ModeImageMoveDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
+			_Mask.Find("MapPage").DOLocalMoveY(-110.6f, _MenuData.ModeMapMoveInDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
+			Context._brawlMode.DOLocalMove(new Vector3(449f, -38f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			Context._brawlMode.DOScale(new Vector3(1.74f, 1.74f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+
+			Context._cartMode.DOLocalMove(new Vector3(-452f, -38f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			Context._cartMode.DOScale(new Vector3(1.74f, 1.74f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
 		}
 
 		public override void Update()
@@ -975,6 +993,7 @@ public class Menu : MonoBehaviour
 		{
 			base.Init();
 			_wholeMask = Context._brawlMode.Find("WholeMask").gameObject;
+			_Mask = Context._brawlMode.Find("Mask");
 			Debug.Assert(_wholeMask != null);
 		}
 
@@ -994,6 +1013,7 @@ public class Menu : MonoBehaviour
 		{
 			base.Init();
 			_wholeMask = Context._cartMode.Find("WholeMask").gameObject;
+			_Mask = Context._cartMode.Find("Mask");
 			Debug.Assert(_wholeMask != null);
 		}
 

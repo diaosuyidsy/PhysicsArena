@@ -4,6 +4,7 @@ using UnityEngine;
 using Rewired;
 using DG.Tweening;
 using TMPro;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class Menu : MonoBehaviour
@@ -38,6 +39,7 @@ public class Menu : MonoBehaviour
 	private Vector3[] _chickenOriginalLocalPosition;
 	private Transform _chickenHolder;
 	private GameObject _chosenMapImage;
+	private TextMeshProUGUI _hintText;
 
 	private Player _mainPlayer;
 	private FSM<Menu> _menuFSM;
@@ -72,6 +74,7 @@ public class Menu : MonoBehaviour
 		_3rdMenuCharacterImages = new Transform[6];
 		_3rdMenuHoleImages = new Transform[6];
 		_chickenOriginalLocalPosition = new Vector3[6];
+		_hintText = _3rdMenu.Find("Hints").GetComponent<TextMeshProUGUI>();
 		for (int i = 0; i < 6; i++)
 		{
 			_3rdMenuHolders[i] = _3rdMenu.Find("Holes").GetChild(i);
@@ -205,6 +208,44 @@ public class Menu : MonoBehaviour
 		private FSM<CharacterSelectionState>[] _playersFSM;
 		private FSM<CharacterSelectionState>[] _eggsFSM;
 
+		private bool[] _eggSelected;
+		private int _eggsSelectedAmount
+		{
+			get
+			{
+				int count = 0;
+				foreach (var _egg in _eggSelected)
+				{
+					if (_egg) count++;
+				}
+				return count;
+			}
+		}
+		private int _blueEggsSelectedAmount
+		{
+			get
+			{
+				int count = 0;
+				for (int i = 0; i < 3; i++)
+				{
+					if (_eggSelected[i]) count++;
+				}
+				return count;
+			}
+		}
+		private int _redEggsSelectedAmount
+		{
+			get
+			{
+				int count = 0;
+				for (int i = 3; i < 6; i++)
+				{
+					if (_eggSelected[i]) count++;
+				}
+				return count;
+			}
+		}
+
 		public override void Init()
 		{
 			base.Init();
@@ -216,6 +257,7 @@ public class Menu : MonoBehaviour
 			_eggCursors = new int[6];
 			_cursorSelectedEggIndex = new int[6];
 			_eggSelectedCursorIndex = new int[6];
+			_eggSelected = new bool[6];
 			for (int i = 0; i < 6; i++)
 			{
 				_eggsFSM[i] = new FSM<CharacterSelectionState>(this);
@@ -226,7 +268,10 @@ public class Menu : MonoBehaviour
 		public override void Update()
 		{
 			base.Update();
-
+			if (_ADown && _playerMap.Count >= 2 && _blueEggsSelectedAmount > 0 && _redEggsSelectedAmount > 0)
+			{
+				Context.StartCoroutine(_loadScene());
+			}
 			if (_BDown && _playerMap.Count == 0)
 			{
 				TransitionTo<CharacterSelectionToMapTransition>();
@@ -257,6 +302,34 @@ public class Menu : MonoBehaviour
 				if (_playersFSM[i] != null) _playersFSM[i].CurrentState.CleanUp();
 				if (_eggsFSM[i] != null) _eggsFSM[i].CurrentState.CleanUp();
 			}
+		}
+
+		IEnumerator _loadScene()
+		{
+			AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.MapName);
+			while (!asyncload.isDone)
+			{
+				yield return null;
+			}
+		}
+
+		private void _onPlayerEggStateChange()
+		{
+			Context._hintText.DOKill();
+			if (_playerMap.Count == 1 && _eggsSelectedAmount == 1)
+			{
+				Context._hintText.DOText("Need More Players", 1f).SetDelay(2f);
+			}
+			else if (_eggsSelectedAmount == _playerMap.Count && (_blueEggsSelectedAmount == 0 || _redEggsSelectedAmount == 0))
+			{
+				Context._hintText.DOText("Need Players On Both Teams", 1f).SetDelay(2f);
+			}
+			else if (_eggsSelectedAmount == _playerMap.Count)
+			{
+				Context._hintText.DOText("Press A to Start!", 1f);
+			}
+			else
+				Context._hintText.DOText("", 0f);
 		}
 
 		private bool _isRewiredPlayerInGame(int rewiredID)
@@ -324,6 +397,7 @@ public class Menu : MonoBehaviour
 			Player rewiredPlayer = ReInput.players.GetPlayer(rewiredPlayerId);
 
 			rewiredPlayer.controllers.maps.SetMapsEnabled(false, "Assignment");
+			_onPlayerEggStateChange();
 		}
 
 		private void _unassignPlayer(int rewiredPlayerId)
@@ -345,6 +419,7 @@ public class Menu : MonoBehaviour
 			_playerMap.RemoveAt(playerMapIndex);
 			_playersFSM[gamePlayerId].CurrentState.CleanUp();
 			_playersFSM[gamePlayerId] = null;
+			_onPlayerEggStateChange();
 		}
 
 		private int _getNextGamePlayerId()
@@ -559,6 +634,8 @@ public class Menu : MonoBehaviour
 				if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Block"))
 				{
 					Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<EggNormalState>();
+					Context._eggSelected[Context._cursorSelectedEggIndex[_gamePlayerIndex]] = false;
+					Context._onPlayerEggStateChange();
 					TransitionTo<UnselectingState>();
 					return;
 				}
@@ -665,6 +742,8 @@ public class Menu : MonoBehaviour
 				/// Since now chicken has landed
 				/// Switch Cursor to Selected state
 				int playerindex = Context._eggSelectedCursorIndex[_eggIndex];
+				Context._eggSelected[_eggIndex] = true;
+				Context._onPlayerEggStateChange();
 				Context._playersFSM[playerindex].TransitionTo<SelectedState>();
 			}
 

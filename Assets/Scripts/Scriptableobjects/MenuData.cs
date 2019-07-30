@@ -165,7 +165,14 @@ public class MenuData : ScriptableObject
 	public Color HoleNormalColor;
 	public Color[] HoleSelectedColor;
 
+	public float HoleImageInDuration = 0.2f;
+	public float HoleImageOutDuration = 0.2f;
+
 	[Header("Egg To Chicken Transition Setting")]
+
+	public float ETC_HoleImageBlinkDuration = 0.2f;
+	public AnimationCurve ETC_HoleIMageBlinkAnimationCurve;
+
 	public float ETC_EggShakeDuration = 0.5f;
 	public Vector3 ETC_EggShakeStrength;
 	public int ETC_EggShakeVibrato = 30;

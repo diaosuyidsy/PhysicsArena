@@ -94,24 +94,24 @@ public class GameManager : MonoBehaviour
 
 	private void _fillPlayerInformation()
 	{
-		if (CanvasController.CC == null)
-		{
-			PlayersInformation = new PlayerInformation[]
-			{
-				new PlayerInformation("Yellow", Color.yellow),
-				new PlayerInformation("Orange", Color.red),
-				new PlayerInformation("Pink", Color.magenta),
-				new PlayerInformation("Blue", Color.blue),
-				new PlayerInformation("Purple", Color.cyan),
-				new PlayerInformation("Green", Color.green),
-			};
-		}
-		for (int i = 0; i < 6; i++)
-		{
-			if (CanvasController.CC != null)
-				PlayersInformation[i] = CanvasController.CC.FinalInformation[i];
-		}
-		Destroy(CanvasController.CC.gameObject);
+		//if (CanvasController.CC == null)
+		//{
+		//	PlayersInformation = new PlayerInformation[]
+		//	{
+		//		new PlayerInformation("Yellow", Color.yellow),
+		//		new PlayerInformation("Orange", Color.red),
+		//		new PlayerInformation("Pink", Color.magenta),
+		//		new PlayerInformation("Blue", Color.blue),
+		//		new PlayerInformation("Purple", Color.cyan),
+		//		new PlayerInformation("Green", Color.green),
+		//	};
+		//}
+		//for (int i = 0; i < 6; i++)
+		//{
+		//	if (CanvasController.CC != null)
+		//		PlayersInformation[i] = CanvasController.CC.FinalInformation[i];
+		//}
+		//Destroy(CanvasController.CC.gameObject);
 	}
 
 	IEnumerator EndImageShow(float time, GameObject _tar = null)
@@ -171,7 +171,7 @@ public class GameManager : MonoBehaviour
 		// And we need to disable the screen dark corner effect
 		_dcfx.enabled = false;
 		// And here we need to let player be able to restart
-		GetComponent<InputController>().CanRestart();
+		//GetComponent<InputController>().CanRestart();
 		yield return StartCoroutine(StartTransitionColor(2f));
 
 		GetComponent<Scoreboard>().DisplayScore();
@@ -314,23 +314,5 @@ public class GameManager : MonoBehaviour
 			SceneManager.LoadScene("Suyi");
 		}
 
-	}
-}
-
-public sealed class PlayerInformation
-{
-	public string PlayerName;
-	public Color PlayerColor;
-
-	public PlayerInformation()
-	{
-		PlayerName = "";
-		PlayerColor = Color.white;
-	}
-
-	public PlayerInformation(string name, Color color)
-	{
-		PlayerName = name;
-		PlayerColor = color;
 	}
 }

@@ -6,4 +6,6 @@ using UnityEngine;
 public class ConfigData : ScriptableObject
 {
 	public LayerMask AllPlayerLayer;
+	public string[] IndexToName;
+	public Color[] IndexToColor;
 }

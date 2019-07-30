@@ -47,7 +47,7 @@ MonoBehaviour:
   SecondMenuBrawlModeEase: 6
   SecondMenuTitleMoveTime: 0.4
   SecondMenuTitleMoveDelay: 1.4
-  SecondMenuTitleString: Mode Selection
+  SecondMenuTitleString: Map Selection
   SecondMenuTitleMoveOutTime: 0.5
   SecondMenuTitleMoveOutDelay: 0
   SecondMenuCarModeMoveOutTime: 0.5
@@ -160,6 +160,42 @@ MonoBehaviour:
   - {r: 1, g: 0.31764707, b: 0.5803922, a: 1}
   - {r: 1, g: 0.31764707, b: 0.5803922, a: 1}
   - {r: 1, g: 0.31764707, b: 0.5803922, a: 1}
+  HoleImageInDuration: 0.2
+  HoleImageOutDuration: 0.2
+  ETC_HoleImageBlinkDuration: 0.2
+  ETC_HoleIMageBlinkAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.08553788
+      value: 0.99632144
+      inSlope: 0.003639984
+      outSlope: 0.003639984
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.9809265
+      value: 0.002380371
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   ETC_EggShakeDuration: 0.5
   ETC_EggShakeStrength: {x: 0, y: 0, z: 10}
   ETC_EggShakeVibrato: 30

@@ -177,16 +177,16 @@ public class Scoreboard : MonoBehaviour
 				maxBlockPlayer = i;
 			}
 		}
-		KillMasterSummary.transform.GetChild(0).GetComponent<Image>().color = GameManager.GM.PlayersInformation[maxKillPlayer].PlayerColor;
-		SuicideMasterSummary.transform.GetChild(0).GetComponent<Image>().color = GameManager.GM.PlayersInformation[maxSuicidePlayer].PlayerColor;
-		TMKillerSummary.transform.GetChild(0).GetComponent<Image>().color = GameManager.GM.PlayersInformation[maxTMQPlayer].PlayerColor;
-		BlockMasterSummary.transform.GetChild(0).GetComponent<Image>().color = GameManager.GM.PlayersInformation[maxBlockPlayer].PlayerColor;
+		//KillMasterSummary.transform.GetChild(0).GetComponent<Image>().color = GameManager.GM.PlayersInformation[maxKillPlayer].PlayerColor;
+		//SuicideMasterSummary.transform.GetChild(0).GetComponent<Image>().color = GameManager.GM.PlayersInformation[maxSuicidePlayer].PlayerColor;
+		//TMKillerSummary.transform.GetChild(0).GetComponent<Image>().color = GameManager.GM.PlayersInformation[maxTMQPlayer].PlayerColor;
+		//BlockMasterSummary.transform.GetChild(0).GetComponent<Image>().color = GameManager.GM.PlayersInformation[maxBlockPlayer].PlayerColor;
 
 
-		KillMasterSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxKillPlayer].PlayerName];
-		SuicideMasterSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxSuicidePlayer].PlayerName];
-		TMKillerSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxTMQPlayer].PlayerName];
-		BlockMasterSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxBlockPlayer].PlayerName];
+		//KillMasterSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxKillPlayer].PlayerName];
+		//SuicideMasterSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxSuicidePlayer].PlayerName];
+		//TMKillerSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxTMQPlayer].PlayerName];
+		//BlockMasterSummary.transform.GetChild(1).GetComponent<Image>().sprite = _playerLookUpDict[GameManager.GM.PlayersInformation[maxBlockPlayer].PlayerName];
 
 		KillMasterSummary.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = maxKillValue.ToString();
 		SuicideMasterSummary.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = maxSuicideValue.ToString();
@@ -296,8 +296,8 @@ public class Scoreboard : MonoBehaviour
 			}
 		}
 
-		MostKillsNameFX.SetText(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerName);
-		MostKillsNameFX.SetColour(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerColor);
+		//MostKillsNameFX.SetText(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerName);
+		//MostKillsNameFX.SetColour(GameManager.GM.PlayersInformation[MostKillPlayer].PlayerColor);
 
 		MostKillsNameGM.SetActive(true);
 
@@ -338,8 +338,8 @@ public class Scoreboard : MonoBehaviour
 
 		}
 
-		MostSuicideNameFX.SetText(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerName);
-		MostSuicideNameFX.SetColour(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerColor);
+		//MostSuicideNameFX.SetText(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerName);
+		//MostSuicideNameFX.SetColour(GameManager.GM.PlayersInformation[MostSuicidePlayer].PlayerColor);
 
 		MostSuicideNameGM.SetActive(true);
 
@@ -378,8 +378,8 @@ public class Scoreboard : MonoBehaviour
 			}
 		}
 
-		TMKillerNameFX.SetText(GameManager.GM.PlayersInformation[MostTMQPlayer].PlayerName);
-		TMKillerNameFX.SetColour(GameManager.GM.PlayersInformation[MostTMQPlayer].PlayerColor);
+		//TMKillerNameFX.SetText(GameManager.GM.PlayersInformation[MostTMQPlayer].PlayerName);
+		//TMKillerNameFX.SetColour(GameManager.GM.PlayersInformation[MostTMQPlayer].PlayerColor);
 
 		TMKillerNameGM.SetActive(true);
 
@@ -418,8 +418,8 @@ public class Scoreboard : MonoBehaviour
 			}
 		}
 
-		BlockNameFX.SetText(GameManager.GM.PlayersInformation[MostBlockPlayer].PlayerName);
-		BlockNameFX.SetColour(GameManager.GM.PlayersInformation[MostBlockPlayer].PlayerColor);
+		//BlockNameFX.SetText(GameManager.GM.PlayersInformation[MostBlockPlayer].PlayerName);
+		//BlockNameFX.SetColour(GameManager.GM.PlayersInformation[MostBlockPlayer].PlayerColor);
 
 		BlockNameGM.SetActive(true);
 

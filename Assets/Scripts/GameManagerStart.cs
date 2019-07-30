@@ -64,8 +64,8 @@ public class GameManagerStart : MonoBehaviour
 		//SceneManager.LoadSceneAsync(1);
 		HoldAToSkip.SetActive(false);
 		GameManager.GM.FillPlayerInformation();
-		GameManager.GM.GetComponent<InputController>().enabled = true;
-		GameManager.GM.GetComponent<InputController>().AllEnterGame();
+		//GameManager.GM.GetComponent<InputController>().enabled = true;
+		//GameManager.GM.GetComponent<InputController>().AllEnterGame();
 	}
 
 	private void Update()
@@ -101,8 +101,8 @@ public class GameManagerStart : MonoBehaviour
 					PressAToSpawn.SetActive(false);
 
 					GameManager.GM.FillPlayerInformation();
-					GameManager.GM.GetComponent<InputController>().enabled = true;
-					GameManager.GM.GetComponent<InputController>().AllEnterGame();
+					//GameManager.GM.GetComponent<InputController>().enabled = true;
+					//GameManager.GM.GetComponent<InputController>().AllEnterGame();
 				}
 			}
 			else

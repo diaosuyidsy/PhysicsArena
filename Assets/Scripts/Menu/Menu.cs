@@ -294,10 +294,24 @@ public class Menu : MonoBehaviour
 		public override void Update()
 		{
 			base.Update();
-			if (_ADown && _playerMap.Count >= 2 && _blueEggsSelectedAmount > 0 && _redEggsSelectedAmount > 0)
+			/// Poll for Loading State A Press
+			/// 1. A player pressed A
+			/// 2. This player is in selected state
+			/// 3. All players are in selected state
+			/// 4. Both team has players
+			foreach (PlayerMap _pm in _playerMap)
 			{
-				TransitionTo<LoadingState>();
-				return;
+				if (ReInput.players.GetPlayer(_pm.RewiredPlayerID).GetButtonDown("Jump") &&
+					_playersFSM[_pm.GamePlayerID] != null &&
+					_playersFSM[_pm.GamePlayerID].CurrentState.GetType().Equals(typeof(SelectedState)) &&
+					_playerMap.Count >= 2 &&
+					_blueEggsSelectedAmount > 0 &&
+					_redEggsSelectedAmount > 0 && _playerMap.Count == _eggsSelectedAmount)
+				{
+					_saveData();
+					TransitionTo<LoadingState>();
+					return;
+				}
 			}
 			if (_BDown && _playerMap.Count == 0)
 			{
@@ -331,6 +345,23 @@ public class Menu : MonoBehaviour
 			}
 		}
 
+		private void _saveData()
+		{
+			int[] rewiredPlayerID = new int[_playerMap.Count];
+			int[] GameplayerID = new int[_playerMap.Count];
+			int[] colorIndex = new int[_playerMap.Count];
+			for (int i = 0; i < _playerMap.Count; i++)
+			{
+				PlayerMap pm = _playerMap[i];
+				rewiredPlayerID[i] = pm.RewiredPlayerID;
+				GameplayerID[i] = pm.GamePlayerID;
+				colorIndex[i] = _cursorSelectedEggIndex[pm.GamePlayerID];
+				//saveData[i] = new PlayerInformation(pm.RewiredPlayerID, pm.GamePlayerID, _cursorSelectedEggIndex[pm.GamePlayerID]);
+			}
+			PlayerInformation saveData = new PlayerInformation(rewiredPlayerID, GameplayerID, colorIndex);
+			DataSaver.saveData(saveData, "PlayersInformation");
+		}
+
 		private void _onPlayerEggStateChange()
 		{
 			Context._hintText.DOKill();
@@ -338,11 +369,11 @@ public class Menu : MonoBehaviour
 			{
 				Context._hintText.DOText("Need More Players", 1f).SetDelay(2f);
 			}
-			else if (_eggsSelectedAmount == _playerMap.Count && (_blueEggsSelectedAmount == 0 || _redEggsSelectedAmount == 0))
+			else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count && (_blueEggsSelectedAmount == 0 || _redEggsSelectedAmount == 0))
 			{
 				Context._hintText.DOText("Need Players On Both Teams", 1f).SetDelay(2f);
 			}
-			else if (_eggsSelectedAmount == _playerMap.Count)
+			else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count)
 			{
 				Context._hintText.DOText("Press A to Start!", 1f);
 			}
@@ -502,6 +533,15 @@ public class Menu : MonoBehaviour
 		private abstract class ControllableState : PlayerState
 		{
 			protected Vector3 _CursorPos { get { return Context.Context._3rdMenuCursors[_gamePlayerIndex].position; } }
+			protected float _ScreenX;
+			protected float _ScreenY;
+
+			public override void Init()
+			{
+				base.Init();
+				_ScreenX = Screen.width;
+				_ScreenY = Screen.height;
+			}
 
 			public override void OnEnter()
 			{
@@ -516,7 +556,14 @@ public class Menu : MonoBehaviour
 				float HLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxis("Move Horizontal");
 				float VLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxis("Move Vertical");
 				Transform cursor = Context.Context._3rdMenuCursors[_gamePlayerIndex];
-				cursor.localPosition += new Vector3(HLAxis, -VLAxis) * Time.deltaTime * Context._MenuData.CursorMoveSpeed;
+				Vector3 finalPosition = cursor.position + new Vector3(HLAxis, -VLAxis) * Time.deltaTime * Context._MenuData.CursorMoveSpeed;
+				if ((finalPosition.x > _ScreenX || finalPosition.x < 0f) && (finalPosition.y > _ScreenY || finalPosition.y < 0f)) return;
+				else if (finalPosition.x > _ScreenX || finalPosition.x < 0f)
+					cursor.localPosition += new Vector3(0f, -VLAxis) * Time.deltaTime * Context._MenuData.CursorMoveSpeed;
+				else if (finalPosition.y > _ScreenY || finalPosition.y < 0f)
+					cursor.localPosition += new Vector3(HLAxis, 0f) * Time.deltaTime * Context._MenuData.CursorMoveSpeed;
+				else
+					cursor.localPosition += new Vector3(HLAxis, -VLAxis) * Time.deltaTime * Context._MenuData.CursorMoveSpeed;
 			}
 		}
 
@@ -529,6 +576,7 @@ public class Menu : MonoBehaviour
 				// Disable all grey images
 				for (int i = 0; i < 6; i++)
 				{
+					//Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(i).DOLocalMoveX(-244f, Context._MenuData.HoleImageOutDuration);
 					Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(i).gameObject.SetActive(false);
 				}
 				// Change Hole Image to normal
@@ -567,9 +615,10 @@ public class Menu : MonoBehaviour
 					_castedEggSiblingIndex = hit.transform.GetSiblingIndex();
 					Context._onCursorChange(1, _castedEggSiblingIndex);
 					/// Show Grey image on hole
+					//Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(233f, 0f);
 					Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(true);
 					Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).GetComponent<Image>().color = Context._MenuData.HoverImageColor;
-
+					//Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(-53.6f, Context._MenuData.HoleImageInDuration);
 					//// Also Change Hole Color to related color
 					Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleCursorveHoverColor[_castedEggSiblingIndex];
 					//// Hide the indicators
@@ -590,6 +639,7 @@ public class Menu : MonoBehaviour
 					{
 						Context._onCursorChange(-1, _castedEggSiblingIndex);
 						Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+						//Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(-244f, Context._MenuData.HoleImageOutDuration);
 						TransitionTo<HoveringState>();
 						return;
 					}
@@ -637,11 +687,16 @@ public class Menu : MonoBehaviour
 				Context.Context._3rdMenuCursors[_gamePlayerIndex].gameObject.SetActive(false);
 				Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(castedEggIndex).GetComponent<Image>().color = Color.white;
 				Context.Context._3rdMenuHolders[_gamePlayerIndex].GetComponent<Image>().color = Context._MenuData.HoleSelectedColor[castedEggIndex];
+				/// 5. Scale In VFX
+				//GameObject shadowHoleImage = Instantiate(Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(castedEggIndex).gameObject,
+				//	Context.Context._3rdMenuHoleImages[_gamePlayerIndex], false);
+				//Context.Context._3rdMenuHolders[_gamePlayerIndex].DOShakePosition(Context._MenuData.ETC_HoleImageBlinkDuration, new Vector3(100f, 0f), 30);
+				//shadowHoleImage.transform.DOScale(1f, Context._MenuData.ETC_HoleImageBlinkDuration).SetEase(Context._MenuData.ETC_HoleIMageBlinkAnimationCurve).SetRelative(true);
+				//shadowHoleImage.GetComponent<Image>().DOFade(0f, Context._MenuData.ETC_HoleImageBlinkDuration).SetEase(Context._MenuData.ETC_HoleIMageBlinkAnimationCurve).OnComplete(() =>
+				//{
+				//	Destroy(shadowHoleImage);
+				//});
 			}
-		}
-
-		private class SelectedToUnselectedTransition : PlayerState
-		{
 		}
 
 		private class SelectedState : PlayerState
@@ -874,11 +929,6 @@ public class Menu : MonoBehaviour
 	#region 2nd Menu States
 	private abstract class ModeMenuState : MenuState
 	{
-		public override void OnEnter()
-		{
-			base.OnEnter();
-			print(GetType().Name);
-		}
 	}
 
 	private abstract class MapSelectState : ModeMenuState

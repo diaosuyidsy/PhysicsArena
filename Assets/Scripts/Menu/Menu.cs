@@ -1067,11 +1067,11 @@ public class Menu : MonoBehaviour
 		protected override void _OnBlinkComplete()
 		{
 			base._OnBlinkComplete();
-			_Mode.transform.DOLocalMove(new Vector3(5f, 1f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
-			_Mode.transform.DOScale(new Vector3(2.3f, 2.3f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			_Mode.transform.DOLocalMove(_MenuData.ModePanelSelectedZoomLocalPosition, _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			_Mode.transform.DOScale(_MenuData.ModePanelSelectedZoomScale, _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
 
-			Context._cartMode.DOLocalMove(new Vector3(-723f, -266f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
-			Context._cartMode.transform.DOScale(new Vector3(1f, 1f), _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase).
+			Context._cartMode.DOLocalMove(_MenuData.BrawlModePanelSelectedCartModeMoveLocalPosition, _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase);
+			Context._cartMode.transform.DOScale(_MenuData.ModePanelSelectedOtherModeScale, _MenuData.ModePanelSelectedZoomDuration).SetEase(_MenuData.ModePanelSelectedZoomEase).
 				OnComplete(() =>
 				{
 					TransitionTo<BrawlMapSelectState>();
@@ -1091,11 +1091,11 @@ public class Menu : MonoBehaviour
 		protected override void _OnBlinkComplete()
 		{
 			base._OnBlinkComplete();
-			_Mode.transform.DOLocalMove(new Vector3(5f, 1f), _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
-			_Mode.transform.DOScale(new Vector3(2.3f, 2.3f), _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
+			_Mode.transform.DOLocalMove(_MenuData.ModePanelSelectedZoomLocalPosition, _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
+			_Mode.transform.DOScale(_MenuData.ModePanelSelectedZoomScale, _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
 
-			Context._brawlMode.DOLocalMove(new Vector3(736f, -266f), _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
-			Context._brawlMode.transform.DOScale(new Vector3(1f, 1f), _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad).
+			Context._brawlMode.DOLocalMove(_MenuData.CartModePanelSelectedBrawlModeMoveLocalPosition, _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad);
+			Context._brawlMode.transform.DOScale(_MenuData.ModePanelSelectedOtherModeScale, _MenuData.ModePanelSelectedZoomDuration).SetEase(Ease.OutQuad).
 				OnComplete(() =>
 				{
 					TransitionTo<CartMapSelectState>();

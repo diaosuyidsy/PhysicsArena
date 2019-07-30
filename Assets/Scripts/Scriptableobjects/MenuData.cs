@@ -102,6 +102,15 @@ public class MenuData : ScriptableObject
 	public float ModeMapMoveInDelay = 0f;
 	public Ease ModeMapMoveInEase;
 
+	public Vector3 ModePanelSelectedZoomLocalPosition = new Vector3(5f, 1f);
+	public Vector3 ModePanelSelectedZoomScale = new Vector3(2.3f, 2.3f);
+	public Vector3 ModePanelSelectedOtherModeScale = new Vector3(1f, 1f);
+
+	public Vector3 BrawlModePanelSelectedCartModeMoveLocalPosition = new Vector3(-723f, -266f);
+	public Vector3 CartModePanelSelectedBrawlModeMoveLocalPosition = new Vector3(736f, -266f);
+
+
+
 	public float ModePanelSelectedZoomDuration = 0.2f;
 	public Ease ModePanelSelectedZoomEase;
 

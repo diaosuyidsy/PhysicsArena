@@ -4,19 +4,22 @@ using UnityEngine;
 using Rewired;
 using TMPro;
 using DG.Tweening;
+using UnityEngine.UI;
 
 public class GameStateManager
 {
 	private GameMapData _gameMapdata;
 	private FSM<GameStateManager> _gameStateFSM;
 	private PlayerInformation _playersInformation;
-	private TextMeshProUGUI _tutorialTitle;
-	private TextMeshProUGUI _tutorialText;
+	private TextMeshProUGUI _holdAText;
+	private Image _holdAImage;
 
 	public GameStateManager(GameMapData _gmp)
 	{
 		_gameMapdata = _gmp;
 		_gameStateFSM = new FSM<GameStateManager>(this);
+		_holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").GetComponent<TextMeshProUGUI>();
+		_holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
 		_playersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
 		Debug.Assert(_playersInformation != null, "Unable to load Players information");
 		switch (_gameMapdata.GameMapMode)
@@ -84,9 +87,10 @@ public class GameStateManager
 		public override void OnEnter()
 		{
 			base.OnEnter();
+			//Context._holdAText.DOText("Hold  A  To Skip")
 			Sequence seq = DOTween.Sequence();
-			seq.Append(Context._tutorialTitle.DOText("Winning Condition", _GameMapData.TutorialTitleEnterDuration, true, _GameMapData.TutorialTitleScrambleMode));
-			seq.AppendInterval(_GameMapData.TutorialTitleAfterDelay);
+			//seq.Append(Context._tutorialTitle.DOText("Winning Condition", _GameMapData.TutorialTitleEnterDuration, true, _GameMapData.TutorialTitleScrambleMode));
+			//seq.AppendInterval(_GameMapData.TutorialTitleAfterDelay);
 			//seq.Append(Context._tutorialText.DOText(""))
 		}
 	}

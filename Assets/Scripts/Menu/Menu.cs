@@ -1038,6 +1038,7 @@ public class Menu : MonoBehaviour
 		public override void OnEnter()
 		{
 			base.OnEnter();
+			Context._2ndMenuTitle.DOText("", 0f);
 			_WholeMask.SetActive(false);
 			_Mode.GetComponent<Image>().DOColor(_MenuData.ModeSelectedBlinkColor, _MenuData.ModeSelectedBlinkDurition).
 				SetEase(Ease.Flash, _MenuData.ModeSelectedBlinkTime, _MenuData.ModeSelectedBlinkPeriod).
@@ -1111,6 +1112,8 @@ public class Menu : MonoBehaviour
 		public override void OnEnter()
 		{
 			base.OnEnter();
+			if (!Context._2ndMenuTitle.text.Equals(_MenuData.SecondMenuTitleString))
+				Context._2ndMenuTitle.DOText(_MenuData.SecondMenuTitleString, _MenuData.SecondMenuTitleMoveTime);
 			_wholeMask.SetActive(false);
 			_Mask.Find("MainPage").DOLocalMoveY(0f, _MenuData.ModeImageMoveDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
 			_Mask.Find("MapPage").DOLocalMoveY(-110.6f, _MenuData.ModeMapMoveInDuration).SetEase(_MenuData.ModeImageMoveEase).SetDelay(_MenuData.ModeImageMoveDelay);
@@ -1212,8 +1215,7 @@ public class Menu : MonoBehaviour
 				SetDelay(_MenuData.FirstMenuToSecondCameraMoveDelay);
 
 			Context._cartMode.DOLocalMoveY(-38f, _MenuData.SecondMenuCarModeMoveTime).SetEase(_MenuData.SecondMenuCarModeEase).SetDelay(_MenuData.SecondMenuCarModeMoveDelay);
-			Context._brawlMode.DOLocalMoveY(-38f, _MenuData.SecondMenuBrawlModeMoveTime).SetEase(_MenuData.SecondMenuBrawlModeEase).SetDelay(_MenuData.SecondMenuBrawlModeMoveDelay);
-			Context._2ndMenuTitle.DOText(_MenuData.SecondMenuTitleString, _MenuData.SecondMenuTitleMoveTime).SetDelay(_MenuData.SecondMenuTitleMoveDelay).OnComplete(() =>
+			Context._brawlMode.DOLocalMoveY(-38f, _MenuData.SecondMenuBrawlModeMoveTime).SetEase(_MenuData.SecondMenuBrawlModeEase).SetDelay(_MenuData.SecondMenuBrawlModeMoveDelay).OnComplete(() =>
 			{
 				TransitionTo<CarModeState>();
 			});

@@ -109,8 +109,6 @@ public class MenuData : ScriptableObject
 	public Vector3 BrawlModePanelSelectedCartModeMoveLocalPosition = new Vector3(-723f, -266f);
 	public Vector3 CartModePanelSelectedBrawlModeMoveLocalPosition = new Vector3(736f, -266f);
 
-
-
 	public float ModePanelSelectedZoomDuration = 0.2f;
 	public Ease ModePanelSelectedZoomEase;
 

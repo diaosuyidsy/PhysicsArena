@@ -7,7 +7,14 @@ using DG.Tweening;
 public class GameMapData : ScriptableObject
 {
 	public GameMapMode GameMapMode;
-	public float TutorialTitleEnterDuration;
-	public ScrambleMode TutorialTitleScrambleMode;
-	public float TutorialTitleAfterDelay = 0.5f;
+	[Header("Landing State Setting")]
+	public AnimationCurve BirfiaTitleFadeInOutCurve;
+	public float BirfiaTitalFadeInOutDuration = 5f;
+
+	public float BirdsFlyDownDuration = 2f;
+	public float[] BirdsFlyDownDelay;
+	public Ease BirdsFlyDownEase = Ease.OutQuad;
+
+	public AnimationCurve CameraRotateCurve;
+	public float CameraMoveDuration;
 }

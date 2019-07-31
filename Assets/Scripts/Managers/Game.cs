@@ -8,6 +8,7 @@ public class Game : MonoBehaviour
 	public VFXData VFXData;
 	public ConfigData ConfigData;
 	public WeaponData WeaponData;
+	public GameMapData GameMapData;
 
 	private void Awake()
 	{
@@ -18,12 +19,14 @@ public class Game : MonoBehaviour
 		Services.WeaponGenerationManager = new WeaponGenerationManager(WeaponData, transform.Find("Weapons").gameObject);
 		Services.StatisticsManager = new StatisticsManager();
 		Services.TinylyticsManager = new TinylyticsHandler();
+		Services.GameStateManager = new GameStateManager(GameMapData);
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
 		Services.WeaponGenerationManager.Update();
+		Services.GameStateManager.Update();
 	}
 
 	private void OnDestroy()
@@ -45,5 +48,8 @@ public class Game : MonoBehaviour
 
 		Services.Config.Destroy();
 		Services.Config = null;
+
+		Services.GameStateManager.Destroy();
+		Services.GameStateManager = null;
 	}
 }

@@ -22,6 +22,7 @@ public class Menu : MonoBehaviour
 	private Transform _brawlMode;
 	private Transform _2ndMenu;
 	private Transform _3rdMenu;
+	private Transform _loadingMenu;
 	private TextMeshProUGUI _2ndMenuTitle;
 	private TextMeshProUGUI _3rdMenuTitle;
 	private Transform[] _3rdMenuHolders;
@@ -40,6 +41,11 @@ public class Menu : MonoBehaviour
 	private Transform _chickenHolder;
 	private GameObject _chosenMapImage;
 	private TextMeshProUGUI _hintText;
+	private Image _loadingBackgroundImage;
+	private Transform _loadingBar;
+	private Image _loadingBarFillImage;
+	private Image _loadingImage;
+	private PlayerInformation _finalPlayerInformation;
 
 	private Player _mainPlayer;
 	private FSM<Menu> _menuFSM;
@@ -54,6 +60,11 @@ public class Menu : MonoBehaviour
 		_quit = transform.Find("MainMenu").Find("Quit").gameObject;
 		_title = transform.Find("MainMenu").Find("Title");
 		_2ndMenu = transform.Find("2ndMenu");
+		_loadingMenu = transform.Find("LoadingMenu");
+		_loadingBackgroundImage = _loadingMenu.Find("LoadingBackgroundImage").GetComponent<Image>();
+		_loadingBar = _loadingMenu.Find("LoadingBar");
+		_loadingBarFillImage = _loadingBar.GetChild(0).GetComponent<Image>();
+		_loadingImage = _loadingMenu.Find("LoadingImage").GetComponent<Image>();
 		_cartMode = _2ndMenu.Find("CartMode");
 		_brawlMode = _2ndMenu.Find("BrawlMode");
 		_chickenHolder = GameObject.Find("Chickens").transform;
@@ -182,6 +193,42 @@ public class Menu : MonoBehaviour
 	}
 
 	#region Loading State
+	private class CharacterSelectionToLoadingTransition : MenuState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context._hintText.DOText("", 0f);
+			Context._3rdMenuTitle.DOText("", 0f);
+			for (int i = 0; i < 6; i++)
+			{
+				Context._3rdMenuHolders[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+				Context._3rdMenuPrompts[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+				Context._3rdMenuHoleImages[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
+					SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
+					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+			}
+			Context._camera.DOLocalMove(_MenuData.EggFocusCameraPosition, _MenuData.EggFocusCameraDuration).SetEase(_MenuData.EggFocusCameraEase);
+			// Explode the egg
+			for (int i = 0; i < 6; i++)
+			{
+				int x = new int();
+				x = i;
+				Context._eggs[i].DOShakeRotation(_MenuData.ETC_EggShakeDuration, _MenuData.ETC_EggShakeStrength, _MenuData.ETC_EggShakeVibrato).SetDelay(_MenuData.EggExplodeDelay[i]).
+					OnComplete(() =>
+				{
+					Context._eggs[x].GetChild(0).gameObject.SetActive(false);
+					Instantiate(_MenuData.EggExplosionEffect, Context._eggs[x].transform.position + _MenuData.EggExplosionOffset[x], _MenuData.EggExplosionEffect.transform.rotation);
+				});
+			}
+			// Explode the land
+		}
+	}
+
 	private class LoadingState : MenuState
 	{
 		public override void OnEnter()
@@ -309,7 +356,7 @@ public class Menu : MonoBehaviour
 					_redEggsSelectedAmount > 0 && _playerMap.Count == _eggsSelectedAmount)
 				{
 					_saveData();
-					TransitionTo<LoadingState>();
+					TransitionTo<CharacterSelectionToLoadingTransition>();
 					return;
 				}
 			}
@@ -359,6 +406,7 @@ public class Menu : MonoBehaviour
 				//saveData[i] = new PlayerInformation(pm.RewiredPlayerID, pm.GamePlayerID, _cursorSelectedEggIndex[pm.GamePlayerID]);
 			}
 			PlayerInformation saveData = new PlayerInformation(rewiredPlayerID, GameplayerID, colorIndex);
+			Context._finalPlayerInformation = saveData;
 			DataSaver.saveData(saveData, "PlayersInformation");
 		}
 

@@ -200,4 +200,15 @@ public class MenuData : ScriptableObject
 
 	public GameObject ETC_ChickenDisappearVFX;
 	public Vector3 ETC_ChickenDisapperavFXOffset;
+
+	[Header("Character Selection To Loading Menu Setting")]
+	public Vector3 EggFocusCameraPosition = new Vector3(16.8f, 1.5f, 3.1f);
+	public float EggFocusCameraDuration = 2f;
+	public Ease EggFocusCameraEase;
+
+	public GameObject EggExplosionEffect;
+	public Vector3[] EggExplosionOffset;
+	public float[] EggExplodeDelay;
+
+
 }

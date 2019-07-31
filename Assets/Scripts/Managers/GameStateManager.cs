@@ -13,25 +13,30 @@ public class GameStateManager
 	private PlayerInformation _playersInformation;
 	private TextMeshProUGUI _holdAText;
 	private Image _holdAImage;
+	private Transform _tutorialImage;
 	private Transform _playersHolder;
 	private Transform[] _playersOutestHolder;
+	private TextMeshProUGUI _countDownText;
 
 	public GameStateManager(GameMapData _gmp)
 	{
 		_gameMapdata = _gmp;
 		_gameStateFSM = new FSM<GameStateManager>(this);
-		//_holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").GetComponent<TextMeshProUGUI>();
-		//_holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
+		_holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").GetComponent<TextMeshProUGUI>();
+		_holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
 		_playersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
 		Debug.Assert(_playersInformation != null, "Unable to load Players information");
 		_playersHolder = GameObject.Find("Players").transform;
+		_tutorialImage = GameObject.Find("TutorialCanvas").transform.Find("TutorialImage");
+		Debug.Assert(_tutorialImage != null);
 		_playersOutestHolder = new Transform[6];
+		_countDownText = GameObject.Find("TutorialCanvas").transform.Find("CountDown").GetComponent<TextMeshProUGUI>();
 		for (int i = 0; i < 6; i++)
 		{
 			_playersOutestHolder[i] = _playersHolder.GetChild(i);
-			Debug.Log(i + " th child's name is: " + _playersHolder.GetChild(i).name);
 		}
-		_gameStateFSM.TransitionTo<LandingState>();
+		//_gameStateFSM.TransitionTo<LandingState>();
+		_gameStateFSM.TransitionTo<FoodCartTutorialState>();
 	}
 
 	public void Update()
@@ -83,13 +88,11 @@ public class GameStateManager
 
 	private class LandingState : GameState
 	{
-		private SpriteRenderer _titleInAir;
 		private Camera _cam;
 
 		public override void Init()
 		{
 			base.Init();
-			_titleInAir = GameObject.Find("TitleInAir").GetComponent<SpriteRenderer>();
 			_cam = Camera.main;
 		}
 
@@ -97,12 +100,23 @@ public class GameStateManager
 		{
 			base.OnEnter();
 			Sequence seq = DOTween.Sequence();
-			_titleInAir.DOFade(1f, _GameMapData.BirfiaTitalFadeInOutDuration).SetEase(_GameMapData.BirfiaTitleFadeInOutCurve).
-				OnPlay(() => _cam.GetComponent<DOTweenAnimation>().DOPlayById("Move1"));
+			_cam.transform.DOLocalMove(_GameMapData.CameraMoveToPosition, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
+			seq.AppendInterval(_GameMapData.CountDownStartDelay);
+			for (int i = 3; i > 0; i--)
+			{
+				seq.Append(Context._countDownText.DOScale(0f, 0f));
+				seq.Append(Context._countDownText.DOText(i.ToString(), 0f));
+				seq.Append(Context._countDownText.DOScale(_GameMapData.CountDownScale[i - 1], _GameMapData.CountDownDuration[i - 1]).SetEase(_GameMapData.CountDownEase));
+				seq.AppendInterval(_GameMapData.CountDownDelay[i - 1]);
+			}
+			seq.Append(Context._countDownText.DOScale(0f, 0f));
+			seq.Append(Context._countDownText.DOText("Fight!", 0f));
+			seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.CountDownEase));
+			seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
+			seq.Append(Context._countDownText.DOScale(0f, 0.2f));
 			for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
 			{
 				int playerIndex = _PlayersInformation.ColorIndex[i];
-				Debug.Log(playerIndex);
 				Context._playersOutestHolder[playerIndex].gameObject.SetActive(true);
 			}
 			// TODO: Find the first 2 chicken duck and fly them down, then others
@@ -128,14 +142,44 @@ public class GameStateManager
 
 	private class FoodCartTutorialState : TutorialState
 	{
+		private bool _canHoldA;
+
 		public override void OnEnter()
 		{
 			base.OnEnter();
+			Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase);
+			Context._holdAText.DOText("Hold  A  To Start", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true);
 			//Context._holdAText.DOText("Hold  A  To Skip")
 			//Sequence seq = DOTween.Sequence();
 			//seq.Append(Context._tutorialTitle.DOText("Winning Condition", _GameMapData.TutorialTitleEnterDuration, true, _GameMapData.TutorialTitleScrambleMode));
 			//seq.AppendInterval(_GameMapData.TutorialTitleAfterDelay);
 			//seq.Append(Context._tutorialText.DOText(""))
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_canHoldA && _AnyAHolding)
+			{
+				Context._holdAImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
+				if (Context._holdAImage.fillAmount >= 1f)
+				{
+					TransitionTo<LandingState>();
+					return;
+				}
+			}
+			else
+			{
+				Context._holdAImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
+			}
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			Context._tutorialImage.DOScale(Vector3.zero, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase);
+			Context._holdAText.DOText("", 0f);
+			Context._holdAImage.transform.DOScale(0f, 0f);
 		}
 	}
 }

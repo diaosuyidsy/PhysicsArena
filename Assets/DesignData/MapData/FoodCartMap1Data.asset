@@ -13,89 +13,38 @@ MonoBehaviour:
   m_Name: FoodCartMap1Data
   m_EditorClassIdentifier: 
   GameMapMode: 2
-  BirfiaTitleFadeInOutCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 0.35718283
-      value: 1.0038035
-      inSlope: -0.013702008
-      outSlope: -0.013702008
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.6693493
-    - serializedVersion: 3
-      time: 0.4947575
-      value: 1.0040417
-      inSlope: -0.01975302
-      outSlope: -0.01975302
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.25076315
-    - serializedVersion: 3
-      time: 0.69615215
-      value: 1.0014133
-      inSlope: 0.004270105
-      outSlope: 0.004270105
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.42793888
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 0.9944458
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  BirfiaTitalFadeInOutDuration: 3.5
-  BirdsFlyDownDuration: 2
+  TutorialImageMoveInDuration: 0.5
+  TutorialImageMoveInEase: 27
+  HoldAMoveInDuration: 0.2
+  HoldAMoveInDelay: 0.2
+  FillASpeed: 2
+  BirdsFlyDownDuration: 1
   BirdsFlyDownDelay:
-  - 3
-  - 3
+  - 0
+  - 0.8
+  - 1.6
+  - 2.4
+  - 3.2
   - 4
-  - 4.5
-  - 0
-  - 0
   BirdsFlyDownEase: 5
-  CameraRotateCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 2
-      outSlope: 2
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  CameraMoveDuration: 2
+  CameraMoveToPosition: {x: 17.13, y: 8.2, z: -25.6}
+  CameraMoveDuration: 3
+  CameraMoveDelay: 0
+  CameraMoveEase: 6
+  CountDownStartDelay: 1
+  CountDownDuration:
+  - 0.5
+  - 0.5
+  - 0.5
+  CountDownDelay:
+  - 0.5
+  - 0.5
+  - 0.5
+  CountDownScale:
+  - 2
+  - 2
+  - 2
+  CountDownEase: 27
+  FightScale: 2
+  FightDuration: 0.5
+  FightStayOnScreenDuration: 0.5

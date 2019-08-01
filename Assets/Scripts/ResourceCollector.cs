@@ -25,7 +25,7 @@ public class ResourceCollector : MonoBehaviour
 			{
 				//TeamTracker++;
 				other.tag = "Untagged";
-				other.gameObject.layer = LayerMask.NameToLayer("Defualt");
+				other.gameObject.layer = LayerMask.NameToLayer("Default");
 				//print("Team 1 Score = " + TeamTracker);
 				// Statistics: Add the dropper to the stats record
 				//int lastholder = other.GetComponent<rtBirdFood>().LastHolder;
@@ -59,7 +59,7 @@ public class ResourceCollector : MonoBehaviour
 			{
 				//TeamTracker++;
 				other.tag = "Untagged";
-				other.gameObject.layer = LayerMask.NameToLayer("Defualt");
+				other.gameObject.layer = LayerMask.NameToLayer("Default");
 				//print("Team 2 Score = " + TeamTracker);
 				// Statistics: Add the dropper to the stats record
 				//int lastholder = other.GetComponent<rtBirdFood>().LastHolder;

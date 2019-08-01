@@ -240,21 +240,21 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
-	public void GameOver(int winner, GameObject _tar)
-	{
-		if (_won)
-			return;
-		EventManager.Instance.TriggerEvent(new GameEnd(winner));
-		Winner = winner;
-		StartCoroutine(EndImageShow(3f, _tar));
-		_won = true;
-	}
+	//public void GameOver(int winner, GameObject _tar)
+	//{
+	//	if (_won)
+	//		return;
+	//	EventManager.Instance.TriggerEvent(new GameEnd(winner, _tar.transform));
+	//	Winner = winner;
+	//	StartCoroutine(EndImageShow(3f, _tar));
+	//	_won = true;
+	//}
 
 	// This function is used for testing purposes only
-	public void ForceGameOver(int winner)
-	{
-		GameOver(winner, APlayers[winner - 1]);
-	}
+	//public void ForceGameOver(int winner)
+	//{
+	//	GameOver(winner, APlayers[winner - 1]);
+	//}
 
 	private void Update()
 	{

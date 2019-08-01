@@ -34,4 +34,13 @@ public class GameMapData : ScriptableObject
 	public float FightScale;
 	public float FightDuration;
 	public float FightStayOnScreenDuration;
+
+	[Header("Win State Setting")]
+	[Range(0f, 1f)]
+	public float DarkCornerMiddlePercentage = 0.75f;
+	[Range(0f, 1f)]
+	public float DarkCornerFinalPercentage = 0.45f;
+	public float DarkCornerToMiddleDuration = 2f;
+	public float DarkCornerToFinalDuration = 1f;
+	public float DarkCornerMiddleStayDuration = 3f;
 }

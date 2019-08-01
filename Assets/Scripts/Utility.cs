@@ -5,7 +5,29 @@ using System;
 
 public static class Utility
 {
+	// This function takes the center position on sreen
+	// and calculates the maximum length of its position to the four corners
+	public static float GetMaxLengthToCorner(Vector2 centerposition)
+	{
+		Vector2[] screenVertices = new Vector2[]
+		{
+			new Vector2(0f, 0f),
+			new Vector2(Screen.width, 0f),
+			new Vector2(Screen.width, Screen.height),
+			new Vector2(0f, Screen.height),
+		};
 
+		float maxLength = 0f;
+		for (int i = 0; i < 4; i++)
+		{
+			float length = Vector2.Distance(centerposition, screenVertices[i]);
+			if (length > maxLength)
+			{
+				maxLength = length;
+			}
+		}
+		return maxLength;
+	}
 }
 
 [Serializable]

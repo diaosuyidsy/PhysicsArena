@@ -9,79 +9,21 @@ public class CameraController : MonoBehaviour
 
 	public CameraData CameraData;
 
-	private float _maxDistanceOrigin;
-	private float _xDiffOrigin;
-	private float _zDiffOrigin;
-	private Vector3 _desiredPosition;
-	private Vector3 _smoothedPosition;
-	private float _desiredFOV;
-	private float _smoothedFOV;
-	private bool _winLock = false;
-	private float transformY;
-
+	private Vector3 _winFocusPosition;
+	private Camera _cam;
 	private FSM<CameraController> _camFSM;
 
 	private void Awake()
 	{
+		_cam = GetComponent<Camera>();
 		_camFSM = new FSM<CameraController>(this);
 		_camFSM.TransitionTo<EntryState>();
 	}
-	// Use this for initialization
-	//void Start()
-	//{
-	//	SetTarget(false);
-	//	// Set the max Distance originally
-	//	float maxDist = 0f;
-	//	foreach (PlayerController go in Services.GameStateManager.PlayerControllers)
-	//	{
-	//		if (go == null) continue;
-	//		float temp = Vector3.Distance(go.transform.position, FollowTarget);
-	//		if (temp > maxDist)
-	//		{
-	//			maxDist = temp;
-	//		}
-	//	}
-	//	_maxDistanceOrigin = maxDist;
-	//	// Set X and Z Original Difference
-	//	//_xDiffOrigin = transform.position.x - FollowTarget.x;
-	//	_zDiffOrigin = transform.position.z - Services.GameStateManager.PlayerControllers[0].transform.position.z;
-	//	_xDiffOrigin = 0f;
-	//	transformY = transform.position.y;
-	//	//iffOrigin = 0f;
-	//}
 
 	// Update is called once per frame
 	void Update()
 	{
 		_camFSM.Update();
-		// If player won, then do Won Logic and lock others
-		//if (_winLock)
-		//{
-		//	_desiredPosition = new Vector3(FollowTarget.x + _xDiffOrigin, transformY, FollowTarget.z + _zDiffOrigin);
-		//	_smoothedPosition = Vector3.Lerp(transform.position, _desiredPosition, CameraData.SmoothSpeed);
-		//	transform.position = _smoothedPosition;
-		//	GetComponent<Camera>().fieldOfView = Mathf.Lerp(GetComponent<Camera>().fieldOfView, CameraData.WonFOVSize, CameraData.SmoothSpeed);
-		//	return;
-		//}
-		//SetTarget();
-		//if (FollowTarget == Vector3.zero || FollowTarget == new Vector3(CameraData.XOffset, 0f, CameraData.ZOffset))
-		//{
-		//	return;
-		//}
-		//_desiredPosition = new Vector3(FollowTarget.x + _xDiffOrigin, transformY, FollowTarget.z + _zDiffOrigin);
-		//_smoothedPosition = Vector3.Lerp(transform.position, _desiredPosition, CameraData.SmoothSpeed);
-		//transform.position = _smoothedPosition;
-		////GetComponent<Camera> ().fieldOfView += (MaxDistance () - _maxDistanceOrigin) * CameraScaleSpeed;
-		////_maxDistanceOrigin = MaxDistance ();
-		//_desiredFOV = 2f * MaxDistance() + 3.99f;
-		//GetComponent<Camera>().fieldOfView = Mathf.Lerp(GetComponent<Camera>().fieldOfView, _desiredFOV, CameraData.SmoothSpeed);
-		//GetComponent<Camera>().fieldOfView = Mathf.Clamp(GetComponent<Camera>().fieldOfView, CameraData.FOVSizeMin, CameraData.FOVSizeMax);
-	}
-
-	public void OnWinCameraZoom(Transform tar)
-	{
-		_winLock = true;
-		FollowTarget = tar.position;
 	}
 
 	private abstract class CameraState : FSM<CameraController>.State
@@ -113,11 +55,6 @@ public class CameraController : MonoBehaviour
 		private Vector3 _targetOnGround;
 		private Vector3 _desiredPosition;
 
-		public override void OnEnter()
-		{
-			base.OnEnter();
-		}
-
 		public override void Update()
 		{
 			base.Update();
@@ -146,8 +83,8 @@ public class CameraController : MonoBehaviour
 			Context.transform.position = Vector3.Lerp(Context.transform.position, _desiredPosition, _CameraData.SmoothSpeed);
 
 			float _desiredFOV = 2f * _getMaxDistance() + 3.99f;
-			Context.GetComponent<Camera>().fieldOfView = Mathf.Lerp(Context.GetComponent<Camera>().fieldOfView, _desiredFOV, _CameraData.SmoothSpeed);
-			Context.GetComponent<Camera>().fieldOfView = Mathf.Clamp(Context.GetComponent<Camera>().fieldOfView, _CameraData.FOVSizeMin, _CameraData.FOVSizeMax);
+			Context._cam.fieldOfView = Mathf.Lerp(Context._cam.fieldOfView, _desiredFOV, _CameraData.SmoothSpeed);
+			Context._cam.fieldOfView = Mathf.Clamp(Context._cam.fieldOfView, _CameraData.FOVSizeMin, _CameraData.FOVSizeMax);
 		}
 
 		private void _setCameraPosition()
@@ -199,7 +136,17 @@ public class CameraController : MonoBehaviour
 
 	private class WinState : CameraState
 	{
+		private Vector3 _desiredPosition;
 
+		public override void Update()
+		{
+			base.Update();
+			_desiredPosition.x = Context._winFocusPosition.x;
+			_desiredPosition.y = Context._winFocusPosition.y + Mathf.Sin(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
+			_desiredPosition.z = Context._winFocusPosition.z - Mathf.Cos(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
+			Context.transform.position = Vector3.Lerp(Context.transform.position, _desiredPosition, _CameraData.SmoothSpeed);
+			Context._cam.fieldOfView = Mathf.Lerp(Context._cam.fieldOfView, _CameraData.WonFOVSize, _CameraData.SmoothSpeed);
+		}
 	}
 
 	private void _onGameStart(GameStart gs)
@@ -224,11 +171,21 @@ public class CameraController : MonoBehaviour
 		if (_camFSM.CurrentState.GetType().Equals(typeof(AllDeadState))) _camFSM.TransitionTo<TrackingState>();
 	}
 
+	private void _onGameWon(GameEnd ge)
+	{
+		if (!_camFSM.CurrentState.GetType().Equals(typeof(AllDeadState)) &&
+			!_camFSM.CurrentState.GetType().Equals(typeof(TrackingState))) return;
+		_winFocusPosition = new Vector3(ge.WinnedObjective.position.x, ge.WinnedObjective.position.y, ge.WinnedObjective.position.z);
+		_camFSM.TransitionTo<WinState>();
+		return;
+	}
+
 	private void OnEnable()
 	{
 		EventManager.Instance.AddHandler<GameStart>(_onGameStart);
 		EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDead);
 		EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
+		EventManager.Instance.AddHandler<GameEnd>(_onGameWon);
 	}
 
 	private void OnDisable()
@@ -236,5 +193,6 @@ public class CameraController : MonoBehaviour
 		EventManager.Instance.RemoveHandler<GameStart>(_onGameStart);
 		EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDead);
 		EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawn);
+		EventManager.Instance.RemoveHandler<GameEnd>(_onGameWon);
 	}
 }

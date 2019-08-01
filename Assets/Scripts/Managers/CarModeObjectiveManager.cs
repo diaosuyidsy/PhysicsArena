@@ -14,8 +14,9 @@ public class CarModeObjectiveManager : MonoBehaviour
 			Team1Score++;
 			if (Team1Score >= 2)
 			{
-				GameManager.GM.GameOver(1, fd.Food);
-				Camera.main.GetComponent<CameraController>().OnWinCameraZoom(fd.Food.transform);
+				//GameManager.GM.GameOver(1, fd.Food);
+				EventManager.Instance.TriggerEvent(new GameEnd(1, fd.Food.transform));
+				//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(fd.Food.transform);
 			}
 		}
 		else
@@ -23,8 +24,9 @@ public class CarModeObjectiveManager : MonoBehaviour
 			Team2Score++;
 			if (Team2Score >= 2)
 			{
-				GameManager.GM.GameOver(2, fd.Food);
-				Camera.main.GetComponent<CameraController>().OnWinCameraZoom(fd.Food.transform);
+				//GameManager.GM.GameOver(2, fd.Food);
+				EventManager.Instance.TriggerEvent(new GameEnd(2, fd.Food.transform));
+				//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(fd.Food.transform);
 			}
 		}
 	}

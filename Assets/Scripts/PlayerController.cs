@@ -131,8 +131,7 @@ public class PlayerController : MonoBehaviour
 	{
 		// First check if the player could block the attack
 		if (_blockable &&
-			_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
-			_angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+			CanBlock(sender.transform.forward))
 		{
 			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
 		}
@@ -141,6 +140,20 @@ public class PlayerController : MonoBehaviour
 			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
 			OnImpact(force, ForceMode.Impulse, sender);
 		}
+	}
+
+	/// <summary>
+	/// Can Block The attack or not
+	/// Used by hook and hit
+	/// </summary>
+	/// <param name="forwardAngle"></param>
+	/// <returns></returns>
+	public bool CanBlock(Vector3 forwardAngle)
+	{
+		if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
+			_angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+			return true;
+		return false;
 	}
 
 	/// <summary>

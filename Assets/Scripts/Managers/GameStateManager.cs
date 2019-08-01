@@ -20,11 +20,17 @@ public class GameStateManager
 	private Transform[] _playersOutestHolder;
 	private TextMeshProUGUI _countDownText;
 	private Camera _cam;
+	private Vector3 _endFocusPosition;
+	private DarkCornerEffect _darkCornerEffect;
+	private Transform _gameEndCanvas;
+	private GameObject _blackbackground;
 
 	public GameStateManager(GameMapData _gmp)
 	{
 		_gameMapdata = _gmp;
 		_gameStateFSM = new FSM<GameStateManager>(this);
+		_gameEndCanvas = GameObject.Find("GameEndCanvas").transform;
+		_blackbackground = _gameEndCanvas.Find("EndImageBackground").gameObject;
 		_holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").GetComponent<TextMeshProUGUI>();
 		_holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
 		_playersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
@@ -43,7 +49,9 @@ public class GameStateManager
 		{
 			PlayerControllers[i] = _playersOutestHolder[_playersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
 		}
+		EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
 		_cam = Camera.main;
+		_darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
 		//_gameStateFSM.TransitionTo<LandingState>();
 		_gameStateFSM.TransitionTo<FoodCartTutorialState>();
 	}
@@ -55,8 +63,19 @@ public class GameStateManager
 
 	public void Destroy()
 	{
+		EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
 		if (_gameStateFSM.CurrentState != null)
 			_gameStateFSM.CurrentState.CleanUp();
+	}
+
+	private void _onGameEnd(GameEnd ge)
+	{
+		if (!_gameStateFSM.CurrentState.GetType().Equals(typeof(WinState)))
+		{
+			_endFocusPosition = ge.WinnedObjective.position;
+			_gameStateFSM.TransitionTo<WinState>();
+			return;
+		}
 	}
 
 	private abstract class GameState : FSM<GameStateManager>.State
@@ -105,6 +124,58 @@ public class GameStateManager
 			base.Init();
 			_PlayersInformation = Context._playersInformation;
 			_GameMapData = Context._gameMapdata;
+		}
+	}
+
+	private class StaticsticWorkState : GameState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context._blackbackground.SetActive(true);
+		}
+	}
+
+	private class WinState : GameState
+	{
+		private Vector2 _targetPosition
+		{
+			get
+			{
+				Vector3 _temp = Camera.main.WorldToScreenPoint(Context._endFocusPosition);
+				_temp.y = Screen.height - _temp.y;
+				return _temp;
+			}
+		}
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Context._darkCornerEffect.CenterPosition = _targetPosition;
+
+			float maxlength = Utility.GetMaxLengthToCorner(_targetPosition);
+			Context._darkCornerEffect.enabled = true;
+			Context._darkCornerEffect.Length = maxlength;
+			float middlelength = maxlength * _GameMapData.DarkCornerMiddlePercentage;
+			float finallength = maxlength * _GameMapData.DarkCornerFinalPercentage;
+
+			Sequence seq = DOTween.Sequence();
+			seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, middlelength, _GameMapData.DarkCornerToMiddleDuration));
+			seq.AppendInterval(_GameMapData.DarkCornerMiddleStayDuration);
+			seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, finallength, _GameMapData.DarkCornerToFinalDuration));
+			seq.AppendCallback(() =>
+			{
+				Context._darkCornerEffect.enabled = false;
+			});
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (Context._darkCornerEffect.enabled)
+			{
+				Context._darkCornerEffect.CenterPosition = _targetPosition;
+			}
 		}
 	}
 

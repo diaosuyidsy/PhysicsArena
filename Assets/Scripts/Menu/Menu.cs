@@ -6,6 +6,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.Linq;
 
 public class Menu : MonoBehaviour
 {
@@ -45,7 +46,9 @@ public class Menu : MonoBehaviour
 	private Transform _loadingBar;
 	private Image _loadingBarFillImage;
 	private Image _loadingImage;
+	private Transform _loadingTitle;
 	private PlayerInformation _finalPlayerInformation;
+	private Transform _3rdLand;
 
 	private Player _mainPlayer;
 	private FSM<Menu> _menuFSM;
@@ -65,6 +68,7 @@ public class Menu : MonoBehaviour
 		_loadingBar = _loadingMenu.Find("LoadingBar");
 		_loadingBarFillImage = _loadingBar.GetChild(0).GetComponent<Image>();
 		_loadingImage = _loadingMenu.Find("LoadingImage").GetComponent<Image>();
+		_loadingTitle = _loadingMenu.Find("LoadingTitle");
 		_cartMode = _2ndMenu.Find("CartMode");
 		_brawlMode = _2ndMenu.Find("BrawlMode");
 		_chickenHolder = GameObject.Find("Chickens").transform;
@@ -86,6 +90,7 @@ public class Menu : MonoBehaviour
 		_3rdMenuHoleImages = new Transform[6];
 		_chickenOriginalLocalPosition = new Vector3[6];
 		_hintText = _3rdMenu.Find("Hints").GetComponent<TextMeshProUGUI>();
+		_3rdLand = GameObject.Find("3rd land").transform;
 		for (int i = 0; i < 6; i++)
 		{
 			_3rdMenuHolders[i] = _3rdMenu.Find("Holes").GetChild(i);
@@ -213,19 +218,37 @@ public class Menu : MonoBehaviour
 					SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
 			}
 			Context._camera.DOLocalMove(_MenuData.EggFocusCameraPosition, _MenuData.EggFocusCameraDuration).SetEase(_MenuData.EggFocusCameraEase);
-			// Explode the egg
+			Sequence seq = DOTween.Sequence();
+			// Explode the unchosen egg TODO: Unchosen only
+			int count = 0;
 			for (int i = 0; i < 6; i++)
 			{
-				int x = new int();
-				x = i;
-				Context._eggs[i].DOShakeRotation(_MenuData.ETC_EggShakeDuration, _MenuData.ETC_EggShakeStrength, _MenuData.ETC_EggShakeVibrato).SetDelay(_MenuData.EggExplodeDelay[i]).
+				if (Context._finalPlayerInformation.ColorIndex.Contains(i)) continue;
+				int temp = i;
+				seq.Append(Context._eggs[temp].DOShakeRotation(_MenuData.EggExplosionShakeDuration, _MenuData.ETC_EggShakeStrength, _MenuData.ETC_EggShakeVibrato).
 					OnComplete(() =>
 				{
-					Context._eggs[x].GetChild(0).gameObject.SetActive(false);
-					Instantiate(_MenuData.EggExplosionEffect, Context._eggs[x].transform.position + _MenuData.EggExplosionOffset[x], _MenuData.EggExplosionEffect.transform.rotation);
-				});
+					Context._eggs[temp].GetChild(0).gameObject.SetActive(false);
+					Instantiate(_MenuData.EggExplosionEffect, Context._eggs[temp].transform.position + _MenuData.EggExplosionOffset[temp], _MenuData.EggExplosionEffect.transform.rotation);
+				}));
+				seq.AppendInterval(_MenuData.EggExplodeDelay[temp]);
 			}
-			// Explode the land
+
+			// Explode the land or somehow make the land disappear
+			seq.Append(Context._3rdLand.DOLocalMoveY(-33f, _MenuData.ThirdLandDropDuration).SetEase(_MenuData.ThirdLandDropEase).SetDelay(_MenuData
+				.ThirdLandDropDelay).OnComplete(() =>
+					{
+						for (int i = 0; i < Context._finalPlayerInformation.ColorIndex.Length; i++)
+						{
+							if (i != Context._finalPlayerInformation.ColorIndex.Length - 1)
+								Context._chickens[Context._finalPlayerInformation.ColorIndex[i]].DOLocalMoveY(-10f, _MenuData.ChickensDropDuration[i]).SetRelative(true).
+							SetDelay(_MenuData.ChickensDropDelay[i]).SetEase(_MenuData.ChickenDropEase);
+							else
+								Context._chickens[Context._finalPlayerInformation.ColorIndex[i]].DOLocalMoveY(-10f, _MenuData.ChickensDropDuration[i]).SetRelative(true).
+							SetDelay(_MenuData.ChickensDropDelay[i]).SetEase(_MenuData.ChickenDropEase).OnComplete(() => TransitionTo<LoadingState>());
+						}
+					}));
+
 		}
 	}
 
@@ -234,17 +257,27 @@ public class Menu : MonoBehaviour
 		public override void OnEnter()
 		{
 			base.OnEnter();
-			Context.StartCoroutine(_loadScene());
+			Context._hintText.text = "";
+			Context._loadingBackgroundImage.DOFade(1f, _MenuData.BackgroundImageFadeDuration).SetEase(_MenuData.BackgroundImageFadeEase).OnComplete(() =>
+			{
+				Context._loadingBar.gameObject.SetActive(true);
+				Context._loadingImage.gameObject.SetActive(true);
+				Context._loadingTitle.gameObject.SetActive(true);
+				Context.StartCoroutine(_loadScene());
+			});
 		}
 
 		IEnumerator _loadScene()
 		{
+			yield return 5f;
 			AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.MapName);
 			asyncload.allowSceneActivation = false;
 			while (!asyncload.isDone)
 			{
+				Context._loadingBarFillImage.fillAmount = asyncload.progress * (1f / 0.9f);
 				if (asyncload.progress >= 0.9f)
 				{
+					Context._loadingTitle.GetComponent<TextMeshProUGUI>().text = "Press A To Continue";
 					if (_ADown)
 						asyncload.allowSceneActivation = true;
 				}
@@ -423,7 +456,7 @@ public class Menu : MonoBehaviour
 			}
 			else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count)
 			{
-				Context._hintText.DOText("Press A to Start!", 1f);
+				Context._hintText.DOText("Press A to Confirm", 1f);
 			}
 			else
 				Context._hintText.DOText("", 0f);

@@ -206,9 +206,21 @@ public class MenuData : ScriptableObject
 	public float EggFocusCameraDuration = 2f;
 	public Ease EggFocusCameraEase;
 
+	public float EggExplosionShakeDuration = 0.2f;
 	public GameObject EggExplosionEffect;
 	public Vector3[] EggExplosionOffset;
 	public float[] EggExplodeDelay;
 
+	public float ThirdLandDropDuration;
+	public float ThirdLandDropDelay;
+	public Ease ThirdLandDropEase;
+
+	public float[] ChickensDropDuration;
+	public float[] ChickensDropDelay;
+	public Ease ChickenDropEase;
+
+	[Header("Loading Menu Setting")]
+	public float BackgroundImageFadeDuration = 1f;
+	public Ease BackgroundImageFadeEase = Ease.InQuad;
 
 }

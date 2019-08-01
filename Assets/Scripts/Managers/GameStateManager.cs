@@ -101,14 +101,14 @@ public class GameStateManager
 			base.OnEnter();
 			Sequence seq = DOTween.Sequence();
 			_cam.transform.DOLocalMove(_GameMapData.CameraMoveToPosition, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
-			seq.AppendInterval(_GameMapData.CountDownStartDelay);
-			for (int i = 3; i > 0; i--)
-			{
-				seq.Append(Context._countDownText.DOScale(0f, 0f));
-				seq.Append(Context._countDownText.DOText(i.ToString(), 0f));
-				seq.Append(Context._countDownText.DOScale(_GameMapData.CountDownScale[i - 1], _GameMapData.CountDownDuration[i - 1]).SetEase(_GameMapData.CountDownEase));
-				seq.AppendInterval(_GameMapData.CountDownDelay[i - 1]);
-			}
+			seq.AppendInterval(_GameMapData.CountDownStartDelay + 3f);
+			//for (int i = 3; i > 0; i--)
+			//{
+			//	seq.Append(Context._countDownText.DOScale(0f, 0f));
+			//	seq.Append(Context._countDownText.DOText(i.ToString(), 0f));
+			//	seq.Append(Context._countDownText.DOScale(_GameMapData.CountDownScale[i - 1], _GameMapData.CountDownDuration[i - 1]).SetEase(_GameMapData.CountDownEase));
+			//	seq.AppendInterval(_GameMapData.CountDownDelay[i - 1]);
+			//}
 			seq.Append(Context._countDownText.DOScale(0f, 0f));
 			seq.Append(Context._countDownText.DOText("Fight!", 0f));
 			seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.CountDownEase));

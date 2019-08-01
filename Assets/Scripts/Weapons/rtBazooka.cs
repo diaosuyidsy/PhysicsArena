@@ -78,7 +78,7 @@ public class rtBazooka : WeaponBase
 				if (hit.collider.gameObject == _gpc.Owner) return;
 				_bazookaState = BazookaStates.Idle;
 				List<GameObject> affectedPlayers = new List<GameObject>();
-				foreach (PlayerController _pc in Services.Config.Players)
+				foreach (PlayerController _pc in Services.GameStateManager.PlayerControllers)
 				{
 					float dis = Vector3.Distance(_pc.transform.position, transform.position);
 					if (_pc.gameObject.activeInHierarchy &&

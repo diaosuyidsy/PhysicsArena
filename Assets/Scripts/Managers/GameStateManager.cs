@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class GameStateManager
 {
+	public PlayerController[] PlayerControllers;
+
 	private GameMapData _gameMapdata;
 	private FSM<GameStateManager> _gameStateFSM;
 	private PlayerInformation _playersInformation;
@@ -17,6 +19,7 @@ public class GameStateManager
 	private Transform _playersHolder;
 	private Transform[] _playersOutestHolder;
 	private TextMeshProUGUI _countDownText;
+	private Camera _cam;
 
 	public GameStateManager(GameMapData _gmp)
 	{
@@ -31,10 +34,16 @@ public class GameStateManager
 		Debug.Assert(_tutorialImage != null);
 		_playersOutestHolder = new Transform[6];
 		_countDownText = GameObject.Find("TutorialCanvas").transform.Find("CountDown").GetComponent<TextMeshProUGUI>();
+		PlayerControllers = new PlayerController[_playersInformation.ColorIndex.Length];
 		for (int i = 0; i < 6; i++)
 		{
 			_playersOutestHolder[i] = _playersHolder.GetChild(i);
 		}
+		for (int i = 0; i < _playersInformation.ColorIndex.Length; i++)
+		{
+			PlayerControllers[i] = _playersOutestHolder[_playersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
+		}
+		_cam = Camera.main;
 		//_gameStateFSM.TransitionTo<LandingState>();
 		_gameStateFSM.TransitionTo<FoodCartTutorialState>();
 	}
@@ -46,7 +55,8 @@ public class GameStateManager
 
 	public void Destroy()
 	{
-		_gameStateFSM.CurrentState.CleanUp();
+		if (_gameStateFSM.CurrentState != null)
+			_gameStateFSM.CurrentState.CleanUp();
 	}
 
 	private abstract class GameState : FSM<GameStateManager>.State
@@ -76,6 +86,18 @@ public class GameStateManager
 			}
 		}
 
+		protected bool _AnyPauseDown
+		{
+			get
+			{
+				for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
+				{
+					if (ReInput.players.GetPlayer(_PlayersInformation.RewiredID[i]).GetButtonDown("Pause")) return true;
+				}
+				return false;
+			}
+		}
+
 		protected GameMapData _GameMapData;
 
 		public override void Init()
@@ -83,6 +105,51 @@ public class GameStateManager
 			base.Init();
 			_PlayersInformation = Context._playersInformation;
 			_GameMapData = Context._gameMapdata;
+		}
+	}
+
+	private class GameLoop : GameState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			/// Resume Music
+			Context._cam.GetComponent<AudioSource>().Play();
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_AnyPauseDown)
+			{
+				TransitionTo<PauseState>();
+				return;
+			}
+		}
+	}
+
+	private class PauseState : GameState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Time.timeScale = 0f;
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_AnyPauseDown)
+			{
+				TransitionTo<GameLoop>();
+				return;
+			}
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			Time.timeScale = 1f;
 		}
 	}
 
@@ -99,39 +166,44 @@ public class GameStateManager
 		public override void OnEnter()
 		{
 			base.OnEnter();
+			int numOfPlayers = _PlayersInformation.ColorIndex.Length;
 			Sequence seq = DOTween.Sequence();
-			_cam.transform.DOLocalMove(_GameMapData.CameraMoveToPosition, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
-			seq.AppendInterval(_GameMapData.CountDownStartDelay + 3f);
-			//for (int i = 3; i > 0; i--)
-			//{
-			//	seq.Append(Context._countDownText.DOScale(0f, 0f));
-			//	seq.Append(Context._countDownText.DOText(i.ToString(), 0f));
-			//	seq.Append(Context._countDownText.DOScale(_GameMapData.CountDownScale[i - 1], _GameMapData.CountDownDuration[i - 1]).SetEase(_GameMapData.CountDownEase));
-			//	seq.AppendInterval(_GameMapData.CountDownDelay[i - 1]);
-			//}
-			seq.Append(Context._countDownText.DOScale(0f, 0f));
-			seq.Append(Context._countDownText.DOText("Fight!", 0f));
-			seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.CountDownEase));
-			seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
-			seq.Append(Context._countDownText.DOScale(0f, 0.2f));
+			//_cam.transform.DOLocalMove(_GameMapData.CameraMoveToPosition, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
+			_cam.DOFieldOfView(_GameMapData.CameraTargetFOV, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
 			for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
 			{
 				int playerIndex = _PlayersInformation.ColorIndex[i];
+				int temp = i;
 				Context._playersOutestHolder[playerIndex].gameObject.SetActive(true);
+				seq.Join(Context._playersOutestHolder[playerIndex].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[temp]).SetEase(_GameMapData.BirdsFlyDownEase).
+				OnComplete(() => _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree")));
 			}
-			// TODO: Find the first 2 chicken duck and fly them down, then others
-			Context._playersOutestHolder[1].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[0]).SetEase(_GameMapData.BirdsFlyDownEase).
-				OnComplete(() => _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree"));
-			Context._playersOutestHolder[3].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[1]).SetEase(_GameMapData.BirdsFlyDownEase).
-				OnComplete(() => _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree"));
-			Context._playersOutestHolder[0].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[2]).SetEase(_GameMapData.BirdsFlyDownEase).
-				OnComplete(() => _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree"));
-			Context._playersOutestHolder[4].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[3]).SetEase(_GameMapData.BirdsFlyDownEase).
-				OnComplete(() => _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree"));
-			//seq.AppendInterval(0.5f);
-			//seq.AppendCallback(() => _cam.GetComponent<DOTweenAnimation>().DOPlayById("Shake"));
-			//seq.Append(_cam.transform.DOLocalRotate(new Vector3(45f, 0f, 0f), _GameMapData.CameraMoveDuration).SetEase(_GameMapData.CameraRotateCurve));
-			//seq.Join(_cam.DOFieldOfView(30f, _GameMapData.CameraMoveDuration));
+			seq.AppendInterval(_GameMapData.FightDelay);
+			seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.FightEase));
+			seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
+			seq.Append(Context._countDownText.DOScale(0f, 0.2f));
+			seq.AppendCallback(() => TransitionTo<GameLoop>());
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			/// Need to Enable everything that game loop has
+			/// 1. Enable PlayerController, set rigidbody kinematic = false
+			/// TODO: Color the players
+			/// 2. Enable Camera
+			/// 3. Send Game Start Event
+			for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+			{
+				int playerindex = _PlayersInformation.ColorIndex[i];
+				int rewiredid = _PlayersInformation.RewiredID[i];
+				PlayerController playercontroller = Context._playersOutestHolder[playerindex].GetComponentInChildren<PlayerController>(true);
+				playercontroller.enabled = true;
+				playercontroller.Init(rewiredid);
+				playercontroller.GetComponent<Rigidbody>().isKinematic = false;
+			}
+			Context._cam.GetComponent<CameraController>().enabled = true;
+			EventManager.Instance.TriggerEvent(new GameStart());
 		}
 	}
 
@@ -149,11 +221,6 @@ public class GameStateManager
 			base.OnEnter();
 			Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase);
 			Context._holdAText.DOText("Hold  A  To Start", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true);
-			//Context._holdAText.DOText("Hold  A  To Skip")
-			//Sequence seq = DOTween.Sequence();
-			//seq.Append(Context._tutorialTitle.DOText("Winning Condition", _GameMapData.TutorialTitleEnterDuration, true, _GameMapData.TutorialTitleScrambleMode));
-			//seq.AppendInterval(_GameMapData.TutorialTitleAfterDelay);
-			//seq.Append(Context._tutorialText.DOText(""))
 		}
 
 		public override void Update()
@@ -179,7 +246,7 @@ public class GameStateManager
 			base.OnExit();
 			Context._tutorialImage.DOScale(Vector3.zero, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase);
 			Context._holdAText.DOText("", 0f);
-			Context._holdAImage.transform.DOScale(0f, 0f);
+			Context._holdAImage.transform.DOScale(0f, 0f).SetEase(Ease.OutQuad);
 		}
 	}
 }

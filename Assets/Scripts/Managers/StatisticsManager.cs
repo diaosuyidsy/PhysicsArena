@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Rewired;
 
 public class StatisticsManager
 {
@@ -23,21 +24,22 @@ public class StatisticsManager
 
 	public StatisticsManager()
 	{
-		SuicideRecord = new int[6];
-		KillRecord = new int[6];
-		TeammateMurderRecord = new int[6];
-		BlockTimes = new int[6];
-		FoodScoreTimes = new int[6];
-		HookGunUseTimes = new int[6];
-		HookGunSuccessTimes = new int[6];
-		SuckedPlayersTimes = new int[6];
-		BlockedTimes = new int[6];
-		WeaponPickedTimes = new int[6];
-		CartTime = new float[6];
-		WaterGunUseTime = new float[6];
-		DeadTimes = new int[6];
-		MeleeUseTimes = new int[6];
-		MeleeHitTimes = new int[6];
+		int maxPlayers = ReInput.players.playerCount;
+		SuicideRecord = new int[maxPlayers];
+		KillRecord = new int[maxPlayers];
+		TeammateMurderRecord = new int[maxPlayers];
+		BlockTimes = new int[maxPlayers];
+		FoodScoreTimes = new int[maxPlayers];
+		HookGunUseTimes = new int[maxPlayers];
+		HookGunSuccessTimes = new int[maxPlayers];
+		SuckedPlayersTimes = new int[maxPlayers];
+		BlockedTimes = new int[maxPlayers];
+		WeaponPickedTimes = new int[maxPlayers];
+		CartTime = new float[maxPlayers];
+		WaterGunUseTime = new float[maxPlayers];
+		DeadTimes = new int[maxPlayers];
+		MeleeUseTimes = new int[maxPlayers];
+		MeleeHitTimes = new int[maxPlayers];
 		EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
 		EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
 		EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);

@@ -214,6 +214,7 @@ public class MenuData : ScriptableObject
 	public float ThirdLandDropDuration;
 	public float ThirdLandDropDelay;
 	public Ease ThirdLandDropEase;
+	public Vector3 ThirdLandDropLocalPosition = new Vector3(0f, -5f);
 
 	public float[] ChickensDropDuration;
 	public float[] ChickensDropDelay;

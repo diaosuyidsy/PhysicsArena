@@ -24,14 +24,13 @@ public class GameMapData : ScriptableObject
 	public Vector3 CameraMoveToPosition = new Vector3(17.13f, 8.2f, -25.6f);
 	public float CameraMoveDuration = 1f;
 	public float CameraMoveDelay = 0f;
+	public float CameraTargetFOV = 15f;
 	public Ease CameraMoveEase;
 
 	public float CountDownStartDelay;
-	public float[] CountDownDuration;
-	public float[] CountDownDelay;
-	public float[] CountDownScale;
-	public Ease CountDownEase = Ease.OutElastic;
+	public Ease FightEase = Ease.OutElastic;
 
+	public float FightDelay = 0.5f;
 	public float FightScale;
 	public float FightDuration;
 	public float FightStayOnScreenDuration;

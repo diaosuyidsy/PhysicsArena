@@ -220,7 +220,6 @@ public class Menu : MonoBehaviour
 			Context._camera.DOLocalMove(_MenuData.EggFocusCameraPosition, _MenuData.EggFocusCameraDuration).SetEase(_MenuData.EggFocusCameraEase);
 			Sequence seq = DOTween.Sequence();
 			// Explode the unchosen egg TODO: Unchosen only
-			int count = 0;
 			for (int i = 0; i < 6; i++)
 			{
 				if (Context._finalPlayerInformation.ColorIndex.Contains(i)) continue;
@@ -235,7 +234,7 @@ public class Menu : MonoBehaviour
 			}
 
 			// Explode the land or somehow make the land disappear
-			seq.Append(Context._3rdLand.DOLocalMoveY(-33f, _MenuData.ThirdLandDropDuration).SetEase(_MenuData.ThirdLandDropEase).SetDelay(_MenuData
+			seq.Append(Context._3rdLand.DOLocalMove(_MenuData.ThirdLandDropLocalPosition, _MenuData.ThirdLandDropDuration).SetRelative(true).SetEase(_MenuData.ThirdLandDropEase).SetDelay(_MenuData
 				.ThirdLandDropDelay).OnComplete(() =>
 					{
 						for (int i = 0; i < Context._finalPlayerInformation.ColorIndex.Length; i++)

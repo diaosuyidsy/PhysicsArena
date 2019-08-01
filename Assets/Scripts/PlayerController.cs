@@ -735,6 +735,7 @@ public class PlayerController : MonoBehaviour
 			base.Update();
 			if (Time.time >= _startTime + _respawnTime)
 			{
+				EventManager.Instance.TriggerEvent(new PlayerRespawned(Context.gameObject));
 				TransitionTo<IdleState>();
 				return;
 			}

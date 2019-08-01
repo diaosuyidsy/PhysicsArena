@@ -31,21 +31,6 @@ public class CameraShake : MonoBehaviour
 		originalPos = camTransform.localPosition;
 	}
 
-	//void Update()
-	//{
-	//	if (shakeDuration > 0)
-	//	{
-	//		camTransform.localPosition = originalPos + Random.insideUnitSphere * shakeAmount;
-
-	//		shakeDuration -= Time.deltaTime * decreaseFactor;
-	//	}
-	//	else
-	//	{
-	//		shakeDuration = 0f;
-	//		//camTransform.localPosition = originalPos;
-	//	}
-	//}
-
 	public void Shake(float _shakeDuration, float _shakeAmount = 0.15f, float _decreaseFactor = 1f)
 	{
 		StopAllCoroutines();

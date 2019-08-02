@@ -144,7 +144,7 @@ public class rtBazooka : WeaponBase
 		_ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
 		transform.GetComponent<Rigidbody>().isKinematic = false;
 		_gpc.CanBePickedUp = true;
-		//gameObject.SetActive(false);
+		gameObject.SetActive(false);
 	}
 
 	private void _aim()

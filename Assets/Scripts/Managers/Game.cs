@@ -29,6 +29,14 @@ public class Game : MonoBehaviour
 		Services.GameStateManager.Update();
 	}
 
+	private void OnDrawGizmos()
+	{
+		Gizmos.color = new Color(1, 0, 0, 0.5f);
+		Gizmos.DrawCube(new Vector3(0f, 6.5f, 0f), GameMapData.WeaponSpawnerSize);
+		Gizmos.color = new Color(0, 0, 0, 0.5f);
+		Gizmos.DrawCube(GameMapData.WorldCenter, GameMapData.WorldSize);
+	}
+
 	private void OnDestroy()
 	{
 		Services.AudioManager.Destroy();

@@ -34,12 +34,6 @@ public class CameraController : MonoBehaviour
 			base.Init();
 			_CameraData = Context.CameraData;
 		}
-
-		public override void OnEnter()
-		{
-			base.OnEnter();
-			print(GetType().Name);
-		}
 	}
 
 	private class EntryState : CameraState

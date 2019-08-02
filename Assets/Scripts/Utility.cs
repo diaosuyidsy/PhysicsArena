@@ -93,6 +93,15 @@ public class StatisticsRecord
 }
 
 [Serializable]
+public class WeaponInformation
+{
+	public string WeaponName;
+	public int WeaponSetNumber;
+	public GameObject WeaponPrefab;
+}
+
+
+[Serializable]
 public sealed class PlayerInformation
 {
 	public int[] RewiredID;

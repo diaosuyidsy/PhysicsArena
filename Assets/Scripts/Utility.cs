@@ -34,8 +34,11 @@ public static class Utility
 	// Sequence example, bubbly fade-in + bounce
 	public static Sequence BubbleFadeIn(CharTweener _tweener, int start, int end, float amplitude = 100f, float duration = 0.5f)
 	{
+		for (int i = start; i < end; i++)
+		{
+			_tweener.DOScale(i, 0f, 0f);
+		}
 		var sequence = DOTween.Sequence();
-
 		for (var i = start; i <= end; ++i)
 		{
 			var timeOffset = Mathf.Lerp(0, 1, (i - start) / (float)(end - start + 1));
@@ -117,4 +120,17 @@ public enum GameMapMode
 	FoodCartMode,
 	ObjectiveMode,
 	BrawlMode,
+}
+
+public enum TeamNum
+{
+	Team1,
+	Team2,
+}
+
+public enum GameWinType
+{
+	CartWin,
+	FoodWin,
+	ScoreWin,
 }

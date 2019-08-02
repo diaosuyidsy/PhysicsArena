@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.Audio;
 
 [CreateAssetMenu(fileName = "GameMapData", menuName = "ScriptableObjects/GameMapData", order = 1)]
 public class GameMapData : ScriptableObject
@@ -53,5 +54,8 @@ public class GameMapData : ScriptableObject
 	public string[] StatisticsIntro1;
 	public string[] StatisticsIntro2;
 	public float StatisticStayTime = 2f;
+
+	[Header("Pause Menu Setting")]
+	public AudioMixer BackgroundMusicMixer;
 
 }

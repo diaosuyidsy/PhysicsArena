@@ -43,15 +43,7 @@ public class CarPathOriginal : MonoBehaviour
 			Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
 			transform.position = pos;
 			//GameManager.GM.GameOver(winner, gameObject);
-			EventManager.Instance.TriggerEvent(new GameEnd(winner, transform));
-			if (winner == 2)
-			{
-				GameManager.GM.TeamRed1Explosion.SetActive(true);
-			}
-			else
-			{
-				GameManager.GM.TeamBlue2Explosion.SetActive(true);
-			}
+			EventManager.Instance.TriggerEvent(new GameEnd(winner, transform, GameWinType.CartWin));
 			return;
 		}
 
@@ -150,7 +142,7 @@ public class CarPathOriginal : MonoBehaviour
 	{
 		foreach (int playernum in _playerInCircle)
 		{
-			Services.StatisticsManager.CartTime[playernum]++;
+			Services.StatisticsManager.CartTime[playernum] += Time.deltaTime;
 		}
 	}
 

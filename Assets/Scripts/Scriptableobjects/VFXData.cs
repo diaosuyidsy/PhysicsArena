@@ -24,4 +24,5 @@ public class VFXData : ScriptableObject
 	public GameObject DuckBlockVFX;
 	public GameObject StunnedVFX;
 	public GameObject SlowedVFX;
+	public GameObject CartExplosionVFX;
 }

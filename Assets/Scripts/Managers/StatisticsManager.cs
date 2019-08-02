@@ -10,7 +10,7 @@ public class StatisticsManager
 	public int[] SuicideRecord;
 	public int[] KillRecord;
 	public int[] TeammateMurderRecord;
-	public int[] CartTime;
+	public float[] CartTime;
 	public int[] BlockTimes;
 	/// Times that this player is blocked, stupid
 	public int[] BlockedTimes;
@@ -55,7 +55,7 @@ public class StatisticsManager
 	{
 		get
 		{
-			int maxTimes = CartTime.Max();
+			float maxTimes = CartTime.Max();
 			if (maxTimes == 0) return null;
 			return new StatisticsRecord(Array.IndexOf(CartTime, maxTimes), maxTimes);
 		}
@@ -108,7 +108,7 @@ public class StatisticsManager
 			}
 			float maxTimes = HookGunAccuracy.Max();
 			if (maxTimes == -1f) return null;
-			return new StatisticsRecord(Array.IndexOf(HookGunAccuracy, maxTimes), maxTimes);
+			return new StatisticsRecord(Array.IndexOf(HookGunAccuracy, maxTimes), maxTimes * 100f);
 		}
 	}
 	public StatisticsRecord MostPlayerSucked
@@ -150,7 +150,7 @@ public class StatisticsManager
 			}
 			float maxTimes = MeleeAccuracy.Max();
 			if (maxTimes == -1f) return null;
-			return new StatisticsRecord(Array.IndexOf(MeleeAccuracy, maxTimes), maxTimes);
+			return new StatisticsRecord(Array.IndexOf(MeleeAccuracy, maxTimes), maxTimes * 100f);
 		}
 	}
 
@@ -189,7 +189,7 @@ public class StatisticsManager
 		SuckedPlayersTimes = new int[maxPlayers];
 		BlockedTimes = new int[maxPlayers];
 		WeaponPickedTimes = new int[maxPlayers];
-		CartTime = new int[maxPlayers];
+		CartTime = new float[maxPlayers];
 		WaterGunUseTime = new int[maxPlayers];
 		DeadTimes = new int[maxPlayers];
 		MeleeUseTimes = new int[maxPlayers];

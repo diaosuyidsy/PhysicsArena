@@ -5,16 +5,19 @@ using UnityEngine;
 public class ResourceCollector : MonoBehaviour
 {
 	public TeamNum Team;
-	private GameObject[] Team1ResourceSpawnPt;
-	private GameObject[] Team2ResourceSpawnPt;
+	private Transform[] SpawnPoints;
 
 	//private int TeamTracker;
 	private int TeamResourceSpawnIndex;
 
-	private void Start()
+	private void Awake()
 	{
-		Team1ResourceSpawnPt = GameManager.GM.Team1ResourceRespawnPoints;
-		Team2ResourceSpawnPt = GameManager.GM.Team2ResrouceRespawnPoints;
+		Transform temp = transform.parent.Find("RespawnPoints");
+		SpawnPoints = new Transform[temp.childCount];
+		for (int i = 0; i < temp.childCount; i++)
+		{
+			SpawnPoints[i] = temp.GetChild(i);
+		}
 	}
 
 	private void OnTriggerEnter(Collider other)
@@ -49,8 +52,8 @@ public class ResourceCollector : MonoBehaviour
 			else if (other.CompareTag("Team2Resource"))
 			{
 				EventManager.Instance.TriggerEvent(new ObjectDespawned(other.gameObject));
-				GameManager.GM.Team2ResourceSpawnIndex = (GameManager.GM.Team2ResourceSpawnIndex + 1) % Team2ResourceSpawnPt.Length;
-				other.transform.position = Team2ResourceSpawnPt[GameManager.GM.Team2ResourceSpawnIndex].transform.position;
+				TeamResourceSpawnIndex = (TeamResourceSpawnIndex + 1) % SpawnPoints.Length;
+				other.transform.position = SpawnPoints[TeamResourceSpawnIndex].transform.position;
 			}
 		}
 		else
@@ -85,8 +88,8 @@ public class ResourceCollector : MonoBehaviour
 			else if (other.CompareTag("Team1Resource"))
 			{
 				EventManager.Instance.TriggerEvent(new ObjectDespawned(other.gameObject));
-				GameManager.GM.Team1ResourceSpawnIndex = (GameManager.GM.Team1ResourceSpawnIndex + 1) % Team1ResourceSpawnPt.Length;
-				other.transform.position = Team1ResourceSpawnPt[GameManager.GM.Team1ResourceSpawnIndex].transform.position;
+				TeamResourceSpawnIndex = (TeamResourceSpawnIndex + 1) % SpawnPoints.Length;
+				other.transform.position = SpawnPoints[TeamResourceSpawnIndex].transform.position;
 			}
 		}
 

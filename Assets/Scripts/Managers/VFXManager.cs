@@ -140,6 +140,13 @@ public class VFXManager
 	{
 		pu.Player.GetComponent<PlayerController>().SlowVFXHolder.SetActive(false);
 	}
+	private void _onGameEnd(GameEnd ge)
+	{
+		if (ge.GameWinType == GameWinType.CartWin)
+		{
+			_instantiateVFX(VFXDataStore.CartExplosionVFX, ge.WinnedObjective.position, VFXDataStore.CartExplosionVFX.transform.rotation);
+		}
+	}
 	#endregion
 
 	private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -167,6 +174,7 @@ public class VFXManager
 		EventManager.Instance.AddHandler<PlayerUnStunned>(_onPlayerUnStunned);
 		EventManager.Instance.AddHandler<PlayerSlowed>(_onPlayerSlowed);
 		EventManager.Instance.AddHandler<PlayerUnslowed>(_onPlayerUnslowed);
+		EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
 	}
 
 	private void OnDisable()
@@ -188,6 +196,7 @@ public class VFXManager
 		EventManager.Instance.RemoveHandler<PlayerUnStunned>(_onPlayerUnStunned);
 		EventManager.Instance.RemoveHandler<PlayerSlowed>(_onPlayerSlowed);
 		EventManager.Instance.RemoveHandler<PlayerUnslowed>(_onPlayerUnslowed);
+		EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
 	}
 
 	public void Destory()

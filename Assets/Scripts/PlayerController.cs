@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using Rewired;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -234,6 +235,27 @@ public class PlayerController : MonoBehaviour
 	}
 
 	#region Helper Method
+	private void _setToSpawn(float yOffset)
+	{
+		int colorindex = 0;
+		for (int j = 0; j < Services.GameStateManager.PlayersInformation.RewiredID.Length; j++)
+		{
+			if (PlayerNumber == Services.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = Services.GameStateManager.PlayersInformation.ColorIndex[j];
+		}
+		if (CompareTag("Team1"))
+		{
+			Vector3 pos = Services.GameStateManager.Team1RespawnPoints[colorindex - 3];
+			pos.y += yOffset;
+			transform.position = pos;
+		}
+		else
+		{
+			Vector3 pos = Services.GameStateManager.Team2RespawnPoints[colorindex];
+			pos.y += yOffset;
+			transform.position = pos;
+		}
+	}
+
 	private string _getGroundTag()
 	{
 		RaycastHit hit;
@@ -739,7 +761,7 @@ public class PlayerController : MonoBehaviour
 			base.OnEnter();
 			_startTime = Time.time;
 			Context._rb.isKinematic = true;
-			GameManager.GM.SetToRespawn(Context.gameObject, 10f);
+			Context._setToSpawn(10f);
 			foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
 		}
 
@@ -758,7 +780,7 @@ public class PlayerController : MonoBehaviour
 		{
 			base.OnExit();
 			Context._rb.isKinematic = false;
-			GameManager.GM.SetToRespawn(Context.gameObject, 0f);
+			Context._setToSpawn(0f);
 			foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(true); }
 
 		}

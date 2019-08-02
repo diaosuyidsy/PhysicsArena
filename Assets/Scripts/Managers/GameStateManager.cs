@@ -6,14 +6,17 @@ using TMPro;
 using DG.Tweening;
 using UnityEngine.UI;
 using CharTween;
+using UnityEngine.SceneManagement;
 
 public class GameStateManager
 {
 	public PlayerController[] PlayerControllers;
+	public PlayerInformation PlayersInformation;
+	public Vector3[] Team1RespawnPoints;
+	public Vector3[] Team2RespawnPoints;
 
 	private GameMapData _gameMapdata;
 	private FSM<GameStateManager> _gameStateFSM;
-	private PlayerInformation _playersInformation;
 	private TextMeshProUGUI _holdAText;
 	private Image _holdAImage;
 	private Transform _tutorialImage;
@@ -28,6 +31,10 @@ public class GameStateManager
 	private Transform _gameEndTitleText;
 	private Transform _pauseMenu;
 	private Transform _pauseBackgroundMask;
+	private Transform _pausePausedText;
+	private Transform _pauseResume;
+	private Transform _pauseQuit;
+	private Transform _pauseWholeMask;
 	private Transform _statisticIndicator;
 	private Transform _statisticNominee;
 	private Transform _statisticRecord;
@@ -42,8 +49,8 @@ public class GameStateManager
 		_gameEndTitleText = _gameEndCanvas.Find("TitleText");
 		_holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").GetComponent<TextMeshProUGUI>();
 		_holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
-		_playersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
-		Debug.Assert(_playersInformation != null, "Unable to load Players information");
+		PlayersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
+		Debug.Assert(PlayersInformation != null, "Unable to load Players information");
 		_playersHolder = GameObject.Find("Players").transform;
 		_tutorialImage = GameObject.Find("TutorialCanvas").transform.Find("TutorialImage");
 		Debug.Assert(_tutorialImage != null);
@@ -51,7 +58,11 @@ public class GameStateManager
 		_countDownText = GameObject.Find("TutorialCanvas").transform.Find("CountDown").GetComponent<TextMeshProUGUI>();
 		_pauseMenu = GameObject.Find("PauseMenu").transform;
 		_pauseBackgroundMask = _pauseMenu.Find("BackgroundMask");
-		PlayerControllers = new PlayerController[_playersInformation.ColorIndex.Length];
+		_pausePausedText = _pauseMenu.Find("Paused");
+		_pauseResume = _pauseMenu.Find("Resume");
+		_pauseQuit = _pauseMenu.Find("Quit");
+		_pauseWholeMask = _pauseMenu.Find("WholeMask");
+		PlayerControllers = new PlayerController[PlayersInformation.ColorIndex.Length];
 		_statisticIndicator = _gameEndCanvas.Find("StatisticsIndicator");
 		_statisticNominee = _gameEndCanvas.Find("StatisticsNominee");
 		_statisticRecord = _gameEndCanvas.Find("StatisticsRecord");
@@ -59,13 +70,20 @@ public class GameStateManager
 		{
 			_playersOutestHolder[i] = _playersHolder.GetChild(i);
 		}
-		for (int i = 0; i < _playersInformation.ColorIndex.Length; i++)
+		for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
 		{
-			PlayerControllers[i] = _playersOutestHolder[_playersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
+			PlayerControllers[i] = _playersOutestHolder[PlayersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
 		}
 		EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
 		_cam = Camera.main;
 		_darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
+		Team1RespawnPoints = new Vector3[3];
+		Team2RespawnPoints = new Vector3[3];
+		for (int i = 0; i < Team1RespawnPoints.Length; i++)
+		{
+			Team1RespawnPoints[i] = GameObject.Find("GameManager").transform.Find("Team1Points").GetChild(i).position;
+			Team2RespawnPoints[i] = GameObject.Find("GameManager").transform.Find("Team2Points").GetChild(i).position;
+		}
 		//_gameStateFSM.TransitionTo<LandingState>();
 		_gameStateFSM.TransitionTo<FoodCartTutorialState>();
 	}
@@ -132,14 +150,52 @@ public class GameStateManager
 			}
 		}
 
+		protected float _AnyVLAxisRaw
+		{
+			get
+			{
+				float result = 0f;
+				for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
+				{
+					result = ReInput.players.GetPlayer(_PlayersInformation.RewiredID[i]).GetAxisRaw("Move Vertical");
+					if (!Mathf.Approximately(0f, result)) return result;
+				}
+				return result;
+			}
+		}
+
+		protected bool _vAxisInUse = true;
+
 		protected GameMapData _GameMapData;
 
 		public override void Init()
 		{
 			base.Init();
-			_PlayersInformation = Context._playersInformation;
+			_PlayersInformation = Context.PlayersInformation;
 			_GameMapData = Context._gameMapdata;
 		}
+
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			_vAxisInUse = true;
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_AnyVLAxisRaw == 0f) _vAxisInUse = false;
+		}
+	}
+
+	private class GameQuitState : GameState
+	{
+
+	}
+
+	private class LastPanelState : GameState
+	{
+
 	}
 
 	private abstract class StatisticsWordState : GameState
@@ -154,31 +210,54 @@ public class GameStateManager
 
 	private class FoodCartStatisticsWordSstate : StatisticsWordState
 	{
+		Sequence seq;
 		public override void OnEnter()
 		{
 			base.OnEnter();
-			Sequence seq = DOTween.Sequence();
+			seq = DOTween.Sequence();
 			for (int i = 0; i < Services.StatisticsManager.FoodCartRecords.Length; i++)
 			{
+				int temp = i;
 				StatisticsRecord sr = Services.StatisticsManager.FoodCartRecords[i];
 				if (sr == null) continue;
 				int colorindex = 0;
-				for (int j = 0; j < Context._playersInformation.RewiredID.Length; j++)
+				for (int j = 0; j < Context.PlayersInformation.RewiredID.Length; j++)
 				{
-					if (sr.RewiredID == Context._playersInformation.RewiredID[j]) colorindex = Context._playersInformation.ColorIndex[j];
+					if (sr.RewiredID == Context.PlayersInformation.RewiredID[j]) colorindex = Context.PlayersInformation.ColorIndex[j];
 				}
-				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsNames[i], 0f));
-				seq.Append(Utility.BubbleFadeIn(Context._statisticIndicator.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticIndicator.GetComponent<TextMeshProUGUI>().text.Length));
-				seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], 0f));
-				seq.Append(Utility.BubbleFadeIn(Context._statisticNominee.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticNominee.GetComponent<TextMeshProUGUI>().text.Length));
-				seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsIntro1[i] + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + _GameMapData.StatisticsIntro2[i], 0f));
-				seq.Append(Utility.BubbleFadeIn(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
-
+				//seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsNames[i], 0f));
+				//seq.Append(Utility.BubbleFadeIn(Context._statisticIndicator.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticIndicator.GetComponent<TextMeshProUGUI>().text.Length));
+				//seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], 0f));
+				//seq.Append(Utility.BubbleFadeIn(Context._statisticNominee.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticNominee.GetComponent<TextMeshProUGUI>().text.Length));
+				//seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsIntro1[i] + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + _GameMapData.StatisticsIntro2[i], 0f));
+				//seq.Append(Utility.BubbleFadeIn(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
+				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsNames[temp], 1f));
+				seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], 1f).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
+				seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsIntro1[temp] + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + _GameMapData.StatisticsIntro2[temp], 1f));
 				seq.AppendInterval(_GameMapData.StatisticStayTime);
-				seq.Join(Utility.BubbleFadeOut(Context._statisticIndicator.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticIndicator.GetComponent<TextMeshProUGUI>().text.Length));
-				seq.Join(Utility.BubbleFadeOut(Context._statisticNominee.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticNominee.GetComponent<TextMeshProUGUI>().text.Length));
-				seq.Join(Utility.BubbleFadeOut(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
+				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText("", 1f));
+				seq.Join(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText("", 1f));
+				seq.Join(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText("", 1f));
+				//seq.Join(Utility.BubbleFadeOut(Context._statisticIndicator.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticIndicator.GetComponent<TextMeshProUGUI>().text.Length));
+				//seq.Join(Utility.BubbleFadeOut(Context._statisticNominee.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticNominee.GetComponent<TextMeshProUGUI>().text.Length));
+				//seq.Join(Utility.BubbleFadeOut(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
 			}
+		}
+
+		public override void Update()
+		{
+			base.Update();
+			if (_AnyADown)
+			{
+				TransitionTo<LastPanelState>();
+				return;
+			}
+		}
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			seq.Kill();
 		}
 	}
 
@@ -221,6 +300,7 @@ public class GameStateManager
 			seq.Join(Utility.BubbleFadeOut(Context._gameEndTitleText.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text.Length));
 			seq.AppendCallback(() =>
 			{
+				Context._gameEndTitleText.GetComponent<TMP_Text>().text = "";
 				TransitionTo<FoodCartStatisticsWordSstate>();
 				return;
 			});
@@ -241,10 +321,9 @@ public class GameStateManager
 		public override void OnEnter()
 		{
 			base.OnEnter();
-			/// Resume Music
-			Context._cam.GetComponent<AudioSource>().Play();
+			_GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
+			_GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
 		}
-
 		public override void Update()
 		{
 			base.Update();
@@ -258,20 +337,68 @@ public class GameStateManager
 
 	private class PauseState : GameState
 	{
+		private bool onresume;
 		public override void OnEnter()
 		{
 			base.OnEnter();
+			_GameMapData.BackgroundMusicMixer.SetFloat("Vol", -10f);
+			_GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 450f);
+			onresume = true;
 			Context._pauseBackgroundMask.gameObject.SetActive(true);
+			Context._pausePausedText.gameObject.SetActive(true);
+			Context._pauseResume.gameObject.SetActive(true);
+			Context._pauseQuit.gameObject.SetActive(true);
+			_switchMenu();
 			Time.timeScale = 0f;
 		}
 
 		public override void Update()
 		{
 			base.Update();
-			if (_AnyPauseDown)
+			if (onresume && _AnyADown)
 			{
 				TransitionTo<GameLoop>();
 				return;
+			}
+			if (!onresume && _AnyADown)
+			{
+				Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene("NewMenu"));
+				TransitionTo<GameQuitState>();
+				return;
+			}
+			if (_AnyVLAxisRaw < -0.2f && !_vAxisInUse && !onresume)
+			{
+				onresume = true;
+				_switchMenu();
+				return;
+			}
+			else if (_AnyVLAxisRaw > 0.2f && !_vAxisInUse && onresume)
+			{
+				onresume = false;
+				_switchMenu();
+				return;
+			}
+		}
+
+		private void _switchMenu()
+		{
+			if (onresume)
+			{
+				Color temp = Context._pauseResume.GetComponent<Image>().color;
+				temp.a = 1f;
+				Context._pauseResume.GetComponent<Image>().color = temp;
+				temp = Context._pauseQuit.GetComponent<Image>().color;
+				temp.a = 0.66f;
+				Context._pauseQuit.GetComponent<Image>().color = temp;
+			}
+			else
+			{
+				Color temp = Context._pauseResume.GetComponent<Image>().color;
+				temp.a = 0.66f;
+				Context._pauseResume.GetComponent<Image>().color = temp;
+				temp = Context._pauseQuit.GetComponent<Image>().color;
+				temp.a = 1f;
+				Context._pauseQuit.GetComponent<Image>().color = temp;
 			}
 		}
 
@@ -280,6 +407,9 @@ public class GameStateManager
 			base.OnExit();
 			Time.timeScale = 1f;
 			Context._pauseBackgroundMask.gameObject.SetActive(false);
+			Context._pausePausedText.gameObject.SetActive(false);
+			Context._pauseResume.gameObject.SetActive(false);
+			Context._pauseQuit.gameObject.SetActive(false);
 		}
 	}
 
@@ -298,8 +428,6 @@ public class GameStateManager
 			base.OnEnter();
 			int numOfPlayers = _PlayersInformation.ColorIndex.Length;
 			Sequence seq = DOTween.Sequence();
-			//Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text = "CHICKENS WIN";
-			//Utility.Tween3(Context._gameEndTitleText.GetComponent<TMP_Text>().GetCharTweener(), 0, 11);
 			//_cam.transform.DOLocalMove(_GameMapData.CameraMoveToPosition, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
 			_cam.DOFieldOfView(_GameMapData.CameraTargetFOV, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
 			for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
@@ -314,7 +442,11 @@ public class GameStateManager
 			seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.FightEase));
 			seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
 			seq.Append(Context._countDownText.DOScale(0f, 0.2f));
-			seq.AppendCallback(() => TransitionTo<GameLoop>());
+			seq.AppendCallback(() =>
+			{
+				Context._cam.GetComponent<AudioSource>().Play();
+				TransitionTo<GameLoop>();
+			});
 		}
 
 		public override void OnExit()

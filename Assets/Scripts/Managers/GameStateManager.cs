@@ -5,6 +5,7 @@ using Rewired;
 using TMPro;
 using DG.Tweening;
 using UnityEngine.UI;
+using CharTween;
 
 public class GameStateManager
 {
@@ -23,14 +24,22 @@ public class GameStateManager
 	private Vector3 _endFocusPosition;
 	private DarkCornerEffect _darkCornerEffect;
 	private Transform _gameEndCanvas;
-	private GameObject _blackbackground;
+	private GameObject _gameEndBlackbackground;
+	private Transform _gameEndTitleText;
+	private Transform _pauseMenu;
+	private Transform _pauseBackgroundMask;
+	private Transform _statisticIndicator;
+	private Transform _statisticNominee;
+	private Transform _statisticRecord;
+	private int _winner;
 
 	public GameStateManager(GameMapData _gmp)
 	{
 		_gameMapdata = _gmp;
 		_gameStateFSM = new FSM<GameStateManager>(this);
 		_gameEndCanvas = GameObject.Find("GameEndCanvas").transform;
-		_blackbackground = _gameEndCanvas.Find("EndImageBackground").gameObject;
+		_gameEndBlackbackground = _gameEndCanvas.Find("EndImageBackground").gameObject;
+		_gameEndTitleText = _gameEndCanvas.Find("TitleText");
 		_holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").GetComponent<TextMeshProUGUI>();
 		_holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
 		_playersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
@@ -40,7 +49,12 @@ public class GameStateManager
 		Debug.Assert(_tutorialImage != null);
 		_playersOutestHolder = new Transform[6];
 		_countDownText = GameObject.Find("TutorialCanvas").transform.Find("CountDown").GetComponent<TextMeshProUGUI>();
+		_pauseMenu = GameObject.Find("PauseMenu").transform;
+		_pauseBackgroundMask = _pauseMenu.Find("BackgroundMask");
 		PlayerControllers = new PlayerController[_playersInformation.ColorIndex.Length];
+		_statisticIndicator = _gameEndCanvas.Find("StatisticsIndicator");
+		_statisticNominee = _gameEndCanvas.Find("StatisticsNominee");
+		_statisticRecord = _gameEndCanvas.Find("StatisticsRecord");
 		for (int i = 0; i < 6; i++)
 		{
 			_playersOutestHolder[i] = _playersHolder.GetChild(i);
@@ -73,6 +87,7 @@ public class GameStateManager
 		if (!_gameStateFSM.CurrentState.GetType().Equals(typeof(WinState)))
 		{
 			_endFocusPosition = ge.WinnedObjective.position;
+			_winner = ge.Winner;
 			_gameStateFSM.TransitionTo<WinState>();
 			return;
 		}
@@ -127,12 +142,43 @@ public class GameStateManager
 		}
 	}
 
-	private class StaticsticWorkState : GameState
+	private abstract class StatisticsWordState : GameState
 	{
 		public override void OnEnter()
 		{
 			base.OnEnter();
-			Context._blackbackground.SetActive(true);
+			Context._gameEndBlackbackground.SetActive(true);
+			Context._darkCornerEffect.enabled = false;
+		}
+	}
+
+	private class FoodCartStatisticsWordSstate : StatisticsWordState
+	{
+		public override void OnEnter()
+		{
+			base.OnEnter();
+			Sequence seq = DOTween.Sequence();
+			for (int i = 0; i < Services.StatisticsManager.FoodCartRecords.Length; i++)
+			{
+				StatisticsRecord sr = Services.StatisticsManager.FoodCartRecords[i];
+				if (sr == null) continue;
+				int colorindex = 0;
+				for (int j = 0; j < Context._playersInformation.RewiredID.Length; j++)
+				{
+					if (sr.RewiredID == Context._playersInformation.RewiredID[j]) colorindex = Context._playersInformation.ColorIndex[j];
+				}
+				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsNames[i], 0f));
+				seq.Append(Utility.BubbleFadeIn(Context._statisticIndicator.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticIndicator.GetComponent<TextMeshProUGUI>().text.Length));
+				seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], 0f));
+				seq.Append(Utility.BubbleFadeIn(Context._statisticNominee.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticNominee.GetComponent<TextMeshProUGUI>().text.Length));
+				seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsIntro1[i] + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + _GameMapData.StatisticsIntro2[i], 0f));
+				seq.Append(Utility.BubbleFadeIn(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
+
+				seq.AppendInterval(_GameMapData.StatisticStayTime);
+				seq.Join(Utility.BubbleFadeOut(Context._statisticIndicator.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticIndicator.GetComponent<TextMeshProUGUI>().text.Length));
+				seq.Join(Utility.BubbleFadeOut(Context._statisticNominee.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticNominee.GetComponent<TextMeshProUGUI>().text.Length));
+				seq.Join(Utility.BubbleFadeOut(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
+			}
 		}
 	}
 
@@ -147,7 +193,14 @@ public class GameStateManager
 				return _temp;
 			}
 		}
-
+		private string _victoryTeam
+		{
+			get
+			{
+				if (Context._winner == 1) return "CHICKENS WIN";
+				else return "DUCKS WIN";
+			}
+		}
 		public override void OnEnter()
 		{
 			base.OnEnter();
@@ -158,14 +211,18 @@ public class GameStateManager
 			Context._darkCornerEffect.Length = maxlength;
 			float middlelength = maxlength * _GameMapData.DarkCornerMiddlePercentage;
 			float finallength = maxlength * _GameMapData.DarkCornerFinalPercentage;
-
+			Context._gameEndTitleText.GetComponent<TMP_Text>().text = _victoryTeam;
 			Sequence seq = DOTween.Sequence();
 			seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, middlelength, _GameMapData.DarkCornerToMiddleDuration));
+			seq.Join(Utility.BubbleFadeIn(Context._gameEndTitleText.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text.Length).
+				SetDelay(_GameMapData.TitleTextInDelay));
 			seq.AppendInterval(_GameMapData.DarkCornerMiddleStayDuration);
 			seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, finallength, _GameMapData.DarkCornerToFinalDuration));
+			seq.Join(Utility.BubbleFadeOut(Context._gameEndTitleText.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text.Length));
 			seq.AppendCallback(() =>
 			{
-				Context._darkCornerEffect.enabled = false;
+				TransitionTo<FoodCartStatisticsWordSstate>();
+				return;
 			});
 		}
 
@@ -204,6 +261,7 @@ public class GameStateManager
 		public override void OnEnter()
 		{
 			base.OnEnter();
+			Context._pauseBackgroundMask.gameObject.SetActive(true);
 			Time.timeScale = 0f;
 		}
 
@@ -221,6 +279,7 @@ public class GameStateManager
 		{
 			base.OnExit();
 			Time.timeScale = 1f;
+			Context._pauseBackgroundMask.gameObject.SetActive(false);
 		}
 	}
 
@@ -239,6 +298,8 @@ public class GameStateManager
 			base.OnEnter();
 			int numOfPlayers = _PlayersInformation.ColorIndex.Length;
 			Sequence seq = DOTween.Sequence();
+			//Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text = "CHICKENS WIN";
+			//Utility.Tween3(Context._gameEndTitleText.GetComponent<TMP_Text>().GetCharTweener(), 0, 11);
 			//_cam.transform.DOLocalMove(_GameMapData.CameraMoveToPosition, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
 			_cam.DOFieldOfView(_GameMapData.CameraTargetFOV, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
 			for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)

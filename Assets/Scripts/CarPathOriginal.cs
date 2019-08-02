@@ -150,7 +150,7 @@ public class CarPathOriginal : MonoBehaviour
 	{
 		foreach (int playernum in _playerInCircle)
 		{
-			Services.StatisticsManager.CartTime[playernum] += Time.deltaTime;
+			Services.StatisticsManager.CartTime[playernum]++;
 		}
 	}
 

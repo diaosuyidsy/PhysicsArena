@@ -22,4 +22,10 @@ public class WeaponData : ScriptableObject
 	// Need to manually set up world center until we figure out a way to automatically do it.
 	public Vector3 WorldCenter;
 	public Vector3 WorldSize;
+
+	[Header("Weapon Prefabs")]
+	public GameObject SuckGunPrefab;
+	public GameObject HookGunPrefab;
+	public GameObject FistGunPrefab;
+	public GameObject BazookaPrefab;
 }

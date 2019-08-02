@@ -11,10 +11,12 @@ public class WeaponGenerationManager
 	private CameraController _cc;
 	private bool _gamestart;
 	private float _spawnTimer;
+	private GameMapData GameMapData;
 
-	public WeaponGenerationManager(WeaponData _wd, GameObject _weaponsHolder)
+	public WeaponGenerationManager(GameMapData gmp, WeaponData _wd, GameObject _weaponsHolder)
 	{
 		WeaponDataStore = _wd;
+		GameMapData = gmp;
 		EventManager.Instance.AddHandler<GameStart>(_onGameStart);
 		_cc = Camera.main.GetComponent<CameraController>();
 		Weapons = new GameObject[_weaponsHolder.transform.childCount];

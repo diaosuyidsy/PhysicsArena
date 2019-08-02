@@ -58,4 +58,12 @@ public class GameMapData : ScriptableObject
 	[Header("Pause Menu Setting")]
 	public AudioMixer BackgroundMusicMixer;
 
+	[Header("Weapon Generation Setting")]
+	public int MaxAmountWeaponAtOnetime = 3;
+	[Range(0, 8)]
+	public int WaterGunSetAmount = 4;
+	public int SuckGunSetAmount = 1;
+	public int HookGunSetAmount = 1;
+	public int BazookaSetAmount = 1;
+	public int FistGunSetAmount = 1;
 }

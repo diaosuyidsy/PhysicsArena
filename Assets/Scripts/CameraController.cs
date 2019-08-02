@@ -77,6 +77,7 @@ public class CameraController : MonoBehaviour
 			}
 			total /= (length == 0 ? 1 : length);
 			_targetOnGround = total;
+			Context.FollowTarget = _targetOnGround;
 			_desiredPosition.x = _targetOnGround.x;
 			_desiredPosition.y = _targetOnGround.y + Mathf.Sin(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
 			_desiredPosition.z = _targetOnGround.z - Mathf.Cos(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;

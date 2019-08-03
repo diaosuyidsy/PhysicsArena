@@ -13,8 +13,6 @@ public class GameStateManager
 {
 	public PlayerController[] PlayerControllers;
 	public PlayerInformation PlayersInformation;
-	public Vector3[] Team1RespawnPoints;
-	public Vector3[] Team2RespawnPoints;
 
 	private GameMapData _gameMapdata;
 	private FSM<GameStateManager> _gameStateFSM;
@@ -82,13 +80,6 @@ public class GameStateManager
 		EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
 		_cam = Camera.main;
 		_darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-		Team1RespawnPoints = new Vector3[3];
-		Team2RespawnPoints = new Vector3[3];
-		for (int i = 0; i < Team1RespawnPoints.Length; i++)
-		{
-			Team1RespawnPoints[i] = GameObject.Find("GameManager").transform.Find("Team1Points").GetChild(i).position;
-			Team2RespawnPoints[i] = GameObject.Find("GameManager").transform.Find("Team2Points").GetChild(i).position;
-		}
 		//_gameStateFSM.TransitionTo<LandingState>();
 		_gameStateFSM.TransitionTo<FoodCartTutorialState>();
 	}
@@ -437,9 +428,13 @@ public class GameStateManager
 			Sequence seq = DOTween.Sequence();
 			//_cam.transform.DOLocalMove(_GameMapData.CameraMoveToPosition, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
 			_cam.DOFieldOfView(_GameMapData.CameraTargetFOV, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
+			int chickenPosIndex = 0;
+			int duckPosIndex = 0;
 			for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
 			{
 				int playerIndex = _PlayersInformation.ColorIndex[i];
+				if (playerIndex < 3) Context._playersOutestHolder[playerIndex].position = _GameMapData.DuckLandingPostion[duckPosIndex++];
+				else Context._playersOutestHolder[playerIndex].position = _GameMapData.ChickenLandingPosition[chickenPosIndex++];
 				int temp = i;
 				Context._playersOutestHolder[playerIndex].gameObject.SetActive(true);
 				seq.Join(Context._playersOutestHolder[playerIndex].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[temp]).SetEase(_GameMapData.BirdsFlyDownEase).

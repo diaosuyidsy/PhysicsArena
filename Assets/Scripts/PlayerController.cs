@@ -244,13 +244,13 @@ public class PlayerController : MonoBehaviour
 		}
 		if (CompareTag("Team1"))
 		{
-			Vector3 pos = Services.GameStateManager.Team1RespawnPoints[colorindex - 3];
+			Vector3 pos = Services.Config.GameMapData.Team1RespawnPoints[colorindex - 3];
 			pos.y += yOffset;
 			transform.position = pos;
 		}
 		else
 		{
-			Vector3 pos = Services.GameStateManager.Team2RespawnPoints[colorindex];
+			Vector3 pos = Services.Config.GameMapData.Team2RespawnPoints[colorindex];
 			pos.y += yOffset;
 			transform.position = pos;
 		}

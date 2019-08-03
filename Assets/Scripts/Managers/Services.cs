@@ -115,4 +115,18 @@ public static class Services
 			_gamestatemanager = value;
 		}
 	}
+
+	private static ObjectiveManager _gameObjectiveManager;
+	public static ObjectiveManager GameObjectiveManager
+	{
+		get
+		{
+			Debug.Assert(_gameObjectiveManager != null);
+			return _gameObjectiveManager;
+		}
+		set
+		{
+			_gameObjectiveManager = value;
+		}
+	}
 }

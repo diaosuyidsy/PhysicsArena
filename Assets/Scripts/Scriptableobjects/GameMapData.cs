@@ -8,6 +8,11 @@ using UnityEngine.Audio;
 public class GameMapData : ScriptableObject
 {
 	public GameMapMode GameMapMode;
+
+	[Header("General Map Settings")]
+	public Vector3[] Team1RespawnPoints;
+	public Vector3[] Team2RespawnPoints;
+
 	[Header("Tutorial State Setting")]
 	public float TutorialImageMoveInDuration = 0.2f;
 	public Ease TutorialImageMoveInEase;
@@ -18,6 +23,10 @@ public class GameMapData : ScriptableObject
 	public float FillASpeed = 2f;
 
 	[Header("Landing State Setting")]
+
+	public Vector3[] ChickenLandingPosition;
+	public Vector3[] DuckLandingPostion;
+
 	public float BirdsFlyDownDuration = 2f;
 	public float[] BirdsFlyDownDelay;
 	public Ease BirdsFlyDownEase = Ease.OutQuad;

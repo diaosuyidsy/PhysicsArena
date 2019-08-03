@@ -28,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2328720101541501453}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.1, y: 0.07, z: -0.003}
+  m_LocalPosition: {x: 0.003, y: 0.07, z: -0.003}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_Children: []
   m_Father: {fileID: 2747658201903773674}
@@ -139,7 +139,7 @@ Transform:
   m_GameObject: {fileID: 2747658201903773669}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 15.45, y: 0.448, z: -17.21}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_Children:
   - {fileID: 9181214899201842029}
   - {fileID: 1534770030605441645}
@@ -159,7 +159,7 @@ CapsuleCollider:
   m_Radius: 0.10786535
   m_Height: 0.40724564
   m_Direction: 0
-  m_Center: {x: -0.11673641, y: 0.07858543, z: 0.000082969666}
+  m_Center: {x: -0.03, y: 0.07858543, z: 0.000082969666}
 --- !u!65 &2747658201903773675
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -171,8 +171,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 0.08421707, y: 0.08993572, z: 0.054445267}
-  m_Center: {x: -0.03525734, y: -0.07413471, z: 0.0008955002}
+  m_Size: {x: 0.092856884, y: 0.08993573, z: 0.054445267}
+  m_Center: {x: 0.07851124, y: -0.07413471, z: 0.00089549925}
 --- !u!54 &2747658201903773673
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -233,10 +233,25 @@ PrefabInstance:
       propertyPath: m_Name
       value: FistGunBody (1)
       objectReference: {fileID: 0}
+    - target: {fileID: -5982317671917873857, guid: 8e06ce9daff218445b1ecd9dc5898462,
+        type: 3}
+      propertyPath: m_Name
+      value: FistGunBody
+      objectReference: {fileID: 0}
+    - target: {fileID: -5982317671917873857, guid: 8e06ce9daff218445b1ecd9dc5898462,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -1666095514690725240, guid: 8e06ce9daff218445b1ecd9dc5898462,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 8e06ce9daff218445b1ecd9dc5898462,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -4216859302048453862, guid: 8e06ce9daff218445b1ecd9dc5898462,
         type: 3}
@@ -303,21 +318,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.8
       objectReference: {fileID: 0}
-    - target: {fileID: 7448237762609144904, guid: 8e06ce9daff218445b1ecd9dc5898462,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 629c6a2d3df411d45bbef36d8123259d, type: 2}
-    - target: {fileID: -5982317671917873857, guid: 8e06ce9daff218445b1ecd9dc5898462,
-        type: 3}
-      propertyPath: m_Name
-      value: FistGunBody
-      objectReference: {fileID: 0}
-    - target: {fileID: -5982317671917873857, guid: 8e06ce9daff218445b1ecd9dc5898462,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: -369348217905469127, guid: 8e06ce9daff218445b1ecd9dc5898462,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -328,11 +328,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: -1666095514690725240, guid: 8e06ce9daff218445b1ecd9dc5898462,
+    - target: {fileID: 7448237762609144904, guid: 8e06ce9daff218445b1ecd9dc5898462,
         type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 629c6a2d3df411d45bbef36d8123259d, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8e06ce9daff218445b1ecd9dc5898462, type: 3}
 --- !u!4 &1534770030605441645 stripped

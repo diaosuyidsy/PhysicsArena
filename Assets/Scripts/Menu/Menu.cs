@@ -269,16 +269,24 @@ public class Menu : MonoBehaviour
 		IEnumerator _loadScene()
 		{
 			yield return 5f;
+			float loadingProgress = 0f;
 			AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.MapName);
 			asyncload.allowSceneActivation = false;
 			while (!asyncload.isDone)
 			{
-				Context._loadingBarFillImage.fillAmount = asyncload.progress * (1f / 0.9f);
-				if (asyncload.progress >= 0.9f)
+				if (loadingProgress <= 0.9f)
+					loadingProgress += Time.deltaTime;
+				//Context._loadingBarFillImage.fillAmount = asyncload.progress * (1f / 0.9f);
+				if (asyncload.progress >= 0.9f && loadingProgress >= 0.8f)
 				{
+					Context._loadingBarFillImage.fillAmount = 1f;
 					Context._loadingTitle.GetComponent<TextMeshProUGUI>().text = "Press A To Continue";
 					if (_ADown)
 						asyncload.allowSceneActivation = true;
+				}
+				else
+				{
+					Context._loadingBarFillImage.fillAmount = loadingProgress;
 				}
 				yield return null;
 			}

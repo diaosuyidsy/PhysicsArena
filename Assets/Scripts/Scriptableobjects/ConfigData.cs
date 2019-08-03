@@ -8,4 +8,6 @@ public class ConfigData : ScriptableObject
 	public LayerMask AllPlayerLayer;
 	public string[] IndexToName;
 	public Color[] IndexToColor;
+	[Tooltip("Team Index 0 is chicken, 1 is duck")]
+	public Color[] TeamColor;
 }

@@ -36,12 +36,16 @@ public class CarPathOriginal : MonoBehaviour
 
 	private void Update()
 	{
-		if (ending == 2) return;
+		if (ending == 2)
+		{
+			Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
+			transform.position = pos;
+			return;
+		}
 		if (ending == 1)
 		{
 			ending = 2;
-			Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
-			transform.position = pos;
+
 			//GameManager.GM.GameOver(winner, gameObject);
 			EventManager.Instance.TriggerEvent(new GameEnd(winner, transform, GameWinType.CartWin));
 			return;

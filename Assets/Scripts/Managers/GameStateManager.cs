@@ -7,6 +7,7 @@ using DG.Tweening;
 using UnityEngine.UI;
 using CharTween;
 using UnityEngine.SceneManagement;
+using TextFx;
 
 public class GameStateManager
 {
@@ -236,7 +237,7 @@ public class GameStateManager
 				//seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsIntro1[i] + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + _GameMapData.StatisticsIntro2[i], 0f));
 				//seq.Append(Utility.BubbleFadeIn(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
 				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsNames[temp], 1f));
-				seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], 1f).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
+				seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], 0.5f).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
 				seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsIntro1[temp] + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + _GameMapData.StatisticsIntro2[temp], 1f));
 				seq.AppendInterval(_GameMapData.StatisticStayTime);
 				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText("", 1f));
@@ -294,14 +295,16 @@ public class GameStateManager
 			Context._darkCornerEffect.Length = maxlength;
 			float middlelength = maxlength * _GameMapData.DarkCornerMiddlePercentage;
 			float finallength = maxlength * _GameMapData.DarkCornerFinalPercentage;
-			Context._gameEndTitleText.GetComponent<TMP_Text>().text = _victoryTeam;
+			Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text = _victoryTeam;
+			Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.TeamColor[Context._winner - 1];
 			Sequence seq = DOTween.Sequence();
 			seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, middlelength, _GameMapData.DarkCornerToMiddleDuration));
-			seq.Join(Utility.BubbleFadeIn(Context._gameEndTitleText.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text.Length).
+			seq.Join(Context._gameEndTitleText.DOScale(1f, _GameMapData.TitleTextInDuration).SetEase(_GameMapData.TitleTextInCurve).
 				SetDelay(_GameMapData.TitleTextInDelay));
+			seq.Join(Context._gameEndTitleText.DOScale(0f, _GameMapData.TitleTextOutDuration).SetDelay(_GameMapData.TitleStayDuration + _GameMapData.TitleTextInDuration).SetEase(Ease
+				.InBack));
 			seq.AppendInterval(_GameMapData.DarkCornerMiddleStayDuration);
 			seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, finallength, _GameMapData.DarkCornerToFinalDuration));
-			seq.Join(Utility.BubbleFadeOut(Context._gameEndTitleText.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text.Length));
 			seq.AppendCallback(() =>
 			{
 				Context._gameEndTitleText.GetComponent<TMP_Text>().text = "";

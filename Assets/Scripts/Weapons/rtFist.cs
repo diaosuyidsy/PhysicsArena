@@ -8,6 +8,7 @@ public class rtFist : WeaponBase
 	private GameObject _fistDup;
 	private Fist _fistScript;
 	private FistGunState _fistGunState = FistGunState.Idle;
+	private GameObject _fireOwner;
 	private enum FistGunState
 	{
 		Idle,
@@ -35,7 +36,7 @@ public class rtFist : WeaponBase
 			RaycastHit hit;
 			if (Physics.SphereCast(_fistDup.transform.position, 0.3f, -_fistDup.transform.right, out hit, 0.1f, Services.Config.ConfigData.AllPlayerLayer))
 			{
-				hit.collider.GetComponentInParent<PlayerController>().OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _gpc.Owner);
+				hit.collider.GetComponentInParent<PlayerController>().OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner);
 				_switchToRecharge();
 				return;
 			}
@@ -52,6 +53,7 @@ public class rtFist : WeaponBase
 		{
 			if (_fistGunState == FistGunState.Idle)
 			{
+				_fireOwner = _gpc.Owner;
 				_maxDistance = transform.position + -transform.right * WeaponDataStore.FistGunDataStore.MaxFlyDistance;
 				_fistDup = Instantiate(_fist.gameObject, transform);
 				_fistDup.transform.position = _fist.position;

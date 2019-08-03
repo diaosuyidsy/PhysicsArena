@@ -44,6 +44,7 @@ public class GameMapData : ScriptableObject
 	public float DarkCornerToMiddleDuration = 2f;
 	public float DarkCornerToFinalDuration = 1f;
 	public float DarkCornerMiddleStayDuration = 3f;
+	public Ease TitleTextInCurve;
 	public float TitleTextInDuration = 1.5f;
 	public float TitleStayDuration = 1f;
 	public float TitleTextOutDuration = 1f;

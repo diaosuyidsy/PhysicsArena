@@ -1057,6 +1057,7 @@ public class PlayerController : MonoBehaviour
 				int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
 				if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
 				{
+					if (hit.transform.GetComponentInParent<PlayerController>() == null) return;
 					_hitOnce = true;
 					foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
 					{

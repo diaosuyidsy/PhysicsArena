@@ -93,19 +93,15 @@ public class rtEmit : WeaponBase
 	private void _detectPlayer()
 	{
 		// This layermask means we are only looking for Player1Body - Player6Body
-		int layermask = (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15) | (1 << 16);
+		//int layermask = (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15) | (1 << 16);
+		LayerMask layermask = Services.Config.ConfigData.AllPlayerLayer;
 		RaycastHit hit;
 		if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
 		{
-			hit.transform.GetComponentInParent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner);
+			if (hit.transform.GetComponentInParent<PlayerController>() != null)
+				hit.transform.GetComponentInParent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner);
 		}
 	}
-
-	//private void _addToSprayTime()
-	//{
-	//	int playerNumber = _gpc.Owner.GetComponent<PlayerController>().PlayerNumber;
-	//	GameManager.GM.WaterGunUseTime[playerNumber] += Time.deltaTime;
-	//}
 
 	private void ChangeAmmoUI()
 	{

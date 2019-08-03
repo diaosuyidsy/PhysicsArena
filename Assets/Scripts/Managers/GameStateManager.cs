@@ -20,6 +20,8 @@ public class GameStateManager
 	private TextMeshProUGUI _holdAText;
 	private Image _holdAImage;
 	private Transform _tutorialImage;
+	private Transform _tutorialBackgroundMask;
+	private Transform _tutorialObjectiveImages;
 	private Transform _playersHolder;
 	private Transform[] _playersOutestHolder;
 	private TextMeshProUGUI _countDownText;
@@ -53,6 +55,8 @@ public class GameStateManager
 		Debug.Assert(PlayersInformation != null, "Unable to load Players information");
 		_playersHolder = GameObject.Find("Players").transform;
 		_tutorialImage = GameObject.Find("TutorialCanvas").transform.Find("TutorialImage");
+		_tutorialBackgroundMask = GameObject.Find("TutorialCanvas").transform.Find("BackgroundMask");
+		_tutorialObjectiveImages = GameObject.Find("TutorialCanvas").transform.Find("ObjectiveImages");
 		Debug.Assert(_tutorialImage != null);
 		_playersOutestHolder = new Transform[6];
 		_countDownText = GameObject.Find("TutorialCanvas").transform.Find("CountDown").GetComponent<TextMeshProUGUI>();
@@ -483,8 +487,15 @@ public class GameStateManager
 		public override void OnEnter()
 		{
 			base.OnEnter();
-			Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase);
-			Context._holdAText.DOText("Hold  A  To Start", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true);
+			Context._tutorialBackgroundMask.gameObject.SetActive(true);
+			Sequence seq = DOTween.Sequence();
+			seq.Append(Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase));
+			seq.Append(Context._tutorialImage.DOScale(Vector3.one, 0f));
+			for (int i = 0; i < Context._tutorialObjectiveImages.childCount; i++)
+			{
+				seq.Join(Context._tutorialObjectiveImages.GetChild(i).DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack).SetDelay(i * 0.2f));
+			}
+			seq.Append(Context._holdAText.DOText("Hold  A  To Start", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true));
 		}
 
 		public override void Update()
@@ -508,7 +519,14 @@ public class GameStateManager
 		public override void OnExit()
 		{
 			base.OnExit();
-			Context._tutorialImage.DOScale(Vector3.zero, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase);
+			Context._tutorialBackgroundMask.gameObject.SetActive(false);
+			for (int i = 0; i < Context._tutorialObjectiveImages.childCount; i++)
+			{
+				//Context._tutorialObjectiveImages.GetChild(i).DOScale(Vector3.zero, 0.5f).SetEase(Ease.InBack).SetDelay(i * 0.1f);
+				Context._tutorialObjectiveImages.GetChild(i).DOScale(Vector3.zero, 0f);
+			}
+			//Context._tutorialImage.DOScale(Vector3.zero, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase).SetDelay(0.5f);
+			Context._tutorialImage.DOScale(Vector3.zero, 0f);
 			Context._holdAText.DOText("", 0f);
 			Context._holdAImage.transform.DOScale(0f, 0f).SetEase(Ease.OutQuad);
 		}

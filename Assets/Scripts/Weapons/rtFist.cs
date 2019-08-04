@@ -42,7 +42,7 @@ public class rtFist : WeaponBase
 			}
 			if (Vector3.Distance(_fistDup.transform.position, _maxDistance) <= 0.2f)
 			{
-				_switchToRecharge();
+				_switchToRecharge(true);
 			}
 		}
 	}
@@ -78,10 +78,12 @@ public class rtFist : WeaponBase
 		gameObject.SetActive(false);
 	}
 
-	private void _switchToRecharge()
+	private void _switchToRecharge(bool maintainSpeed = false)
 	{
 		_fistGunState = FistGunState.Recharging;
 		_fistDup.GetComponent<Rigidbody>().isKinematic = false;
+		if (maintainSpeed)
+			_fistDup.GetComponent<Rigidbody>().velocity = -_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistSpeed;
 		_onWeaponUsedOnce();
 		StartCoroutine(_recharge(WeaponDataStore.FistGunDataStore.ReloadTime));
 	}

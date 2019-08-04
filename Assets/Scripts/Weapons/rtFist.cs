@@ -34,15 +34,19 @@ public class rtFist : WeaponBase
 			Vector3 nextPos = (_maxDistance - _fistDup.transform.position).normalized;
 			_fistDup.transform.Translate(nextPos * Time.deltaTime * WeaponDataStore.FistGunDataStore.FistSpeed, Space.World);
 			RaycastHit hit;
-			if (Physics.SphereCast(_fistDup.transform.position, 0.3f, -_fistDup.transform.right, out hit, 0.1f, Services.Config.ConfigData.AllPlayerLayer))
+			if (Physics.SphereCast(_fistDup.transform.position, 0.3f, -_fistDup.transform.right, out hit, 0.1f, Services.Config.ConfigData.AllPlayerLayer ^ (1 << _fireOwner.layer)))
 			{
-				hit.collider.GetComponentInParent<PlayerController>().OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner);
+				PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
+				if (pc != null && !pc.CanBlock(-_fistDup.transform.right))
+				{
+					pc.OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner);
+				}
 				_switchToRecharge();
 				return;
 			}
 			if (Vector3.Distance(_fistDup.transform.position, _maxDistance) <= 0.2f)
 			{
-				_switchToRecharge();
+				_switchToRecharge(true);
 			}
 		}
 	}
@@ -78,10 +82,19 @@ public class rtFist : WeaponBase
 		gameObject.SetActive(false);
 	}
 
-	private void _switchToRecharge()
+	private void _switchToRecharge(bool maintainSpeed = false)
 	{
 		_fistGunState = FistGunState.Recharging;
 		_fistDup.GetComponent<Rigidbody>().isKinematic = false;
+		if (maintainSpeed)
+			_fistDup.GetComponent<Rigidbody>().velocity = -_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistSpeed;
+		else
+		{
+			Vector3 rebound = _fistDup.transform.right;
+			rebound = rebound.normalized;
+			rebound.y = WeaponDataStore.FistGunDataStore.FistReboundY;
+			_fistDup.GetComponent<Rigidbody>().AddForce(WeaponDataStore.FistGunDataStore.FistReboundForce * rebound, ForceMode.Impulse);
+		}
 		_onWeaponUsedOnce();
 		StartCoroutine(_recharge(WeaponDataStore.FistGunDataStore.ReloadTime));
 	}

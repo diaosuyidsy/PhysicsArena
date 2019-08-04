@@ -11,4 +11,6 @@ public class FistGunData : ScriptableObject
 	public float BackfireHitForce = 300f;
 	public float MaxFlyDistance = 10f;
 	public float ReloadTime = 2f;
+	public float FistReboundY = 1f;
+	public float FistReboundForce = 100f;
 }

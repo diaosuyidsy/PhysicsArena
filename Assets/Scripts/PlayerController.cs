@@ -18,10 +18,6 @@ public class PlayerController : MonoBehaviour
 	public GameObject RightHand;
 	public GameObject TurnReference;
 	public GameObject[] OnDeathHidden;
-	[Tooltip("0 is leg 2, 1 is upleg, 0 is leg")]
-	public GameObject[] LeftLegs;
-	[Tooltip("0 is leg 2, 1 is upleg, 0 is leg")]
-	public GameObject[] RightLegs;
 
 	public int PlayerNumber;
 
@@ -46,12 +42,6 @@ public class PlayerController : MonoBehaviour
 	private HingeJoint _rightArmhj;
 	private HingeJoint _leftHandhj;
 	private HingeJoint _rightHandhj;
-	private HingeJoint _leftLeg2hj;
-	private HingeJoint _leftLegUphj;
-	private HingeJoint _leftLeghj;
-	private HingeJoint _rightLeg2hj;
-	private HingeJoint _rightLegUphj;
-	private HingeJoint _rightLeghj;
 	private GameObject _enemyWhoHitPlayer;
 	private float _playerMarkedTime;
 	IEnumerator _startSlow;
@@ -97,12 +87,6 @@ public class PlayerController : MonoBehaviour
 		_rightArmhj = RightArms[1].GetComponent<HingeJoint>();
 		_leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
 		_rightHandhj = RightArms[2].GetComponent<HingeJoint>();
-		_leftLeg2hj = LeftLegs[0].GetComponent<HingeJoint>();
-		_rightLeg2hj = RightLegs[0].GetComponent<HingeJoint>();
-		_leftLegUphj = LeftLegs[1].GetComponent<HingeJoint>();
-		_rightLegUphj = RightLegs[1].GetComponent<HingeJoint>();
-		_leftLeghj = LeftLegs[2].GetComponent<HingeJoint>();
-		_rightLeghj = RightLegs[2].GetComponent<HingeJoint>();
 		_movementFSM.TransitionTo<IdleState>();
 		_actionFSM.TransitionTo<IdleActionState>();
 	}
@@ -586,14 +570,6 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
-	IEnumerator _runAnimation()
-	{
-		WaitForEndOfFrame temp = new WaitForEndOfFrame();
-		while (true)
-		{
-			yield return temp;
-		}
-	}
 	#endregion
 
 	#region Movment States
@@ -609,19 +585,12 @@ public class PlayerController : MonoBehaviour
 		{
 			Parent.TransitionTo<DeadState>();
 		}
-
-		public override void Update()
-		{
-			base.Update();
-
-		}
 	}
 
 	private class ControllableMovementState : MovementState
 	{
 		public override void Update()
 		{
-			base.Update();
 			if (_jump && Context._isGrounded())
 			{
 				Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);

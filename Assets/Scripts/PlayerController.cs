@@ -167,6 +167,11 @@ public class PlayerController : MonoBehaviour
 	{
 		_rb.AddForce(force, forcemode);
 		OnImpact(enforcer);
+		if (force.magnitude > CharacterDataStore.CharacterMovementDataStore.DropWeaponForceThreshold &&
+			_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+		{
+			_actionFSM.TransitionTo<IdleActionState>();
+		}
 	}
 
 	public void OnImpact(GameObject enforcer)

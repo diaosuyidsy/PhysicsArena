@@ -78,7 +78,7 @@ public class rtBazooka : WeaponBase
 			_throwMark.position += movement;
 			transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
 			RaycastHit hit;
-			if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.HitExplodeLayer))
+			if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.HitExplodeLayer ^ _gpc.Owner.layer))
 			{
 				if (hit.collider.gameObject == _gpc.Owner) return;
 				_bazookaState = BazookaStates.Idle;
@@ -93,8 +93,9 @@ public class rtBazooka : WeaponBase
 					{
 						affectedPlayers.Add(_pc.gameObject);
 						Vector3 dir = _pc.transform.position - transform.position;
+						print(dir);
 						dir.y = 0f;
-						_pc.gameObject.GetComponent<Rigidbody>().AddForce(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse);
+						_pc.OnImpact(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse, _gpc.Owner);
 					}
 				}
 				EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));

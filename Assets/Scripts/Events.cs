@@ -12,9 +12,14 @@ public class GameStart : GameEvent
 public class GameEnd : GameEvent
 {
 	public int Winner;
-	public GameEnd(int _winner)
+	public Transform WinnedObjective;
+	public GameWinType GameWinType;
+
+	public GameEnd(int winner, Transform winnedObjective, GameWinType gameWinType)
 	{
-		Winner = _winner;
+		Winner = winner;
+		WinnedObjective = winnedObjective;
+		GameWinType = gameWinType;
 	}
 }
 

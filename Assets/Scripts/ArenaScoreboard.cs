@@ -53,15 +53,15 @@ public class ArenaScoreboard : MonoBehaviour
 	public void EndGame(GameObject _go)
 	{
 		CancelInvoke();
-		GameManager.GM.GameOver(ChickenScore > DuckScore ? 1 : 0, _go);
-		Camera.main.GetComponent<CameraController>().OnWinCameraZoom(_go.transform);
+		//GameManager.GM.GameOver(ChickenScore > DuckScore ? 1 : 0, _go);
+		//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(_go.transform);
 
 	}
 
 	public void EndGame()
 	{
 		CancelInvoke();
-		GameManager.GM.GameOver(ChickenScore > DuckScore ? 1 : 0, TimerMinuteBoard);
+		//GameManager.GM.GameOver(ChickenScore > DuckScore ? 1 : 0, TimerMinuteBoard);
 		//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(TimerMinuteBoard.transform);
 
 	}

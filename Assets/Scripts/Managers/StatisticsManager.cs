@@ -1,6 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Rewired;
+using System;
+using System.Linq;
 
 public class StatisticsManager
 {
@@ -12,7 +15,7 @@ public class StatisticsManager
 	/// Times that this player is blocked, stupid
 	public int[] BlockedTimes;
 	public int[] FoodScoreTimes;
-	public float[] WaterGunUseTime;
+	public int[] WaterGunUseTime;
 	public int[] HookGunUseTimes;
 	public int[] HookGunSuccessTimes;
 	public int[] SuckedPlayersTimes;
@@ -21,23 +24,176 @@ public class StatisticsManager
 	public int[] MeleeUseTimes;
 	public int[] MeleeHitTimes;
 
+	public StatisticsRecord MostSelfDestruct
+	{
+		get
+		{
+			int maxTimes = SuicideRecord.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(SuicideRecord, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostKill
+	{
+		get
+		{
+			int maxTimes = KillRecord.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(KillRecord, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostTeammateKill
+	{
+		get
+		{
+			int maxTimes = TeammateMurderRecord.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(TeammateMurderRecord, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostPayloadTime
+	{
+		get
+		{
+			float maxTimes = CartTime.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(CartTime, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostBlockMaster
+	{
+		get
+		{
+			int maxTimes = BlockTimes.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(BlockTimes, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostBlockedDumbass
+	{
+		get
+		{
+			int maxTimes = BlockedTimes.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(BlockedTimes, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostFoodDelivery
+	{
+		get
+		{
+			int maxTimes = FoodScoreTimes.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(FoodScoreTimes, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostWaterGunMaster
+	{
+		get
+		{
+			int maxTimes = WaterGunUseTime.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(WaterGunUseTime, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostHookGunAccuracy
+	{
+		get
+		{
+			float[] HookGunAccuracy = new float[HookGunSuccessTimes.Length];
+			for (int i = 0; i < HookGunAccuracy.Length; i++)
+			{
+				if (HookGunUseTimes[i] == 0) HookGunAccuracy[i] = -1f;
+				else HookGunAccuracy[i] = 1f * HookGunSuccessTimes[i] / HookGunUseTimes[i];
+			}
+			float maxTimes = HookGunAccuracy.Max();
+			if (maxTimes == -1f) return null;
+			return new StatisticsRecord(Array.IndexOf(HookGunAccuracy, maxTimes), maxTimes * 100f);
+		}
+	}
+	public StatisticsRecord MostPlayerSucked
+	{
+		get
+		{
+			int maxTimes = SuckedPlayersTimes.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(SuckedPlayersTimes, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostWeaponPickedUp
+	{
+		get
+		{
+			int maxTimes = WeaponPickedTimes.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(WeaponPickedTimes, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostDeadTimes
+	{
+		get
+		{
+			int maxTimes = DeadTimes.Max();
+			if (maxTimes == 0) return null;
+			return new StatisticsRecord(Array.IndexOf(DeadTimes, maxTimes), maxTimes);
+		}
+	}
+	public StatisticsRecord MostMeleeHitAccuracy
+	{
+		get
+		{
+			float[] MeleeAccuracy = new float[MeleeHitTimes.Length];
+			for (int i = 0; i < MeleeAccuracy.Length; i++)
+			{
+				if (MeleeUseTimes[i] == 0) MeleeAccuracy[i] = -1f;
+				else MeleeAccuracy[i] = 1f * MeleeHitTimes[i] / MeleeUseTimes[i];
+			}
+			float maxTimes = MeleeAccuracy.Max();
+			if (maxTimes == -1f) return null;
+			return new StatisticsRecord(Array.IndexOf(MeleeAccuracy, maxTimes), maxTimes * 100f);
+		}
+	}
+
+	public StatisticsRecord[] FoodCartRecords
+	{
+		get
+		{
+			StatisticsRecord[] result = new StatisticsRecord[13];
+			result[0] = MostSelfDestruct;
+			result[1] = MostKill;
+			result[2] = MostTeammateKill;
+			result[3] = MostPayloadTime;
+			result[4] = MostBlockMaster;
+			result[5] = MostBlockedDumbass;
+			result[6] = MostFoodDelivery;
+			result[7] = MostWaterGunMaster;
+			result[8] = MostHookGunAccuracy;
+			result[9] = MostPlayerSucked;
+			result[10] = MostWeaponPickedUp;
+			result[11] = MostDeadTimes;
+			result[12] = MostMeleeHitAccuracy;
+			return result;
+		}
+	}
+
 	public StatisticsManager()
 	{
-		SuicideRecord = new int[6];
-		KillRecord = new int[6];
-		TeammateMurderRecord = new int[6];
-		BlockTimes = new int[6];
-		FoodScoreTimes = new int[6];
-		HookGunUseTimes = new int[6];
-		HookGunSuccessTimes = new int[6];
-		SuckedPlayersTimes = new int[6];
-		BlockedTimes = new int[6];
-		WeaponPickedTimes = new int[6];
-		CartTime = new float[6];
-		WaterGunUseTime = new float[6];
-		DeadTimes = new int[6];
-		MeleeUseTimes = new int[6];
-		MeleeHitTimes = new int[6];
+		int maxPlayers = ReInput.players.playerCount;
+		SuicideRecord = new int[maxPlayers];
+		KillRecord = new int[maxPlayers];
+		TeammateMurderRecord = new int[maxPlayers];
+		BlockTimes = new int[maxPlayers];
+		FoodScoreTimes = new int[maxPlayers];
+		HookGunUseTimes = new int[maxPlayers];
+		HookGunSuccessTimes = new int[maxPlayers];
+		SuckedPlayersTimes = new int[maxPlayers];
+		BlockedTimes = new int[maxPlayers];
+		WeaponPickedTimes = new int[maxPlayers];
+		CartTime = new float[maxPlayers];
+		WaterGunUseTime = new int[maxPlayers];
+		DeadTimes = new int[maxPlayers];
+		MeleeUseTimes = new int[maxPlayers];
+		MeleeHitTimes = new int[maxPlayers];
 		EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
 		EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
 		EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);

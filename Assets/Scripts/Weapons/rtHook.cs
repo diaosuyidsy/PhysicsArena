@@ -154,6 +154,11 @@ public class rtHook : WeaponBase
 
 	public void HookOnHit(GameObject hit)
 	{
+		if (hit.GetComponent<PlayerController>().CanBlock(-_hook.transform.right))
+		{
+			_hookState = State.FlyingIn;
+			return;
+		}
 		_hookState = State.OnTarget;
 		Hooked = hit;
 		Hooked.GetComponent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner);

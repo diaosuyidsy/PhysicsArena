@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using UnityEngine;
 using Rewired;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -131,8 +132,7 @@ public class PlayerController : MonoBehaviour
 	{
 		// First check if the player could block the attack
 		if (_blockable &&
-			_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
-			_angleWithin(transform.forward, sender.transform.forward, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+			CanBlock(sender.transform.forward))
 		{
 			sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
 		}
@@ -141,6 +141,20 @@ public class PlayerController : MonoBehaviour
 			EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
 			OnImpact(force, ForceMode.Impulse, sender);
 		}
+	}
+
+	/// <summary>
+	/// Can Block The attack or not
+	/// Used by hook and hit
+	/// </summary>
+	/// <param name="forwardAngle"></param>
+	/// <returns></returns>
+	public bool CanBlock(Vector3 forwardAngle)
+	{
+		if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
+			_angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+			return true;
+		return false;
 	}
 
 	/// <summary>
@@ -224,6 +238,27 @@ public class PlayerController : MonoBehaviour
 	}
 
 	#region Helper Method
+	private void _setToSpawn(float yOffset)
+	{
+		int colorindex = 0;
+		for (int j = 0; j < Services.GameStateManager.PlayersInformation.RewiredID.Length; j++)
+		{
+			if (PlayerNumber == Services.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = Services.GameStateManager.PlayersInformation.ColorIndex[j];
+		}
+		if (CompareTag("Team1"))
+		{
+			Vector3 pos = Services.Config.GameMapData.Team1RespawnPoints[colorindex - 3];
+			pos.y += yOffset;
+			transform.position = pos;
+		}
+		else
+		{
+			Vector3 pos = Services.Config.GameMapData.Team2RespawnPoints[colorindex];
+			pos.y += yOffset;
+			transform.position = pos;
+		}
+	}
+
 	private string _getGroundTag()
 	{
 		RaycastHit hit;
@@ -766,7 +801,7 @@ public class PlayerController : MonoBehaviour
 			base.OnEnter();
 			_startTime = Time.time;
 			Context._rb.isKinematic = true;
-			GameManager.GM.SetToRespawn(Context.gameObject, 10f);
+			Context._setToSpawn(10f);
 			foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
 		}
 
@@ -775,6 +810,7 @@ public class PlayerController : MonoBehaviour
 			base.Update();
 			if (Time.time >= _startTime + _respawnTime)
 			{
+				EventManager.Instance.TriggerEvent(new PlayerRespawned(Context.gameObject));
 				TransitionTo<IdleState>();
 				return;
 			}
@@ -784,7 +820,7 @@ public class PlayerController : MonoBehaviour
 		{
 			base.OnExit();
 			Context._rb.isKinematic = false;
-			GameManager.GM.SetToRespawn(Context.gameObject, 0f);
+			Context._setToSpawn(0f);
 			foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(true); }
 
 		}
@@ -1066,6 +1102,7 @@ public class PlayerController : MonoBehaviour
 				int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
 				if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
 				{
+					if (hit.transform.GetComponentInParent<PlayerController>() == null) return;
 					_hitOnce = true;
 					foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
 					{

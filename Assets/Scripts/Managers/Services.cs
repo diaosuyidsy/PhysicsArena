@@ -101,4 +101,32 @@ public static class Services
 			_config = value;
 		}
 	}
+
+	private static GameStateManager _gamestatemanager;
+	public static GameStateManager GameStateManager
+	{
+		get
+		{
+			Debug.Assert(_gamestatemanager != null);
+			return _gamestatemanager;
+		}
+		set
+		{
+			_gamestatemanager = value;
+		}
+	}
+
+	private static ObjectiveManager _gameObjectiveManager;
+	public static ObjectiveManager GameObjectiveManager
+	{
+		get
+		{
+			Debug.Assert(_gameObjectiveManager != null);
+			return _gameObjectiveManager;
+		}
+		set
+		{
+			_gameObjectiveManager = value;
+		}
+	}
 }

@@ -5,23 +5,54 @@ using UnityEngine;
 
 public class WeaponGenerationManager
 {
-	private GameObject[] Weapons;
 	private WeaponData WeaponDataStore;
 	private Vector3 _weaponSpawnerCenter = new Vector3(0f, 6.5f, 0f);
 	private CameraController _cc;
 	private bool _gamestart;
 	private float _spawnTimer;
+	private GameMapData GameMapData;
 
-	public WeaponGenerationManager(WeaponData _wd, GameObject _weaponsHolder)
+	private List<int> _weaponBag;
+	private List<List<GameObject>> _curWeapons;
+	private int _totalActiveWeaponCount
+	{
+		get
+		{
+			int count = 0;
+			foreach (List<GameObject> gos in _curWeapons)
+			{
+				for (int i = 0; i < gos.Count; i++)
+				{
+					if (gos[i].activeInHierarchy) count++;
+				}
+			}
+			return count;
+		}
+	}
+
+	public WeaponGenerationManager(GameMapData gmp, WeaponData _wd)
 	{
 		WeaponDataStore = _wd;
+		GameMapData = gmp;
 		EventManager.Instance.AddHandler<GameStart>(_onGameStart);
 		_cc = Camera.main.GetComponent<CameraController>();
-		Weapons = new GameObject[_weaponsHolder.transform.childCount];
-		for (int i = 0; i < Weapons.Length; i++)
+		_weaponBag = new List<int>();
+		_shuffleWeaponBag();
+		_curWeapons = new List<List<GameObject>>();
+		for (int i = 0; i < GameMapData.WeaponsInformation.Length; i++)
 		{
-			Weapons[i] = _weaponsHolder.transform.GetChild(i).gameObject;
-			Weapons[i].SetActive(false);
+			_curWeapons.Add(new List<GameObject>());
+		}
+	}
+
+	private void _shuffleWeaponBag()
+	{
+		for (int i = 0; i < GameMapData.WeaponsInformation.Length; i++)
+		{
+			for (int j = 0; j < GameMapData.WeaponsInformation[i].WeaponSetNumber; j++)
+			{
+				_weaponBag.Add(i);
+			}
 		}
 	}
 
@@ -31,7 +62,7 @@ public class WeaponGenerationManager
 		{
 			_setWeaponSpawn();
 			_spawnTimer += Time.deltaTime;
-			if (_spawnTimer > WeaponDataStore.WeaponSpawnCD)
+			if (_spawnTimer > GameMapData.WeaponSpawnCD && _totalActiveWeaponCount < GameMapData.MaxAmountWeaponAtOnetime)
 			{
 				_generateWeapon();
 				_spawnTimer = 0f;
@@ -48,34 +79,38 @@ public class WeaponGenerationManager
 
 	private void _generateWeapon()
 	{
-		// If next weapon in array is deactivated
-		// Then move it to the current random spawn location
-		// Then activate it
-		// First we need to shuffle the array
-		System.Random rng = new System.Random();
-		for (int i = Weapons.Length - 1; i > 0; i--)
+		Debug.Assert(_weaponBag.Count > 0, "Weapon Bag's count must be larger than 0");
+		int rand = UnityEngine.Random.Range(0, _weaponBag.Count);
+		int index = _weaponBag[rand];
+		_weaponBag.RemoveAt(rand);
+		if (_weaponBag.Count == 0) _shuffleWeaponBag();
+		/// We would like to generate weapon at index
+		/// If it can be object pooled, then no need to instantiate a new one
+		bool hasInactiveWeapon = false;
+		foreach (GameObject weapon in _curWeapons[index])
 		{
-			int j = rng.Next(0, i + 1);
-
-			GameObject temp = Weapons[i];
-			Weapons[i] = Weapons[j];
-			Weapons[j] = temp;
-		}
-		// Then search through it
-		for (int i = 0; i < Weapons.Length; i++)
-		{
-			GameObject weapon = Weapons[i];
-			if (!weapon.activeSelf)
+			if (!weapon.activeInHierarchy)
 			{
 				_moveWeaponToSpawnArea(weapon);
 				weapon.SetActive(true);
+				hasInactiveWeapon = true;
+				break;
 			}
+		}
+		/// If it cannot be object pooled, then need to instantitate a new one
+		if (!hasInactiveWeapon)
+		{
+			GameObject weapon = GameObject.Instantiate(GameMapData.WeaponsInformation[index].WeaponPrefab);
+			if (GameMapData.WeaponsInformation[index].WeaponName.Contains("Water"))
+				Camera.main.GetComponent<Obi.ObiBaseFluidRenderer>().particleRenderers.Add(weapon.GetComponent<rtEmit>().ParticleRenderer);
+			_moveWeaponToSpawnArea(weapon);
+			_curWeapons[index].Add(weapon);
 		}
 	}
 
 	private void _moveWeaponToSpawnArea(GameObject weapon)
 	{
-		Vector3 weaponSpawnerSize = WeaponDataStore.WeaponSpawnerSize;
+		Vector3 weaponSpawnerSize = GameMapData.WeaponSpawnerSize;
 		Vector3 targetPos = _weaponSpawnerCenter + new Vector3(
 			UnityEngine.Random.Range(-weaponSpawnerSize.x / 2, weaponSpawnerSize.x / 2),
 			UnityEngine.Random.Range(-weaponSpawnerSize.y / 2, weaponSpawnerSize.y / 2),
@@ -90,15 +125,6 @@ public class WeaponGenerationManager
 		weapon.transform.position = targetPos;
 	}
 
-	//make the space for weapon to respawn (weapon-spawner) visible in scene
-	private void OnDrawGizmosSelected()
-	{
-		Gizmos.color = new Color(1, 0, 0, 0.5f);
-		Gizmos.DrawCube(_weaponSpawnerCenter, WeaponDataStore.WeaponSpawnerSize);
-		Gizmos.color = new Color(0, 0, 0, 0.5f);
-		Gizmos.DrawCube(WeaponDataStore.WorldCenter, WeaponDataStore.WorldSize);
-	}
-
 	// This method set the weaponspawn area to follow the center of the player
 	// Also, clamp the weeaponspawn area to not let it exceed the boundaries of the world
 	private void _setWeaponSpawn()
@@ -106,9 +132,9 @@ public class WeaponGenerationManager
 		_weaponSpawnerCenter.x = _cc.FollowTarget.x;
 		_weaponSpawnerCenter.z = _cc.FollowTarget.z;
 
-		Vector3 WorldCenter = WeaponDataStore.WorldCenter;
-		Vector3 WorldSize = WeaponDataStore.WorldSize;
-		Vector3 WeaponSpawnerSize = WeaponDataStore.WeaponSpawnerSize;
+		Vector3 WorldCenter = GameMapData.WorldCenter;
+		Vector3 WorldSize = GameMapData.WorldSize;
+		Vector3 WeaponSpawnerSize = GameMapData.WeaponSpawnerSize;
 		// Trying to clamp the weapon Spawn Area within the world space
 		float xmin = WorldCenter.x - WorldSize.x / 2 + WeaponSpawnerSize.x / 2;
 		float xmax = WorldCenter.x + WorldSize.x / 2 - WeaponSpawnerSize.x / 2;

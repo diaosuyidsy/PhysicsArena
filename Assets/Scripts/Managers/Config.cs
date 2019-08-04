@@ -5,16 +5,15 @@ using UnityEngine;
 public class Config
 {
 	public ConfigData ConfigData;
-	public PlayerController[] Players;
+	public GameMapData GameMapData;
 
-	public Config(ConfigData _cd)
+	public Config(ConfigData _cd, GameMapData _gmp)
 	{
 		ConfigData = _cd;
-		Players = GameObject.Find("Players").GetComponentsInChildren<PlayerController>(true);
+		GameMapData = _gmp;
 	}
 
 	public void Destroy()
 	{
-		Players = null;
 	}
 }

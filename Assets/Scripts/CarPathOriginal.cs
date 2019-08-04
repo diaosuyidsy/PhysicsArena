@@ -15,7 +15,7 @@ public class CarPathOriginal : MonoBehaviour
 	public Color Team2Color;
 
 	private int dir;
-	private bool ending = false;
+	private int ending;
 	private int winner;
 	private Transform[] target;
 	private HashSet<int> _playerInCircle;
@@ -36,19 +36,18 @@ public class CarPathOriginal : MonoBehaviour
 
 	private void Update()
 	{
-		if (ending)
+		if (ending == 2)
 		{
 			Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
 			transform.position = pos;
-			GameManager.GM.GameOver(winner, gameObject);
-			if (winner == 2)
-			{
-				GameManager.GM.TeamRed1Explosion.SetActive(true);
-			}
-			else
-			{
-				GameManager.GM.TeamBlue2Explosion.SetActive(true);
-			}
+			return;
+		}
+		if (ending == 1)
+		{
+			ending = 2;
+
+			//GameManager.GM.GameOver(winner, gameObject);
+			EventManager.Instance.TriggerEvent(new GameEnd(winner, transform, GameWinType.CartWin));
 			return;
 		}
 
@@ -56,9 +55,9 @@ public class CarPathOriginal : MonoBehaviour
 		if (current == target.Length - 1)
 		{
 			GetComponent<Rigidbody>().velocity = Vector3.zero;
-			ending = true;
+			ending = 1;
 			winner = 1;
-			Camera.main.GetComponent<CameraController>().OnWinCameraZoom(transform);
+			//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(transform);
 			return;
 		}
 
@@ -66,9 +65,9 @@ public class CarPathOriginal : MonoBehaviour
 		if (current == 0)
 		{
 			GetComponent<Rigidbody>().velocity = Vector3.zero;
-			ending = true;
+			ending = 1;
 			winner = 2;
-			Camera.main.GetComponent<CameraController>().OnWinCameraZoom(transform);
+			//Camera.main.GetComponent<CameraController>().OnWinCameraZoom(transform);
 			return;
 		}
 		// When Team 1 player enters trigger, move the car toward next element in an array.

@@ -8,22 +8,56 @@ public class Game : MonoBehaviour
 	public VFXData VFXData;
 	public ConfigData ConfigData;
 	public WeaponData WeaponData;
+	public GameMapData GameMapData;
 
 	private void Awake()
 	{
-		Services.Config = new Config(ConfigData);
+		Services.Config = new Config(ConfigData, GameMapData);
 		Services.AudioManager = new AudioManager(AudioData);
 		Services.GameFeelManager = new GameFeelManager();
 		Services.VisualEffectManager = new VFXManager(VFXData);
-		Services.WeaponGenerationManager = new WeaponGenerationManager(WeaponData, transform.Find("Weapons").gameObject);
+		Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
 		Services.StatisticsManager = new StatisticsManager();
 		Services.TinylyticsManager = new TinylyticsHandler();
+		Services.GameStateManager = new GameStateManager(GameMapData);
+		switch (GameMapData.GameMapMode)
+		{
+			case GameMapMode.FoodCartMode:
+				Services.GameObjectiveManager = new FoodModeObjectiveManager();
+				break;
+			default:
+				Services.GameObjectiveManager = new EmptyObjectiveManager();
+				break;
+		}
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
 		Services.WeaponGenerationManager.Update();
+		Services.GameStateManager.Update();
+	}
+
+	private void OnDrawGizmos()
+	{
+		Gizmos.color = new Color(1, 0, 0, 0.5f);
+		Gizmos.DrawCube(new Vector3(0f, 6.5f, 0f), GameMapData.WeaponSpawnerSize);
+		Gizmos.color = new Color(0, 0, 0, 0.5f);
+		Gizmos.DrawCube(GameMapData.WorldCenter, GameMapData.WorldSize);
+		for (int i = 0; i < GameMapData.ChickenLandingPosition.Length; i++)
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawSphere(GameMapData.ChickenLandingPosition[i], 0.2f);
+			Gizmos.color = Color.blue;
+			Gizmos.DrawSphere(GameMapData.DuckLandingPostion[i], 0.2f);
+		}
+		for (int i = 0; i < GameMapData.Team1RespawnPoints.Length; i++)
+		{
+			Gizmos.color = Color.red;
+			Gizmos.DrawSphere(GameMapData.Team1RespawnPoints[i], 0.2f);
+			Gizmos.color = Color.blue;
+			Gizmos.DrawSphere(GameMapData.Team2RespawnPoints[i], 0.2f);
+		}
 	}
 
 	private void OnDestroy()
@@ -45,5 +79,11 @@ public class Game : MonoBehaviour
 
 		Services.Config.Destroy();
 		Services.Config = null;
+
+		Services.GameStateManager.Destroy();
+		Services.GameStateManager = null;
+
+		Services.GameObjectiveManager.Destroy();
+		Services.GameObjectiveManager = null;
 	}
 }

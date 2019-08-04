@@ -116,8 +116,9 @@ public class VFXManager
 
 	private void _onPlayerStunned(PlayerStunned ps)
 	{
+		GameObject VFX = ps.Player.CompareTag("Team1") ? VFXDataStore.ChickenStunnedVFX : VFXDataStore.DuckStunnedVFX;
 		if (ps.Player.GetComponent<PlayerController>().StunVFXHolder == null)
-			ps.Player.GetComponent<PlayerController>().StunVFXHolder = GameObject.Instantiate(VFXDataStore.StunnedVFX, ps.PlayerHead, false);
+			ps.Player.GetComponent<PlayerController>().StunVFXHolder = GameObject.Instantiate(VFX, ps.PlayerHead, false);
 		ps.Player.GetComponent<PlayerController>().StunVFXHolder.SetActive(true);
 	}
 
@@ -128,10 +129,11 @@ public class VFXManager
 
 	private void _onPlayerSlowed(PlayerSlowed ps)
 	{
+		GameObject VFX = ps.Player.CompareTag("Team1") ? VFXDataStore.ChickenSlowedVFX : VFXDataStore.DuckSlowedVFX;
 		if (ps.Player.GetComponent<PlayerController>().SlowVFXHolder == null)
 		{
-			ps.Player.GetComponent<PlayerController>().SlowVFXHolder = GameObject.Instantiate(VFXDataStore.SlowedVFX, ps.PlayerFeet.transform, false);
-			ps.Player.GetComponent<PlayerController>().SlowVFXHolder.transform.rotation = VFXDataStore.SlowedVFX.transform.rotation;
+			ps.Player.GetComponent<PlayerController>().SlowVFXHolder = GameObject.Instantiate(VFX, ps.PlayerFeet.transform, false);
+			ps.Player.GetComponent<PlayerController>().SlowVFXHolder.transform.rotation = VFX.transform.rotation;
 		}
 		ps.Player.GetComponent<PlayerController>().SlowVFXHolder.SetActive(true);
 	}

@@ -167,6 +167,11 @@ public class PlayerController : MonoBehaviour
 	{
 		_rb.AddForce(force, forcemode);
 		OnImpact(enforcer);
+		if (force.magnitude > CharacterDataStore.CharacterMovementDataStore.DropWeaponForceThreshold &&
+			_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+		{
+			_actionFSM.TransitionTo<IdleActionState>();
+		}
 	}
 
 	public void OnImpact(GameObject enforcer)
@@ -1003,8 +1008,8 @@ public class PlayerController : MonoBehaviour
 		public override void FixedUpdate()
 		{
 			base.FixedUpdate();
-			if (Context._rb.velocity.magnitude >= Context.CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
-				TransitionTo<IdleActionState>();
+			//if (Context._rb.velocity.magnitude >= Context.CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
+			//	TransitionTo<IdleActionState>();
 		}
 
 		public override void OnExit()

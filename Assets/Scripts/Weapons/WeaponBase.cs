@@ -43,7 +43,7 @@ public abstract class WeaponBase : MonoBehaviour
 		{
 			_onWeaponDespawn();
 		}
-		if ((WeaponDataStore.Ground == (WeaponDataStore.Ground | (1 << other.gameObject.layer))) && _ammo <= 0)
+		if ((WeaponDataStore.OnNoAmmoDropDisappear == (WeaponDataStore.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))) && _ammo <= 0)
 		{
 			_onWeaponDespawn();
 		}

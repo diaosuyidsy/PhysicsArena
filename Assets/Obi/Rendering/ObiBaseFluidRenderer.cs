@@ -6,15 +6,17 @@ using UnityEngine.Rendering;
 namespace Obi
 {
 	[ExecuteInEditMode]
-	[RequireComponent (typeof(Camera))]
-	public abstract class ObiBaseFluidRenderer : MonoBehaviour{
+	[RequireComponent(typeof(Camera))]
+	public abstract class ObiBaseFluidRenderer : MonoBehaviour
+	{
 
-		public ObiParticleRenderer[] particleRenderers;
+		public List<ObiParticleRenderer> particleRenderers;
 		public bool autoupdate = true;
 		protected CommandBuffer renderFluid;
 		protected Camera currentCam;
 
-		void Awake(){
+		void Awake()
+		{
 			currentCam = GetComponent<Camera>();
 		}
 
@@ -24,58 +26,63 @@ namespace Obi
 			DestroyCommandBuffer();
 			Cleanup();
 		}
-		
+
 		public void OnDisable()
 		{
 			DestroyCommandBuffer();
 			Cleanup();
 		}
 
-		protected Material CreateMaterial (Shader shader)
-	    {
+		protected Material CreateMaterial(Shader shader)
+		{
 			if (!shader || !shader.isSupported)
-	            return null;
-	        Material m = new Material (shader);
-	        m.hideFlags = HideFlags.HideAndDontSave;
-	        return m;
-	    }
+				return null;
+			Material m = new Material(shader);
+			m.hideFlags = HideFlags.HideAndDontSave;
+			return m;
+		}
 
-		protected virtual void Setup(){}
-		protected virtual void Cleanup(){}
+		protected virtual void Setup() { }
+		protected virtual void Cleanup() { }
 
 		/**
 		 * Re-generates the CommandBuffer used for fluid rendering. Call it whenever a new ParticleRenderer is added, removed or modified.
 		 */
 		public abstract void UpdateFluidRenderingCommandBuffer();
 
-		private void DestroyCommandBuffer(){
-			if (renderFluid != null){
-				GetComponent<Camera>().RemoveCommandBuffer (CameraEvent.BeforeImageEffects,renderFluid);
+		private void DestroyCommandBuffer()
+		{
+			if (renderFluid != null)
+			{
+				GetComponent<Camera>().RemoveCommandBuffer(CameraEvent.BeforeImageEffects, renderFluid);
 				renderFluid = null;
 			}
 		}
 
-		private void OnPreRender(){
+		private void OnPreRender()
+		{
 
 			bool act = gameObject.activeInHierarchy && enabled;
-			if (!act || particleRenderers == null || particleRenderers.Length == 0)
+			if (!act || particleRenderers == null || particleRenderers.Count == 0)
 			{
 				DestroyCommandBuffer();
 				Cleanup();
 				return;
 			}
-	
+
 			Setup();
-	
+
 			if (renderFluid == null)
 			{
 
 				renderFluid = new CommandBuffer();
 				renderFluid.name = "Render fluid";
 				UpdateFluidRenderingCommandBuffer();
-				currentCam.AddCommandBuffer (CameraEvent.BeforeImageEffects, renderFluid);
+				currentCam.AddCommandBuffer(CameraEvent.BeforeImageEffects, renderFluid);
 
-			}else if (autoupdate){
+			}
+			else if (autoupdate)
+			{
 
 				UpdateFluidRenderingCommandBuffer();
 

@@ -72,8 +72,6 @@ public class GameMapData : ScriptableObject
 	public float WeaponSpawnCD = 1f;
 	public int MaxAmountWeaponAtOnetime = 3;
 	public WeaponInformation[] WeaponsInformation;
-	[Range(0, 16)]
-	public int WaterGunSetAmount = 4;
 
 	public Vector3 WeaponSpawnerSize;
 

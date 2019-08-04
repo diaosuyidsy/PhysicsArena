@@ -16,7 +16,7 @@ public class Game : MonoBehaviour
 		Services.AudioManager = new AudioManager(AudioData);
 		Services.GameFeelManager = new GameFeelManager();
 		Services.VisualEffectManager = new VFXManager(VFXData);
-		Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData, transform.Find("Weapons").gameObject);
+		Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
 		Services.StatisticsManager = new StatisticsManager();
 		Services.TinylyticsManager = new TinylyticsHandler();
 		Services.GameStateManager = new GameStateManager(GameMapData);

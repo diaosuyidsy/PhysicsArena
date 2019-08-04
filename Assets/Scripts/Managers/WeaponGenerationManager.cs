@@ -30,7 +30,7 @@ public class WeaponGenerationManager
 		}
 	}
 
-	public WeaponGenerationManager(GameMapData gmp, WeaponData _wd, GameObject _weaponsHolder)
+	public WeaponGenerationManager(GameMapData gmp, WeaponData _wd)
 	{
 		WeaponDataStore = _wd;
 		GameMapData = gmp;
@@ -39,14 +39,9 @@ public class WeaponGenerationManager
 		_weaponBag = new List<int>();
 		_shuffleWeaponBag();
 		_curWeapons = new List<List<GameObject>>();
-		for (int i = 0; i < GameMapData.WeaponsInformation.Length + 1; i++)
+		for (int i = 0; i < GameMapData.WeaponsInformation.Length; i++)
 		{
 			_curWeapons.Add(new List<GameObject>());
-		}
-		for (int i = 0; i < _weaponsHolder.transform.childCount; i++)
-		{
-			_curWeapons[GameMapData.WeaponsInformation.Length].Add(_weaponsHolder.transform.GetChild(i).gameObject);
-			_weaponsHolder.transform.GetChild(i).gameObject.SetActive(false);
 		}
 	}
 
@@ -58,10 +53,6 @@ public class WeaponGenerationManager
 			{
 				_weaponBag.Add(i);
 			}
-		}
-		for (int i = 0; i < GameMapData.WaterGunSetAmount; i++)
-		{
-			_weaponBag.Add(GameMapData.WeaponsInformation.Length);
 		}
 	}
 
@@ -107,9 +98,11 @@ public class WeaponGenerationManager
 			}
 		}
 		/// If it cannot be object pooled, then need to instantitate a new one
-		if (!hasInactiveWeapon && index != GameMapData.WeaponsInformation.Length)
+		if (!hasInactiveWeapon)
 		{
 			GameObject weapon = GameObject.Instantiate(GameMapData.WeaponsInformation[index].WeaponPrefab);
+			if (GameMapData.WeaponsInformation[index].WeaponName.Contains("Water"))
+				Camera.main.GetComponent<Obi.ObiBaseFluidRenderer>().particleRenderers.Add(weapon.GetComponent<rtEmit>().ParticleRenderer);
 			_moveWeaponToSpawnArea(weapon);
 			_curWeapons[index].Add(weapon);
 		}

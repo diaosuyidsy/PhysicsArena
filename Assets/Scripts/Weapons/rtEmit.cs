@@ -6,6 +6,7 @@ using UnityEngine;
 public class rtEmit : WeaponBase
 {
 	public ObiEmitter WaterBall;
+	public ObiParticleRenderer ParticleRenderer;
 	public GameObject WaterUI;
 	public GameObject GunUI;
 

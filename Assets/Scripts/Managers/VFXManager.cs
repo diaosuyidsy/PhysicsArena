@@ -149,6 +149,32 @@ public class VFXManager
 			_instantiateVFX(VFXDataStore.CartExplosionVFX, ge.WinnedObjective.position, VFXDataStore.CartExplosionVFX.transform.rotation);
 		}
 	}
+
+	private void _onObjectPickedUp(ObjectPickedUp opu)
+	{
+		rtBirdFood bf = opu.Obj.GetComponent<rtBirdFood>();
+		if (bf != null)
+		{
+			if ((opu.Obj.tag.Contains("Team1") && opu.Player.tag.Contains("Team2")) || (opu.Obj.tag.Contains("Team2") && opu.Player.tag.Contains("Team1")))
+				return;
+			GameObject VFX = opu.Obj.tag.Contains("Team1") ? VFXDataStore.ChickenFoodVFX : VFXDataStore.DuckFoodVFX;
+			if (bf.PickUpVFXHolder == null)
+			{
+				bf.PickUpVFXHolder = GameObject.Instantiate(VFX, opu.Obj.transform, false);
+				bf.PickUpVFXHolder.transform.rotation = VFX.transform.rotation;
+			}
+			bf.PickUpVFXHolder.SetActive(true);
+		}
+	}
+
+	private void _onObjectDropped(ObjectDropped od)
+	{
+		rtBirdFood bf = od.Obj.GetComponent<rtBirdFood>();
+		if (bf != null && bf.PickUpVFXHolder != null)
+		{
+			bf.PickUpVFXHolder.SetActive(false);
+		}
+	}
 	#endregion
 
 	private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -177,6 +203,9 @@ public class VFXManager
 		EventManager.Instance.AddHandler<PlayerSlowed>(_onPlayerSlowed);
 		EventManager.Instance.AddHandler<PlayerUnslowed>(_onPlayerUnslowed);
 		EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
+		EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
+		EventManager.Instance.AddHandler<ObjectDropped>(_onObjectDropped);
+
 	}
 
 	private void OnDisable()
@@ -199,6 +228,9 @@ public class VFXManager
 		EventManager.Instance.RemoveHandler<PlayerSlowed>(_onPlayerSlowed);
 		EventManager.Instance.RemoveHandler<PlayerUnslowed>(_onPlayerUnslowed);
 		EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
+		EventManager.Instance.RemoveHandler<ObjectPickedUp>(_onObjectPickedUp);
+		EventManager.Instance.RemoveHandler<ObjectDropped>(_onObjectDropped);
+
 	}
 
 	public void Destory()

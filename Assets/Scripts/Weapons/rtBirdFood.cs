@@ -6,6 +6,8 @@ public class rtBirdFood : WeaponBase
 {
 	[HideInInspector]
 	public int LastHolder = 7; // Initializ the Last Holder to an error value to assert game register before use
+	[HideInInspector]
+	public GameObject PickUpVFXHolder;
 	private Vector3 _originalPosition;
 
 	protected override void Awake()

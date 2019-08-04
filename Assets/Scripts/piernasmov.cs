@@ -8,15 +8,6 @@ public class piernasmov : MonoBehaviour
 	public HingeJoint hj;
 	public Transform objetivo;
 	public bool invertido;
-	// Suscribe Edsonxn Channel On Youtube!!
-	//for more tutorials
-
-
-	// Use this for initialization
-	void Start()
-	{
-
-	}
 
 	// Update is called once per frame
 	void Update()

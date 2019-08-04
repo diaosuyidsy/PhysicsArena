@@ -13,5 +13,6 @@ public class WeaponData : ScriptableObject
 	public HammerData HammerDataStore;
 
 	public LayerMask Ground;
+	public LayerMask OnNoAmmoDropDisappear;
 	public LayerMask OnHitDisappear;
 }

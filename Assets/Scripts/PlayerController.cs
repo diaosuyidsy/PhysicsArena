@@ -1003,8 +1003,8 @@ public class PlayerController : MonoBehaviour
 		public override void FixedUpdate()
 		{
 			base.FixedUpdate();
-			if (Context._rb.velocity.magnitude >= Context.CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
-				TransitionTo<IdleActionState>();
+			//if (Context._rb.velocity.magnitude >= Context.CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
+			//	TransitionTo<IdleActionState>();
 		}
 
 		public override void OnExit()

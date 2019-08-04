@@ -159,6 +159,20 @@ public class ObjectPickedUp : GameEvent
 	}
 }
 
+public class ObjectDropped : GameEvent
+{
+	public GameObject Player;
+	public int PlayerNumber;
+	public GameObject Obj;
+
+	public ObjectDropped(GameObject player, int playerNumber, GameObject obj)
+	{
+		Player = player;
+		PlayerNumber = playerNumber;
+		Obj = obj;
+	}
+}
+
 public class WaterGunFired : GameEvent
 {
 	public GameObject WaterGun { get; }

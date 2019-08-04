@@ -282,6 +282,7 @@ public class PlayerController : MonoBehaviour
 		if (HandObject == null) return;
 		// Drop the thing
 		HandObject.SendMessage("Drop");
+		EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
 		// Return the body to normal position
 		_resetBodyAnimation();
 		// These two are necessary for all objects

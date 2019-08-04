@@ -15,6 +15,8 @@ public class BazookaData : ScriptableObject
 	public float MarkAirMoveSpeed = 5f;
 	public float MarkThrowThurst = 10f;
 	public float MarkGravityScale = 1f;
+	public float TrajectoryLineStep = 0.1f;
+	public float TrajectoryLineTime = 2.5f;
 	public LayerMask CanHideLayer;
 	public LayerMask LineCastLayer;
 	public LayerMask HitExplodeLayer;

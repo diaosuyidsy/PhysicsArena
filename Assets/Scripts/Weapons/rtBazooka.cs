@@ -55,6 +55,11 @@ public class rtBazooka : WeaponBase
 		_lineRenderer = GetComponent<LineRenderer>();
 		_throwMark = transform.Find("ThrowMark");
 		Debug.Assert(_throwMark != null);
+		Vector3 throwmarkscaleAdjust = Vector3.one;
+		throwmarkscaleAdjust.x = WeaponDataStore.BazookaDataStore.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+		throwmarkscaleAdjust.y = WeaponDataStore.BazookaDataStore.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
+		throwmarkscaleAdjust.z = WeaponDataStore.BazookaDataStore.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.z;
+		_throwMark.transform.localScale = throwmarkscaleAdjust * 2f;
 		_shadowThrowMark = transform.Find("ShadowThrowMark");
 		Debug.Assert(_shadowThrowMark != null);
 		_ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
@@ -105,19 +110,26 @@ public class rtBazooka : WeaponBase
 			GetComponent<Rigidbody>().AddForce(Vector3.down * Physics.gravity.y * (1f - WeaponDataStore.BazookaDataStore.MarkGravityScale));
 	}
 
+	private void OnDrawGizmosSelected()
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireSphere(transform.position, WeaponDataStore.BazookaDataStore.MaxAffectionRange);
+	}
+
 	public override void Fire(bool buttondown)
 	{
-		if (buttondown)
+		if (buttondown && _bazookaState == BazookaStates.Idle)
 		{
 			_bazookaState = BazookaStates.Aiming;
 			_player = ReInput.players.GetPlayer(_gpc.Owner.GetComponent<PlayerController>().PlayerNumber);
 			_throwMark.gameObject.SetActive(true);
+			Services.GameStateManager.CameraTargets.Add(_throwMark);
 			_shadowThrowMark.gameObject.SetActive(true);
 			_throwMark.parent = null;
 			_shadowThrowMark.parent = null;
 			_throwMark.eulerAngles = new Vector3(90f, 0f, 0f);
 		}
-		else
+		else if (!buttondown && _bazookaState == BazookaStates.Aiming)
 		{
 			_bazookaState = BazookaStates.Out;
 			_lineRenderer.enabled = false;
@@ -134,6 +146,7 @@ public class rtBazooka : WeaponBase
 		_lineRenderer.enabled = false;
 		_player = null;
 		_throwMark.gameObject.SetActive(false);
+		Services.GameStateManager.CameraTargets.Remove(_throwMark);
 		_shadowThrowMark.gameObject.SetActive(false);
 		_throwMark.parent = transform;
 		_shadowThrowMark.parent = transform;
@@ -152,7 +165,12 @@ public class rtBazooka : WeaponBase
 		Vector3 newPosition = _shadowThrowMark.position + new Vector3(_HLAxis, 0f, -_VLAxis) * Time.deltaTime * WeaponDataStore.BazookaDataStore.MarkMoveSpeed;
 		RaycastHit hit;
 		if (Physics.Raycast(newPosition + new Vector3(0, 20f), Vector3.down, out hit, 30f, WeaponDataStore.BazookaDataStore.LineCastLayer))
+		{
 			newPosition.y = hit.point.y;
+			_throwMark.gameObject.SetActive(true);
+		}
+		else _throwMark.gameObject.SetActive(false);
+
 		float distance = Vector3.Distance(new Vector3(newPosition.x, 0f, newPosition.z), new Vector3(transform.position.x, 0f, transform.position.z));
 		if (distance > _range)
 		{
@@ -171,7 +189,7 @@ public class rtBazooka : WeaponBase
 
 	private void _drawTrajectory()
 	{
-		var points = _getTrajectoryPoints(transform.position, _startVelocity, 0.1f, 10f);
+		var points = _getTrajectoryPoints(transform.position, _startVelocity, WeaponDataStore.BazookaDataStore.TrajectoryLineStep, WeaponDataStore.BazookaDataStore.TrajectoryLineTime);
 		if (_lineRenderer)
 		{
 			if (!_lineRenderer.enabled) _lineRenderer.enabled = true;
@@ -180,7 +198,7 @@ public class rtBazooka : WeaponBase
 		}
 		if (_throwMark.gameObject)
 		{
-			if (!_throwMark.gameObject.activeSelf) _throwMark.gameObject.SetActive(true);
+			//if (!_throwMark.gameObject.activeSelf) _throwMark.gameObject.SetActive(true);
 			if (points.Count > 1)
 				_throwMark.position = points[points.Count - 1];
 		}

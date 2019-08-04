@@ -13,6 +13,7 @@ public class GameStateManager
 {
 	public PlayerController[] PlayerControllers;
 	public PlayerInformation PlayersInformation;
+	public List<Transform> CameraTargets;
 
 	private GameMapData _gameMapdata;
 	private FSM<GameStateManager> _gameStateFSM;
@@ -69,6 +70,7 @@ public class GameStateManager
 		_statisticIndicator = _gameEndCanvas.Find("StatisticsIndicator");
 		_statisticNominee = _gameEndCanvas.Find("StatisticsNominee");
 		_statisticRecord = _gameEndCanvas.Find("StatisticsRecord");
+		CameraTargets = new List<Transform>();
 		for (int i = 0; i < 6; i++)
 		{
 			_playersOutestHolder[i] = _playersHolder.GetChild(i);
@@ -76,8 +78,11 @@ public class GameStateManager
 		for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
 		{
 			PlayerControllers[i] = _playersOutestHolder[PlayersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
+			CameraTargets.Add(PlayerControllers[i].transform);
 		}
 		EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
+		EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
+		EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
 		_cam = Camera.main;
 		_darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
 		//_gameStateFSM.TransitionTo<LandingState>();
@@ -92,6 +97,8 @@ public class GameStateManager
 	public void Destroy()
 	{
 		EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
+		EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
+		EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawn);
 		if (_gameStateFSM.CurrentState != null)
 			_gameStateFSM.CurrentState.CleanUp();
 	}
@@ -105,6 +112,16 @@ public class GameStateManager
 			_gameStateFSM.TransitionTo<WinState>();
 			return;
 		}
+	}
+
+	private void _onPlayerDied(PlayerDied pd)
+	{
+		CameraTargets.Remove(pd.Player.transform);
+	}
+
+	private void _onPlayerRespawn(PlayerRespawned pr)
+	{
+		CameraTargets.Add(pr.Player.transform);
 	}
 
 	private abstract class GameState : FSM<GameStateManager>.State

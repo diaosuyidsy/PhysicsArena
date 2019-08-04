@@ -61,11 +61,14 @@ public class CameraController : MonoBehaviour
 			Vector3 total = Vector3.zero;
 			int length = 0;
 
-			foreach (PlayerController go in Services.GameStateManager.PlayerControllers)
+			foreach (Transform go in Services.GameStateManager.CameraTargets)
 			{
-				if (go != null && go.LegSwingReference.activeSelf)
+				PlayerController pc = go.GetComponent<PlayerController>();
+				if ((pc != null
+					&& pc.LegSwingReference.activeSelf)
+					|| (pc == null))
 				{
-					total += go.transform.position;
+					total += go.position;
 					length++;
 				}
 			}
@@ -77,7 +80,7 @@ public class CameraController : MonoBehaviour
 			_desiredPosition.z = _targetOnGround.z - Mathf.Cos(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
 			Context.transform.position = Vector3.Lerp(Context.transform.position, _desiredPosition, _CameraData.SmoothSpeed);
 
-			float _desiredFOV = 2f * _getMaxDistance() + 3.99f;
+			float _desiredFOV = 2f * _getMaxDistance() + 5f;
 			Context._cam.fieldOfView = Mathf.Lerp(Context._cam.fieldOfView, _desiredFOV, _CameraData.SmoothSpeed);
 			Context._cam.fieldOfView = Mathf.Clamp(Context._cam.fieldOfView, _CameraData.FOVSizeMin, _CameraData.FOVSizeMax);
 		}
@@ -110,15 +113,11 @@ public class CameraController : MonoBehaviour
 		private float _getMaxDistance()
 		{
 			float maxDist = 0f;
-			for (int i = 0; i < Services.GameStateManager.PlayerControllers.Length; i++)
+			for (int i = 0; i < Services.GameStateManager.CameraTargets.Count; i++)
 			{
-				if (!Services.GameStateManager.PlayerControllers[i].LegSwingReference.activeSelf)
-					continue;
-				for (int j = i + 1; j < Services.GameStateManager.PlayerControllers.Length; j++)
+				for (int j = i + 1; j < Services.GameStateManager.CameraTargets.Count; j++)
 				{
-					if (!Services.GameStateManager.PlayerControllers[j].LegSwingReference.activeSelf)
-						continue;
-					float temp = Vector3.Distance(Services.GameStateManager.PlayerControllers[i].transform.position, Services.GameStateManager.PlayerControllers[j].transform.position);
+					float temp = Vector3.Distance(Services.GameStateManager.CameraTargets[i].position, Services.GameStateManager.CameraTargets[j].position);
 					if (temp > maxDist)
 					{
 						maxDist = temp;

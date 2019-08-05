@@ -59,12 +59,6 @@ public class GameMapData : ScriptableObject
 	public float TitleTextOutDuration = 1f;
 	public float TitleTextInDelay = 1f;
 
-	[Header("Statistic Setting")]
-	public string[] StatisticsNames;
-	public string[] StatisticsIntro1;
-	public string[] StatisticsIntro2;
-	public float StatisticStayTime = 2f;
-
 	[Header("Pause Menu Setting")]
 	public AudioMixer BackgroundMusicMixer;
 

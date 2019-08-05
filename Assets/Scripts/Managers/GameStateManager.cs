@@ -246,7 +246,7 @@ public class GameStateManager
 				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsTitle, Services.Config.ConfigData.StatisticsTitleAnimationDuration));
 				seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], Services.Config.ConfigData.StatisticsNomineeAnimationDuration).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
 				seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro1 + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro2, Services.Config.ConfigData.StatisticsRecordAnimationDuration));
-				seq.AppendInterval(_GameMapData.StatisticStayTime);
+				seq.AppendInterval(Services.Config.ConfigData.StatisStayTime);
 				//if (sr.HasExtra)
 				//{
 				//	seq.AppendInterval(0.5f);

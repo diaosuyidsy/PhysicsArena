@@ -56,8 +56,9 @@ public class AudioManager
         }
         else
         {
-            ///If it's not null, then it's a hit
-            _playSound(ph.Hitted, AudioDataStore.PlayerHitAudioClip);
+            if (ph.MeleeCharge > 0.1f)
+                ///If it's not null, then it's a hit
+                _playSound(ph.Hitted, AudioDataStore.PlayerHitAudioClip);
         }
     }
 

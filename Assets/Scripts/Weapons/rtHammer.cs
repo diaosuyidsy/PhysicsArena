@@ -80,6 +80,7 @@ public class rtHammer : WeaponBase
 		_player = null;
 		_gpc.FollowHand = true;
 		_gpc.CanBePickedUp = true;
+		EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
 	}
 
 	protected override void OnTriggerEnter(Collider other)

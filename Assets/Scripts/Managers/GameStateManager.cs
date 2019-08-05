@@ -39,6 +39,7 @@ public class GameStateManager
 	private Transform _pauseWholeMask;
 	private Transform _statisticIndicator;
 	private Transform _statisticNominee;
+	private Transform _statisticExtra;
 	private Transform _statisticRecord;
 	private int _winner;
 
@@ -70,6 +71,7 @@ public class GameStateManager
 		_statisticIndicator = _gameEndCanvas.Find("StatisticsIndicator");
 		_statisticNominee = _gameEndCanvas.Find("StatisticsNominee");
 		_statisticRecord = _gameEndCanvas.Find("StatisticsRecord");
+		_statisticExtra = _gameEndCanvas.Find("StatisticsExtra");
 		CameraTargets = new List<Transform>();
 		for (int i = 0; i < 6; i++)
 		{
@@ -228,32 +230,32 @@ public class GameStateManager
 		{
 			base.OnEnter();
 			seq = DOTween.Sequence();
-			for (int i = 0; i < Services.StatisticsManager.FoodCartRecords.Length; i++)
+			StatisticsRecord[] record = Services.StatisticsManager.FoodCartRecords;
+			Utility.SelectionSortStatsRecord(ref record);
+			for (int i = record.Length - 1; i >= 0; i--)
 			{
-				int temp = i;
-				StatisticsRecord sr = Services.StatisticsManager.FoodCartRecords[i];
+				StatisticsRecord sr = record[i];
 				if (sr == null) continue;
+				int temp = sr.Index;
 				int colorindex = 0;
 				for (int j = 0; j < Context.PlayersInformation.RewiredID.Length; j++)
 				{
 					if (sr.RewiredID == Context.PlayersInformation.RewiredID[j]) colorindex = Context.PlayersInformation.ColorIndex[j];
 				}
-				//seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsNames[i], 0f));
-				//seq.Append(Utility.BubbleFadeIn(Context._statisticIndicator.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticIndicator.GetComponent<TextMeshProUGUI>().text.Length));
-				//seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], 0f));
-				//seq.Append(Utility.BubbleFadeIn(Context._statisticNominee.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticNominee.GetComponent<TextMeshProUGUI>().text.Length));
-				//seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsIntro1[i] + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + _GameMapData.StatisticsIntro2[i], 0f));
-				//seq.Append(Utility.BubbleFadeIn(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
-				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsNames[temp], 1f));
-				seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], 0.5f).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
-				seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(_GameMapData.StatisticsIntro1[temp] + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + _GameMapData.StatisticsIntro2[temp], 1f));
+
+				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsTitle, Services.Config.ConfigData.StatisticsTitleAnimationDuration));
+				seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], Services.Config.ConfigData.StatisticsNomineeAnimationDuration).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
+				seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro1 + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro2, Services.Config.ConfigData.StatisticsRecordAnimationDuration));
 				seq.AppendInterval(_GameMapData.StatisticStayTime);
+				//if (sr.HasExtra)
+				//{
+				//	seq.AppendInterval(0.5f);
+				//	seq.Join(Context._statisticExtra.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsExtra, 0f));
+				//	seq.Join(Context._statisticExtra.DOLocalMoveX(-3200f, 5f).SetRelative(true).SetEase(Ease.Linear).OnComplete(() => Context._statisticExtra.DOLocalMoveX(3200f, 0f)));
+				//}
 				seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText("", 1f));
 				seq.Join(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText("", 1f));
 				seq.Join(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText("", 1f));
-				//seq.Join(Utility.BubbleFadeOut(Context._statisticIndicator.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticIndicator.GetComponent<TextMeshProUGUI>().text.Length));
-				//seq.Join(Utility.BubbleFadeOut(Context._statisticNominee.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticNominee.GetComponent<TextMeshProUGUI>().text.Length));
-				//seq.Join(Utility.BubbleFadeOut(Context._statisticRecord.GetComponent<TMP_Text>().GetCharTweener(), 0, Context._statisticRecord.GetComponent<TextMeshProUGUI>().text.Length));
 			}
 		}
 

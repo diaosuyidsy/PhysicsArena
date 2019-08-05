@@ -10,4 +10,10 @@ public class ConfigData : ScriptableObject
 	public Color[] IndexToColor;
 	[Tooltip("Team Index 0 is chicken, 1 is duck")]
 	public Color[] TeamColor;
+	[Header("Statistics Setting")]
+	public StatisticsInformation[] StatsInfo;
+	public float StatisticsTitleAnimationDuration = 1f;
+	public float StatisticsNomineeAnimationDuration = 0.5f;
+	public float StatisticsRecordAnimationDuration = 1f;
+	public float StatisStayTime = 3f;
 }

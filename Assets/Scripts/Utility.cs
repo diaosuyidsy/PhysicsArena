@@ -71,25 +71,61 @@ public static class Utility
 
 		return sequence;
 	}
+
+	public static void SelectionSortStatsRecord(ref StatisticsRecord[] arr)
+	{
+		int n = arr.Length;
+		for (int i = 0; i < n - 1; i++)
+		{
+			int min_idx = i;
+			for (int j = i + 1; j < n; j++)
+				if (Services.Config.ConfigData.StatsInfo[j].Importance < Services.Config.ConfigData.StatsInfo[min_idx].Importance)
+					min_idx = j;
+			var temp = arr[min_idx];
+			arr[min_idx] = arr[i];
+			arr[i] = temp;
+		}
+	}
 }
 
 public class StatisticsRecord
 {
+	public int Index;
 	public int RewiredID;
 	public int MaxTime;
 	public float MaxTime_Float;
+	public bool HasExtra;
 
-	public StatisticsRecord(int rewiredID, int maxTime)
+	public StatisticsRecord(int index, int rewiredID, int maxTime, bool hasExtra)
 	{
+		Index = index;
 		RewiredID = rewiredID;
 		MaxTime = maxTime;
+		HasExtra = hasExtra;
 	}
 
-	public StatisticsRecord(int rewiredID, float maxTime)
+	public StatisticsRecord(int index, int rewiredID, float maxTime, bool hasExtra)
 	{
+		Index = index;
 		RewiredID = rewiredID;
 		MaxTime_Float = maxTime;
+		HasExtra = hasExtra;
 	}
+}
+
+[Serializable]
+public class StatisticsInformation
+{
+	public string StatisticsTitle;
+	public string StatisticsIntro1;
+	public string StatisticsIntro2;
+	public string StatisticsExtra;
+	[Tooltip("The limit number of showing it on statistics")]
+	public float ShowLimit;
+	[Tooltip("The limit of number of extra showing on statstics")]
+	public float ExtraLimit;
+	[Tooltip("High Importance shows in front")]
+	public int Importance;
 }
 
 [Serializable]

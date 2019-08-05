@@ -29,8 +29,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = SuicideRecord.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(SuicideRecord, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[0].ShowLimit) return null;
+			return new StatisticsRecord(0, Array.IndexOf(SuicideRecord, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[0].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostKill
@@ -38,8 +38,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = KillRecord.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(KillRecord, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[1].ShowLimit) return null;
+			return new StatisticsRecord(1, Array.IndexOf(KillRecord, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[1].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostTeammateKill
@@ -47,8 +47,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = TeammateMurderRecord.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(TeammateMurderRecord, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[2].ShowLimit) return null;
+			return new StatisticsRecord(2, Array.IndexOf(TeammateMurderRecord, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[2].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostPayloadTime
@@ -56,8 +56,8 @@ public class StatisticsManager
 		get
 		{
 			float maxTimes = CartTime.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(CartTime, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[3].ShowLimit) return null;
+			return new StatisticsRecord(3, Array.IndexOf(CartTime, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[3].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostBlockMaster
@@ -65,8 +65,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = BlockTimes.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(BlockTimes, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[4].ShowLimit) return null;
+			return new StatisticsRecord(4, Array.IndexOf(BlockTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[4].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostBlockedDumbass
@@ -74,8 +74,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = BlockedTimes.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(BlockedTimes, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[5].ShowLimit) return null;
+			return new StatisticsRecord(5, Array.IndexOf(BlockedTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[5].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostFoodDelivery
@@ -83,8 +83,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = FoodScoreTimes.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(FoodScoreTimes, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[6].ShowLimit) return null;
+			return new StatisticsRecord(6, Array.IndexOf(FoodScoreTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[6].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostWaterGunMaster
@@ -92,8 +92,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = WaterGunUseTime.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(WaterGunUseTime, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[7].ShowLimit) return null;
+			return new StatisticsRecord(7, Array.IndexOf(WaterGunUseTime, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[7].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostHookGunAccuracy
@@ -107,8 +107,8 @@ public class StatisticsManager
 				else HookGunAccuracy[i] = 1f * HookGunSuccessTimes[i] / HookGunUseTimes[i];
 			}
 			float maxTimes = HookGunAccuracy.Max();
-			if (maxTimes == -1f) return null;
-			return new StatisticsRecord(Array.IndexOf(HookGunAccuracy, maxTimes), maxTimes * 100f);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[8].ShowLimit) return null;
+			return new StatisticsRecord(8, Array.IndexOf(HookGunAccuracy, maxTimes), maxTimes * 100f, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[8].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostPlayerSucked
@@ -116,8 +116,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = SuckedPlayersTimes.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(SuckedPlayersTimes, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[9].ShowLimit) return null;
+			return new StatisticsRecord(9, Array.IndexOf(SuckedPlayersTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[9].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostWeaponPickedUp
@@ -125,8 +125,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = WeaponPickedTimes.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(WeaponPickedTimes, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[10].ShowLimit) return null;
+			return new StatisticsRecord(10, Array.IndexOf(WeaponPickedTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[10].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostDeadTimes
@@ -134,8 +134,8 @@ public class StatisticsManager
 		get
 		{
 			int maxTimes = DeadTimes.Max();
-			if (maxTimes == 0) return null;
-			return new StatisticsRecord(Array.IndexOf(DeadTimes, maxTimes), maxTimes);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[11].ShowLimit) return null;
+			return new StatisticsRecord(11, Array.IndexOf(DeadTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[11].ExtraLimit);
 		}
 	}
 	public StatisticsRecord MostMeleeHitAccuracy
@@ -149,8 +149,8 @@ public class StatisticsManager
 				else MeleeAccuracy[i] = 1f * MeleeHitTimes[i] / MeleeUseTimes[i];
 			}
 			float maxTimes = MeleeAccuracy.Max();
-			if (maxTimes == -1f) return null;
-			return new StatisticsRecord(Array.IndexOf(MeleeAccuracy, maxTimes), maxTimes * 100f);
+			if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[12].ShowLimit) return null;
+			return new StatisticsRecord(12, Array.IndexOf(MeleeAccuracy, maxTimes), maxTimes * 100f, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[12].ExtraLimit);
 		}
 	}
 

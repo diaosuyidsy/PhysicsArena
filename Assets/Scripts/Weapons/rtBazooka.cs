@@ -98,7 +98,7 @@ public class rtBazooka : WeaponBase
 					}
 				}
 				EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));
-				_gpc.Owner.GetComponent<PlayerController>().OnImpact(new StunEffect(5f, 0f));
+				_gpc.Owner.GetComponent<PlayerController>().OnImpact(new StunEffect(WeaponDataStore.BazookaDataStore.SelfStunTime, 0f));
 				_onWeaponUsedOnce();
 			}
 		}

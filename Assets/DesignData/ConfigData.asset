@@ -32,6 +32,13 @@ MonoBehaviour:
   TeamColor:
   - {r: 0.9607843, g: 0.10588237, b: 0.49995545, a: 1}
   - {r: 0.25490198, g: 0.4039216, b: 1, a: 1}
+  FrameYPosition:
+  - 356.5
+  - 214.5
+  - 72.5
+  - -69.5
+  - -211.5
+  - -353.5
   StatsInfo:
   - StatisticsTitle: 'The Bungee Lover:'
     StatisticsIntro1: 'who wanders off the map '
@@ -111,6 +118,12 @@ MonoBehaviour:
     StatisticIcon: {fileID: 0}
     Weight: 0
     ExcludeFromMVPCalculation: 0
+  - StatisticsTitle: 'The Melee Master:'
+    StatisticsIntro1: 'whose melee attack hits '
+    StatisticsIntro2: '% of the time!'
+    StatisticIcon: {fileID: 0}
+    Weight: 0
+    ExcludeFromMVPCalculation: 0
   StatisticsTitleAnimationDuration: 1
   StatisticsNomineeAnimationDuration: 0.5
   StatisticsRecordAnimationDuration: 1
@@ -122,3 +135,6 @@ MonoBehaviour:
   MVPSpotLightEase: 6
   MVPSpotLightToLandDuration: 0.5
   MVPLandToWordShowDuration: 0.5
+  MVPToUIMoveInDuration: 0.5
+  MVPScaleDownDuration: 0.5
+  FrameMoveInDuration: 0.2

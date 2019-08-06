@@ -58,7 +58,8 @@ public class StatisticsManager
             , maxtimes
             , maxtimes * _configData.StatsInfo[i].Weight);
         }
-        Utility.SelectionSortStatisticRecord(ref mostRecords);
+        // Utility.SelectionSortStatisticRecord(ref mostRecords);
+        // Array.Sort(mostRecords, StatsTuple.Weightc);
         HashSet<int> rewiredIDSet = new HashSet<int>();
         for (int i = mostRecords.Length - 1; i >= 0; i--)
         {
@@ -76,6 +77,15 @@ public class StatisticsManager
                             _configData.StatsInfo[record.Index].StatisticIcon
                 ));
             }
+        }
+        for (int i = 0; i < Services.GameStateManager.PlayersInformation.RewiredID.Length; i++)
+        {
+            int rewiredID = Services.GameStateManager.PlayersInformation.RewiredID[i];
+            if (!result.ContainsKey(rewiredID)) result.Add(rewiredID, new StatisticsRecord(
+                 "Useless",
+                 "Does Nothing All Game",
+                 null
+             ));
         }
         return result;
     }

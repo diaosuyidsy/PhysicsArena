@@ -12,6 +12,7 @@ public class ConfigData : ScriptableObject
     [Tooltip("Team Index 0 is chicken, 1 is duck")]
     public Color[] TeamColor;
     [Header("Statistics Setting")]
+    public float[] FrameYPosition;
     public StatisticsInformation[] StatsInfo;
     public float StatisticsTitleAnimationDuration = 1f;
     public float StatisticsNomineeAnimationDuration = 0.5f;
@@ -27,4 +28,5 @@ public class ConfigData : ScriptableObject
 
     public float MVPToUIMoveInDuration = 0.5f;
     public float MVPScaleDownDuration = 0.5f;
+    public float FrameMoveInDuration = 0.2f;
 }

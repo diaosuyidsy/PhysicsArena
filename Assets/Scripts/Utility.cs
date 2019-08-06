@@ -102,6 +102,21 @@ public class StatsTuple
         RawData = rawData;
         WeightData = weightData;
     }
+
+    private class WeightComparer : IComparer
+    {
+        public int Compare(System.Object x, System.Object y)
+        {
+            StatsTuple a = (StatsTuple)x;
+            StatsTuple b = (StatsTuple)y;
+            if (a.WeightData > b.WeightData)
+                return 1;
+            if (a.WeightData < b.WeightData)
+                return -1;
+            return 0;
+        }
+    }
+
 }
 
 public class StatisticsRecord

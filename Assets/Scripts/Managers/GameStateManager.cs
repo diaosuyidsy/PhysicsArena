@@ -8,6 +8,7 @@ using UnityEngine.UI;
 using CharTween;
 using UnityEngine.SceneManagement;
 using TextFx;
+using System;
 
 public class GameStateManager
 {
@@ -38,11 +39,8 @@ public class GameStateManager
     private Transform _pauseResume;
     private Transform _pauseQuit;
     private Transform _pauseWholeMask;
-    private Transform _statisticIndicator;
-    private Transform _statisticNominee;
-    private Transform _statisticExtra;
-    private Transform _statisticRecord;
     private Transform _statisticPanel;
+    private Transform _statisticUIHolder;
     private Transform _MVPDisplay;
     private Transform _MVPTitle;
     private Transform _MVP;
@@ -78,13 +76,10 @@ public class GameStateManager
         _pauseQuit = _pauseMenu.Find("Quit");
         _pauseWholeMask = _pauseMenu.Find("WholeMask");
         PlayerControllers = new PlayerController[PlayersInformation.ColorIndex.Length];
-        _statisticIndicator = _gameEndCanvas.Find("StatisticsIndicator");
-        _statisticNominee = _gameEndCanvas.Find("StatisticsNominee");
-        _statisticRecord = _gameEndCanvas.Find("StatisticsRecord");
-        _statisticExtra = _gameEndCanvas.Find("StatisticsExtra");
         _statisticPanel = _gameEndCanvas.Find("StatisticPanel");
         _MVPDisplay = _statisticPanel.Find("MVPDisplay");
         _MVPTitle = _statisticPanel.Find("MVPTitle");
+        _statisticUIHolder = _statisticPanel.Find("StatisticUIHolder");
         _MVP = GameObject.Find("MVP").transform;
         _MVPCamera = _MVP.Find("MVP Camera");
         _MVPPlayerHolder = _MVP.Find("MVPPlayerHolder");
@@ -288,7 +283,26 @@ public class GameStateManager
             seq.Join(Context._MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
             seq.Join(Context._MVPTitle.DOLocalMove(new Vector3(-587f, 112f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
             seq.Join(Context._MVPTitle.DOScale(0.5f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
-
+            var statsresult = Services.StatisticsManager.GetStatisticResult();
+            /// Move in all players 
+            for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
+            {
+                int rewiredID = _PlayersInformation.RewiredID[i];
+                int colorindex = Context.GetColorIndexFromRewiredID(rewiredID);
+                Transform frame = Context._statisticUIHolder.GetChild(colorindex);
+                frame.GetChild(0).GetComponent<Image>().sprite = statsresult[rewiredID].StatisticIcon;
+                frame.GetChild(1).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticName;
+                frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticsInformation;
+            }
+            int[] ci = _PlayersInformation.ColorIndex;
+            Array.Sort(ci);
+            for (int i = 0; i < ci.Length; i++)
+            {
+                int x = _PlayersInformation.ColorIndex[i];
+                Context._statisticUIHolder.GetChild(x).DOLocalMoveY(_configData.FrameYPosition[i], 0f);
+                seq.Append(Context._statisticUIHolder.GetChild(x).DOLocalMoveX(770f, _configData.FrameMoveInDuration)
+                .SetEase(Ease.Linear));
+            }
         }
     }
 

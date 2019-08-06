@@ -256,58 +256,59 @@ public class GameStateManager
         }
     }
 
-    private class FoodCartStatisticsWordSstate : StatisticsWordState
-    {
-        Sequence seq;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            seq = DOTween.Sequence();
-            StatisticsRecord[] record = Services.StatisticsManager.FoodCartRecords;
-            Utility.SelectionSortStatsRecord(ref record);
-            for (int i = record.Length - 1; i >= 0; i--)
-            {
-                StatisticsRecord sr = record[i];
-                if (sr == null) continue;
-                int temp = sr.Index;
-                int colorindex = 0;
-                for (int j = 0; j < Context.PlayersInformation.RewiredID.Length; j++)
-                {
-                    if (sr.RewiredID == Context.PlayersInformation.RewiredID[j]) colorindex = Context.PlayersInformation.ColorIndex[j];
-                }
+    // private class FoodCartStatisticsWordSstate : StatisticsWordState
+    // {
+    //     Sequence seq;
+    //     public override void OnEnter()
+    //     {
+    //         base.OnEnter();
+    //         seq = DOTween.Sequence();
+    //         // StatisticsRecord[] record = Services.StatisticsManager.FoodCartRecords;
+    //         StatisticsRecord[] record = null;
+    //         Utility.SelectionSortStatsRecord(ref record);
+    //         for (int i = record.Length - 1; i >= 0; i--)
+    //         {
+    //             StatisticsRecord sr = record[i];
+    //             if (sr == null) continue;
+    //             int temp = sr.Index;
+    //             int colorindex = 0;
+    //             for (int j = 0; j < Context.PlayersInformation.RewiredID.Length; j++)
+    //             {
+    //                 if (sr.RewiredID == Context.PlayersInformation.RewiredID[j]) colorindex = Context.PlayersInformation.ColorIndex[j];
+    //             }
 
-                seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsTitle, Services.Config.ConfigData.StatisticsTitleAnimationDuration));
-                seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], Services.Config.ConfigData.StatisticsNomineeAnimationDuration).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
-                seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro1 + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro2, Services.Config.ConfigData.StatisticsRecordAnimationDuration));
-                seq.AppendInterval(Services.Config.ConfigData.StatisStayTime);
-                //if (sr.HasExtra)
-                //{
-                //	seq.AppendInterval(0.5f);
-                //	seq.Join(Context._statisticExtra.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsExtra, 0f));
-                //	seq.Join(Context._statisticExtra.DOLocalMoveX(-3200f, 5f).SetRelative(true).SetEase(Ease.Linear).OnComplete(() => Context._statisticExtra.DOLocalMoveX(3200f, 0f)));
-                //}
-                seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText("", 1f));
-                seq.Join(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText("", 1f));
-                seq.Join(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText("", 1f));
-            }
-        }
+    //             seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsTitle, Services.Config.ConfigData.StatisticsTitleAnimationDuration));
+    //             seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], Services.Config.ConfigData.StatisticsNomineeAnimationDuration).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
+    //             seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro1 + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro2, Services.Config.ConfigData.StatisticsRecordAnimationDuration));
+    //             seq.AppendInterval(Services.Config.ConfigData.StatisStayTime);
+    //             //if (sr.HasExtra)
+    //             //{
+    //             //	seq.AppendInterval(0.5f);
+    //             //	seq.Join(Context._statisticExtra.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsExtra, 0f));
+    //             //	seq.Join(Context._statisticExtra.DOLocalMoveX(-3200f, 5f).SetRelative(true).SetEase(Ease.Linear).OnComplete(() => Context._statisticExtra.DOLocalMoveX(3200f, 0f)));
+    //             //}
+    //             seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText("", 1f));
+    //             seq.Join(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText("", 1f));
+    //             seq.Join(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText("", 1f));
+    //         }
+    //     }
 
-        public override void Update()
-        {
-            base.Update();
-            if (_AnyADown)
-            {
-                // TransitionTo<LastPanelState>();
-                return;
-            }
-        }
+    //     public override void Update()
+    //     {
+    //         base.Update();
+    //         if (_AnyADown)
+    //         {
+    //             // TransitionTo<LastPanelState>();
+    //             return;
+    //         }
+    //     }
 
-        public override void OnExit()
-        {
-            base.OnExit();
-            seq.Kill();
-        }
-    }
+    //     public override void OnExit()
+    //     {
+    //         base.OnExit();
+    //         seq.Kill();
+    //     }
+    // }
 
     private class WinState : GameState
     {

@@ -1,12 +1,13 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
-using Rewired;
-using System;
 using System.Linq;
+using Rewired;
+using UnityEngine;
 
 public class StatisticsManager
 {
+    private ConfigData _configData;
     public int[] SuicideRecord;
     public int[] KillRecord;
     public int[] TeammateMurderRecord;
@@ -24,79 +25,79 @@ public class StatisticsManager
     public int[] MeleeUseTimes;
     public int[] MeleeHitTimes;
 
-    public StatisticsRecord MostSelfDestruct
+    public StatsTuple MostSelfDestruct
     {
         get
         {
             int maxTimes = SuicideRecord.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[0].ShowLimit) return null;
-            return new StatisticsRecord(0, Array.IndexOf(SuicideRecord, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[0].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(0, Array.IndexOf(SuicideRecord, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[0].Weight);
         }
     }
-    public StatisticsRecord MostKill
+    public StatsTuple MostKill
     {
         get
         {
             int maxTimes = KillRecord.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[1].ShowLimit) return null;
-            return new StatisticsRecord(1, Array.IndexOf(KillRecord, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[1].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(1, Array.IndexOf(KillRecord, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[1].Weight);
         }
     }
-    public StatisticsRecord MostTeammateKill
+    public StatsTuple MostTeammateKill
     {
         get
         {
             int maxTimes = TeammateMurderRecord.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[2].ShowLimit) return null;
-            return new StatisticsRecord(2, Array.IndexOf(TeammateMurderRecord, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[2].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(2, Array.IndexOf(TeammateMurderRecord, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[2].Weight);
         }
     }
-    public StatisticsRecord MostPayloadTime
+    public StatsTuple MostPayloadTime
     {
         get
         {
             float maxTimes = CartTime.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[3].ShowLimit) return null;
-            return new StatisticsRecord(3, Array.IndexOf(CartTime, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[3].ExtraLimit);
+            if (Mathf.Approximately(0f, maxTimes)) return null;
+            return new StatsTuple(3, Array.IndexOf(CartTime, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[3].Weight);
         }
     }
-    public StatisticsRecord MostBlockMaster
+    public StatsTuple MostBlockMaster
     {
         get
         {
             int maxTimes = BlockTimes.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[4].ShowLimit) return null;
-            return new StatisticsRecord(4, Array.IndexOf(BlockTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[4].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(4, Array.IndexOf(BlockTimes, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[4].Weight);
         }
     }
-    public StatisticsRecord MostBlockedDumbass
+    public StatsTuple MostBlockedDumbass
     {
         get
         {
             int maxTimes = BlockedTimes.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[5].ShowLimit) return null;
-            return new StatisticsRecord(5, Array.IndexOf(BlockedTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[5].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(5, Array.IndexOf(BlockedTimes, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[5].Weight);
         }
     }
-    public StatisticsRecord MostFoodDelivery
+    public StatsTuple MostFoodDelivery
     {
         get
         {
             int maxTimes = FoodScoreTimes.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[6].ShowLimit) return null;
-            return new StatisticsRecord(6, Array.IndexOf(FoodScoreTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[6].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(6, Array.IndexOf(FoodScoreTimes, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[6].Weight);
         }
     }
-    public StatisticsRecord MostWaterGunMaster
+    public StatsTuple MostWaterGunMaster
     {
         get
         {
             int maxTimes = WaterGunUseTime.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[7].ShowLimit) return null;
-            return new StatisticsRecord(7, Array.IndexOf(WaterGunUseTime, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[7].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(7, Array.IndexOf(WaterGunUseTime, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[7].Weight);
         }
     }
-    public StatisticsRecord MostHookGunAccuracy
+    public StatsTuple MostHookGunAccuracy
     {
         get
         {
@@ -107,38 +108,38 @@ public class StatisticsManager
                 else HookGunAccuracy[i] = 1f * HookGunSuccessTimes[i] / HookGunUseTimes[i];
             }
             float maxTimes = HookGunAccuracy.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[8].ShowLimit) return null;
-            return new StatisticsRecord(8, Array.IndexOf(HookGunAccuracy, maxTimes), maxTimes * 100f, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[8].ExtraLimit);
+            if (Mathf.Approximately(0f, maxTimes)) return null;
+            return new StatsTuple(8, Array.IndexOf(HookGunAccuracy, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[8].Weight);
         }
     }
-    public StatisticsRecord MostPlayerSucked
+    public StatsTuple MostPlayerSucked
     {
         get
         {
             int maxTimes = SuckedPlayersTimes.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[9].ShowLimit) return null;
-            return new StatisticsRecord(9, Array.IndexOf(SuckedPlayersTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[9].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(9, Array.IndexOf(SuckedPlayersTimes, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[9].Weight);
         }
     }
-    public StatisticsRecord MostWeaponPickedUp
+    public StatsTuple MostWeaponPickedUp
     {
         get
         {
             int maxTimes = WeaponPickedTimes.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[10].ShowLimit) return null;
-            return new StatisticsRecord(10, Array.IndexOf(WeaponPickedTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[10].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(10, Array.IndexOf(WeaponPickedTimes, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[10].Weight);
         }
     }
-    public StatisticsRecord MostDeadTimes
+    public StatsTuple MostDeadTimes
     {
         get
         {
             int maxTimes = DeadTimes.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[11].ShowLimit) return null;
-            return new StatisticsRecord(11, Array.IndexOf(DeadTimes, maxTimes), maxTimes, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[11].ExtraLimit);
+            if (maxTimes == 0) return null;
+            return new StatsTuple(11, Array.IndexOf(DeadTimes, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[11].Weight);
         }
     }
-    public StatisticsRecord MostMeleeHitAccuracy
+    public StatsTuple MostMeleeHitAccuracy
     {
         get
         {
@@ -149,16 +150,15 @@ public class StatisticsManager
                 else MeleeAccuracy[i] = 1f * MeleeHitTimes[i] / MeleeUseTimes[i];
             }
             float maxTimes = MeleeAccuracy.Max();
-            if (1f * maxTimes <= Services.Config.ConfigData.StatsInfo[12].ShowLimit) return null;
-            return new StatisticsRecord(12, Array.IndexOf(MeleeAccuracy, maxTimes), maxTimes * 100f, 1f * maxTimes > Services.Config.ConfigData.StatsInfo[12].ExtraLimit);
+            if (Mathf.Approximately(0f, maxTimes)) return null;
+            return new StatsTuple(12, Array.IndexOf(MeleeAccuracy, maxTimes), maxTimes, maxTimes * _configData.StatsInfo[12].Weight);
         }
     }
-
-    public StatisticsRecord[] FoodCartRecords
+    public StatsTuple[] FoodCartRecords
     {
         get
         {
-            StatisticsRecord[] result = new StatisticsRecord[13];
+            StatsTuple[] result = new StatsTuple[13];
             result[0] = MostSelfDestruct;
             result[1] = MostKill;
             result[2] = MostTeammateKill;
@@ -178,6 +178,7 @@ public class StatisticsManager
 
     public StatisticsManager()
     {
+        _configData = Services.Config.ConfigData;
         int maxPlayers = ReInput.players.playerCount;
         SuicideRecord = new int[maxPlayers];
         KillRecord = new int[maxPlayers];
@@ -203,6 +204,36 @@ public class StatisticsManager
         EventManager.Instance.AddHandler<WaterGunFired>(_onWaterGunFired);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.AddHandler<PunchReleased>(_onMelee);
+    }
+
+    /// <summary>
+    /// Returns the Statistic Result of the Game
+    /// </summary>
+    /// <returns>A Dictionary that maps rewired Id to a statistic Record</returns>
+    public Dictionary<int, StatisticsRecord> GetStatisticResult()
+    {
+        Dictionary<int, StatisticsRecord> result = new Dictionary<int, StatisticsRecord>();
+        StatsTuple[] foodcartrecord = FoodCartRecords;
+        Utility.SelectionSortStatisticRecord(ref foodcartrecord);
+        HashSet<int> rewiredIDSet = new HashSet<int>();
+        for (int i = foodcartrecord.Length - 1; i >= 0; i--)
+        {
+            StatsTuple record = foodcartrecord[i];
+            if (record == null) continue;
+            if (rewiredIDSet.Contains(record.RewiredID)) continue;
+            else
+            {
+                rewiredIDSet.Add(record.RewiredID);
+                result.Add(record.RewiredID, new StatisticsRecord(
+                    _configData.StatsInfo[record.Index].StatisticsTitle,
+                    _configData.StatsInfo[record.Index].StatisticsIntro1 +
+                        record.RawData +
+                            _configData.StatsInfo[record.Index].StatisticsIntro2,
+                            _configData.StatsInfo[record.Index].StatisticIcon
+                ));
+            }
+        }
+        return result;
     }
 
     private void _onPlayerDied(PlayerDied pd)

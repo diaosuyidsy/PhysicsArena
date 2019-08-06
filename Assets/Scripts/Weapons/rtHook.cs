@@ -162,7 +162,7 @@ public class rtHook : WeaponBase
         }
         _hookState = State.OnTarget;
         Hooked = hit;
-        Hooked.GetComponent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner);
+        Hooked.GetComponent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner, ImpactType.HookGun);
         foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
         {
             rb.isKinematic = true;

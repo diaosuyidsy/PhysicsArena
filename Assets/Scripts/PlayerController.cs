@@ -43,8 +43,7 @@ public class PlayerController : MonoBehaviour
     private HingeJoint _rightArmhj;
     private HingeJoint _leftHandhj;
     private HingeJoint _rightHandhj;
-    private GameObject _enemyWhoHitPlayer;
-    private float _playerMarkedTime;
+    private ImpactMarker _impactMarker;
     IEnumerator _startSlow;
 
     private FSM<PlayerController> _movementFSM;
@@ -90,6 +89,7 @@ public class PlayerController : MonoBehaviour
         _rightHandhj = RightArms[2].GetComponent<HingeJoint>();
         _movementFSM.TransitionTo<IdleState>();
         _actionFSM.TransitionTo<IdleActionState>();
+        _impactMarker = new ImpactMarker(null, Time.time, ImpactType.Self);
     }
 
     public void Init(int controllernumber)
@@ -123,7 +123,7 @@ public class PlayerController : MonoBehaviour
         {
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
-            EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _enemyWhoHitPlayer, Time.time < _playerMarkedTime + 3f));
+            EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker));
         }
     }
 
@@ -139,7 +139,7 @@ public class PlayerController : MonoBehaviour
         else // Player is hit cause he could not block
         {
             EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
-            OnImpact(force, ForceMode.Impulse, sender);
+            OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
         }
     }
 
@@ -163,10 +163,10 @@ public class PlayerController : MonoBehaviour
     /// <param name="force">The amount of force</param>
     /// <param name="forcemode">Force mode</param>
     /// <param name="enforcer">who is the impactor</param>
-    public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer)
+    public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType)
     {
         _rb.AddForce(force, forcemode);
-        OnImpact(enforcer);
+        OnImpact(enforcer, impactType);
         if (force.magnitude > CharacterDataStore.CharacterMovementDataStore.DropWeaponForceThreshold &&
             _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
         {
@@ -174,10 +174,9 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    public void OnImpact(GameObject enforcer)
+    public void OnImpact(GameObject enforcer, ImpactType impactType)
     {
-        _enemyWhoHitPlayer = enforcer;
-        _playerMarkedTime = Time.time;
+        _impactMarker.SetValue(enforcer, Time.time, impactType);
     }
 
     public void OnImpact(Status status)

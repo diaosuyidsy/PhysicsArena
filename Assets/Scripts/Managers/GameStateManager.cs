@@ -44,6 +44,7 @@ public class GameStateManager
     private Transform _statisticRecord;
     private Transform _statisticPanel;
     private Transform _MVPDisplay;
+    private Transform _MVPTitle;
     private Transform _MVP;
     private Transform _MVPCamera;
     private Transform _MVPPlayerHolder;
@@ -83,6 +84,7 @@ public class GameStateManager
         _statisticExtra = _gameEndCanvas.Find("StatisticsExtra");
         _statisticPanel = _gameEndCanvas.Find("StatisticPanel");
         _MVPDisplay = _statisticPanel.Find("MVPDisplay");
+        _MVPTitle = _statisticPanel.Find("MVPTitle");
         _MVP = GameObject.Find("MVP").transform;
         _MVPCamera = _MVP.Find("MVP Camera");
         _MVPPlayerHolder = _MVP.Find("MVPPlayerHolder");
@@ -103,7 +105,18 @@ public class GameStateManager
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-        _gameStateFSM.TransitionTo<FoodCartTutorialState>();
+        // _gameStateFSM.TransitionTo<FoodCartTutorialState>();
+        _gameStateFSM.TransitionTo<MVPEndPanelState>();
+    }
+
+    public int GetColorIndexFromRewiredID(int rewiredID)
+    {
+        for (int i = 0; i < PlayersInformation.RewiredID.Length; i++)
+        {
+            if (PlayersInformation.RewiredID[i] == rewiredID) return PlayersInformation.ColorIndex[i];
+        }
+        Debug.LogError("Rewired ID: " + rewiredID + " Related Color Index not Found");
+        return -1;
     }
 
     public void Update()
@@ -229,6 +242,7 @@ public class GameStateManager
 
         public override void Init()
         {
+            base.Init();
             _configData = Context._configData;
         }
         public override void OnEnter()
@@ -248,67 +262,35 @@ public class GameStateManager
             Context._MVPPlayerHolder.gameObject.SetActive(true);
             Context._MVPSpotLight.gameObject.SetActive(true);
             Context._MVPPodium.gameObject.SetActive(true);
+            int MVPColorIndex = Context.GetColorIndexFromRewiredID(Services.StatisticsManager.GetMVPRewiredID());
+            Transform MVPChicken = Context._MVPPlayerHolder.GetChild(MVPColorIndex);
+            MVPChicken.gameObject.SetActive(true);
+            MVPChicken.GetComponent<Animator>().SetTrigger("Enter");
+            Color MVPColor = _configData.IndexToColor[MVPColorIndex];
+            MVPColor.a = 0f;
+            Context._MVPTitle.GetComponent<TextMeshProUGUI>().color = MVPColor;
             Sequence seq = DOTween.Sequence();
-            seq.Append(Context._MVPPodium.DOLocalMoveY(0.7f, _configData.MVPPodiumMoveDuration).SetEase(_configData.MVPPodiumMoveEase));
+            seq.Append(Context._MVPPodium.DOLocalMoveY(0.7f, _configData.MVPPodiumMoveDuration).SetEase(_configData.MVPPodiumMoveEase).SetRelative(true));
             seq.Append(Context._MVPSpotLight.GetComponent<Light>().DOIntensity(_configData.MVPSpotLightIntensity, _configData.MVPSpotLightDuration).SetEase(_configData.MVPSpotLightEase).SetLoops(3, LoopType.Yoyo));
             seq.AppendInterval(_configData.MVPSpotLightToLandDuration);
+            seq.Append(MVPChicken.DOLocalMoveY(-3.116f, 0.2f).SetEase(Ease.InCirc).SetRelative(true)
+            .OnComplete(() =>
+            {
+                Context._MVPCamera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
+                MVPChicken.GetComponent<Animator>().SetTrigger("Pose");
+            }));
+            seq.AppendInterval(_configData.MVPLandToWordShowDuration);
+            seq.Append(Context._MVPTitle.DOScale(5f, 0.2f).From().SetEase(Ease.OutCirc).SetRelative(true));
+            seq.Join(Context._MVPTitle.GetComponent<TextMeshProUGUI>().DOFade(1f, 0.2f));
+            seq.AppendInterval(_configData.MVPToUIMoveInDuration);
+            seq.Append(Context._MVPPlayerHolder.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+            seq.Join(Context._MVPSpotLight.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+            seq.Join(Context._MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+            seq.Join(Context._MVPTitle.DOLocalMove(new Vector3(-587f, 112f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+            seq.Join(Context._MVPTitle.DOScale(0.5f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
 
         }
     }
-
-    // private class FoodCartStatisticsWordSstate : StatisticsWordState
-    // {
-    //     Sequence seq;
-    //     public override void OnEnter()
-    //     {
-    //         base.OnEnter();
-    //         seq = DOTween.Sequence();
-    //         // StatisticsRecord[] record = Services.StatisticsManager.FoodCartRecords;
-    //         StatisticsRecord[] record = null;
-    //         Utility.SelectionSortStatsRecord(ref record);
-    //         for (int i = record.Length - 1; i >= 0; i--)
-    //         {
-    //             StatisticsRecord sr = record[i];
-    //             if (sr == null) continue;
-    //             int temp = sr.Index;
-    //             int colorindex = 0;
-    //             for (int j = 0; j < Context.PlayersInformation.RewiredID.Length; j++)
-    //             {
-    //                 if (sr.RewiredID == Context.PlayersInformation.RewiredID[j]) colorindex = Context.PlayersInformation.ColorIndex[j];
-    //             }
-
-    //             seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsTitle, Services.Config.ConfigData.StatisticsTitleAnimationDuration));
-    //             seq.Append(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.IndexToName[colorindex], Services.Config.ConfigData.StatisticsNomineeAnimationDuration).OnPlay(() => Context._statisticNominee.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.IndexToColor[colorindex]));
-    //             seq.Append(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro1 + (sr.MaxTime == 0 ? sr.MaxTime_Float.ToString("F1") : sr.MaxTime.ToString()) + Services.Config.ConfigData.StatsInfo[temp].StatisticsIntro2, Services.Config.ConfigData.StatisticsRecordAnimationDuration));
-    //             seq.AppendInterval(Services.Config.ConfigData.StatisStayTime);
-    //             //if (sr.HasExtra)
-    //             //{
-    //             //	seq.AppendInterval(0.5f);
-    //             //	seq.Join(Context._statisticExtra.GetComponent<TextMeshProUGUI>().DOText(Services.Config.ConfigData.StatsInfo[temp].StatisticsExtra, 0f));
-    //             //	seq.Join(Context._statisticExtra.DOLocalMoveX(-3200f, 5f).SetRelative(true).SetEase(Ease.Linear).OnComplete(() => Context._statisticExtra.DOLocalMoveX(3200f, 0f)));
-    //             //}
-    //             seq.Append(Context._statisticIndicator.GetComponent<TextMeshProUGUI>().DOText("", 1f));
-    //             seq.Join(Context._statisticNominee.GetComponent<TextMeshProUGUI>().DOText("", 1f));
-    //             seq.Join(Context._statisticRecord.GetComponent<TextMeshProUGUI>().DOText("", 1f));
-    //         }
-    //     }
-
-    //     public override void Update()
-    //     {
-    //         base.Update();
-    //         if (_AnyADown)
-    //         {
-    //             // TransitionTo<LastPanelState>();
-    //             return;
-    //         }
-    //     }
-
-    //     public override void OnExit()
-    //     {
-    //         base.OnExit();
-    //         seq.Kill();
-    //     }
-    // }
 
     private class WinState : GameState
     {

@@ -119,6 +119,25 @@ public class StatisticsRecord
 
 }
 
+public class ImpactMarker
+{
+    public GameObject EnemyWhoHitPlayer { get; private set; }
+    public float PlayerMarkedTime { get; private set; }
+    public ImpactType ImpactType { get; private set; }
+
+    public ImpactMarker(GameObject enemyWhoHitPlayer, float playerMarkedTime, ImpactType impactType)
+    {
+        SetValue(enemyWhoHitPlayer, playerMarkedTime, impactType);
+    }
+
+    public void SetValue(GameObject enemyWhoHitPlayer, float playerMarkedTime, ImpactType impactType)
+    {
+        EnemyWhoHitPlayer = enemyWhoHitPlayer;
+        PlayerMarkedTime = playerMarkedTime;
+        ImpactType = impactType;
+    }
+}
+
 [Serializable]
 public class StatisticsInformation
 {
@@ -180,4 +199,17 @@ public enum GameWinType
     CartWin,
     FoodWin,
     ScoreWin,
+}
+
+public enum ImpactType
+{
+    WaterGun,
+    HookGun,
+    SuckGun,
+    FistGun,
+    BazookaGun,
+    HammerGun,
+    Melee,
+    Block,
+    Self,
 }

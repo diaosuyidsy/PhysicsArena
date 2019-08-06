@@ -23,4 +23,8 @@ public class ConfigData : ScriptableObject
     public float MVPSpotLightIntensity = 5f;
     public Ease MVPSpotLightEase = Ease.OutQuad;
     public float MVPSpotLightToLandDuration = 0.5f;
+    public float MVPLandToWordShowDuration = 0.2f;
+
+    public float MVPToUIMoveInDuration = 0.5f;
+    public float MVPScaleDownDuration = 0.5f;
 }

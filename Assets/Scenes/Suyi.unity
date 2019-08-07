@@ -1090,7 +1090,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7594fd5c5bd87ae49aed533df8abac38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainLightingProfile: {fileID: 11400000, guid: 38e3ced4ccfc00645b3113b9b7f771c9,
+  mainLightingProfile: {fileID: 11400000, guid: 64f2185cbdf580345b954844eedc3ce7,
     type: 2}
 --- !u!4 &114530107
 Transform:
@@ -36715,8 +36715,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4282502399
-  m_fontColor: {r: 1, g: 0.8021134, b: 0.2588235, a: 1}
+    rgba: 4312319
+  m_fontColor: {r: 1, g: 0.8021134, b: 0.2588235, a: 0}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -51796,6 +51796,11 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 1571880247}
     m_Modifications:
+    - target: {fileID: 20459301899154910, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 3}
+      propertyPath: m_TargetTexture
+      value: 
+      objectReference: {fileID: 0}
     - target: {fileID: 4195833958785946, guid: f8d6c631da37749db9f9744813be0f39, type: 3}
       propertyPath: m_LocalPosition.x
       value: 17.13
@@ -51913,15 +51918,15 @@ PrefabInstance:
       propertyPath: particleRenderers.Array.data[15]
       value: 
       objectReference: {fileID: 0}
-    - target: {fileID: 20459301899154910, guid: f8d6c631da37749db9f9744813be0f39,
-        type: 3}
-      propertyPath: m_TargetTexture
-      value: 
-      objectReference: {fileID: 0}
     - target: {fileID: 114322385920369306, guid: f8d6c631da37749db9f9744813be0f39,
         type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 82697173938787356, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 3}
+      propertyPath: m_Volume
+      value: 0.218
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8d6c631da37749db9f9744813be0f39, type: 3}
@@ -52931,7 +52936,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2096385912
 RectTransform:
   m_ObjectHideFlags: 0

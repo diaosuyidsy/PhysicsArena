@@ -125,7 +125,8 @@ public class VFXManager
 
     private void _onPlayerUnStunned(PlayerUnStunned ps)
     {
-        ps.Player.GetComponent<PlayerController>().StunVFXHolder.SetActive(false);
+        if (ps.Player.GetComponent<PlayerController>().StunVFXHolder != null)
+            ps.Player.GetComponent<PlayerController>().StunVFXHolder.SetActive(false);
     }
 
     private void _onPlayerSlowed(PlayerSlowed ps)
@@ -176,6 +177,25 @@ public class VFXManager
             bf.PickUpVFXHolder.SetActive(false);
         }
     }
+
+    private void _onFistGunFire(FistGunFired ev)
+    {
+        GameObject.Instantiate(VFXDataStore.FistGunFistTrailVFX, ev.Fist.transform, false);
+    }
+
+    private void _onFistGunRecharged(FistGunCharged ev)
+    {
+        GameObject.Instantiate(VFXDataStore.VanishVFX, ev.FistPos, VFXDataStore.VanishVFX.transform.rotation);
+    }
+    private void _onBazookaLaunched(BazookaFired ev)
+    {
+        // GameObject.Instantiate(VFXDataStore.BazookaStartVFX, ev.FistPos, VFXDataStore.BazookaStartVFX.transform.rotation);
+        if (ev.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder != null)
+        {
+            ev.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder = GameObject.Instantiate(VFXDataStore.BazookaTrailVFX, ev.BazookaGun.transform, false);
+            ev.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder.transform.rotation = VFXDataStore.BazookaTrailVFX.transform.rotation;
+        }
+    }
     #endregion
 
     private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -183,7 +203,6 @@ public class VFXManager
         if (_vfx == null) return null;
         return GameObject.Instantiate(_vfx, _pos, _rot);
     }
-
     private void OnEnable()
     {
         EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
@@ -206,7 +225,9 @@ public class VFXManager
         EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.AddHandler<ObjectDropped>(_onObjectDropped);
-
+        EventManager.Instance.AddHandler<FistGunFired>(_onFistGunFire);
+        EventManager.Instance.AddHandler<FistGunCharged>(_onFistGunRecharged);
+        EventManager.Instance.AddHandler<BazookaFired>(_onBazookaLaunched);
     }
 
     private void OnDisable()
@@ -231,6 +252,9 @@ public class VFXManager
         EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.RemoveHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.RemoveHandler<ObjectDropped>(_onObjectDropped);
+        EventManager.Instance.RemoveHandler<FistGunFired>(_onFistGunFire);
+        EventManager.Instance.RemoveHandler<FistGunCharged>(_onFistGunRecharged);
+        EventManager.Instance.RemoveHandler<BazookaFired>(_onBazookaLaunched);
 
     }
 

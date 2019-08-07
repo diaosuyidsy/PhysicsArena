@@ -298,6 +298,11 @@ public class ObjectDropped : GameEvent
     }
 }
 
+public class ObjectHitGround : GameEvent
+{
+
+}
+
 #region WEAPON EVENT
 public class WaterGunFired : GameEvent
 {
@@ -457,6 +462,17 @@ public class FistGunBlocked : FistGunEvent
         Blocker = blocker;
         BlockerPlayerNumber = blockerPlayerNumber;
     }
+}
+
+public class FistGunCharged : FistGunEvent
+{
+    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, int fistGunOwnerPlayerNumber, Vector3 fistPos) : base(fistGun, fistGunOwner, fistGunOwnerPlayerNumber)
+    {
+        FistPos = fistPos;
+    }
+
+    public Vector3 FistPos { get; }
+
 }
 
 public class BazookaFired : GameEvent

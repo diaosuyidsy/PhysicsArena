@@ -134,7 +134,7 @@ public class AudioManager
 
     private void _onPlayerJump(PlayerJump pj)
     {
-        _playSound(pj.Player, AudioDataStore.JumpAudioClip);
+        _playSound(pj.PlayerFeet, AudioDataStore.JumpAudioClip);
     }
 
     private void _onWaterGunFired(WaterGunFired wf)
@@ -197,6 +197,10 @@ public class AudioManager
         _playSound(fs.Food, AudioDataStore.FoodDeliveredAudioClip);
     }
 
+    private void _onPlayerLand(PlayerLand ev)
+    {
+        _playSound(ev.PlayerFeet, AudioDataStore.LandAudioClip);
+    }
     #endregion
 
     private void OnEnable()
@@ -223,6 +227,7 @@ public class AudioManager
         EventManager.Instance.AddHandler<BazookaBombed>(_onBazookaBombed);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);
+        EventManager.Instance.AddHandler<PlayerLand>(_onPlayerLand);
     }
 
     private void OnDisable()
@@ -250,6 +255,7 @@ public class AudioManager
         EventManager.Instance.RemoveHandler<BazookaBombed>(_onBazookaBombed);
         EventManager.Instance.RemoveHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelievered);
+        EventManager.Instance.RemoveHandler<PlayerLand>(_onPlayerLand);
 
     }
 

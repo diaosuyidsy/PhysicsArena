@@ -106,6 +106,7 @@ public class rtFist : WeaponBase
     IEnumerator _recharge(float time)
     {
         yield return new WaitForSeconds(time);
+        EventManager.Instance.TriggerEvent(new FistGunCharged(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup.transform.position));
         Destroy(_fistDup);
         _fistDup = null;
         _fist.gameObject.SetActive(true);

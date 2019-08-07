@@ -6,6 +6,8 @@ using Rewired;
 [RequireComponent(typeof(LineRenderer))]
 public class rtBazooka : WeaponBase
 {
+    [HideInInspector]
+    public GameObject BazookaTrailVFXHolder;
     public Vector3 BazookaShadowTransformPosition { get { return _shadowThrowMark.transform.position; } }
     private enum BazookaStates
     {

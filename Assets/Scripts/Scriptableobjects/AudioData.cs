@@ -7,8 +7,8 @@ public class AudioData : ScriptableObject
 {
     public AudioClip BlockAudioClip;
     public AudioClip PunchChargingAudioClip;
-    public AudioClip PunchReleasedAudioClip;
-    public AudioClip WaterGunFiredAudioClip;
+    public AudioClip[] PunchReleasedAudioClip;
+    public AudioClip[] WaterGunFiredAudioClip;
     public AudioClip HookGunFiredAudioClip;
     public AudioClip HookGunHitAudioClip;
     public AudioClip HookGunBlockedAudioClip;

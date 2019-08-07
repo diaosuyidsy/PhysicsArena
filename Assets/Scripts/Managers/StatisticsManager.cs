@@ -83,9 +83,9 @@ public class StatisticsManager
         {
             int rewiredID = Services.GameStateManager.PlayersInformation.RewiredID[i];
             if (!result.ContainsKey(rewiredID)) result.Add(rewiredID, new StatisticsRecord(
-                 "Useless",
-                 "Does Nothing All Game",
-                 null
+                 _configData.UselessInfo.StatisticsTitle,
+                _configData.UselessInfo.StatisticsIntro1 + _configData.UselessInfo.StatisticsIntro2,
+                 _configData.UselessInfo.StatisticIcon
              ));
         }
         return result;

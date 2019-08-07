@@ -14,6 +14,7 @@ public class ConfigData : ScriptableObject
     [Header("Statistics Setting")]
     public float[] FrameYPosition;
     public StatisticsInformation[] StatsInfo;
+    public StatisticsInformation UselessInfo;
     public float StatisticsTitleAnimationDuration = 1f;
     public float StatisticsNomineeAnimationDuration = 0.5f;
     public float StatisticsRecordAnimationDuration = 1f;

@@ -27,6 +27,8 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public GameObject BlockVFXHolder;
     [HideInInspector] public GameObject StunVFXHolder;
     [HideInInspector] public GameObject SlowVFXHolder;
+    [HideInInspector] public GameObject FoodTraverseVFXHolder;
+    public Transform PlayerFeet { get { return OnDeathHidden[1].transform; } }
 
     #region Private Variables
     private Player _player;

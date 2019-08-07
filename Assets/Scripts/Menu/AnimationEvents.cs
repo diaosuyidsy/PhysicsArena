@@ -5,8 +5,8 @@ using DG.Tweening;
 
 public class AnimationEvents : MonoBehaviour
 {
-	public void DoCameraAnimation(string args)
-	{
-		Camera.main.GetComponent<DOTweenAnimation>().DORestartAllById(args);
-	}
+    public void DoCameraAnimation(string cameraTag)
+    {
+        GameObject.FindGameObjectWithTag(cameraTag).GetComponent<DOTweenAnimation>().DORestartAllById("Sit");
+    }
 }

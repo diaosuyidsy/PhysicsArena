@@ -39,7 +39,7 @@ public class rtFist : WeaponBase
                 PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
                 if (pc != null && !pc.CanBlock(-_fistDup.transform.right))
                 {
-                    pc.OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner);
+                    pc.OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner, ImpactType.FistGun);
                     EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, _gpc.Owner, pc.gameObject, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, pc.PlayerNumber));
                 }
                 else EventManager.Instance.TriggerEvent(new FistGunBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup, pc.gameObject, pc.PlayerNumber));

@@ -94,7 +94,7 @@ public class rtBazooka : WeaponBase
                         affectedPlayers.Add(_pc.gameObject);
                         Vector3 dir = _pc.transform.position - transform.position;
                         dir.y = 0f;
-                        _pc.OnImpact(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse, _gpc.Owner);
+                        _pc.OnImpact(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse, _gpc.Owner, ImpactType.BazookaGun);
                     }
                 }
                 EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));

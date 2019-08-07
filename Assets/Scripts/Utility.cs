@@ -102,6 +102,21 @@ public class StatsTuple
         RawData = rawData;
         WeightData = weightData;
     }
+
+    private class WeightComparer : IComparer
+    {
+        public int Compare(System.Object x, System.Object y)
+        {
+            StatsTuple a = (StatsTuple)x;
+            StatsTuple b = (StatsTuple)y;
+            if (a.WeightData > b.WeightData)
+                return 1;
+            if (a.WeightData < b.WeightData)
+                return -1;
+            return 0;
+        }
+    }
+
 }
 
 public class StatisticsRecord
@@ -117,6 +132,25 @@ public class StatisticsRecord
     public string StatisticsInformation { get; }
     public Sprite StatisticIcon { get; }
 
+}
+
+public class ImpactMarker
+{
+    public GameObject EnemyWhoHitPlayer { get; private set; }
+    public float PlayerMarkedTime { get; private set; }
+    public ImpactType ImpactType { get; private set; }
+
+    public ImpactMarker(GameObject enemyWhoHitPlayer, float playerMarkedTime, ImpactType impactType)
+    {
+        SetValue(enemyWhoHitPlayer, playerMarkedTime, impactType);
+    }
+
+    public void SetValue(GameObject enemyWhoHitPlayer, float playerMarkedTime, ImpactType impactType)
+    {
+        EnemyWhoHitPlayer = enemyWhoHitPlayer;
+        PlayerMarkedTime = playerMarkedTime;
+        ImpactType = impactType;
+    }
 }
 
 [Serializable]
@@ -180,4 +214,17 @@ public enum GameWinType
     CartWin,
     FoodWin,
     ScoreWin,
+}
+
+public enum ImpactType
+{
+    WaterGun,
+    HookGun,
+    SuckGun,
+    FistGun,
+    BazookaGun,
+    HammerGun,
+    Melee,
+    Block,
+    Self,
 }

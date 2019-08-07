@@ -40,90 +40,96 @@ MonoBehaviour:
   - -211.5
   - -353.5
   StatsInfo:
-  - StatisticsTitle: 'The Bungee Lover:'
-    StatisticsIntro1: 'who wanders off the map '
-    StatisticsIntro2: ' times!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
+  - StatisticsTitle: The Bungee Lover
+    StatisticsIntro1: 'Wandered Off the Map: '
+    StatisticsIntro2: ' Times!'
+    StatisticIcon: {fileID: 21300000, guid: f8860ada5794f494aae634e02183baff, type: 3}
+    Weight: 15
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: The Hitbird 47
+    StatisticsIntro1: 'Killed: '
+    StatisticsIntro2: ' Other Birdies In Total!'
+    StatisticIcon: {fileID: 21300000, guid: 70251928d34dd1249b988f7262e1d9bd, type: 3}
+    Weight: 10
     ExcludeFromMVPCalculation: 0
-  - StatisticsTitle: 'The Best Killer:'
-    StatisticsIntro1: 'who killed '
-    StatisticsIntro2: ' other birdies!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
+  - StatisticsTitle: The Spy
+    StatisticsIntro1: 'Murdered: '
+    StatisticsIntro2: ' Teammates!'
+    StatisticIcon: {fileID: 21300000, guid: ad5b43ee9280a53428ee5180d978e116, type: 3}
+    Weight: 30
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: The Driver
+    StatisticsIntro1: 'Stayed Inside The Payload for: '
+    StatisticsIntro2: ' Seconds!'
+    StatisticIcon: {fileID: 21300000, guid: 720cd135189e5474e9454fd18845d06b, type: 3}
+    Weight: 2.5
     ExcludeFromMVPCalculation: 0
-  - StatisticsTitle: 'The Best Teammate Killer:'
-    StatisticsIntro1: 'who killed '
-    StatisticsIntro2: ' other teammates!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
-  - StatisticsTitle: 'The Driver:'
-    StatisticsIntro1: 'who stayed inside payload for '
-    StatisticsIntro2: ' seconds!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
-  - StatisticsTitle: 'The Block Master:'
-    StatisticsIntro1: 'who successfully block '
+  - StatisticsTitle: The Block Master
+    StatisticsIntro1: 'Success Blocked: '
     StatisticsIntro2: ' attacks!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
-  - StatisticsTitle: 'The Iron Dumbass:'
-    StatisticsIntro1: 'whose attack was blocked '
-    StatisticsIntro2: ' times!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
-  - StatisticsTitle: 'The Delivery Guy:'
-    StatisticsIntro1: 'who delivered '
-    StatisticsIntro2: ' times the food!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
+    StatisticIcon: {fileID: 21300000, guid: be07a5862ac7ed04c982f289ae3f72e4, type: 3}
+    Weight: 20
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: The Iron Dumbass
+    StatisticsIntro1: 'Attacks Were Blocked: '
+    StatisticsIntro2: ' Times!'
+    StatisticIcon: {fileID: 21300000, guid: b994ce331b38c214daa50a6ba2e0b83f, type: 3}
+    Weight: 20
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: The Delivery Guy
+    StatisticsIntro1: 'Delivered: '
+    StatisticsIntro2: ' Food!'
+    StatisticIcon: {fileID: 21300000, guid: 53f33a92333a9a64182f3a59ffd1d1a6, type: 3}
+    Weight: 50
     ExcludeFromMVPCalculation: 0
   - StatisticsTitle: 'The Firefighter:'
-    StatisticsIntro1: 'who used '
-    StatisticsIntro2: ' times the water gun!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
+    StatisticsIntro1: 'Squirted: '
+    StatisticsIntro2: ' Birdies to Death!'
+    StatisticIcon: {fileID: 21300000, guid: 8d4419e15e39a5f4fa0d273e530a8173, type: 3}
+    Weight: 4
+    ExcludeFromMVPCalculation: 1
   - StatisticsTitle: 'The Hooker:'
-    StatisticsIntro1: 'whose hook accuracy is insane! '
-    StatisticsIntro2: '%!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
+    StatisticsIntro1: 'Hooked: '
+    StatisticsIntro2: ' Birdies with Hook Gun!'
+    StatisticIcon: {fileID: 21300000, guid: bc302ae83af516c46930f34c9b10fec0, type: 3}
+    Weight: 7
+    ExcludeFromMVPCalculation: 1
   - StatisticsTitle: 'The Sucker:'
-    StatisticsIntro1: 'who sucked '
-    StatisticsIntro2: ' other birdies into abyss!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
+    StatisticsIntro1: 'Sucked: '
+    StatisticsIntro2: ' Birdies with Gravity Gun!'
+    StatisticIcon: {fileID: 21300000, guid: cf39f204650f0b84bb1730b4a470858b, type: 3}
+    Weight: 7
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Boxer:'
+    StatisticsIntro1: 'Punched: '
+    StatisticsIntro2: ' Birdies with Fist Gun!'
+    StatisticIcon: {fileID: 21300000, guid: 2cdfa1f0ff1cf334da3290f02dc27230, type: 3}
+    Weight: 3.5
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Terrorist:'
+    StatisticsIntro1: 'Bombed: '
+    StatisticsIntro2: Birdies with Bazooka Gun
+    StatisticIcon: {fileID: 21300000, guid: 6d2a3af924647024784310b70934f0c6, type: 3}
+    Weight: 40
+    ExcludeFromMVPCalculation: 1
   - StatisticsTitle: 'The Greedy:'
-    StatisticsIntro1: 'who picked up '
-    StatisticsIntro2: ' weapons in total!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
-  - StatisticsTitle: 'The Dead:'
-    StatisticsIntro1: 'who died '
-    StatisticsIntro2: ' times!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
+    StatisticsIntro1: 'Picked Up: '
+    StatisticsIntro2: ' Weapons in Total!'
+    StatisticIcon: {fileID: 21300000, guid: edb42ab56c357b7489e1b2fc9872ab67, type: 3}
+    Weight: 0.5
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Victim:'
+    StatisticsIntro1: 'Died to Enemies'' Attack: '
+    StatisticsIntro2: ' Times!'
+    StatisticIcon: {fileID: 21300000, guid: 3c6a5e67b70cb9444b3ed5101f275dc4, type: 3}
+    Weight: 10
+    ExcludeFromMVPCalculation: 1
   - StatisticsTitle: 'The Melee Master:'
-    StatisticsIntro1: 'whose melee attack hits '
-    StatisticsIntro2: '% of the time!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
-  - StatisticsTitle: 'The Melee Master:'
-    StatisticsIntro1: 'whose melee attack hits '
-    StatisticsIntro2: '% of the time!'
-    StatisticIcon: {fileID: 0}
-    Weight: 0
-    ExcludeFromMVPCalculation: 0
+    StatisticsIntro1: 'Punched: '
+    StatisticsIntro2: ' Birdies with the Bare Hand!'
+    StatisticIcon: {fileID: 21300000, guid: c1307b8489b4b854ea540012ae35ad12, type: 3}
+    Weight: 1
+    ExcludeFromMVPCalculation: 1
   StatisticsTitleAnimationDuration: 1
   StatisticsNomineeAnimationDuration: 0.5
   StatisticsRecordAnimationDuration: 1

@@ -39,6 +39,8 @@ public class StatisticsManager
         EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
+        EventManager.Instance.AddHandler<HookBlocked>(_onHookGUnBlocked);
+        EventManager.Instance.AddHandler<FistGunBlocked>(_onFistGunBlocked);
     }
 
     /// <summary>
@@ -58,8 +60,7 @@ public class StatisticsManager
             , maxtimes
             , maxtimes * _configData.StatsInfo[i].Weight);
         }
-        // Utility.SelectionSortStatisticRecord(ref mostRecords);
-        // Array.Sort(mostRecords, StatsTuple.Weightc);
+        Utility.SelectionSortStatisticRecord(ref mostRecords);
         HashSet<int> rewiredIDSet = new HashSet<int>();
         for (int i = mostRecords.Length - 1; i >= 0; i--)
         {
@@ -98,12 +99,25 @@ public class StatisticsManager
         {
             for (int j = 0; j < _configData.StatsInfo.Length; j++)
             {
-                MVPWeightedScore[i] += AllRecords[j][i] * _configData.StatsInfo[j].Weight;
+                if (!_configData.StatsInfo[j].ExcludeFromMVPCalculation)
+                    MVPWeightedScore[i] += AllRecords[j][i] * _configData.StatsInfo[j].Weight;
             }
         }
         float max = MVPWeightedScore.Max();
 
         return Array.IndexOf(MVPWeightedScore, max);
+    }
+
+    private void _onFistGunBlocked(FistGunBlocked ev)
+    {
+        AllRecords[4][ev.BlockerPlayerNumber]++;
+        AllRecords[5][ev.FistGunOwnerPlayerNumber]++;
+    }
+
+    private void _onHookGUnBlocked(HookBlocked ev)
+    {
+        AllRecords[4][ev.HookBlockerPlayerNumber]++;
+        AllRecords[5][ev.HookGunOwnerPlayerNumber]++;
     }
 
     private void _onPlayerDied(PlayerDied pd)
@@ -114,33 +128,36 @@ public class StatisticsManager
             AllRecords[0][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
             return;
         }
-        /// Kill Type Record
-        switch (pd.ImpactType)
-        {
-            case ImpactType.WaterGun:
-                AllRecords[7][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
-                break;
-            case ImpactType.BazookaGun:
-                AllRecords[11][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
-                break;
-            case ImpactType.HookGun:
-                AllRecords[8][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
-                break;
-            case ImpactType.FistGun:
-                AllRecords[10][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
-                break;
-            case ImpactType.Melee:
-                AllRecords[14][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
-                break;
-            case ImpactType.SuckGun:
-                AllRecords[9][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
-                break;
-        }
 
-        /// Kill Record
-        if (pd.HitterIsValid && pd.Player.tag != pd.PlayerHitter.tag) AllRecords[1][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
         /// Teammate Murder Record
         if (pd.HitterIsValid && pd.Player.tag == pd.PlayerHitter.tag) AllRecords[2][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+        /// Kill Record
+        if (pd.HitterIsValid && pd.Player.tag != pd.PlayerHitter.tag)
+        {
+            AllRecords[1][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+            /// Kill Type Record
+            switch (pd.ImpactType)
+            {
+                case ImpactType.WaterGun:
+                    AllRecords[7][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+                    break;
+                case ImpactType.BazookaGun:
+                    AllRecords[11][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+                    break;
+                case ImpactType.HookGun:
+                    AllRecords[8][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+                    break;
+                case ImpactType.FistGun:
+                    AllRecords[10][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+                    break;
+                case ImpactType.Melee:
+                    AllRecords[14][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+                    break;
+                case ImpactType.SuckGun:
+                    AllRecords[9][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+                    break;
+            }
+        }
         /// Dead Times Record
         AllRecords[13][pd.PlayerNumber]++;
     }
@@ -170,6 +187,7 @@ public class StatisticsManager
         EventManager.Instance.RemoveHandler<PlayerHit>(_onPlayerHit);
         EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelievered);
         EventManager.Instance.RemoveHandler<ObjectPickedUp>(_onObjectPickedUp);
-
+        EventManager.Instance.RemoveHandler<HookBlocked>(_onHookGUnBlocked);
+        EventManager.Instance.RemoveHandler<FistGunBlocked>(_onFistGunBlocked);
     }
 }

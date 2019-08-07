@@ -79,7 +79,7 @@ public static class Utility
         {
             int min_idx = i;
             for (int j = i + 1; j < n; j++)
-                if (arr[j].WeightData < arr[min_idx].WeightData)
+                if (arr[j] != null && arr[min_idx] != null && arr[j].WeightData < arr[min_idx].WeightData)
                     min_idx = j;
             var temp = arr[min_idx];
             arr[min_idx] = arr[i];
@@ -102,21 +102,6 @@ public class StatsTuple
         RawData = rawData;
         WeightData = weightData;
     }
-
-    private class WeightComparer : IComparer
-    {
-        public int Compare(System.Object x, System.Object y)
-        {
-            StatsTuple a = (StatsTuple)x;
-            StatsTuple b = (StatsTuple)y;
-            if (a.WeightData > b.WeightData)
-                return 1;
-            if (a.WeightData < b.WeightData)
-                return -1;
-            return 0;
-        }
-    }
-
 }
 
 public class StatisticsRecord

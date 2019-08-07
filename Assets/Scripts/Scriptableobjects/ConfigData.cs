@@ -30,4 +30,5 @@ public class ConfigData : ScriptableObject
     public float MVPToUIMoveInDuration = 0.5f;
     public float MVPScaleDownDuration = 0.5f;
     public float FrameMoveInDuration = 0.2f;
+    public GameObject MVPBadgePrefab;
 }

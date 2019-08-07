@@ -286,6 +286,7 @@ public class GameStateManager
             seq.Join(Context._MVPTitle.DOScale(0.6f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
             var statsresult = Services.StatisticsManager.GetStatisticResult();
             /// Move in all players 
+            GameObject.Instantiate(_configData.MVPBadgePrefab, Context._statisticUIHolder.GetChild(MVPColorIndex));
             for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
             {
                 int rewiredID = _PlayersInformation.RewiredID[i];
@@ -305,6 +306,7 @@ public class GameStateManager
                 seq.Append(Context._statisticUIHolder.GetChild(x).DOScale(0.7f, _configData.FrameMoveInDuration)
                 .SetEase(Ease.OutBack));
             }
+
         }
     }
 

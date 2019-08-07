@@ -144,17 +144,17 @@ public class AudioManager
 
     private void _onFistGunFired(FistGunFired ff)
     {
-        _playSound(ff.FistGun, AudioDataStore.FistGunFiredAudioClip);
+        _playSound(ff.Fist, AudioDataStore.FistGunFiredAudioClip, false);
     }
 
     private void _onFistGunHit(FistGunHit ff)
     {
-        _playSound(ff.Fist, AudioDataStore.FistGunHitAudioClip);
+        _playSound(ff.Fist, AudioDataStore.FistGunHitAudioClip, false);
     }
 
     private void _onFistGunBlocked(FistGunBlocked ff)
     {
-        _playSound(ff.Fist, AudioDataStore.FistGunBlockedAudioClip);
+        _playSound(ff.Fist, AudioDataStore.FistGunBlockedAudioClip, false);
     }
 
     private void _onHookGunBlocked(HookBlocked bh)

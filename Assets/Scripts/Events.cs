@@ -425,8 +425,10 @@ public abstract class FistGunEvent : GameEvent
 
 public class FistGunFired : FistGunEvent
 {
-    public FistGunFired(GameObject _fistGun, GameObject _fistGunOwner, int _fistgunownerplayernumber) : base(_fistGun, _fistGunOwner, _fistgunownerplayernumber)
+    public GameObject Fist { get; }
+    public FistGunFired(GameObject _fistGun, GameObject _fistGunOwner, int _fistgunownerplayernumber, GameObject fist) : base(_fistGun, _fistGunOwner, _fistgunownerplayernumber)
     {
+        Fist = fist;
     }
 }
 

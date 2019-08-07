@@ -100,8 +100,8 @@ public class GameStateManager
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-        // _gameStateFSM.TransitionTo<FoodCartTutorialState>();
-        _gameStateFSM.TransitionTo<MVPEndPanelState>();
+        _gameStateFSM.TransitionTo<FoodCartTutorialState>();
+        // _gameStateFSM.TransitionTo<MVPEndPanelState>();
     }
 
     public int GetColorIndexFromRewiredID(int rewiredID)

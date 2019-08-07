@@ -113,6 +113,8 @@ public class VFXManager
     private void _onBazookaBombed(BazookaBombed bb)
     {
         _instantiateVFX(VFXDataStore.BazookaExplosionVFX, bb.BazookaGun.transform.position, VFXDataStore.BazookaExplosionVFX.transform.rotation);
+        if (bb.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder != null)
+            bb.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder.SetActive(false);
     }
 
     private void _onPlayerStunned(PlayerStunned ps)
@@ -205,11 +207,13 @@ public class VFXManager
     private void _onBazookaLaunched(BazookaFired ev)
     {
         // GameObject.Instantiate(VFXDataStore.BazookaStartVFX, ev.FistPos, VFXDataStore.BazookaStartVFX.transform.rotation);
-        if (ev.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder != null)
+        rtBazooka rb = ev.BazookaGun.GetComponent<rtBazooka>();
+        if (rb.BazookaTrailVFXHolder != null)
         {
-            ev.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder = GameObject.Instantiate(VFXDataStore.BazookaTrailVFX, ev.BazookaGun.transform, false);
-            ev.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder.transform.rotation = VFXDataStore.BazookaTrailVFX.transform.rotation;
+            rb.BazookaTrailVFXHolder = GameObject.Instantiate(VFXDataStore.BazookaTrailVFX, ev.BazookaGun.transform, false);
+            rb.BazookaTrailVFXHolder.transform.rotation = VFXDataStore.BazookaTrailVFX.transform.rotation;
         }
+        rb.BazookaTrailVFXHolder.SetActive(true);
     }
     #endregion
 

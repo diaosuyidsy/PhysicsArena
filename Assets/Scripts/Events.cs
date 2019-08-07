@@ -471,7 +471,7 @@ public class FistGunBlocked : FistGunEvent
 
 public class FistGunCharged : FistGunEvent
 {
-    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, int fistGunOwnerPlayerNumber, Vector3 fistPos) : base(fistGun, fistGunOwner, fistGunOwnerPlayerNumber)
+    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, Vector3 fistPos) : base(fistGun, fistGunOwner, -1)
     {
         FistPos = fistPos;
     }

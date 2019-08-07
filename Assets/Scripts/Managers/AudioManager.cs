@@ -204,7 +204,36 @@ public class AudioManager
 
     private void _onObjectHitGround(ObjectHitGround ev)
     {
-
+        if (ev.Obj.GetComponent<rtBazooka>() != null)
+        {
+            _playSound(ev.Obj, AudioDataStore.BazookaGunHitGroundAudioClip);
+            return;
+        }
+        if (ev.Obj.GetComponent<rtBirdFood>() != null)
+        {
+            _playSound(ev.Obj, AudioDataStore.FoodHitGroundAudioClip);
+            return;
+        }
+        if (ev.Obj.GetComponent<rtEmit>() != null)
+        {
+            _playSound(ev.Obj, AudioDataStore.WaterGunHitGroundAudioClip);
+            return;
+        }
+        if (ev.Obj.GetComponent<rtFist>() != null)
+        {
+            _playSound(ev.Obj, AudioDataStore.FistGunHitGroundAudioClip);
+            return;
+        }
+        if (ev.Obj.GetComponent<rtHook>() != null)
+        {
+            _playSound(ev.Obj, AudioDataStore.HookGunHitGroundAudioClip);
+            return;
+        }
+        if (ev.Obj.GetComponent<rtSuck>() != null)
+        {
+            _playSound(ev.Obj, AudioDataStore.SuckGunHitGroundAudioClip);
+            return;
+        }
     }
     #endregion
 

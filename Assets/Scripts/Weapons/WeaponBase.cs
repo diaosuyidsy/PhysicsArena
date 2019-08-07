@@ -49,7 +49,7 @@ public abstract class WeaponBase : MonoBehaviour
         }
         if ((WeaponDataStore.OnNoAmmoDropDisappear == (WeaponDataStore.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
         {
-
+            EventManager.Instance.TriggerEvent(new ObjectHitGround(gameObject));
         }
     }
 

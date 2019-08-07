@@ -176,13 +176,13 @@ public class AudioManager
 
     private void _onObjectPickedUp(ObjectPickedUp opu)
     {
-        if (opu.Obj.GetComponent<rtBirdFood>() != null && (opu.Player.tag.Contains("1") && opu.Player.tag.Contains("1")
-        || (opu.Player.tag.Contains("2") && opu.Player.tag.Contains("2"))))
+        if (opu.Obj.GetComponent<rtBirdFood>() != null && ((opu.Player.tag.Contains("1") && opu.Obj.tag.Contains("1"))
+        || (opu.Player.tag.Contains("2") && opu.Obj.tag.Contains("2"))))
         {
             _playSound(opu.Obj, AudioDataStore.FoodPickedUpCorrectAudioClip);
         }
-        else if (opu.Obj.GetComponent<rtBirdFood>() != null && (opu.Player.tag.Contains("1") && opu.Player.tag.Contains("2")
-       || (opu.Player.tag.Contains("2") && opu.Player.tag.Contains("1"))))
+        else if (opu.Obj.GetComponent<rtBirdFood>() != null && ((opu.Player.tag.Contains("1") && opu.Obj.tag.Contains("2"))
+       || (opu.Player.tag.Contains("2") && opu.Obj.tag.Contains("1"))))
         {
             _playSound(opu.Obj, AudioDataStore.FoodPickedUpWrongAudioClip);
         }

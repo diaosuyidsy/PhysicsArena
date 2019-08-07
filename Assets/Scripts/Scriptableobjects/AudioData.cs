@@ -28,7 +28,7 @@ public class AudioData : ScriptableObject
 	public AudioClip WeaponPickedUpAudioClip;
 	public AudioClip BazookaFiredAudioClip;
 	public AudioClip BazookaBombedAudioClip;
-	public AudioClip FistGunBlockedAudioClip;
+	public AudioClip[] FistGunBlockedAudioClip;
 	public AudioClip FistGunFiredAudioClip;
 	public AudioClip FistGunHitAudioClip;
 	public AudioClip FoodPickedUpCorrectAudioClip;

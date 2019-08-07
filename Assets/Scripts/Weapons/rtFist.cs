@@ -42,7 +42,7 @@ public class rtFist : WeaponBase
                     pc.OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner, ImpactType.FistGun);
                     EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, _gpc.Owner, pc.gameObject, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, pc.PlayerNumber));
                 }
-                else EventManager.Instance.TriggerEvent(new FistGunBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup, pc.gameObject, pc.PlayerNumber));
+                else if (pc != null) EventManager.Instance.TriggerEvent(new FistGunBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup, pc.gameObject, pc.PlayerNumber));
                 _switchToRecharge();
                 return;
             }

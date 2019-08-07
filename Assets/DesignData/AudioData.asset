@@ -26,7 +26,8 @@ MonoBehaviour:
   HookGunFiredAudioClip: {fileID: 8300000, guid: 392e25ded3fa2de469f3efe56707f70b,
     type: 3}
   HookGunHitAudioClip: {fileID: 8300000, guid: fc9b1a665231c0b46bc1978c4f1bcfab, type: 3}
-  HookGunBlockedAudioClip: {fileID: 0}
+  HookGunBlockedAudioClip: {fileID: 8300000, guid: c842fc6f29d9be24d82e7556a143006b,
+    type: 3}
   SuckGunFiredAudioClip: {fileID: 8300000, guid: 9d78c50381fc4b54e8d8948774c75515,
     type: 3}
   SuckGunSuckAudioClip: {fileID: 8300000, guid: 7a27262b9de3f7443b85eac6d16ba980,
@@ -38,9 +39,12 @@ MonoBehaviour:
   FootstepConcreteAudioClip: {fileID: 0}
   FootstepYellowStoneAudioClip: {fileID: 0}
   FootstepGrassAudioClip: {fileID: 0}
-  JumpAudioClip: {fileID: 0}
-  ObjectDespawnedAudioClip: {fileID: 8300000, guid: 933cd07d7d1d3874681af5256ed543a8,
-    type: 3}
+  JumpAudioClip: []
+  ObjectDespawnedAudioClip:
+  - {fileID: 8300000, guid: 617c108fc8e51d94d9d4f11223b7a52f, type: 3}
+  - {fileID: 8300000, guid: e67455b4285f60e4788d513ca48d872f, type: 3}
+  - {fileID: 8300000, guid: 78c4bb905ea917642aaadc9b73ed4903, type: 3}
+  WrongFoodAudioClip: {fileID: 8300000, guid: 933cd07d7d1d3874681af5256ed543a8, type: 3}
   PlayerRespawnedAudioClip: {fileID: 0}
   WeaponSpawnedAudioClip: {fileID: 0}
   WeaponPickedUpAudioClip: {fileID: 0}
@@ -51,7 +55,9 @@ MonoBehaviour:
   FistGunFiredAudioClip: {fileID: 8300000, guid: a7f170911f15a5b40b077dc8d67ad94e,
     type: 3}
   FistGunHitAudioClip: {fileID: 8300000, guid: 7d76f4e32846f2f41a1fd0c7752b932b, type: 3}
-  FoodPickedUpAudioClip: {fileID: 8300000, guid: 45d398f6118e59d4cafa7245f520bba6,
+  FoodPickedUpCorrectAudioClip: {fileID: 8300000, guid: 45d398f6118e59d4cafa7245f520bba6,
+    type: 3}
+  FoodPickedUpWrongAudioClip: {fileID: 8300000, guid: 24c62ade6d14715499b1ee0a59da74f8,
     type: 3}
   FoodDeliveredAudioClip: {fileID: 8300000, guid: 3e0468fa173b7c740b450507f21890d7,
     type: 3}

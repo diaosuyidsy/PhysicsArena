@@ -101,7 +101,6 @@ public class GameStateManager
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
         _gameStateFSM.TransitionTo<FoodCartTutorialState>();
-        // _gameStateFSM.TransitionTo<MVPEndPanelState>();
     }
 
     public int GetColorIndexFromRewiredID(int rewiredID)
@@ -282,8 +281,8 @@ public class GameStateManager
             seq.Append(Context._MVPPlayerHolder.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
             seq.Join(Context._MVPSpotLight.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
             seq.Join(Context._MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
-            seq.Join(Context._MVPTitle.DOLocalMove(new Vector3(-587f, 112f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
-            seq.Join(Context._MVPTitle.DOScale(0.5f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+            seq.Join(Context._MVPTitle.DOLocalMove(new Vector3(-587f, 187f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+            seq.Join(Context._MVPTitle.DOScale(0.6f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
             var statsresult = Services.StatisticsManager.GetStatisticResult();
             /// Move in all players 
             for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)

@@ -469,6 +469,13 @@ public class FistGunBlocked : FistGunEvent
     }
 }
 
+public class FistGunStartCharging : FistGunEvent
+{
+    public FistGunStartCharging(GameObject fistGun, GameObject fistGunOwner, int fistGunOwnerPlayerNumber) : base(fistGun, fistGunOwner, fistGunOwnerPlayerNumber)
+    {
+    }
+}
+
 public class FistGunCharged : FistGunEvent
 {
     public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, Vector3 fistPos) : base(fistGun, fistGunOwner, -1)

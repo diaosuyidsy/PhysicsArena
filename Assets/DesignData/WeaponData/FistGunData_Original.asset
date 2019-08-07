@@ -13,10 +13,15 @@ MonoBehaviour:
   m_Name: FistGunData_Original
   m_EditorClassIdentifier: 
   FistSpeed: 15
-  MaxAmmo: 3
+  MaxAmmo: 4
   FistHitForce: 900
   BackfireHitForce: 170
   MaxFlyDistance: 5
-  ReloadTime: 2
-  FistReboundY: 2
-  FistReboundForce: 5
+  ReloadTime: 1.5
+  FistReboundY: 4
+  FistReboundForce: 1
+  FistHitScanRadius: 0.15
+  FistHitScanDist: 0.4
+  AllThingFistCanCollideLayer:
+    serializedVersion: 2
+    m_Bits: 392704

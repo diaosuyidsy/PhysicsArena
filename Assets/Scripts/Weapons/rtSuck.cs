@@ -40,9 +40,16 @@ public class rtSuck : WeaponBase
             if (_ballTraveledTime >= WeaponDataStore.SuckGunDataStore.MaxBallTravelTime)
             {
                 _ballTraveledTime = 0f;
-                _charged = false;
-                _ballState = State.Suck;
-                StartCoroutine(sucking(0.5f));
+                _suckBall.transform.parent = transform;
+                _suckBall.transform.localPosition = new Vector3(-0.468f, 0f);
+                _suckBall.transform.localEulerAngles = Vector3.zero;
+                _suckBall.transform.localScale = _suckBallInitialScale;
+                _suckBall.SetActive(false);
+                _ballState = State.In;
+                // Need a little clean up the line renderer and stuff
+                _sbc.CleanUpAll();
+                _ballState = State.In;
+                // StartCoroutine(sucking(0.5f));
             }
         }
     }

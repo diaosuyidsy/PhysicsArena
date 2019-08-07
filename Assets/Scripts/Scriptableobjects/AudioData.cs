@@ -31,6 +31,7 @@ public class AudioData : ScriptableObject
     public AudioClip FistGunBlockedAudioClip;
     public AudioClip FistGunFiredAudioClip;
     public AudioClip FistGunHitAudioClip;
+    public AudioClip FistGunChargeAudioClip;
     public AudioClip FoodPickedUpCorrectAudioClip;
     public AudioClip FoodPickedUpWrongAudioClip;
     public AudioClip FoodDeliveredAudioClip;

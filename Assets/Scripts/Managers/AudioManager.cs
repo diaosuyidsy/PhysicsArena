@@ -42,6 +42,7 @@ public class AudioManager
     /// <param name="oneshot"></param>
     private void _playSound(GameObject obj, AudioClip[] clips, bool oneshot = true, float volume = 1)
     {
+        if (clips.Length == 0) return;
         int rand = Random.Range(0, clips.Length);
         _playSound(obj, clips[rand], oneshot, volume);
     }
@@ -157,6 +158,11 @@ public class AudioManager
         _playSound(ff.Fist, AudioDataStore.FistGunBlockedAudioClip, false);
     }
 
+    private void _onFistGunReload(FistGunStartCharging ev)
+    {
+        _playSound(ev.FistGun, AudioDataStore.FistGunChargeAudioClip, false);
+    }
+
     private void _onHookGunBlocked(HookBlocked bh)
     {
         _playSound(bh.Hook, AudioDataStore.HookGunBlockedAudioClip);
@@ -263,6 +269,7 @@ public class AudioManager
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);
         EventManager.Instance.AddHandler<PlayerLand>(_onPlayerLand);
         EventManager.Instance.AddHandler<ObjectHitGround>(_onObjectHitGround);
+        EventManager.Instance.AddHandler<FistGunStartCharging>(_onFistGunReload);
     }
 
     private void OnDisable()
@@ -292,6 +299,7 @@ public class AudioManager
         EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelievered);
         EventManager.Instance.RemoveHandler<PlayerLand>(_onPlayerLand);
         EventManager.Instance.RemoveHandler<ObjectHitGround>(_onObjectHitGround);
+        EventManager.Instance.RemoveHandler<FistGunStartCharging>(_onFistGunReload);
     }
 
     public void Destroy()

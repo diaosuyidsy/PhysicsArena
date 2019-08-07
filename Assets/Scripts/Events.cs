@@ -300,7 +300,12 @@ public class ObjectDropped : GameEvent
 
 public class ObjectHitGround : GameEvent
 {
+    public GameObject Obj;
 
+    public ObjectHitGround(GameObject obj)
+    {
+        Obj = obj;
+    }
 }
 
 #region WEAPON EVENT

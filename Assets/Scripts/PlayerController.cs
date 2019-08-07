@@ -45,6 +45,7 @@ public class PlayerController : MonoBehaviour
     private HingeJoint _rightHandhj;
     private ImpactMarker _impactMarker;
     IEnumerator _startSlow;
+    private bool _isJumping;
 
     private FSM<PlayerController> _movementFSM;
     private FSM<PlayerController> _actionFSM;
@@ -124,6 +125,15 @@ public class PlayerController : MonoBehaviour
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
             EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker));
+        }
+    }
+
+    private void OnCollisionEnter(Collision other)
+    {
+        if (CharacterDataStore.CharacterMovementDataStore.JumpMask == (CharacterDataStore.CharacterMovementDataStore.JumpMask | (1 << other.gameObject.layer)) && _isJumping)
+        {
+            _isJumping = false;
+            EventManager.Instance.TriggerEvent(new PlayerLand(gameObject, OnDeathHidden[1], PlayerNumber, _getGroundTag()));
         }
     }
 
@@ -237,7 +247,7 @@ public class PlayerController : MonoBehaviour
     {
         if (_isGrounded())
         {
-            EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[2], _getGroundTag()));
+            EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[1], _getGroundTag()));
         }
     }
 
@@ -632,7 +642,9 @@ public class PlayerController : MonoBehaviour
         {
             if (_jump && Context._isGrounded())
             {
+                Context._isJumping = true;
                 Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);
+                EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
             }
             Context.LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", Context._walkSpeed);
         }

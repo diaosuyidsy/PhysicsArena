@@ -201,6 +201,11 @@ public class AudioManager
     {
         _playSound(ev.PlayerFeet, AudioDataStore.LandAudioClip);
     }
+
+    private void _onObjectHitGround(ObjectHitGround ev)
+    {
+
+    }
     #endregion
 
     private void OnEnable()
@@ -228,6 +233,7 @@ public class AudioManager
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);
         EventManager.Instance.AddHandler<PlayerLand>(_onPlayerLand);
+        EventManager.Instance.AddHandler<ObjectHitGround>(_onObjectHitGround);
     }
 
     private void OnDisable()
@@ -256,7 +262,7 @@ public class AudioManager
         EventManager.Instance.RemoveHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelievered);
         EventManager.Instance.RemoveHandler<PlayerLand>(_onPlayerLand);
-
+        EventManager.Instance.RemoveHandler<ObjectHitGround>(_onObjectHitGround);
     }
 
     public void Destroy()

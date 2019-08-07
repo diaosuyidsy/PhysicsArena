@@ -19,7 +19,7 @@ public class AudioData : ScriptableObject
 	public AudioClip FootstepConcreteAudioClip;
 	public AudioClip FootstepYellowStoneAudioClip;
 	public AudioClip FootstepGrassAudioClip;
-	public AudioClip LandAudioClip;
+	public AudioClip[] LandAudioClip;
 	public AudioClip[] JumpAudioClip;
 	public AudioClip[] ObjectDespawnedAudioClip;
 	public AudioClip WrongFoodAudioClip;

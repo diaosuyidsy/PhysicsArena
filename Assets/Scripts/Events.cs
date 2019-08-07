@@ -249,9 +249,15 @@ public class PlayerLand : GameEvent
 public class ObjectDespawned : GameEvent
 {
     public GameObject Obj { get; }
+    public GameObject Despawner { get; }
     public ObjectDespawned(GameObject _obj)
     {
         Obj = _obj;
+    }
+
+    public ObjectDespawned(GameObject obj, GameObject despawner) : this(obj)
+    {
+        Despawner = despawner;
     }
 }
 

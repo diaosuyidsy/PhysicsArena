@@ -10,12 +10,10 @@ public class DarkCornerEffect : MonoBehaviour
     public Vector2 CenterPosition;
 
     public Material Material;
-
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         Material.SetFloat("_dcLength", Length);
         Material.SetVector("_CenterPoint", CenterPosition);
         Graphics.Blit(source, destination, Material);
-
     }
 }

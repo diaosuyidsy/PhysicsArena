@@ -100,8 +100,8 @@ public class GameStateManager
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-        _gameStateFSM.TransitionTo<FoodCartTutorialState>();
-        // _gameStateFSM.TransitionTo<MVPEndPanelState>();
+        // _gameStateFSM.TransitionTo<FoodCartTutorialState>();
+        _gameStateFSM.TransitionTo<MVPEndPanelState>();
     }
 
     public int GetColorIndexFromRewiredID(int rewiredID)
@@ -243,7 +243,7 @@ public class GameStateManager
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._gameEndBlackbackground.SetActive(true);
+            // Context._gameEndBlackbackground.SetActive(true);
             Context._darkCornerEffect.enabled = false;
         }
     }
@@ -378,6 +378,7 @@ public class GameStateManager
             if (_AnyPauseDown)
             {
                 TransitionTo<PauseState>();
+                // TransitionTo<MVPEndPanelState>();
                 return;
             }
         }
@@ -498,6 +499,7 @@ public class GameStateManager
             {
                 Context._cam.GetComponent<AudioSource>().Play();
                 TransitionTo<GameLoop>();
+                // TransitionTo<MVPEndPanelState>();
             });
         }
 
@@ -555,6 +557,7 @@ public class GameStateManager
                 if (Context._holdAImage.fillAmount >= 1f)
                 {
                     TransitionTo<LandingState>();
+                    // TransitionTo<MVPEndPanelState>();
                     return;
                 }
             }

@@ -125,7 +125,7 @@ public class StatisticsManager
         /// Suicide Record
         if (!pd.HitterIsValid || pd.PlayerHitter == null)
         {
-            AllRecords[0][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+            AllRecords[0][pd.PlayerNumber]++;
             return;
         }
 

@@ -89,7 +89,12 @@ public class AudioManager
 
     private void _onObjectDespawned(ObjectDespawned od)
     {
-        _playSound(od.Obj, AudioDataStore.ObjectDespawnedAudioClip);
+        if (od.Despawner != null && od.Despawner.GetComponent<ResourceCollector>() != null)
+        {
+            _playSound(od.Obj, AudioDataStore.WrongFoodAudioClip);
+        }
+        else
+            _playSound(od.Obj, AudioDataStore.ObjectDespawnedAudioClip);
     }
 
     private void _onPlayerRespawned(PlayerRespawned pr)
@@ -171,9 +176,15 @@ public class AudioManager
 
     private void _onObjectPickedUp(ObjectPickedUp opu)
     {
-        if (opu.Obj.GetComponent<rtBirdFood>() != null)
+        if (opu.Obj.GetComponent<rtBirdFood>() != null && (opu.Player.tag.Contains("1") && opu.Player.tag.Contains("1")
+        || (opu.Player.tag.Contains("2") && opu.Player.tag.Contains("2"))))
         {
-            _playSound(opu.Obj, AudioDataStore.FoodPickedUpAudioClip);
+            _playSound(opu.Obj, AudioDataStore.FoodPickedUpCorrectAudioClip);
+        }
+        else if (opu.Obj.GetComponent<rtBirdFood>() != null && (opu.Player.tag.Contains("1") && opu.Player.tag.Contains("2")
+       || (opu.Player.tag.Contains("2") && opu.Player.tag.Contains("1"))))
+        {
+            _playSound(opu.Obj, AudioDataStore.FoodPickedUpWrongAudioClip);
         }
         else if (opu.Obj.GetComponent<WeaponBase>() != null)
         {

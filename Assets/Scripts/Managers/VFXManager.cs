@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class VFXManager
 {
-    private VFXData VFXDataStore;
+    public VFXData VFXDataStore;
 
     public VFXManager(VFXData _vfxdata)
     {
@@ -69,17 +69,24 @@ public class VFXManager
     private void _onBlockStart(BlockStart bs)
     {
         GameObject VFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockVFX : VFXDataStore.DuckBlockVFX;
+        GameObject UIVFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockUIVFX : VFXDataStore.DuckBlockUIVFX;
         GameObject BlockVFXHolder = bs.Player.GetComponent<PlayerController>().BlockVFXHolder;
         if (BlockVFXHolder == null)
         {
             bs.Player.GetComponent<PlayerController>().BlockVFXHolder = GameObject.Instantiate(VFX, bs.Player.transform);
         }
+        if (bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder == null)
+        {
+            bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder = GameObject.Instantiate(UIVFX, bs.Player.transform);
+        }
         bs.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(true);
+        bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder.SetActive(true);
     }
 
     private void _onBlockEnd(BlockEnd be)
     {
         be.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(false);
+        be.Player.GetComponent<PlayerController>().BlockUIVFXHolder.SetActive(false);
     }
 
     private void _onPunchStart(PunchStart ps)

@@ -21,6 +21,8 @@ public class GameStateManager
     private FSM<GameStateManager> _gameStateFSM;
     private TextMeshProUGUI _holdAText;
     private Image _holdAImage;
+    private TextMeshProUGUI _holdBText;
+    private Image _holdBImage;
     private Transform _tutorialImage;
     private Transform _tutorialBackgroundMask;
     private Transform _tutorialObjectiveImages;
@@ -60,6 +62,8 @@ public class GameStateManager
         _gameEndTitleText = _gameEndCanvas.Find("TitleText");
         _holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").GetComponent<TextMeshProUGUI>();
         _holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
+        _holdBText = GameObject.Find("HoldCanvas").transform.Find("HoldB").GetComponent<TextMeshProUGUI>();
+        _holdBImage = GameObject.Find("HoldCanvas").transform.Find("HoldBImage").GetComponent<Image>();
         PlayersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
         Debug.Assert(PlayersInformation != null, "Unable to load Players information");
         _playersHolder = GameObject.Find("Players").transform;
@@ -176,6 +180,18 @@ public class GameStateManager
             }
         }
 
+        protected bool _AnyBHolding
+        {
+            get
+            {
+                for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
+                {
+                    if (ReInput.players.GetPlayer(_PlayersInformation.RewiredID[i]).GetButton("Block")) return true;
+                }
+                return false;
+            }
+        }
+
         protected bool _AnyPauseDown
         {
             get
@@ -250,6 +266,7 @@ public class GameStateManager
 
     private class MVPEndPanelState : StatisticsWordState
     {
+        private bool _canHold;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -306,7 +323,42 @@ public class GameStateManager
                 seq.Append(Context._statisticUIHolder.GetChild(x).DOScale(0.7f, _configData.FrameMoveInDuration)
                 .SetEase(Ease.OutBack));
             }
+            seq.Append(Context._holdAText.DOText("Next Map", 0.2f).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
+            seq.Join(Context._holdBText.DOText("Menu", 0.2f).OnPlay(() => Context._holdBText.gameObject.SetActive(true)));
+            seq.AppendCallback(() => _canHold = true);
+        }
 
+        public override void Update()
+        {
+            base.Update();
+            if (_canHold && _AnyAHolding)
+            {
+                Context._holdAImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
+                if (Context._holdAImage.fillAmount >= 1f)
+                {
+                    if (SceneManager.GetActiveScene().buildIndex < SceneManager.sceneCountInBuildSettings - 1)
+                        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
+                    else
+                        SceneManager.LoadScene(1);
+                }
+            }
+            else
+            {
+                Context._holdAImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
+            }
+
+            if (_canHold && _AnyBHolding)
+            {
+                Context._holdBImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
+                if (Context._holdBImage.fillAmount >= 1f)
+                {
+                    SceneManager.LoadScene("NewMenu");
+                }
+            }
+            else
+            {
+                Context._holdBImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
+            }
         }
     }
 
@@ -381,7 +433,6 @@ public class GameStateManager
             if (_AnyPauseDown)
             {
                 TransitionTo<PauseState>();
-                // TransitionTo<MVPEndPanelState>();
                 return;
             }
         }
@@ -502,7 +553,6 @@ public class GameStateManager
             {
                 Context._cam.GetComponent<AudioSource>().Play();
                 TransitionTo<GameLoop>();
-                // TransitionTo<MVPEndPanelState>();
             });
         }
 
@@ -548,7 +598,7 @@ public class GameStateManager
             {
                 seq.Join(Context._tutorialObjectiveImages.GetChild(i).DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack).SetDelay(i * 0.2f));
             }
-            seq.Append(Context._holdAText.DOText("Hold  A  To Start", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true));
+            seq.Append(Context._holdAText.DOText("Start Game", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
         }
 
         public override void Update()
@@ -582,7 +632,8 @@ public class GameStateManager
             //Context._tutorialImage.DOScale(Vector3.zero, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase).SetDelay(0.5f);
             Context._tutorialImage.DOScale(Vector3.zero, 0f);
             Context._holdAText.DOText("", 0f);
-            Context._holdAImage.transform.DOScale(0f, 0f).SetEase(Ease.OutQuad);
+            Context._holdAText.gameObject.SetActive(false);
+            Context._holdAImage.fillAmount = 0f;
         }
     }
 }

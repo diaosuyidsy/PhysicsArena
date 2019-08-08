@@ -551,7 +551,6 @@ public class GameStateManager
             seq.Append(Context._countDownText.DOScale(0f, 0.2f));
             seq.AppendCallback(() =>
             {
-                Context._cam.GetComponent<AudioSource>().Play();
                 TransitionTo<GameLoop>();
             });
         }
@@ -580,7 +579,11 @@ public class GameStateManager
 
     private abstract class TutorialState : GameState
     {
-
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._cam.GetComponent<AudioSource>().Play();
+        }
     }
 
     private class FoodCartTutorialState : TutorialState

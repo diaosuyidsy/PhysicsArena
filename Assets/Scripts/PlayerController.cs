@@ -315,7 +315,7 @@ public class PlayerController : MonoBehaviour
         HandObject = null;
     }
 
-    private void _helpAim(float maxangle)
+    private void _helpAim(float maxangle, float maxRange)
     {
         GameObject target = null;
         float minAngle = 360f;
@@ -325,7 +325,7 @@ public class PlayerController : MonoBehaviour
             if (otherPlayer.activeSelf)
             {
                 // If other player are within max Distance, then check for the smalliest angle player
-                if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= CharacterDataStore.HelpAimMaxRange)
+                if (Vector3.Distance(otherPlayer.transform.position, gameObject.transform.position) <= maxRange)
                 {
                     Vector3 targetDir = otherPlayer.transform.position - transform.position;
                     float angle = Vector3.Angle(targetDir, transform.forward);
@@ -969,6 +969,7 @@ public class PlayerController : MonoBehaviour
                 case "Hook":
                 case "FistGun":
                 case "Hammer":
+                case "Weapon":
                     _lefthandcoroutine = Context._pickUpHalfAnimation(Context._leftArmhj, 0.1f);
                     _righthandcoroutine = Context._pickUpHalfAnimation(Context._rightArmhj, 0.1f);
                     break;
@@ -991,14 +992,8 @@ public class PlayerController : MonoBehaviour
             }
             if (_RightTriggerDown)
             {
-                switch (Context.HandObject.tag)
-                {
-                    case "Weapon":
-                    case "Hook":
-                    case "FistGun":
-                        Context._helpAim(Context.CharacterDataStore.HelpAimMaxRange);
-                        break;
-                }
+                WeaponBase wb = Context.HandObject.GetComponent<WeaponBase>();
+                Context._helpAim(wb.HelpAimAngle, wb.HelpAimDistance);
                 Context.HandObject.GetComponent<WeaponBase>().Fire(true);
                 switch (Context.HandObject.tag)
                 {

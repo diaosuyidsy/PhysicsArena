@@ -16,4 +16,6 @@ public class FistGunData : ScriptableObject
     public float FistHitScanRadius = 0.3f;
     public float FistHitScanDist = 0.1f;
     public LayerMask AllThingFistCanCollideLayer;
+    public float HelpAimAngle = 30f;
+    public float HelpAimDistance = 30f;
 }

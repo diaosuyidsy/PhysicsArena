@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class rtFist : WeaponBase
 {
+    public override float HelpAimAngle { get { return WeaponDataStore.FistGunDataStore.HelpAimAngle; } }
+    public override float HelpAimDistance { get { return WeaponDataStore.FistGunDataStore.HelpAimDistance; } }
+
     private Transform _fist;
     private GameObject _fistDup;
     private Fist _fistScript;
@@ -37,6 +40,7 @@ public class rtFist : WeaponBase
             RaycastHit hit;
             if (Physics.SphereCast(_fistDup.transform.position, WeaponDataStore.FistGunDataStore.FistHitScanRadius, -_fistDup.transform.right, out hit, WeaponDataStore.FistGunDataStore.FistHitScanDist, WeaponDataStore.FistGunDataStore.AllThingFistCanCollideLayer ^ (1 << _fireOwner.layer)))
             {
+                if (hit.collider.tag.Contains("Fist")) return;
                 PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
                 if (pc != null && !pc.CanBlock(-_fistDup.transform.right))
                 {
@@ -45,7 +49,11 @@ public class rtFist : WeaponBase
                 }
                 else if (pc != null)
                 {
+                    _maxDistance = pc.transform.position + pc.transform.forward * WeaponDataStore.FistGunDataStore.MaxFlyDistance;
+                    _fireOwner = pc.gameObject;
+                    _fistDup.transform.rotation = Quaternion.LookRotation(pc.transform.right, _fistDup.transform.up);
                     EventManager.Instance.TriggerEvent(new FistGunBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup, pc.gameObject, pc.PlayerNumber));
+                    return;
                 }
                 else if (pc == null)
                 {

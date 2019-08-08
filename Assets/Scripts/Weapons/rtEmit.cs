@@ -9,7 +9,8 @@ public class rtEmit : WeaponBase
     public ObiParticleRenderer ParticleRenderer;
     public GameObject WaterUI;
     public GameObject GunUI;
-
+    public override float HelpAimAngle { get { return WeaponDataStore.WaterGunDataStore.HelpAimAngle; } }
+    public override float HelpAimDistance { get { return WeaponDataStore.WaterGunDataStore.HelpAimDistance; } }
     private float _shootCD = 0f;
 
     private enum State

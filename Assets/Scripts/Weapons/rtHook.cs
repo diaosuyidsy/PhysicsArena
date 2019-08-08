@@ -8,7 +8,8 @@ public class rtHook : WeaponBase
     public GameObject Hooked = null;
     [HideInInspector]
     public bool HookCanBend = true;
-
+    public override float HelpAimAngle { get { return WeaponDataStore.HookGunDataStore.HelpAimAngle; } }
+    public override float HelpAimDistance { get { return WeaponDataStore.HookGunDataStore.HelpAimDistance; } }
     private GameObject _hook;
     private Vector3 _hookinitlocalPos;
     private Vector3 _hookinitlocalScale;
@@ -27,8 +28,11 @@ public class rtHook : WeaponBase
         FlyingOut,
         OnTarget,
         FlyingIn,
+        Broken,
     }
     private State _hookState;
+    private bool _released;
+    private float _brokenTimer;
 
     protected override void Awake()
     {
@@ -62,6 +66,20 @@ public class rtHook : WeaponBase
 
         if (_hookState == State.FlyingIn)
         {
+            if (Hooked != null && _released)
+            {
+                foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+                {
+                    rb.isKinematic = false;
+                }
+                Vector3 force = (transform.position - _hook.transform.position).normalized;
+                Vector3 vec2 = transform.right;
+                Vector3 finalVec = force - vec2;
+                force = (force + finalVec * 10f).normalized;
+
+                Hooked.GetComponent<Rigidbody>().AddForce(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse);
+                Hooked = null;
+            }
             Vector3 nextpos = (transform.position - _hook.transform.position).normalized;
             if (HookCanBend && Hooked != null)
             {
@@ -95,6 +113,7 @@ public class rtHook : WeaponBase
                 _hook.transform.localScale = _hookinitlocalScale;
                 _hook.transform.localEulerAngles = Vector3.zero;
                 _hook.transform.localPosition = _hookinitlocalPos;
+                _released = false;
                 // Need to set hooked's rigidbody back
                 if (Hooked != null)
                 {
@@ -105,6 +124,14 @@ public class rtHook : WeaponBase
                 }
 
                 Hooked = null;
+            }
+        }
+        if (_hookState == State.Broken)
+        {
+            if (Time.time > _brokenTimer + WeaponDataStore.HookGunDataStore.HookBlockReloadTime)
+            {
+                _hook.SetActive(true);
+                _hookState = State.Empty;
             }
         }
     }
@@ -148,6 +175,10 @@ public class rtHook : WeaponBase
             {
                 _hookState = State.FlyingIn;
             }
+            if (_hookState == State.OnTarget)
+            {
+                _released = true;
+            }
 
         }
     }
@@ -157,7 +188,23 @@ public class rtHook : WeaponBase
         if (hit.GetComponent<PlayerController>().CanBlock(-_hook.transform.right))
         {
             EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, _hook));
-            _hookState = State.FlyingIn;
+            GameObject hookDup = Instantiate(_hook, _hook.transform.position, _hook.transform.rotation);
+            Destroy(hookDup, WeaponDataStore.HookGunDataStore.HookBlockReloadTime);
+            _hook.transform.parent = transform;
+            _hook.transform.localPosition = _hookinitlocalPos;
+            _hook.SetActive(false);
+            // hookDup.GetComponent<HookControl>().enabled = false;
+            Destroy(hookDup.GetComponent<HookControl>());
+            hookDup.GetComponent<Rigidbody>().isKinematic = false;
+            hookDup.GetComponent<Rigidbody>().useGravity = true;
+            // hookDup.GetComponent<Collider>().isTrigger = false;
+            var coll = hookDup.AddComponent<MeshCollider>();
+            coll.convex = true;
+            Vector3 _dir = -hookDup.transform.right;
+            _dir.y = WeaponDataStore.HookGunDataStore.HookBlockYDirection;
+            hookDup.GetComponent<Rigidbody>().AddForce(WeaponDataStore.HookGunDataStore.HookBlockReflectionForce * _dir, ForceMode.Impulse);
+            _brokenTimer = Time.time;
+            _hookState = State.Broken;
             return;
         }
         _hookState = State.OnTarget;

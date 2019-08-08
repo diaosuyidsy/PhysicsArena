@@ -45,6 +45,8 @@ public class PlayerHit : GameEvent
         HittedPlayerNumber = hittedPlayerNumber;
         MeleeCharge = meleeCharge;
         IsABlock = isABlock;
+        if (isABlock)
+            EventManager.Instance.TriggerEvent(new Blocked(hiter, hiterPlayerNumber));
     }
 }
 
@@ -371,6 +373,7 @@ public class HookBlocked : HookGunEvent
         HookBlocker = hookblocker;
         HookBlockerPlayerNumber = hookblockerplayernumber;
         Hook = hook;
+        EventManager.Instance.TriggerEvent(new Blocked(HookBlocker, HookBlockerPlayerNumber));
     }
 }
 
@@ -466,6 +469,7 @@ public class FistGunBlocked : FistGunEvent
         Fist = fist;
         Blocker = blocker;
         BlockerPlayerNumber = blockerPlayerNumber;
+        EventManager.Instance.TriggerEvent(new Blocked(blocker, blockerPlayerNumber));
     }
 }
 
@@ -530,5 +534,17 @@ public class FoodDelivered : GameEvent
         Food = food;
         FoodTag = foodTag;
         DeliverPlayerNumber = deliverPlayerNumber;
+    }
+}
+
+public class Blocked : GameEvent
+{
+    public GameObject Blocker;
+    public int BlockerPlayerNumber;
+
+    public Blocked(GameObject blocker, int blockerPlayerNumber)
+    {
+        Blocker = blocker;
+        BlockerPlayerNumber = blockerPlayerNumber;
     }
 }

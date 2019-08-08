@@ -33,4 +33,9 @@ public class VFXData : ScriptableObject
     public GameObject FistGunFistTrailVFX;
     public GameObject ChickenFoodGuideVFX;
     public GameObject DuckFoodGuideVFX;
+    public GameObject ChickenBlockParryVFX;
+    public GameObject ChickenBlockShieldStarVFX;
+    public GameObject DuckBlockParryVFX;
+    public GameObject DuckBlockShieldStarVFX;
+
 }

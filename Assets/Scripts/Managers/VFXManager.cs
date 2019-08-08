@@ -216,6 +216,15 @@ public class VFXManager
         if (rb.BazookaTrailVFXHolder != null)
             rb.BazookaTrailVFXHolder.SetActive(true);
     }
+
+    private void _onBlocked(Blocked ev)
+    {
+        GameObject parryvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockParryVFX : VFXDataStore.DuckBlockParryVFX;
+        GameObject startvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockShieldStarVFX : VFXDataStore.DuckBlockShieldStarVFX;
+        PlayerController pc = ev.Blocker.GetComponent<PlayerController>();
+        GameObject.Instantiate(parryvfx, pc.transform);
+        GameObject.Instantiate(parryvfx, pc.BlockVFXHolder.transform);
+    }
     #endregion
 
     private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -248,6 +257,7 @@ public class VFXManager
         EventManager.Instance.AddHandler<FistGunFired>(_onFistGunFire);
         EventManager.Instance.AddHandler<FistGunCharged>(_onFistGunRecharged);
         EventManager.Instance.AddHandler<BazookaFired>(_onBazookaLaunched);
+        EventManager.Instance.AddHandler<Blocked>(_onBlocked);
     }
 
     private void OnDisable()
@@ -275,7 +285,7 @@ public class VFXManager
         EventManager.Instance.RemoveHandler<FistGunFired>(_onFistGunFire);
         EventManager.Instance.RemoveHandler<FistGunCharged>(_onFistGunRecharged);
         EventManager.Instance.RemoveHandler<BazookaFired>(_onBazookaLaunched);
-
+        EventManager.Instance.RemoveHandler<Blocked>(_onBlocked);
     }
 
     public void Destory()

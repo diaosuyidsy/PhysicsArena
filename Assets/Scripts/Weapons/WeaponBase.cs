@@ -11,6 +11,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected int _ammo { get; set; }
     protected GunPositionControl _gpc;
+    protected bool _dropped;
 
     protected virtual void Awake()
     {
@@ -51,10 +52,18 @@ public abstract class WeaponBase : MonoBehaviour
         }
         if ((WeaponDataStore.OnNoAmmoDropDisappear == (WeaponDataStore.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
         {
-            EventManager.Instance.TriggerEvent(new ObjectHitGround(gameObject));
+            if (!_dropped)
+            {
+                EventManager.Instance.TriggerEvent(new ObjectHitGround(gameObject));
+                _dropped = true;
+            }
         }
     }
 
+    public void Drop()
+    {
+        _dropped = false;
+    }
     protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("DeathZone"))

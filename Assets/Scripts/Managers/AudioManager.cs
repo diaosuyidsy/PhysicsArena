@@ -120,17 +120,21 @@ public class AudioManager
 
     private void _onFootStep(FootStep fs)
     {
-        AudioClip ac = AudioDataStore.FootstepGrassAudioClip;
         switch (fs.GroundTag)
         {
             case "Ground_Concrete":
-                ac = AudioDataStore.FootstepConcreteAudioClip;
+                _playSound(fs.PlayerFeet, AudioDataStore.FootstepConcreteAudioClip, true, Random.Range(0.2f, 0.3f));
                 break;
             case "Ground_YellowStone":
-                ac = AudioDataStore.FootstepYellowStoneAudioClip;
+                _playSound(fs.PlayerFeet, AudioDataStore.FootstepYellowStoneAudioClip, true, Random.Range(0.2f, 0.3f));
+                break;
+            case "Ground_Grass":
+                _playSound(fs.PlayerFeet, AudioDataStore.FootstepGrassAudioClip, true, Random.Range(0.2f, 0.3f));
+                break;
+            default:
+                _playSound(fs.PlayerFeet, AudioDataStore.FootstepConcreteAudioClip, true, Random.Range(0.2f, 0.3f));
                 break;
         }
-        _playSound(fs.PlayerFeet, ac, true, Random.Range(0.2f, 0.3f));
     }
 
     private void _onPlayerJump(PlayerJump pj)

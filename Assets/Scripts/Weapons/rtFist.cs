@@ -40,7 +40,7 @@ public class rtFist : WeaponBase
             RaycastHit hit;
             if (Physics.SphereCast(_fistDup.transform.position, WeaponDataStore.FistGunDataStore.FistHitScanRadius, -_fistDup.transform.right, out hit, WeaponDataStore.FistGunDataStore.FistHitScanDist, WeaponDataStore.FistGunDataStore.AllThingFistCanCollideLayer ^ (1 << _fireOwner.layer)))
             {
-                if (hit.collider.tag.Contains("Fist")) return;
+                if (hit.collider.GetComponent<WeaponBase>() != null) return;
                 PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
                 if (pc != null && !pc.CanBlock(-_fistDup.transform.right))
                 {

@@ -208,12 +208,13 @@ public class VFXManager
     {
         // GameObject.Instantiate(VFXDataStore.BazookaStartVFX, ev.FistPos, VFXDataStore.BazookaStartVFX.transform.rotation);
         rtBazooka rb = ev.BazookaGun.GetComponent<rtBazooka>();
-        if (rb.BazookaTrailVFXHolder != null)
+        if (rb.BazookaTrailVFXHolder == null)
         {
             rb.BazookaTrailVFXHolder = GameObject.Instantiate(VFXDataStore.BazookaTrailVFX, ev.BazookaGun.transform, false);
             rb.BazookaTrailVFXHolder.transform.rotation = VFXDataStore.BazookaTrailVFX.transform.rotation;
         }
-        rb.BazookaTrailVFXHolder.SetActive(true);
+        if (rb.BazookaTrailVFXHolder != null)
+            rb.BazookaTrailVFXHolder.SetActive(true);
     }
     #endregion
 

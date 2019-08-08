@@ -41,9 +41,9 @@ GameObject:
   - component: {fileID: 5281365466298320964}
   - component: {fileID: 5277280698859365074}
   - component: {fileID: 5266696429046408906}
-  - component: {fileID: 5234858672453993820}
   - component: {fileID: 5297660055217657282}
   - component: {fileID: 5247149832495619000}
+  - component: {fileID: 1845201035604168670}
   m_Layer: 0
   m_Name: Hook
   m_TagString: Untagged
@@ -111,19 +111,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!135 &5234858672453993820
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5278561080671845162}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 1
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.10000001
-  m_Center: {x: -0.12, y: 0.0009010285, z: 0.000000014901161}
 --- !u!54 &5297660055217657282
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -153,6 +140,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   CanHook: 0
+--- !u!136 &1845201035604168670
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5278561080671845162}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 1
+  m_Enabled: 1
+  m_Radius: 0.21043919
+  m_Height: 0.36449134
+  m_Direction: 1
+  m_Center: {x: 0.000000014901161, y: 0.00090103596, z: 0.000000014901161}
 --- !u!1 &5278587989010039512
 GameObject:
   m_ObjectHideFlags: 0

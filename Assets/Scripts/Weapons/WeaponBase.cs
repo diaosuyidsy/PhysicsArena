@@ -6,6 +6,8 @@ using UnityEngine;
 public abstract class WeaponBase : MonoBehaviour
 {
     public WeaponData WeaponDataStore;
+    public virtual float HelpAimAngle { get; }
+    public virtual float HelpAimDistance { get; }
 
     protected int _ammo { get; set; }
     protected GunPositionControl _gpc;

@@ -23,6 +23,8 @@ public class VFXData : ScriptableObject
     public GameObject BazookaTrailVFX;
     public GameObject ChickenBlockVFX;
     public GameObject DuckBlockVFX;
+    public GameObject ChickenBlockUIVFX;
+    public GameObject DuckBlockUIVFX;
     public GameObject ChickenStunnedVFX;
     public GameObject DuckStunnedVFX;
     public GameObject ChickenSlowedVFX;

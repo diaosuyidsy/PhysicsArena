@@ -25,6 +25,7 @@ public class PlayerController : MonoBehaviour
     [HideInInspector] public GameObject HandObject;
     [HideInInspector] public GameObject MeleeVFXHolder;
     [HideInInspector] public GameObject BlockVFXHolder;
+    [HideInInspector] public GameObject BlockUIVFXHolder;
     [HideInInspector] public GameObject StunVFXHolder;
     [HideInInspector] public GameObject SlowVFXHolder;
     [HideInInspector] public GameObject FoodTraverseVFXHolder;
@@ -1153,12 +1154,13 @@ public class PlayerController : MonoBehaviour
     {
         IEnumerator _leftblockcoroutine;
         IEnumerator _rightblockcoroutine;
-
+        private Vector2 _shieldUISize;
         public override void OnEnter()
         {
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             _leftblockcoroutine = Context._blockAnimation(Context._leftArmhj, Context._leftHandhj, 0.1f);
             _rightblockcoroutine = Context._blockAnimation(Context._rightArmhj, Context._rightHandhj, 0.1f);
+            _shieldUISize = Services.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
             Context.StartCoroutine(_leftblockcoroutine);
             Context.StartCoroutine(_rightblockcoroutine);
         }
@@ -1173,6 +1175,12 @@ public class PlayerController : MonoBehaviour
             }
             Context._lastTimeUseBlock = Time.time;
             Context._blockCharge += Time.deltaTime;
+            if (Context.BlockUIVFXHolder != null)
+            {
+                Vector2 _nextShieldUISize = _shieldUISize;
+                _nextShieldUISize.x *= (_charBlockData.MaxBlockCD - Context._blockCharge) / _charBlockData.MaxBlockCD;
+                Context.BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextShieldUISize;
+            }
             if (Context._blockCharge > _charBlockData.MaxBlockCD)
             {
                 TransitionTo<IdleActionState>();

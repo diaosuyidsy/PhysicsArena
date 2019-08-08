@@ -551,7 +551,6 @@ public class GameStateManager
             seq.Append(Context._countDownText.DOScale(0f, 0.2f));
             seq.AppendCallback(() =>
             {
-                Context._cam.GetComponent<AudioSource>().Play();
                 TransitionTo<GameLoop>();
             });
         }
@@ -580,7 +579,11 @@ public class GameStateManager
 
     private abstract class TutorialState : GameState
     {
-
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._cam.GetComponent<AudioSource>().Play();
+        }
     }
 
     private class FoodCartTutorialState : TutorialState
@@ -596,7 +599,8 @@ public class GameStateManager
             seq.Append(Context._tutorialImage.DOScale(Vector3.one, 0f));
             for (int i = 0; i < Context._tutorialObjectiveImages.childCount; i++)
             {
-                seq.Join(Context._tutorialObjectiveImages.GetChild(i).DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack).SetDelay(i * 0.2f));
+                int x = i;
+                seq.Append(Context._tutorialObjectiveImages.GetChild(x).DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack));
             }
             seq.Append(Context._holdAText.DOText("Start Game", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
         }

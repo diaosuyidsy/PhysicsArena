@@ -73,7 +73,7 @@ public class StatisticsManager
                 result.Add(record.RewiredID, new StatisticsRecord(
                     _configData.StatsInfo[record.Index].StatisticsTitle,
                     _configData.StatsInfo[record.Index].StatisticsIntro1 +
-                        record.RawData +
+                        record.RawData.ToString("F0") +
                             _configData.StatsInfo[record.Index].StatisticsIntro2,
                             _configData.StatsInfo[record.Index].StatisticIcon
                 ));

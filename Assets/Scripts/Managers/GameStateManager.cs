@@ -134,7 +134,7 @@ public class GameStateManager
 
     private void _onGameEnd(GameEnd ge)
     {
-        if (!_gameStateFSM.CurrentState.GetType().Equals(typeof(WinState)))
+        if (_gameStateFSM.CurrentState.GetType().Equals(typeof(GameLoop)))
         {
             _endFocusPosition = ge.WinnedObjective.position;
             _winner = ge.Winner;
@@ -259,7 +259,6 @@ public class GameStateManager
         public override void OnEnter()
         {
             base.OnEnter();
-            // Context._gameEndBlackbackground.SetActive(true);
             Context._darkCornerEffect.enabled = false;
         }
     }
@@ -270,6 +269,14 @@ public class GameStateManager
         public override void OnEnter()
         {
             base.OnEnter();
+            for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+            {
+                int playerindex = _PlayersInformation.ColorIndex[i];
+                int rewiredid = _PlayersInformation.RewiredID[i];
+                PlayerController playercontroller = Context._playersOutestHolder[playerindex].GetComponentInChildren<PlayerController>(true);
+                playercontroller.enabled = false;
+                playercontroller.GetComponent<Rigidbody>().isKinematic = false;
+            }
             Context._MVPDisplay.gameObject.SetActive(true);
             Context._MVPCamera.gameObject.SetActive(true);
             Context._MVPPlayerHolder.gameObject.SetActive(true);

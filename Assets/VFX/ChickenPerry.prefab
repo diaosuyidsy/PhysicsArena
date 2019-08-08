@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 7980307013909761794}
   - component: {fileID: 7980307013909761792}
   - component: {fileID: 7980307013909761795}
+  - component: {fileID: 9168571320825460689}
   m_Layer: 0
   m_Name: ChickenPerry
   m_TagString: Untagged
@@ -25,14 +26,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7980307013909761805}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 6.8}
-  m_LocalScale: {x: 8, y: 8, z: 8}
+  m_LocalRotation: {x: -0.08606894, y: 0, z: 0, w: 0.9962892}
+  m_LocalPosition: {x: 0, y: 0.08, z: 1}
+  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children:
   - {fileID: 7980307014351597687}
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -9.875, y: 0, z: 0}
 --- !u!198 &7980307013909761792
 ParticleSystem:
   m_ObjectHideFlags: 0
@@ -4757,6 +4758,18 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &9168571320825460689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7980307013909761805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ad2ba5881bb3c942ac6a5c1b9586da4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &7980307014351597686
 GameObject:
   m_ObjectHideFlags: 0

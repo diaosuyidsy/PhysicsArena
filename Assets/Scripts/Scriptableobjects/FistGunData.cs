@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 [CreateAssetMenu(fileName = "FistGunData", menuName = "ScriptableObjects/Weapon/FistGun", order = 1)]
 public class FistGunData : ScriptableObject
@@ -11,6 +12,7 @@ public class FistGunData : ScriptableObject
     public float BackfireHitForce = 300f;
     public float MaxFlyDistance = 10f;
     public float ReloadTime = 2f;
+    public AnimationCurve ReloadEase;
     public float FistReboundY = 1f;
     public float FistReboundForce = 100f;
     public float FistHitScanRadius = 0.3f;

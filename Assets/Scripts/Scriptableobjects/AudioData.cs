@@ -27,7 +27,6 @@ public class AudioData : ScriptableObject
     public AudioClip WeaponSpawnedAudioClip;
     public AudioClip WeaponPickedUpAudioClip;
     public AudioClip BazookaFiredAudioClip;
-    public AudioClip BazookaBombedAudioClip;
     public AudioClip FistGunBlockedAudioClip;
     public AudioClip FistGunFiredAudioClip;
     public AudioClip FistGunHitAudioClip;
@@ -36,9 +35,11 @@ public class AudioData : ScriptableObject
     public AudioClip FoodPickedUpWrongAudioClip;
     public AudioClip FoodDeliveredAudioClip;
     public AudioClip FistGunHitGroundAudioClip;
+    public AudioClip FistHitGroundAudioClip;
     public AudioClip WaterGunHitGroundAudioClip;
     public AudioClip BazookaGunHitGroundAudioClip;
     public AudioClip HookGunHitGroundAudioClip;
+    public AudioClip HookHitGroundAudioClip;
     public AudioClip SuckGunHitGroundAudioClip;
     public AudioClip[] FoodHitGroundAudioClip;
 }

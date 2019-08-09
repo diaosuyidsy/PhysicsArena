@@ -177,10 +177,8 @@ public class VFXManager
             bf.PickUpVFXHolder.SetActive(true);
             GameObject FoodGuideVFX = opu.Obj.tag.Contains("Team1") ? VFXDataStore.ChickenFoodGuideVFX : VFXDataStore.DuckFoodGuideVFX;
             PlayerController pc = opu.Player.GetComponent<PlayerController>();
-            Debug.Log("hello");
             if (pc != null && pc.FoodTraverseVFXHolder == null)
             {
-                Debug.Log("hello2");
                 pc.FoodTraverseVFXHolder = GameObject.Instantiate(FoodGuideVFX, pc.PlayerFeet, false);
                 pc.FoodTraverseVFXHolder.transform.rotation = FoodGuideVFX.transform.rotation;
             }

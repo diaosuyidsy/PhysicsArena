@@ -49,13 +49,14 @@ public class Menu : MonoBehaviour
     private Transform _loadingTitle;
     private PlayerInformation _finalPlayerInformation;
     private Transform _3rdLand;
-
+    private AudioSource _audioSource;
     private Player _mainPlayer;
     private FSM<Menu> _menuFSM;
 
     private void Awake()
     {
         _mainPlayer = ReInput.players.GetPlayer(0);
+        _audioSource = GetComponent<AudioSource>();
         _selectingBar = transform.Find("MainMenu").Find("SelectingBar");
         _selectedBar = transform.Find("MainMenu").Find("SelectBar");
         _play = transform.Find("MainMenu").Find("Play").gameObject;
@@ -209,7 +210,7 @@ public class Menu : MonoBehaviour
             {
                 Context._3rdMenuHolders[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
                     SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
-                    SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+                    SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuSlotOutAudioClip));
                 Context._3rdMenuPrompts[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
                     SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
                     SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
@@ -227,6 +228,7 @@ public class Menu : MonoBehaviour
                 seq.Append(Context._eggs[temp].DOShakeRotation(_MenuData.EggExplosionShakeDuration, _MenuData.ETC_EggShakeStrength, _MenuData.ETC_EggShakeVibrato).
                     OnComplete(() =>
                 {
+                    Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuEggDisappearAudioClip);
                     Context._eggs[temp].GetChild(0).gameObject.SetActive(false);
                     Instantiate(_MenuData.EggExplosionEffect, Context._eggs[temp].transform.position + _MenuData.EggExplosionOffset[temp], _MenuData.EggExplosionEffect.transform.rotation);
                 }));
@@ -241,12 +243,12 @@ public class Menu : MonoBehaviour
                         {
                             if (i != Context._finalPlayerInformation.ColorIndex.Length - 1)
                                 Context._chickens[Context._finalPlayerInformation.ColorIndex[i]].DOLocalMoveY(-10f, _MenuData.ChickensDropDuration[i]).SetRelative(true).
-                            SetDelay(_MenuData.ChickensDropDelay[i]).SetEase(_MenuData.ChickenDropEase);
+                            SetDelay(_MenuData.ChickensDropDelay[i]).SetEase(_MenuData.ChickenDropEase).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuChickenToAbyssAudioClip));
                             else
                                 Context._chickens[Context._finalPlayerInformation.ColorIndex[i]].DOLocalMoveY(-10f, _MenuData.ChickensDropDuration[i]).SetRelative(true).
-                            SetDelay(_MenuData.ChickensDropDelay[i]).SetEase(_MenuData.ChickenDropEase).OnComplete(() => TransitionTo<LoadingState>());
+                            SetDelay(_MenuData.ChickensDropDelay[i]).SetEase(_MenuData.ChickenDropEase).OnComplete(() => TransitionTo<LoadingState>()).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuChickenToAbyssAudioClip));
                         }
-                    }));
+                    })).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuGroundMoveBackAudioClip));
 
         }
     }
@@ -533,7 +535,7 @@ public class Menu : MonoBehaviour
             _playersFSM[gamePlayerId] = new FSM<CharacterSelectionState>(this);
             _playersFSM[gamePlayerId].TransitionTo<UnselectingState>();
             Player rewiredPlayer = ReInput.players.GetPlayer(rewiredPlayerId);
-
+            Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuJoinGameAudioClip);
             rewiredPlayer.controllers.maps.SetMapsEnabled(false, "Assignment");
             _onPlayerEggStateChange();
         }
@@ -552,6 +554,7 @@ public class Menu : MonoBehaviour
                 }
             }
             if (gamePlayerId == -1) return;
+            Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuUnJoinGameAudioClip);
 
             ReInput.players.GetPlayer(rewiredPlayerId).controllers.maps.SetMapsEnabled(true, "Assignment");
             _playerMap.RemoveAt(playerMapIndex);
@@ -694,6 +697,7 @@ public class Menu : MonoBehaviour
             public override void OnEnter()
             {
                 base.OnEnter();
+                Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuEggJiggleAudioClip);
                 Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
                 RaycastHit hit;
                 Ray ray = Context._mainCamera.ScreenPointToRay(_CursorPos);
@@ -866,14 +870,17 @@ public class Menu : MonoBehaviour
                 Context.Context._eggs[_eggIndex].GetComponent<Collider>().enabled = false;
                 Context.Context._3rdMenuCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
                 _sequence = DOTween.Sequence();
+                Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuEggSelectedAudioClip);
+
                 _sequence.Append(Context.Context._eggs[_eggIndex].DOShakeRotation(Context._MenuData.ETC_EggShakeDuration, Context._MenuData.ETC_EggShakeStrength, Context._MenuData.ETC_EggShakeVibrato));
                 _sequence.Append(Context.Context._eggs[_eggIndex].DOScale(Context._MenuData.ETC_EggScaleAmount, Context._MenuData.ETC_EggScaleDuration).SetEase(Context._MenuData.ETC_EggScaleAnimationCurve));
-                _sequence.Join(Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve));
+                _sequence.Join(Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve).OnPlay(() => Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuEggUpAudioClip)));
                 _sequence.Append(Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.5f, Context._MenuData.ETC_ChickenMoveYDuration).
                             SetEase(Context._MenuData.ETC_ChickenMoveYEase).
                             SetDelay(Context._MenuData.ETC_ChickenMoveYDelay));
                 _sequence.AppendCallback(() =>
                 {
+                    Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuChickenLandAudioClip);
                     Context.Context._camera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
                     Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Pose");
                     Instantiate(Context._MenuData.ETC_ChickenLandVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenLandVFXOffset, Context._MenuData.ETC_ChickenLandVFX.transform.rotation);
@@ -925,6 +932,7 @@ public class Menu : MonoBehaviour
                 /// Reset Egg Position, LocalScale
                 /// Reset Egg Children Scale, Shader Color
                 /// Reset _eggCursors
+                Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuChickenToEggAudioClip);
                 Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Reset");
                 Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
                 Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
@@ -958,7 +966,7 @@ public class Menu : MonoBehaviour
                     Context._brawlMode.Find("Mask").Find("MainPage").DOLocalMoveY(0f, 0);
                     Context._brawlMode.Find("Mask").Find("MapPage").DOLocalMoveY(-110.6f, 0);
                     Context._brawlMode.Find("WholeMask").gameObject.SetActive(true);
-                });
+                }).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuModeDropUpAudioClip));
             Context._cartMode.DOLocalMoveY(1500f, _MenuData.PanelMoveOutDuration).
                 SetEase(_MenuData.PanelMoveOutEase).SetDelay(_MenuData.CartPanelMoveOutDelay).
                 OnComplete(() =>
@@ -968,7 +976,7 @@ public class Menu : MonoBehaviour
                     Context._cartMode.Find("Mask").Find("MainPage").DOLocalMoveY(0f, 0);
                     Context._cartMode.Find("Mask").Find("MapPage").DOLocalMoveY(-110.6f, 0);
                     Context._cartMode.Find("WholeMask").gameObject.SetActive(true);
-                });
+                }).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuModeDropUpAudioClip));
             Context._2ndMenuTitle.DOText("", _MenuData.PanelMoveOutDuration).SetDelay(_MenuData.TextMoveOutDelay);
             Context._camera.DOLocalMoveX(16f, _MenuData.CameraToCharacterSelectionMoveDuration).SetDelay(_MenuData.CameraToCharacterSelectionMoveDelay)
                 .SetEase(_MenuData.CameraToCharacterSelectionMoveEase);
@@ -980,7 +988,7 @@ public class Menu : MonoBehaviour
             {
                 Context._3rdMenuHolders[i].DOLocalMoveX(-763f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
                     SetEase(_MenuData.ThirdMenuHolderMoveInEase).
-                    SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
+                    SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuSlotInAudioClip));
                 Context._3rdMenuPrompts[i].DOLocalMoveX(-763f, _MenuData.ThirdMenuHolderMoveInDuration[i]).
                     SetEase(_MenuData.ThirdMenuHolderMoveInEase).
                     SetDelay(_MenuData.ThirdMenuHolderMoveInDelay[i]);
@@ -993,11 +1001,12 @@ public class Menu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BackAudioClip);
             for (int i = 0; i < 6; i++)
             {
                 Context._3rdMenuHolders[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
                     SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
-                    SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
+                    SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuSlotOutAudioClip));
                 Context._3rdMenuPrompts[i].DOLocalMoveX(-1192f, _MenuData.ThirdMenuHolderMoveOutDuration[i]).
                     SetEase(_MenuData.ThirdMenuHolderMoveOutEase).
                     SetDelay(_MenuData.ThirdMenuHolderMoveOutDelay[i]);
@@ -1045,6 +1054,7 @@ public class Menu : MonoBehaviour
             if (_VLAxisRaw > 0.2f && !_vAxisInUse && _MapIndex < _MapPage.childCount - 1 && _finishedmove)
             {
                 _finishedmove = false;
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuMapBrowseAudioClip);
                 _MapPage.GetChild(_MapIndex++).GetComponent<Image>().color = _MenuData.UnselectedMapColor;
                 _MapPage.DOLocalMoveY(60f, _MenuData.MapMoveDuration).
                     SetEase(_MenuData.MapMoveEase).
@@ -1127,6 +1137,7 @@ public class Menu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SelectionAudioClip);
             Context._2ndMenuTitle.DOText("", 0f);
             _WholeMask.SetActive(false);
             _Mode.GetComponent<Image>().DOColor(_MenuData.ModeSelectedBlinkColor, _MenuData.ModeSelectedBlinkDurition).
@@ -1201,6 +1212,7 @@ public class Menu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SelectionAudioClip);
             if (!Context._2ndMenuTitle.text.Equals(_MenuData.SecondMenuTitleString))
                 Context._2ndMenuTitle.DOText(_MenuData.SecondMenuTitleString, _MenuData.SecondMenuTitleMoveTime);
             _wholeMask.SetActive(false);
@@ -1274,6 +1286,7 @@ public class Menu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SelectionAudioClip);
             Context._play.GetComponent<TextMeshProUGUI>().color = Context.MenuData.SelectingFontColor;
             Context._selectedBar.GetComponent<Image>().enabled = true;
             Context._selectingBar.GetComponent<Image>().enabled = false;
@@ -1303,9 +1316,10 @@ public class Menu : MonoBehaviour
                 SetEase(_MenuData.FirstMenuToSecondCameraEase).
                 SetDelay(_MenuData.FirstMenuToSecondCameraMoveDelay);
 
-            Context._cartMode.DOLocalMoveY(-38f, _MenuData.SecondMenuCarModeMoveTime).SetEase(_MenuData.SecondMenuCarModeEase).SetDelay(_MenuData.SecondMenuCarModeMoveDelay);
+            Context._cartMode.DOLocalMoveY(-38f, _MenuData.SecondMenuCarModeMoveTime).SetEase(_MenuData.SecondMenuCarModeEase).SetDelay(_MenuData.SecondMenuCarModeMoveDelay).OnComplete(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuModeDropDownAudioClip));
             Context._brawlMode.DOLocalMoveY(-38f, _MenuData.SecondMenuBrawlModeMoveTime).SetEase(_MenuData.SecondMenuBrawlModeEase).SetDelay(_MenuData.SecondMenuBrawlModeMoveDelay).OnComplete(() =>
             {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuModeDropDownAudioClip);
                 TransitionTo<CarModeState>();
             });
         }
@@ -1316,9 +1330,10 @@ public class Menu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BackAudioClip);
             Context._2ndMenuTitle.DOText("", _MenuData.SecondMenuTitleMoveOutTime).SetDelay(_MenuData.SecondMenuTitleMoveOutDelay);
-            Context._cartMode.DOLocalMoveY(1500f, _MenuData.SecondMenuCarModeMoveOutTime).SetEase(_MenuData.SecondMenuCarModeEase).SetDelay(_MenuData.SecondMenuCarModeMoveOutDelay);
-            Context._brawlMode.DOLocalMoveY(1500f, _MenuData.SecondMenuBrawlModeMoveOutTime).SetEase(_MenuData.SecondMenuBrawlModeEase).SetDelay(_MenuData.SecondMenuBrawlModeMoveOutDelay);
+            Context._cartMode.DOLocalMoveY(1500f, _MenuData.SecondMenuCarModeMoveOutTime).SetEase(_MenuData.SecondMenuCarModeEase).SetDelay(_MenuData.SecondMenuCarModeMoveOutDelay).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuModeDropUpAudioClip));
+            Context._brawlMode.DOLocalMoveY(1500f, _MenuData.SecondMenuBrawlModeMoveOutTime).SetEase(_MenuData.SecondMenuBrawlModeEase).SetDelay(_MenuData.SecondMenuBrawlModeMoveOutDelay).OnPlay(() => Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuModeDropUpAudioClip));
             Context._camera.DOMoveX(-2.94f, _MenuData.SecondMenuToFirstCameraMoveTime).SetEase(_MenuData.SecondMenuToFirstCameraEase).SetDelay(_MenuData.SecondMenuToFirstCameraMoveDelay);
             Context._title.DOLocalMoveX(-425f, _MenuData.FirstMenuTitleMoveInDuration).
                     SetEase(_MenuData.FirstMenuTitleMoveInEase).
@@ -1368,6 +1383,7 @@ public class Menu : MonoBehaviour
                 {
                     _menuItem.GetComponent<TextMeshProUGUI>().color = Context.MenuData.SelectingFontColor;
                     _finishedEnter = true;
+                    Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BrowseAudioClip);
                 });
         }
 
@@ -1393,7 +1409,10 @@ public class Menu : MonoBehaviour
             if (_VLAxisRaw > 0.2f && !_vAxisInUse && _finishedEnter)
                 TransitionTo<FirstMenuSettingState>();
             if (_ADown)
+            {
                 TransitionTo<FirstMenuToModeMenuTransition>();
+                return;
+            }
         }
     }
 

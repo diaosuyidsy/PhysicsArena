@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class rtFist : WeaponBase
 {
@@ -124,6 +125,7 @@ public class rtFist : WeaponBase
     private void _switchToRecharge(bool maintainSpeed = false)
     {
         _fistGunState = FistGunState.Recharging;
+        _fist.DOScale(0f, WeaponDataStore.FistGunDataStore.ReloadTime).SetEase(WeaponDataStore.FistGunDataStore.ReloadEase).From().OnPlay(() => _fist.gameObject.SetActive(true));
         EventManager.Instance.TriggerEvent(new FistGunStartCharging(gameObject, _fireOwner, _fireOwner.GetComponent<PlayerController>().PlayerNumber));
         _chargeTimer = Time.time;
         _fistDup.GetComponent<Rigidbody>().isKinematic = false;

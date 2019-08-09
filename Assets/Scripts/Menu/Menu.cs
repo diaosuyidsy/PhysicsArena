@@ -1087,6 +1087,7 @@ public class Menu : MonoBehaviour
 
             if (_ADown)
             {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuMapSelectAudioClip);
                 Context._chosenMapImage = _MapPage.GetChild(_MapIndex).gameObject;
                 Context.MapName = _MapPage.GetChild(_MapIndex).name;
                 TransitionTo<MapToCharacterSelectionTransition>();
@@ -1108,7 +1109,11 @@ public class Menu : MonoBehaviour
         {
             base.Update();
             if (_BDown)
+            {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuMapToModeBackAudioClip);
                 TransitionTo<BrawlModeState>();
+
+            }
         }
     }
 
@@ -1126,7 +1131,10 @@ public class Menu : MonoBehaviour
         {
             base.Update();
             if (_BDown)
+            {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuMapToModeBackAudioClip);
                 TransitionTo<CarModeState>();
+            }
         }
     }
 

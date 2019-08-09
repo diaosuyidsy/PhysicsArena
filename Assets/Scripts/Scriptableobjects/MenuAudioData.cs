@@ -10,6 +10,8 @@ public class MenuAudioData : ScriptableObject
     public AudioClip SecondMenuModeDropDownAudioClip;
     public AudioClip SecondMenuModeDropUpAudioClip;
     public AudioClip SecondMenuMapBrowseAudioClip;
+    public AudioClip SecondMenuMapSelectAudioClip;
+    public AudioClip SecondMenuMapToModeBackAudioClip;
     public AudioClip BackAudioClip;
     public AudioClip ThirdMenuSlotInAudioClip;
     public AudioClip ThirdMenuSlotOutAudioClip;

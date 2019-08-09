@@ -14,7 +14,8 @@ public class AudioData : ScriptableObject
     public AudioClip HookGunBlockedAudioClip;
     public AudioClip SuckGunFiredAudioClip;
     public AudioClip SuckGunSuckAudioClip;
-    public AudioClip DeathAudioClip;
+    public AudioClip ChickenDeathAudioClip;
+    public AudioClip DuckDeathAudioClip;
     public AudioClip[] PlayerHitAudioClip;
     public AudioClip[] FootstepConcreteAudioClip;
     public AudioClip[] FootstepYellowStoneAudioClip;
@@ -42,4 +43,8 @@ public class AudioData : ScriptableObject
     public AudioClip HookHitGroundAudioClip;
     public AudioClip SuckGunHitGroundAudioClip;
     public AudioClip[] FoodHitGroundAudioClip;
+    public AudioClip ReadyAudioClip;
+    public AudioClip FightAudioClip;
+    public AudioClip FirstLandAudioClip;
+    public AudioClip DrumLoopAudioClip;
 }

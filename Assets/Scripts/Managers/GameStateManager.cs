@@ -550,10 +550,25 @@ public class GameStateManager
                 int temp = i;
                 Context._playersOutestHolder[playerIndex].gameObject.SetActive(true);
                 seq.Join(Context._playersOutestHolder[playerIndex].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[temp]).SetEase(_GameMapData.BirdsFlyDownEase).
-                OnComplete(() => _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree")));
+                OnComplete(() =>
+                {
+                    _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FirstLandAudioClip);
+                    _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree");
+                }));
             }
             seq.AppendInterval(_GameMapData.FightDelay);
-            seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.FightEase));
+            seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale / 2f, 0.8f).SetEase(Ease.InSine).OnPlay(() =>
+            {
+                _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.ReadyAudioClip);
+                Context._countDownText.text = "READY?";
+            }));
+            seq.AppendInterval(0.3f);
+            seq.Append(Context._countDownText.DOScale(0f, 0.2f));
+            seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.FightEase).OnPlay(() =>
+            {
+                _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FightAudioClip);
+                Context._countDownText.text = "FIGHT!";
+            }));
             seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
             seq.Append(Context._countDownText.DOScale(0f, 0.2f));
             seq.AppendCallback(() =>

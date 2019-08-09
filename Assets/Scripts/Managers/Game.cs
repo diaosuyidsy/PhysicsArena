@@ -25,6 +25,9 @@ public class Game : MonoBehaviour
             case GameMapMode.FoodCartMode:
                 Services.GameObjectiveManager = new FoodModeObjectiveManager();
                 break;
+            case GameMapMode.BrawlMode:
+                Services.GameObjectiveManager = new BrawlModeObjectiveManager();
+                break;
             default:
                 Services.GameObjectiveManager = new EmptyObjectiveManager();
                 break;
@@ -36,6 +39,7 @@ public class Game : MonoBehaviour
     {
         Services.WeaponGenerationManager.Update();
         Services.GameStateManager.Update();
+        Services.GameObjectiveManager.Update();
     }
 
     private void OnDrawGizmos()

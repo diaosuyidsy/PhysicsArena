@@ -85,7 +85,11 @@ public class AudioManager
 
     private void _onPlayerDied(PlayerDied pd)
     {
-        _playSound(pd.Player, AudioDataStore.DeathAudioClip);
+        if (pd.Player.tag.Contains("Team1"))
+            _playSound(pd.Player, AudioDataStore.ChickenDeathAudioClip);
+        else
+            _playSound(pd.Player, AudioDataStore.DuckDeathAudioClip);
+
     }
 
     private void _onObjectDespawned(ObjectDespawned od)

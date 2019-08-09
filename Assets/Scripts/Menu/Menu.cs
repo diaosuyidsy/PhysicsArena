@@ -1071,6 +1071,7 @@ public class Menu : MonoBehaviour
             if (_VLAxisRaw < -0.2f && !_vAxisInUse && _MapIndex > 0 && _finishedmove)
             {
                 _finishedmove = false;
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuMapBrowseAudioClip);
                 _MapPage.GetChild(_MapIndex--).GetComponent<Image>().color = _MenuData.UnselectedMapColor;
                 _MapPage.DOLocalMoveY(-60f, _MenuData.MapMoveDuration).
                     SetEase(_MenuData.MapMoveEase).
@@ -1212,7 +1213,6 @@ public class Menu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SelectionAudioClip);
             if (!Context._2ndMenuTitle.text.Equals(_MenuData.SecondMenuTitleString))
                 Context._2ndMenuTitle.DOText(_MenuData.SecondMenuTitleString, _MenuData.SecondMenuTitleMoveTime);
             _wholeMask.SetActive(false);
@@ -1253,7 +1253,11 @@ public class Menu : MonoBehaviour
         {
             base.Update();
             if (_HLAxisRaw < -0.2f && !_hAxisInUse)
+            {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuMapBrowseAudioClip);
                 TransitionTo<CarModeState>();
+                return;
+            }
             if (_ADown)
                 TransitionTo<BrawlModeToMapSelectTransition>();
         }
@@ -1273,7 +1277,11 @@ public class Menu : MonoBehaviour
         {
             base.Update();
             if (_HLAxisRaw > 0.2f && !_hAxisInUse)
+            {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.SecondMenuMapBrowseAudioClip);
                 TransitionTo<BrawlModeState>();
+                return;
+            }
             if (_ADown)
                 TransitionTo<CartModeToMapSelectTransition>();
         }

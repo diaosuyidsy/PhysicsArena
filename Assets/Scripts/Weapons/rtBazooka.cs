@@ -75,9 +75,19 @@ public class rtBazooka : WeaponBase
         }
         else if (_bazookaState == BazookaStates.Out)
         {
+            if (_gpc.Owner == null) return;
             Vector3 movement = new Vector3(_HLAxis, 0f, -_VLAxis) * WeaponDataStore.BazookaDataStore.MarkAirMoveSpeed * Time.deltaTime;
             transform.position += movement;
-            _throwMark.position += movement;
+            Vector3 _throwMarkNewPos = _throwMark.position + movement;
+            // _throwMark.position += movement;
+            RaycastHit hit1;
+            if (Physics.Raycast(_throwMarkNewPos + new Vector3(0, 20f), Vector3.down, out hit1, 30f, WeaponDataStore.BazookaDataStore.LineCastLayer))
+            {
+                _throwMarkNewPos.y = hit1.point.y;
+                _throwMark.gameObject.SetActive(true);
+            }
+            else _throwMark.gameObject.SetActive(false);
+            _throwMark.position = _throwMarkNewPos;
             transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
             RaycastHit hit;
             if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.HitExplodeLayer ^ (1 << _gpc.Owner.layer)))
@@ -101,6 +111,7 @@ public class rtBazooka : WeaponBase
                 }
                 EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));
                 _gpc.Owner.GetComponent<PlayerController>().OnImpact(new StunEffect(WeaponDataStore.BazookaDataStore.SelfStunTime, 0f));
+                _resetThrowMark();
                 _onWeaponUsedOnce();
             }
         }
@@ -146,9 +157,20 @@ public class rtBazooka : WeaponBase
     protected override void _onWeaponDespawn()
     {
         _gpc.FollowHand = true;
+        if (BazookaTrailVFXHolder != null) BazookaTrailVFXHolder.SetActive(false);
         _bazookaState = BazookaStates.Idle;
         _lineRenderer.enabled = false;
         _player = null;
+        _resetThrowMark();
+        _ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
+        transform.GetComponent<Rigidbody>().isKinematic = false;
+        _gpc.CanBePickedUp = true;
+        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+        gameObject.SetActive(false);
+    }
+
+    private void _resetThrowMark()
+    {
         _throwMark.gameObject.SetActive(false);
         Services.GameStateManager.CameraTargets.Remove(_throwMark);
         _shadowThrowMark.gameObject.SetActive(false);
@@ -158,11 +180,6 @@ public class rtBazooka : WeaponBase
         _throwMark.transform.localEulerAngles = Vector3.zero;
         _shadowThrowMark.transform.localPosition = Vector3.zero;
         _shadowThrowMark.transform.localEulerAngles = Vector3.zero;
-        _ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
-        transform.GetComponent<Rigidbody>().isKinematic = false;
-        _gpc.CanBePickedUp = true;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-        gameObject.SetActive(false);
     }
 
     private void _aim()

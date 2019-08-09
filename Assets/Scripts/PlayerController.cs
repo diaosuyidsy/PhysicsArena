@@ -723,7 +723,7 @@ public class PlayerController : MonoBehaviour
             base.OnEnter();
             Context.LegSwingReference.GetComponent<Animator>().enabled = false;
             Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
-            EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform));
+            EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform, Context._stunTimer - Time.time));
         }
 
         public override void Update()

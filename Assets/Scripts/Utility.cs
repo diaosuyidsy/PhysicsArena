@@ -178,6 +178,12 @@ public sealed class PlayerInformation
         ColorIndex = colorIndex;
     }
 }
+[Serializable]
+public class ViberationInformation
+{
+    public float Duration = 0.15f;
+    public float MotorLevel = 1f;
+}
 
 public enum GameMapMode
 {

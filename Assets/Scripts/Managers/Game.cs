@@ -8,13 +8,14 @@ public class Game : MonoBehaviour
     public VFXData VFXData;
     public ConfigData ConfigData;
     public WeaponData WeaponData;
+    public GameFeelData GameFeelData;
     public GameMapData GameMapData;
 
     private void Awake()
     {
         Services.Config = new Config(ConfigData, GameMapData);
         Services.AudioManager = new AudioManager(AudioData);
-        Services.GameFeelManager = new GameFeelManager();
+        Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
         Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
         Services.StatisticsManager = new StatisticsManager();

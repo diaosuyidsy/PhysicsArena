@@ -120,6 +120,15 @@ public class GameStateManager
         return -1;
     }
 
+    public int GetRewiredIDFromColorIndex(int colorindex)
+    {
+        for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
+        {
+            if (PlayersInformation.ColorIndex[i] == colorindex) return PlayersInformation.RewiredID[i];
+        }
+        return -1;
+    }
+
     public void Update()
     {
         _gameStateFSM.Update();
@@ -587,6 +596,7 @@ public class GameStateManager
             for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
             {
                 int playerIndex = _PlayersInformation.ColorIndex[i];
+                int rewiredID = Context.GetRewiredIDFromColorIndex(playerIndex);
                 if (playerIndex < 3) Context._playersOutestHolder[playerIndex].position = _GameMapData.DuckLandingPostion[duckPosIndex++];
                 else Context._playersOutestHolder[playerIndex].position = _GameMapData.ChickenLandingPosition[chickenPosIndex++];
                 int temp = i;
@@ -594,6 +604,7 @@ public class GameStateManager
                 seq.Join(Context._playersOutestHolder[playerIndex].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[temp]).SetEase(_GameMapData.BirdsFlyDownEase).
                 OnComplete(() =>
                 {
+                    Services.GameFeelManager.ViberateController(rewiredID, 1f, 0.3f);
                     _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FirstLandAudioClip);
                     _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree");
                 }));

@@ -69,16 +69,19 @@ public class PlayerDied : GameEvent
 
 public class PlayerStunned : GameEvent
 {
-    public GameObject Player { get; }
-    public int PlayerNumber { get; }
-    public Transform PlayerHead { get; }
-
-    public PlayerStunned(GameObject player, int playerNumber, Transform playerHead)
+    public PlayerStunned(GameObject player, int playerNumber, Transform playerHead, float stunnedTime)
     {
         Player = player;
         PlayerNumber = playerNumber;
         PlayerHead = playerHead;
+        StunnedTime = stunnedTime;
     }
+
+    public GameObject Player { get; }
+    public int PlayerNumber { get; }
+    public Transform PlayerHead { get; }
+    public float StunnedTime { get; }
+
 }
 
 public class PlayerUnStunned : GameEvent
@@ -482,7 +485,7 @@ public class FistGunStartCharging : FistGunEvent
 
 public class FistGunCharged : FistGunEvent
 {
-    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, Vector3 fistPos) : base(fistGun, fistGunOwner, -1)
+    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, Vector3 fistPos) : base(fistGun, fistGunOwner, fistGunOwner == null ? -1 : fistGunOwner.GetComponent<PlayerController>().PlayerNumber)
     {
         FistPos = fistPos;
     }
@@ -511,6 +514,7 @@ public class BazookaBombed : GameEvent
     public GameObject BazookaUser;
     public int PlayerNumber;
     public List<GameObject> HitPlayers;
+    public List<int> HitPlayersNumber;
 
     public BazookaBombed(GameObject bazookaGun, GameObject bazookaUser, int playerNumber, List<GameObject> hitPlayers)
     {
@@ -518,6 +522,11 @@ public class BazookaBombed : GameEvent
         BazookaUser = bazookaUser;
         PlayerNumber = playerNumber;
         HitPlayers = hitPlayers;
+        HitPlayersNumber = new List<int>();
+        for (int i = 0; i < HitPlayersNumber.Count; i++)
+        {
+            HitPlayersNumber.Add(hitPlayers[i].GetComponent<PlayerController>().PlayerNumber);
+        }
     }
 }
 

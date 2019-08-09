@@ -598,14 +598,14 @@ public class GameStateManager
             seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale / 2f, 0.8f).SetEase(Ease.InSine).OnPlay(() =>
             {
                 _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.ReadyAudioClip);
-                Context._countDownText.text = "READY?";
+                Context._countDownText.text = Context._configData.ReadyString;
             }));
             seq.AppendInterval(0.3f);
             seq.Append(Context._countDownText.DOScale(0f, 0.2f));
             seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.FightEase).OnPlay(() =>
             {
                 _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FightAudioClip);
-                Context._countDownText.text = "FIGHT!";
+                Context._countDownText.text = Context._configData.FightString;
             }));
             seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
             seq.Append(Context._countDownText.DOScale(0f, 0.2f));

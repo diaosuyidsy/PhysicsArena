@@ -55,6 +55,8 @@ public class Menu : MonoBehaviour
 
     private void Awake()
     {
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
         _mainPlayer = ReInput.players.GetPlayer(0);
         _audioSource = GetComponent<AudioSource>();
         _selectingBar = transform.Find("MainMenu").Find("SelectingBar");

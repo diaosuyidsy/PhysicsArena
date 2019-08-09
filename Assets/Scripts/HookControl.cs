@@ -28,8 +28,8 @@ public class HookControl : MonoBehaviour
         if (Services.Config.ConfigData.AllPlayerLayer != (Services.Config.ConfigData.AllPlayerLayer | (1 << other.gameObject.layer))
             || other.gameObject.layer == _gpc.Owner.layer)
             return;
-        CanHook = false;
         if (other.GetComponent<WeaponBase>() != null) return;
+        CanHook = false;
         _rth.HookOnHit(other.GetComponentInParent<PlayerController>().gameObject);
     }
 }

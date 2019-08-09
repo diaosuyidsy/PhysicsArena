@@ -311,7 +311,7 @@ public class GameStateManager
             seq.Append(MVPChicken.DOLocalMoveY(-3.116f, 0.2f).SetEase(Ease.InCirc).SetRelative(true)
             .OnComplete(() =>
             {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FirstLandAudioClip);
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.MVPBirdLandAudioClip);
                 Context._MVPCamera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
                 MVPChicken.GetComponent<Animator>().SetTrigger("Pose");
             }));

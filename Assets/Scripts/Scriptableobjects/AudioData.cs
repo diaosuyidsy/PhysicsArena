@@ -49,4 +49,8 @@ public class AudioData : ScriptableObject
     public AudioClip DrumLoopAudioClip;
     public AudioClip PauseMenuBrowseAudioClip;
     public AudioClip PauseMenuSelectionAudioClip;
+    public AudioClip MVPLandRiseAudioClip;
+    public AudioClip MVPLightFlickerAudioClip;
+    public AudioClip MVPBadgeStampAudioClip;
+    public AudioClip MVPStatisticPanelBopClip;
 }

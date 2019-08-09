@@ -1473,6 +1473,7 @@ public class Menu : MonoBehaviour
         public override void Update()
         {
             base.Update();
+            if (_ADown) Application.Quit();
             if (_VLAxisRaw < -0.2f && !_vAxisInUse && _finishedEnter)
             {
                 Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BrowseAudioClip);

@@ -47,4 +47,6 @@ public class AudioData : ScriptableObject
     public AudioClip FightAudioClip;
     public AudioClip FirstLandAudioClip;
     public AudioClip DrumLoopAudioClip;
+    public AudioClip PauseMenuBrowseAudioClip;
+    public AudioClip PauseMenuSelectionAudioClip;
 }

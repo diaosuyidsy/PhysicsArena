@@ -51,10 +51,12 @@ public class GameStateManager
     private Transform _MVPSpotLight;
     private Transform _MVPPodium;
     private int _winner;
+    private GameObject _gameManager;
 
-    public GameStateManager(GameMapData _gmp, ConfigData _cfd)
+    public GameStateManager(GameMapData _gmp, ConfigData _cfd, GameObject _gm)
     {
         _gameMapdata = _gmp;
+        _gameManager = _gm;
         _configData = _cfd;
         _gameStateFSM = new FSM<GameStateManager>(this);
         _gameEndCanvas = GameObject.Find("GameEndCanvas").transform;
@@ -163,6 +165,17 @@ public class GameStateManager
                 for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
                 {
                     if (ReInput.players.GetPlayer(_PlayersInformation.RewiredID[i]).GetButtonDown("Jump")) return true;
+                }
+                return false;
+            }
+        }
+        protected bool _AnyBDown
+        {
+            get
+            {
+                for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
+                {
+                    if (ReInput.players.GetPlayer(_PlayersInformation.RewiredID[i]).GetButtonDown("Block")) return true;
                 }
                 return false;
             }
@@ -459,32 +472,50 @@ public class GameStateManager
             Context._pauseResume.gameObject.SetActive(true);
             Context._pauseQuit.gameObject.SetActive(true);
             _switchMenu();
+            for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+            {
+                int playerindex = _PlayersInformation.ColorIndex[i];
+                int rewiredid = _PlayersInformation.RewiredID[i];
+                PlayerController playercontroller = Context._playersOutestHolder[playerindex].GetComponentInChildren<PlayerController>(true);
+                playercontroller.enabled = false;
+            }
             Time.timeScale = 0f;
+
         }
 
         public override void Update()
         {
             base.Update();
+            if (_AnyBDown || _AnyPauseDown)
+            {
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                TransitionTo<GameLoop>();
+                return;
+            }
             if (onresume && _AnyADown)
             {
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
                 TransitionTo<GameLoop>();
                 return;
             }
             if (!onresume && _AnyADown)
             {
                 Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene("NewMenu"));
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
                 TransitionTo<GameQuitState>();
                 return;
             }
             if (_AnyVLAxisRaw < -0.2f && !_vAxisInUse && !onresume)
             {
                 onresume = true;
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
                 _switchMenu();
                 return;
             }
             else if (_AnyVLAxisRaw > 0.2f && !_vAxisInUse && onresume)
             {
                 onresume = false;
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
                 _switchMenu();
                 return;
             }
@@ -520,6 +551,13 @@ public class GameStateManager
             Context._pausePausedText.gameObject.SetActive(false);
             Context._pauseResume.gameObject.SetActive(false);
             Context._pauseQuit.gameObject.SetActive(false);
+            for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+            {
+                int playerindex = _PlayersInformation.ColorIndex[i];
+                int rewiredid = _PlayersInformation.RewiredID[i];
+                PlayerController playercontroller = Context._playersOutestHolder[playerindex].GetComponentInChildren<PlayerController>(true);
+                playercontroller.enabled = true;
+            }
         }
     }
 

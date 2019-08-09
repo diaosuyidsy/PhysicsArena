@@ -31,4 +31,7 @@ public class ConfigData : ScriptableObject
     public float MVPScaleDownDuration = 0.5f;
     public float FrameMoveInDuration = 0.2f;
     public GameObject MVPBadgePrefab;
+    [Header("Misc")]
+    public string FightString = "FIGHT!";
+    public string ReadyString = "READY?";
 }

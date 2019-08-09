@@ -19,7 +19,7 @@ public class Game : MonoBehaviour
         Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
         Services.StatisticsManager = new StatisticsManager();
         Services.TinylyticsManager = new TinylyticsHandler();
-        Services.GameStateManager = new GameStateManager(GameMapData, ConfigData);
+        Services.GameStateManager = new GameStateManager(GameMapData, ConfigData, gameObject);
         switch (GameMapData.GameMapMode)
         {
             case GameMapMode.FoodCartMode:

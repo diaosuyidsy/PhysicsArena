@@ -1399,7 +1399,6 @@ public class Menu : MonoBehaviour
                 {
                     _menuItem.GetComponent<TextMeshProUGUI>().color = Context.MenuData.SelectingFontColor;
                     _finishedEnter = true;
-                    Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BrowseAudioClip);
                 });
         }
 
@@ -1423,7 +1422,10 @@ public class Menu : MonoBehaviour
         {
             base.Update();
             if (_VLAxisRaw > 0.2f && !_vAxisInUse && _finishedEnter)
+            {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BrowseAudioClip);
                 TransitionTo<FirstMenuSettingState>();
+            }
             if (_ADown)
             {
                 TransitionTo<FirstMenuToModeMenuTransition>();
@@ -1446,11 +1448,13 @@ public class Menu : MonoBehaviour
             base.Update();
             if (_VLAxisRaw > 0.2f && !_vAxisInUse && _finishedEnter)
             {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BrowseAudioClip);
                 TransitionTo<FirstMenuQuitState>();
                 return;
             }
             if (_VLAxisRaw < -0.2f && !_vAxisInUse && _finishedEnter)
             {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BrowseAudioClip);
                 TransitionTo<FirstMenuPlayState>();
                 return;
             }
@@ -1471,6 +1475,7 @@ public class Menu : MonoBehaviour
             base.Update();
             if (_VLAxisRaw < -0.2f && !_vAxisInUse && _finishedEnter)
             {
+                Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.BrowseAudioClip);
                 TransitionTo<FirstMenuSettingState>();
                 return;
             }

@@ -1,25 +1,36 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class BrawlModeObjectiveManager : ObjectiveManager
 {
     private int _team1Score;
     private int _team2Score;
-    private int _team1FoodCount;
-    private int _team2FoodCount;
     private int winner { get { return _team1Score > _team2Score ? 1 : 2; } }
-
-    public BrawlModeObjectiveManager()
+    private float _timer;
+    private BrawlModeData _brawlModeData;
+    private TextMeshProUGUI _team1ScoreText;
+    private TextMeshProUGUI _team2ScoreText;
+    public BrawlModeObjectiveManager(BrawlModeData _bmd) : base()
     {
+        _brawlModeData = _bmd;
+        _timer = _brawlModeData.TotalTime;
         EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelivered);
+        _team1ScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
+        _team2ScoreText = GameUI.Find("Team2Score").GetComponent<TextMeshProUGUI>();
     }
 
     public override void Destroy()
     {
         EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelivered);
+    }
+
+    public override void Update()
+    {
+        _timer -= Time.deltaTime * _brawlModeData.TimeSpeed;
     }
 
     // 杀人，自杀
@@ -51,20 +62,19 @@ public class BrawlModeObjectiveManager : ObjectiveManager
         if (ev.FoodTag.Contains("1"))
         {
             _team1Score += 10;
-            _team1FoodCount++;
+            _timer -= _brawlModeData.FoodReduceTime;
         }
         else
         {
             _team2Score += 10;
-            _team2FoodCount++;
+            _timer -= _brawlModeData.FoodReduceTime;
         }
         _refreshScore();
-        if (_team1FoodCount == 2 || _team2FoodCount == 2)
-            EventManager.Instance.TriggerEvent(new GameEnd(winner, ev.Food.transform, GameWinType.ScoreWin));
     }
 
     private void _refreshScore()
     {
-
+        _team1ScoreText.text = _team1Score.ToString();
+        _team2ScoreText.text = _team2Score.ToString();
     }
 }

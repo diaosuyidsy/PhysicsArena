@@ -9,6 +9,7 @@ public class Game : MonoBehaviour
     public ConfigData ConfigData;
     public WeaponData WeaponData;
     public GameFeelData GameFeelData;
+    public BrawlModeData BrawlModeData;
     public GameMapData GameMapData;
 
     private void Awake()
@@ -27,7 +28,7 @@ public class Game : MonoBehaviour
                 Services.GameObjectiveManager = new FoodModeObjectiveManager();
                 break;
             case GameMapMode.BrawlMode:
-                Services.GameObjectiveManager = new BrawlModeObjectiveManager();
+                Services.GameObjectiveManager = new BrawlModeObjectiveManager(BrawlModeData);
                 break;
             default:
                 Services.GameObjectiveManager = new EmptyObjectiveManager();

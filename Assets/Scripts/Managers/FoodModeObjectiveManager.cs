@@ -8,7 +8,7 @@ public class FoodModeObjectiveManager : ObjectiveManager
     private int Team2Score;
     private int _correctFoodPickedUp;
 
-    public FoodModeObjectiveManager()
+    public FoodModeObjectiveManager() : base()
     {
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelivered);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onFoodPickedUp);

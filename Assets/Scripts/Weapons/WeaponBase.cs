@@ -16,6 +16,7 @@ public abstract class WeaponBase : MonoBehaviour
     protected virtual void Awake()
     {
         _gpc = GetComponent<GunPositionControl>();
+        if (gameObject.GetComponent<rtBirdFood>() != null) _dropped = true;
     }
 
     /// <summary>

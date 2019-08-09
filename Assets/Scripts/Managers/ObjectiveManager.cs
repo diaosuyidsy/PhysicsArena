@@ -4,5 +4,6 @@ using UnityEngine;
 
 public abstract class ObjectiveManager
 {
-	public virtual void Destroy() { }
+    public virtual void Destroy() { }
+    public virtual void Update() { }
 }

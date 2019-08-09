@@ -18,6 +18,57 @@ MonoBehaviour:
   BackfireHitForce: 150
   MaxFlyDistance: 5
   ReloadTime: 1
+  ReloadEase:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.80168515
+      value: 0.92122006
+      inSlope: -0.025260985
+      outSlope: -0.025260985
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.44868144
+    - serializedVersion: 3
+      time: 0.952489
+      value: 0.9444621
+      inSlope: 0.6253021
+      outSlope: 0.6253021
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 1
+    - serializedVersion: 3
+      time: 0.9844555
+      value: 1.2081249
+      inSlope: 0.008102306
+      outSlope: 0.008102306
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   FistReboundY: 4
   FistReboundForce: 1
   FistHitScanRadius: 0.15

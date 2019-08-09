@@ -590,6 +590,8 @@ public class GameStateManager
         {
             base.OnEnter();
             Context._cam.GetComponent<AudioSource>().Play();
+            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
+            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
         }
     }
 

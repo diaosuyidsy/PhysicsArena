@@ -8,6 +8,7 @@ public class HookControl : MonoBehaviour
     public bool CanHook = false;
     private rtHook _rth;
     private GunPositionControl _gpc;
+    private bool _hitGround;
 
     private void Awake()
     {

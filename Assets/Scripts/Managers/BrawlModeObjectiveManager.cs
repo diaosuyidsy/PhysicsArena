@@ -12,14 +12,16 @@ public class BrawlModeObjectiveManager : ObjectiveManager
     private BrawlModeData _brawlModeData;
     private TextMeshProUGUI _team1ScoreText;
     private TextMeshProUGUI _team2ScoreText;
+    private TextMeshProUGUI _timerText;
     public BrawlModeObjectiveManager(BrawlModeData _bmd) : base()
     {
         _brawlModeData = _bmd;
         _timer = _brawlModeData.TotalTime;
         EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelivered);
-        _team1ScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
-        _team2ScoreText = GameUI.Find("Team2Score").GetComponent<TextMeshProUGUI>();
+        // _team1ScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
+        // _team2ScoreText = GameUI.Find("Team2Score").GetComponent<TextMeshProUGUI>();
+        // _timerText = GameUI.Find("TimerText").GetComponent<TextMeshProUGUI>();
     }
 
     public override void Destroy()
@@ -30,7 +32,14 @@ public class BrawlModeObjectiveManager : ObjectiveManager
 
     public override void Update()
     {
-        _timer -= Time.deltaTime * _brawlModeData.TimeSpeed;
+        // _timer -= Time.deltaTime * _brawlModeData.TimeSpeed;
+        // _timerText.text = _timerToMinute();
+    }
+
+    private string _timerToMinute()
+    {
+
+        return "0:00";
     }
 
     // 杀人，自杀
@@ -74,7 +83,7 @@ public class BrawlModeObjectiveManager : ObjectiveManager
 
     private void _refreshScore()
     {
-        _team1ScoreText.text = _team1Score.ToString();
-        _team2ScoreText.text = _team2Score.ToString();
+        // _team1ScoreText.text = _team1Score.ToString();
+        // _team2ScoreText.text = _team2Score.ToString();
     }
 }

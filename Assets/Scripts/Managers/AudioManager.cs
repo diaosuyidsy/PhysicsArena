@@ -29,6 +29,7 @@ public class AudioManager
             objas.PlayOneShot(clip, volume);
         else
         {
+            objas.Stop();
             objas.clip = clip;
             objas.Play();
         }

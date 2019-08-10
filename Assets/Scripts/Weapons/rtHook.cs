@@ -187,8 +187,8 @@ public class rtHook : WeaponBase
     {
         if (hit.GetComponent<PlayerController>().CanBlock(-_hook.transform.right))
         {
-            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, _hook));
             GameObject hookDup = Instantiate(_hook, _hook.transform.position, _hook.transform.rotation);
+            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, hookDup));
             Destroy(hookDup, WeaponDataStore.HookGunDataStore.HookBlockReloadTime);
             _hook.transform.parent = transform;
             _hook.transform.localPosition = _hookinitlocalPos;

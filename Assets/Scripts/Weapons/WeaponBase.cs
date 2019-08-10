@@ -69,6 +69,7 @@ public abstract class WeaponBase : MonoBehaviour
     {
         if (other.CompareTag("DeathZone"))
         {
+            _dropped = false;
             _onWeaponDespawn();
         }
     }

@@ -29,6 +29,22 @@ public class CarPathOriginal : MonoBehaviour
     private float _barLength;
     private Transform _startPoint;
     private float _wholeTeamLength;
+    private CanvasScaler _canvasScaler;
+    private Vector2 _screenScale
+    {
+        get
+        {
+            return new Vector2(_canvasScaler.referenceResolution.x / Screen.width, _canvasScaler.referenceResolution.y / Screen.height);
+        }
+    }
+
+    private float _screenCanvasRation
+    {
+        get
+        {
+            return Screen.width / _canvasScaler.referenceResolution.x;
+        }
+    }
 
     private void Start()
     {
@@ -42,10 +58,11 @@ public class CarPathOriginal : MonoBehaviour
         _gameUI = GameObject.Find("GameUI").transform;
         _cart = _gameUI.Find("Cart");
         _bar = _gameUI.Find("Bar");
-        _barLength = _bar.GetComponent<RectTransform>().rect.width - 100f;
+        _barLength = _bar.GetComponent<RectTransform>().rect.width;
         _startPoint = WaypointsHolder.Find("Start");
         int startPointIndex = _startPoint.GetSiblingIndex();
         _wholeTeamLength = Vector3.Distance(WaypointsHolder.GetChild(1).position, WaypointsHolder.GetChild(WaypointsHolder.childCount - 2).position);
+        _canvasScaler = _gameUI.GetComponent<CanvasScaler>();
     }
 
     private void Update()
@@ -64,7 +81,9 @@ public class CarPathOriginal : MonoBehaviour
             EventManager.Instance.TriggerEvent(new GameEnd(winner, transform, GameWinType.CartWin));
             return;
         }
-        _cart.position = _bar.position - new Vector3(_barLength / 2f - _barLength * Vector3.Distance(transform.position, WaypointsHolder.GetChild(1).position) / _wholeTeamLength, 0f);
+        Vector3 newCartPos = _bar.position - new Vector3((_barLength / 2f - _barLength * Vector3.Distance(transform.position, WaypointsHolder.GetChild(1).position) / _wholeTeamLength) * _screenCanvasRation, 0f);
+        // newCartPos.x *= _screenCanvasRation;
+        _cart.position = newCartPos;
         // When the car gets to Team 1's home, it stops and print out "Team 1 wins."
         if (current == target.Length - 1)
         {

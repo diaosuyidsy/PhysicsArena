@@ -50,6 +50,7 @@ public class GameStateManager
     private Transform _MVPPlayerHolder;
     private Transform _MVPSpotLight;
     private Transform _MVPPodium;
+    private Transform _gameUI;
     private int _winner;
     private GameObject _gameManager;
 
@@ -59,6 +60,7 @@ public class GameStateManager
         _gameManager = _gm;
         _configData = _cfd;
         _gameStateFSM = new FSM<GameStateManager>(this);
+        _gameUI = GameObject.Find("GameUI").transform;
         _gameEndCanvas = GameObject.Find("GameEndCanvas").transform;
         _gameEndBlackbackground = _gameEndCanvas.Find("EndImageBackground").gameObject;
         _gameEndTitleText = _gameEndCanvas.Find("TitleText");
@@ -591,6 +593,12 @@ public class GameStateManager
             base.OnEnter();
             int numOfPlayers = _PlayersInformation.ColorIndex.Length;
             Sequence seq = DOTween.Sequence();
+            Sequence uiseq = DOTween.Sequence();
+            for (int i = 0; i < Context._gameUI.childCount; i++)
+            {
+                int x = i;
+                uiseq.Append(Context._gameUI.GetChild(x).DOScale(Vector3.one, 0.2f).SetEase(Ease.OutBack));
+            }
             //_cam.transform.DOLocalMove(_GameMapData.CameraMoveToPosition, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
             _cam.DOFieldOfView(_GameMapData.CameraTargetFOV, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
             int chickenPosIndex = 0;

@@ -147,7 +147,9 @@ public class GameStateManager
     {
         if (_gameStateFSM.CurrentState.GetType().Equals(typeof(GameLoop)))
         {
-            _endFocusPosition = ge.WinnedObjective.position;
+            if (ge.WinnedObjective != null)
+                _endFocusPosition = ge.WinnedObjective.position;
+            else _endFocusPosition = ge.WinnedPosition;
             _winner = ge.Winner;
             _gameStateFSM.TransitionTo<WinState>();
             return;

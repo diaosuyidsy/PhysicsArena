@@ -232,6 +232,7 @@ public class rtHook : WeaponBase
         _hook.transform.localScale = _hookinitlocalScale;
         _hook.transform.localEulerAngles = Vector3.zero;
         _hook.transform.localPosition = _hookinitlocalPos;
+        _hook.gameObject.SetActive(true);
         _ammo = WeaponDataStore.HookGunDataStore.MaxHookTimes;
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         // Need to set hooked's rigidbody back

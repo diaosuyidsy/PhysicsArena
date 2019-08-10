@@ -13,12 +13,20 @@ public class GameEnd : GameEvent
 {
     public int Winner;
     public Transform WinnedObjective;
+    public Vector3 WinnedPosition;
     public GameWinType GameWinType;
 
     public GameEnd(int winner, Transform winnedObjective, GameWinType gameWinType)
     {
         Winner = winner;
         WinnedObjective = winnedObjective;
+        GameWinType = gameWinType;
+    }
+
+    public GameEnd(int winner, Vector3 winnedPos, GameWinType gameWinType)
+    {
+        Winner = winner;
+        WinnedPosition = winnedPos;
         GameWinType = gameWinType;
     }
 }

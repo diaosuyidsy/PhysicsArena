@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CarPathOriginal : MonoBehaviour
 {
@@ -22,6 +23,13 @@ public class CarPathOriginal : MonoBehaviour
 
     private int team1Tracker = 0;
     private int team2Tracker = 0;
+    private Transform _gameUI;
+    private Transform _cart;
+    private Transform _bar;
+    private float _barLength;
+    private Transform _startPoint;
+    private float _Team1Length;
+    private float _Team2Length;
 
     private void Start()
     {
@@ -31,6 +39,20 @@ public class CarPathOriginal : MonoBehaviour
         for (int i = 0; i < WaypointsHolder.childCount; i++)
         {
             target[i] = WaypointsHolder.GetChild(i);
+        }
+        _gameUI = GameObject.Find("GameUI").transform;
+        _cart = _gameUI.Find("Cart");
+        _bar = _gameUI.Find("Bar");
+        _barLength = _bar.GetComponent<RectTransform>().rect.width / 2f + 10f;
+        _startPoint = WaypointsHolder.Find("Start");
+        int startPointIndex = _startPoint.GetSiblingIndex();
+        for (int i = 1; i <= startPointIndex; i++)
+        {
+            _Team1Length += Vector3.Distance(WaypointsHolder.GetChild(i).position, WaypointsHolder.GetChild(i + 1).position);
+        }
+        for (int i = startPointIndex; i < WaypointsHolder.childCount - 1; i++)
+        {
+            _Team2Length += Vector3.Distance(WaypointsHolder.GetChild(i).position, WaypointsHolder.GetChild(i + 1).position);
         }
     }
 
@@ -89,6 +111,7 @@ public class CarPathOriginal : MonoBehaviour
                 dir = 1;
                 // Move car toward target location.
                 Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
+                _cart.transform.position += new Vector3(speed * Time.deltaTime * _barLength / _Team1Length, 0f, 0f);
                 transform.position = pos;
                 smoothRotation(target[current].transform, false);
             }
@@ -119,6 +142,7 @@ public class CarPathOriginal : MonoBehaviour
 
                 dir = 2;
                 // Move car toward target location.
+                _cart.transform.position -= new Vector3(speed * Time.deltaTime * _barLength / _Team2Length, 0f, 0f);
                 Vector3 pos = Vector3.MoveTowards(transform.position, target[current].position, speed * Time.deltaTime);
                 transform.position = pos;
                 smoothRotation(target[current].transform, true);

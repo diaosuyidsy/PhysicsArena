@@ -1,18 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class FoodModeObjectiveManager : ObjectiveManager
 {
     private int Team1Score;
     private int Team2Score;
     private int _correctFoodPickedUp;
-
+    private Transform _foodFull;
+    private Transform _cart;
     public FoodModeObjectiveManager() : base()
     {
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelivered);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onFoodPickedUp);
         EventManager.Instance.AddHandler<ObjectDropped>(_onFoodDropped);
+        _foodFull = GameUI.Find("FoodFull");
+        _cart = GameUI.Find("Cart");
     }
 
     public override void Destroy()
@@ -62,6 +66,7 @@ public class FoodModeObjectiveManager : ObjectiveManager
         if (fd.FoodTag == "Team1Resource")
         {
             Team1Score++;
+            _foodFull.GetChild(Team1Score - 1).DOScale(1f, 0.2f).SetEase(Ease.OutBack);
             if (Team1Score >= 2)
             {
                 EventManager.Instance.TriggerEvent(new GameEnd(1, fd.Food.transform, GameWinType.FoodWin));
@@ -70,6 +75,7 @@ public class FoodModeObjectiveManager : ObjectiveManager
         else
         {
             Team2Score++;
+            _foodFull.GetChild(Team2Score + 1).DOScale(1f, 0.2f).SetEase(Ease.OutBack);
             if (Team2Score >= 2)
             {
                 EventManager.Instance.TriggerEvent(new GameEnd(2, fd.Food.transform, GameWinType.FoodWin));

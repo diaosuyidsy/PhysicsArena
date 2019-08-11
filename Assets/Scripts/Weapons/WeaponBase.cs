@@ -74,7 +74,8 @@ public abstract class WeaponBase : MonoBehaviour
             _onWeaponDespawn();
             return;
         }
-        if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | 1 << other.gameObject.layer))
+        if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | 1 << other.gameObject.layer)
+        && _gpc.Owner == null)
         {
             _onWeaponDespawn();
         }

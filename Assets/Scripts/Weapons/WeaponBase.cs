@@ -42,7 +42,7 @@ public abstract class WeaponBase : MonoBehaviour
         }
     }
 
-    protected void OnCollisionEnter(Collision other)
+    protected virtual void OnCollisionEnter(Collision other)
     {
         if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | 1 << other.gameObject.layer))
         {

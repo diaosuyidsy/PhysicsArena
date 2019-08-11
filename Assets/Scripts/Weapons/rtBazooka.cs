@@ -154,6 +154,12 @@ public class rtBazooka : WeaponBase
         }
     }
 
+    protected override void OnCollisionEnter(Collision other)
+    {
+        if (_bazookaState == BazookaStates.Out) return;
+        base.OnCollisionEnter(other);
+    }
+
     protected override void _onWeaponDespawn()
     {
         _gpc.FollowHand = true;
@@ -166,6 +172,7 @@ public class rtBazooka : WeaponBase
         transform.GetComponent<Rigidbody>().isKinematic = false;
         _gpc.CanBePickedUp = true;
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+        _dropped = false;
         gameObject.SetActive(false);
     }
 

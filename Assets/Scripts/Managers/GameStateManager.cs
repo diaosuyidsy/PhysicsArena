@@ -119,7 +119,7 @@ public class GameStateManager
             if (PlayersInformation.RewiredID[i] == rewiredID) return PlayersInformation.ColorIndex[i];
         }
         Debug.LogError("Rewired ID: " + rewiredID + " Related Color Index not Found");
-        return -1;
+        return PlayersInformation.ColorIndex[0];
     }
 
     public int GetRewiredIDFromColorIndex(int colorindex)
@@ -415,7 +415,22 @@ public class GameStateManager
             get
             {
                 if (Context._winner == 1) return "CHICKENS WIN";
-                else return "DUCKS WIN";
+                else if (Context._winner == 2) return "DUCKS WIN";
+                else return "DRAW";
+            }
+        }
+        private Color _virtoryTeamColor
+        {
+            get
+            {
+                if (Context._winner == 1 || Context._winner == 2)
+                {
+                    return Services.Config.ConfigData.TeamColor[Context._winner - 1];
+                }
+                else
+                {
+                    return Color.white;
+                }
             }
         }
         public override void OnEnter()
@@ -429,7 +444,7 @@ public class GameStateManager
             float middlelength = maxlength * _GameMapData.DarkCornerMiddlePercentage;
             float finallength = maxlength * _GameMapData.DarkCornerFinalPercentage;
             Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text = _victoryTeam;
-            Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().color = Services.Config.ConfigData.TeamColor[Context._winner - 1];
+            Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().color = _virtoryTeamColor;
             Sequence seq = DOTween.Sequence();
             seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, middlelength, _GameMapData.DarkCornerToMiddleDuration));
             seq.Join(Context._gameEndTitleText.DOScale(1f, _GameMapData.TitleTextInDuration).SetEase(_GameMapData.TitleTextInCurve).

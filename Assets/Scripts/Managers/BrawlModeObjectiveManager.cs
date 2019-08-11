@@ -8,7 +8,14 @@ public class BrawlModeObjectiveManager : ObjectiveManager
 {
     private int _team1Score;
     private int _team2Score;
-    private int winner { get { return _team1Score > _team2Score ? 1 : 2; } }
+    private int winner
+    {
+        get
+        {
+            if (_team1Score == _team2Score) return 0;
+            return _team1Score > _team2Score ? 1 : 2;
+        }
+    }
     private int _timer;
     private BrawlModeData _brawlModeData;
     private TextMeshProUGUI _team1ScoreText;

@@ -25,12 +25,27 @@ public class rtBirdFood : WeaponBase
     {
     }
 
+    protected override void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("DeathZone"))
+        {
+            _dropped = false;
+            _onWeaponDespawn();
+            return;
+        }
+        if (other.tag.Contains("Collector"))
+        {
+            if ((other.GetComponent<ResourceCollector>().Team == TeamNum.Team1 && tag.Contains("2"))
+             || (other.GetComponent<ResourceCollector>().Team == TeamNum.Team2 && tag.Contains("1"))) _onWeaponDespawn();
+        }
+    }
+
     protected override void _onWeaponDespawn()
     {
+        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+
         _originalPosition.y += 1f;
         transform.position = _originalPosition;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
-
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
     }
 }

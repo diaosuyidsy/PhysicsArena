@@ -7,21 +7,14 @@ public class ResourceCollector : MonoBehaviour
 {
     public TeamNum Team;
     public GameObject BasketModel;
-    private Transform[] SpawnPoints;
 
     //private int TeamTracker;
-    private int TeamResourceSpawnIndex;
     private int _resourcePickedUp;
     private Tweener _lightTween;
 
     private void Awake()
     {
         Transform temp = transform.parent.Find("RespawnPoints");
-        SpawnPoints = new Transform[temp.childCount];
-        for (int i = 0; i < temp.childCount; i++)
-        {
-            SpawnPoints[i] = temp.GetChild(i);
-        }
     }
 
     private void _onObjectPickedUp(ObjectPickedUp ev)
@@ -74,12 +67,6 @@ public class ResourceCollector : MonoBehaviour
                 EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team1Resource", other.GetComponent<rtBirdFood>().LastHolder));
 
             }
-            else if (other.CompareTag("Team2Resource"))
-            {
-                EventManager.Instance.TriggerEvent(new ObjectDespawned(other.gameObject, gameObject));
-                TeamResourceSpawnIndex = (TeamResourceSpawnIndex + 1) % SpawnPoints.Length;
-                other.transform.position = SpawnPoints[TeamResourceSpawnIndex].transform.position;
-            }
         }
         else
         {
@@ -91,12 +78,6 @@ public class ResourceCollector : MonoBehaviour
 
                 EventManager.Instance.TriggerEvent(new FoodDelivered(other.gameObject, "Team2Resource", other.GetComponent<rtBirdFood>().LastHolder));
 
-            }
-            else if (other.CompareTag("Team1Resource"))
-            {
-                EventManager.Instance.TriggerEvent(new ObjectDespawned(other.gameObject, gameObject));
-                TeamResourceSpawnIndex = (TeamResourceSpawnIndex + 1) % SpawnPoints.Length;
-                other.transform.position = SpawnPoints[TeamResourceSpawnIndex].transform.position;
             }
         }
 

@@ -23,6 +23,8 @@ public class GameStateManager
     private Image _holdAImage;
     private TextMeshProUGUI _holdBText;
     private Image _holdBImage;
+    private TextMeshProUGUI _holdYText;
+    private Image _holdYImage;
     private Transform _tutorialImage;
     private Transform _tutorialBackgroundMask;
     private Transform _tutorialObjectiveImages;
@@ -68,6 +70,8 @@ public class GameStateManager
         _holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
         _holdBText = GameObject.Find("HoldCanvas").transform.Find("HoldB").GetComponent<TextMeshProUGUI>();
         _holdBImage = GameObject.Find("HoldCanvas").transform.Find("HoldBImage").GetComponent<Image>();
+        _holdYText = GameObject.Find("HoldCanvas").transform.Find("HoldY").GetComponent<TextMeshProUGUI>();
+        _holdYImage = GameObject.Find("HoldCanvas").transform.Find("HoldYImage").GetComponent<Image>();
         PlayersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
         Debug.Assert(PlayersInformation != null, "Unable to load Players information");
         _playersHolder = GameObject.Find("Players").transform;
@@ -218,6 +222,18 @@ public class GameStateManager
             }
         }
 
+        protected bool _AnyYHolding
+        {
+            get
+            {
+                for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
+                {
+                    if (ReInput.players.GetPlayer(_PlayersInformation.RewiredID[i]).GetButton("Left Trigger")) return true;
+                }
+                return false;
+            }
+        }
+
         protected bool _AnyPauseDown
         {
             get
@@ -362,6 +378,7 @@ public class GameStateManager
             }
             seq.Append(Context._holdAText.DOText("Next Map", 0.2f).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
             seq.Join(Context._holdBText.DOText("Menu", 0.2f).OnPlay(() => Context._holdBText.gameObject.SetActive(true)));
+            seq.Join(Context._holdYText.DOText("Replay", 0.2f).OnPlay(() => Context._holdYText.gameObject.SetActive(true)));
             seq.AppendCallback(() => _canHold = true);
         }
 
@@ -395,6 +412,19 @@ public class GameStateManager
             else
             {
                 Context._holdBImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
+            }
+
+            if (_canHold && _AnyYHolding)
+            {
+                Context._holdYImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
+                if (Context._holdYImage.fillAmount >= 1f)
+                {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                }
+            }
+            else
+            {
+                Context._holdYImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
             }
         }
     }

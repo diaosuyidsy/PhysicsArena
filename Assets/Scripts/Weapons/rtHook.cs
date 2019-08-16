@@ -184,6 +184,12 @@ public class rtHook : WeaponBase
         }
     }
 
+    public override void OnDrop()
+    {
+        base.OnDrop();
+        Hooked = null;
+    }
+
     public void HookOnHit(GameObject hit)
     {
         if (hit.GetComponent<PlayerController>().CanBlock(-_hook.transform.right))

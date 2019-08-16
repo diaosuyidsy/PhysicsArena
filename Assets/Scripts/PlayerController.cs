@@ -17,7 +17,6 @@ public class PlayerController : MonoBehaviour
     public GameObject[] RightArms;
     public GameObject LeftHand;
     public GameObject RightHand;
-    public GameObject TurnReference;
     public GameObject[] OnDeathHidden;
 
     public int PlayerNumber;
@@ -706,11 +705,8 @@ public class PlayerController : MonoBehaviour
             else
                 Context._rb.AddForce(velocityChange * _charMovData.InAirSpeedMultiplier, ForceMode.VelocityChange);
 
-            Transform target = Context.TurnReference.transform.GetChild(0);
-            Vector3 relativePos = target.position - Context.transform.position;
-
-            Context.TurnReference.transform.eulerAngles = new Vector3(Context.transform.eulerAngles.x, Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.eulerAngles.z);
-            Quaternion rotation = Quaternion.LookRotation(relativePos, Vector3.up);
+            Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
+            Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
             Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
             Context.transform.rotation = tr;
         }

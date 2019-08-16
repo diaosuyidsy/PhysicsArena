@@ -302,7 +302,6 @@ GameObject:
   - component: {fileID: 5281137272729510722}
   - component: {fileID: 5297886565798645408}
   - component: {fileID: 5306111736495464174}
-  - component: {fileID: 5247264077065694068}
   - component: {fileID: 5247012718293897220}
   - component: {fileID: 5253686775236426442}
   m_Layer: 20
@@ -359,25 +358,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.27283573, y: 0.20851117, z: 0.21773529}
   m_Center: {x: -0.0048909187, y: 0.005347997, z: 0.0065193176}
---- !u!114 &5247264077065694068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5280293990200061506}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8736a190d38e4d6c80799fbd3bcafe6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Owner: {fileID: 0}
-  DownAngle: 0
-  FaceAngleOffset: 90
-  XOffset: 0
-  VerticalOffset: 0.087
-  CanBePickedUp: 1
-  FollowHand: 1
 --- !u!114 &5247012718293897220
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,6 +371,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WeaponDataStore: {fileID: 11400000, guid: e7c515a3e28814c41a3446a425a78bd8, type: 2}
+  WeaponDataBase: {fileID: 11400000, guid: 3574381f45f1b6847906a977b347216e, type: 2}
   Hooked: {fileID: 0}
   HookCanBend: 1
   CanCarryBack: 1

@@ -912,7 +912,6 @@ GameObject:
   - component: {fileID: 5434409871874317643}
   - component: {fileID: 5434412233470835629}
   - component: {fileID: 5353314698796546151}
-  - component: {fileID: 5413116872991844409}
   - component: {fileID: 5413132943175575745}
   m_Layer: 20
   m_Name: WaterGunGood
@@ -1005,25 +1004,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &5413116872991844409
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5372403526962513977}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8736a190d38e4d6c80799fbd3bcafe6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Owner: {fileID: 0}
-  DownAngle: 0
-  FaceAngleOffset: 90
-  XOffset: 0
-  VerticalOffset: 0.087
-  CanBePickedUp: 1
-  FollowHand: 1
 --- !u!114 &5413132943175575745
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1037,6 +1017,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WeaponDataStore: {fileID: 11400000, guid: e7c515a3e28814c41a3446a425a78bd8, type: 2}
+  WeaponDataBase: {fileID: 11400000, guid: 14ab812a9932c064687aaa5e03d0b845, type: 2}
   WaterBall: {fileID: 5412471293102263891}
   ParticleRenderer: {fileID: 5412450361053340163}
   WaterUI: {fileID: 5371108102030370879}

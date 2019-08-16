@@ -32,8 +32,9 @@ public class rtFist : WeaponBase
     }
 
     // Update is called once per frame
-    void Update()
+    protected override void Update()
     {
+        base.Update();
         if (_fistGunState == FistGunState.Out)
         {
             Vector3 nextPos = (_maxDistance - _fistDup.transform.position).normalized;
@@ -46,19 +47,19 @@ public class rtFist : WeaponBase
                 if (pc != null && !pc.CanBlock(-_fistDup.transform.right))
                 {
                     pc.OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner, ImpactType.FistGun);
-                    EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, _gpc.Owner, pc.gameObject, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, pc.PlayerNumber));
+                    EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, Owner, pc.gameObject, Owner.GetComponent<PlayerController>().PlayerNumber, pc.PlayerNumber));
                 }
                 else if (pc != null)
                 {
                     _maxDistance = pc.transform.position + pc.transform.forward * WeaponDataStore.FistGunDataStore.MaxFlyDistance;
                     _fireOwner = pc.gameObject;
                     _fistDup.transform.rotation = Quaternion.LookRotation(pc.transform.right, _fistDup.transform.up);
-                    EventManager.Instance.TriggerEvent(new FistGunBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup, pc.gameObject, pc.PlayerNumber));
+                    EventManager.Instance.TriggerEvent(new FistGunBlocked(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup, pc.gameObject, pc.PlayerNumber));
                     return;
                 }
                 else if (pc == null)
                 {
-                    EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, _gpc.Owner, hit.collider.gameObject, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, -1));
+                    EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, Owner, hit.collider.gameObject, Owner.GetComponent<PlayerController>().PlayerNumber, -1));
                 }
                 _switchToRecharge();
                 return;
@@ -78,7 +79,7 @@ public class rtFist : WeaponBase
             else
             {
                 // Charged
-                EventManager.Instance.TriggerEvent(new FistGunCharged(gameObject, _gpc.Owner, _fistDup.transform.position));
+                EventManager.Instance.TriggerEvent(new FistGunCharged(gameObject, Owner, _fistDup.transform.position));
                 Destroy(_fistDup);
                 _fistDup = null;
                 _fist.gameObject.SetActive(true);
@@ -94,7 +95,7 @@ public class rtFist : WeaponBase
         {
             if (_fistGunState == FistGunState.Idle)
             {
-                _fireOwner = _gpc.Owner;
+                _fireOwner = Owner;
                 _maxDistance = transform.position + -transform.right * WeaponDataStore.FistGunDataStore.MaxFlyDistance;
                 _fistDup = Instantiate(_fist.gameObject, transform);
                 _fistDup.transform.position = _fist.position;
@@ -102,8 +103,8 @@ public class rtFist : WeaponBase
                 _fistDup.GetComponent<Collider>().isTrigger = false;
                 _fist.gameObject.SetActive(false);
                 /// Add Backfire force to player as well
-                _gpc.Owner.GetComponent<Rigidbody>().AddForce(transform.right * WeaponDataStore.FistGunDataStore.BackfireHitForce, ForceMode.VelocityChange);
-                EventManager.Instance.TriggerEvent(new FistGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup));
+                Owner.GetComponent<Rigidbody>().AddForce(transform.right * WeaponDataStore.FistGunDataStore.BackfireHitForce, ForceMode.VelocityChange);
+                EventManager.Instance.TriggerEvent(new FistGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup));
                 _fistGunState = FistGunState.Out;
             }
         }

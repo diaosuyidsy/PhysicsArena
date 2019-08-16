@@ -4,7 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 
 [CreateAssetMenu(fileName = "FistGunData", menuName = "ScriptableObjects/Weapon/FistGun", order = 1)]
-public class FistGunData : ScriptableObject
+public class FistGunData : WeaponDataBase
 {
     public float FistSpeed = 12f;
     public int MaxAmmo = 15;

@@ -9,14 +9,12 @@ public class SuckBallController : MonoBehaviour
 
     public GameObject RTText;
 
-    private GunPositionControl _gpc;
     private rtSuck _rts;
     private string _opponentTeamTag = "";
     private int _tutorialTimes = 6;
 
     private void Awake()
     {
-        _gpc = GetComponentInParent<GunPositionControl>();
         _rts = GetComponentInParent<rtSuck>();
         InRangePlayers = new List<GameObject>();
     }

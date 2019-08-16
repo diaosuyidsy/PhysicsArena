@@ -31,8 +31,9 @@ public class rtSuck : WeaponBase
 
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         if (_ballState == State.Out)
         {
             _suckBall.transform.position += Time.deltaTime * -1f * _suckBall.transform.right * WeaponDataStore.SuckGunDataStore.BallTravelSpeed;
@@ -66,7 +67,7 @@ public class rtSuck : WeaponBase
                     _suckBall.SetActive(true);
                     _suckBall.transform.parent = null;
                     _charged = false;
-                    EventManager.Instance.TriggerEvent(new SuckGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
+                    EventManager.Instance.TriggerEvent(new SuckGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
                     break;
                 case State.Out:
                     if (_charged)
@@ -92,7 +93,7 @@ public class rtSuck : WeaponBase
     IEnumerator sucking(float time)
     {
         List<GameObject> gos = _sbc.InRangePlayers;
-        EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber,
+        EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerController>().PlayerNumber,
             gos));
         // First prototype: let's try adding a force to every object
         yield return new WaitForSeconds(time);
@@ -100,7 +101,7 @@ public class rtSuck : WeaponBase
         foreach (GameObject go in gos)
         {
             Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * WeaponDataStore.SuckGunDataStore.SuckStrength;
-            go.GetComponent<PlayerController>().OnImpact(force, ForceMode.Impulse, _gpc.Owner, ImpactType.SuckGun);
+            go.GetComponent<PlayerController>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
         }
         yield return new WaitForSeconds(0.3f);
         ////Second prototype

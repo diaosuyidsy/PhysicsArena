@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "WaterGunData", menuName = "ScriptableObjects/Weapon/WaterGun", order = 1)]
-public class WaterGunData : ScriptableObject
+public class WaterGunData : WeaponDataBase
 {
     public float Speed;
     public float BackFireThrust;

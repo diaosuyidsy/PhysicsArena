@@ -134,7 +134,6 @@ GameObject:
   - component: {fileID: 2747658201903773672}
   - component: {fileID: 2747658201903773675}
   - component: {fileID: 2747658201903773673}
-  - component: {fileID: 2747658201903773678}
   - component: {fileID: 2747658201903773679}
   m_Layer: 20
   m_Name: Fist_Gun
@@ -202,25 +201,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &2747658201903773678
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2747658201903773669}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8736a190d38e4d6c80799fbd3bcafe6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Owner: {fileID: 0}
-  DownAngle: 0
-  FaceAngleOffset: 90
-  XOffset: 0
-  VerticalOffset: 0.08
-  CanBePickedUp: 1
-  FollowHand: 1
 --- !u!114 &2747658201903773679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -234,6 +214,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WeaponDataStore: {fileID: 11400000, guid: e7c515a3e28814c41a3446a425a78bd8, type: 2}
+  WeaponDataBase: {fileID: 11400000, guid: e622188261ba2a947aaed1d15e0f456e, type: 2}
 --- !u!1001 &5779857717497606519
 PrefabInstance:
   m_ObjectHideFlags: 0

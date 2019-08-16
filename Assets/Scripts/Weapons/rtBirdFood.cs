@@ -15,10 +15,7 @@ public class rtBirdFood : WeaponBase
         base.Awake();
         _originalPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
         _ammo = 1;
-    }
-    public void RegisterLastHolder(int playernumber)
-    {
-        LastHolder = playernumber;
+        _hitGroundOnce = true;
     }
 
     public override void Fire(bool buttondown)
@@ -29,7 +26,7 @@ public class rtBirdFood : WeaponBase
     {
         if (other.CompareTag("DeathZone"))
         {
-            _dropped = false;
+            _hitGroundOnce = false;
             _onWeaponDespawn();
             return;
         }
@@ -47,5 +44,11 @@ public class rtBirdFood : WeaponBase
         _originalPosition.y += 1f;
         transform.position = _originalPosition;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
+    }
+
+    public override void OnDrop()
+    {
+        LastHolder = Owner.GetComponent<PlayerController>().PlayerNumber;
+        base.OnDrop();
     }
 }

@@ -93,6 +93,7 @@ public class WeaponGenerationManager
             {
                 _moveWeaponToSpawnArea(weapon);
                 weapon.SetActive(true);
+                weapon.GetComponent<WeaponBase>().OnSpawn();
                 hasInactiveWeapon = true;
                 EventManager.Instance.TriggerEvent(new WeaponSpawned(weapon));
                 break;
@@ -105,6 +106,7 @@ public class WeaponGenerationManager
             if (GameMapData.WeaponsInformation[index].WeaponName.Contains("Water"))
                 Camera.main.GetComponent<Obi.ObiBaseFluidRenderer>().particleRenderers.Add(weapon.GetComponent<rtEmit>().ParticleRenderer);
             _moveWeaponToSpawnArea(weapon);
+            weapon.GetComponent<WeaponBase>().OnSpawn();
             _curWeapons[index].Add(weapon);
             EventManager.Instance.TriggerEvent(new WeaponSpawned(weapon));
         }

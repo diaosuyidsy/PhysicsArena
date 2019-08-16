@@ -2,21 +2,33 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(GunPositionControl))]
 public abstract class WeaponBase : MonoBehaviour
 {
     public WeaponData WeaponDataStore;
+    public WeaponDataBase WeaponDataBase;
     public virtual float HelpAimAngle { get; }
     public virtual float HelpAimDistance { get; }
 
+    public GameObject Owner { get; protected set; }
     protected int _ammo { get; set; }
-    protected GunPositionControl _gpc;
-    protected bool _dropped;
+    protected bool _hitGroundOnce;
+    public bool CanBePickedUp;
+    protected bool _followHand;
 
     protected virtual void Awake()
     {
-        _gpc = GetComponent<GunPositionControl>();
-        if (gameObject.GetComponent<rtBirdFood>() != null) _dropped = true;
+        OnSpawn();
+    }
+
+    protected virtual void Update()
+    {
+        if (Owner != null && _followHand)
+        {
+            Vector3 targetposition = (Owner.GetComponent<PlayerController>().LeftHand.transform.position
+            + Owner.GetComponent<PlayerController>().RightHand.transform.position) / 2f;
+            transform.position = new Vector3(targetposition.x, targetposition.y + WeaponDataBase.YOffset, targetposition.z);
+            transform.eulerAngles = new Vector3(WeaponDataBase.XRotation, Owner.transform.eulerAngles.y + WeaponDataBase.YRotation, WeaponDataBase.ZRotation);
+        }
     }
 
     /// <summary>
@@ -36,9 +48,9 @@ public abstract class WeaponBase : MonoBehaviour
         _ammo--;
         if (_ammo <= 0)
         {
-            _gpc.CanBePickedUp = false;
-            if (_gpc.Owner != null)
-                _gpc.Owner.GetComponent<PlayerController>().ForceDropHandObject();
+            CanBePickedUp = false;
+            if (Owner != null)
+                Owner.GetComponent<PlayerController>().ForceDropHandObject();
         }
     }
 
@@ -54,28 +66,45 @@ public abstract class WeaponBase : MonoBehaviour
         }
         if ((WeaponDataStore.OnNoAmmoDropDisappear == (WeaponDataStore.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
         {
-            if (!_dropped)
+            if (!_hitGroundOnce)
             {
                 EventManager.Instance.TriggerEvent(new ObjectHitGround(gameObject));
-                _dropped = true;
+                _hitGroundOnce = true;
             }
         }
     }
 
-    public void Drop()
+    public virtual void OnSpawn()
     {
-        _dropped = false;
+        CanBePickedUp = true;
+        _followHand = true;
     }
+
+    public virtual void OnDrop()
+    {
+        _hitGroundOnce = false;
+        Owner = null;
+        GetComponent<Rigidbody>().isKinematic = false;
+        gameObject.layer = LayerMask.NameToLayer("Pickup");
+    }
+
+    public virtual void OnPickUp(GameObject owner)
+    {
+        Owner = owner;
+        GetComponent<Rigidbody>().isKinematic = true;
+        gameObject.layer = owner.layer;
+    }
+
     protected virtual void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("DeathZone"))
         {
-            _dropped = false;
+            _hitGroundOnce = false;
             _onWeaponDespawn();
             return;
         }
         if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | 1 << other.gameObject.layer)
-        && _gpc.Owner == null)
+        && Owner == null)
         {
             _onWeaponDespawn();
         }

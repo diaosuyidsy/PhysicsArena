@@ -49,8 +49,9 @@ public class rtHook : WeaponBase
         _lr = GetComponent<LineRenderer>();
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         _lr.SetPosition(0, _hookendpoint.position);
         _lr.SetPosition(1, _hookstartpoint.position);
 
@@ -152,7 +153,7 @@ public class rtHook : WeaponBase
                 _hookmaxPos = new Vector3(_hookmax.transform.position.x, _hookmax.transform.position.y, _hookmax.transform.position.z);
                 // Also need to make hook out of parent
                 _hook.transform.parent = null;
-                EventManager.Instance.TriggerEvent(new HookGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
+                EventManager.Instance.TriggerEvent(new HookGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
             }
         }
         else
@@ -188,7 +189,7 @@ public class rtHook : WeaponBase
         if (hit.GetComponent<PlayerController>().CanBlock(-_hook.transform.right))
         {
             GameObject hookDup = Instantiate(_hook, _hook.transform.position, _hook.transform.rotation);
-            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, hookDup));
+            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, hookDup));
             Destroy(hookDup, WeaponDataStore.HookGunDataStore.HookBlockReloadTime);
             _hook.transform.parent = transform;
             _hook.transform.localPosition = _hookinitlocalPos;
@@ -209,13 +210,13 @@ public class rtHook : WeaponBase
         }
         _hookState = State.OnTarget;
         Hooked = hit;
-        Hooked.GetComponent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner, ImpactType.HookGun);
+        Hooked.GetComponent<PlayerController>().OnImpact(Owner, ImpactType.HookGun);
         foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
         {
             rb.isKinematic = true;
         }
         StartCoroutine(hookhelper(WeaponDataStore.HookGunDataStore.HookedTime));
-        EventManager.Instance.TriggerEvent(new HookHit(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, _hook, hit, hit.GetComponent<PlayerController>().PlayerNumber));
+        EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _hook, hit, hit.GetComponent<PlayerController>().PlayerNumber));
     }
 
     IEnumerator hookhelper(float time)

@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 7308740760496570815}
   - component: {fileID: 7308740760496570812}
   - component: {fileID: 7308740760496570813}
-  - component: {fileID: 7308740760496570803}
   - component: {fileID: 7308740760496570800}
   - component: {fileID: 7308740760496570801}
   m_Layer: 20
@@ -82,25 +81,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
---- !u!114 &7308740760496570803
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7308740760496570814}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8736a190d38e4d6c80799fbd3bcafe6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Owner: {fileID: 0}
-  DownAngle: 0
-  FaceAngleOffset: 0
-  XOffset: -75
-  VerticalOffset: 0.087
-  CanBePickedUp: 1
-  FollowHand: 1
 --- !u!114 &7308740760496570800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -114,6 +94,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WeaponDataStore: {fileID: 11400000, guid: e7c515a3e28814c41a3446a425a78bd8, type: 2}
+  WeaponDataBase: {fileID: 11400000, guid: 5b1299431d225db40a58c53262ee4951, type: 2}
   BazookaTrailVFXHolder: {fileID: 0}
 --- !u!120 &7308740760496570801
 LineRenderer:

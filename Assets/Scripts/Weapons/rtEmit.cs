@@ -28,8 +28,9 @@ public class rtEmit : WeaponBase
         _ammo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         switch (_waterGunState)
         {
             case State.Shooting:
@@ -42,18 +43,6 @@ public class rtEmit : WeaponBase
                 }
                 // Statistics: Here we are using raycast for players hit
                 _detectPlayer();
-                // As long as player are actively spraying, should add that time to the record
-                //_addToSprayTime();
-                // Statistics: End
-                //_ammo--;
-                //if (_ammo <= 0)
-                //{
-                //	_gpc.CanBePickedUp = false;
-                //	// If no ammo left, then drop the weapon
-                //	_gpc.Owner.GetComponent<PlayerController>().DropHelper();
-                //	_shootCD = 0f;
-                //	WaterBall.speed = 0f;
-                //}
                 _onWeaponUsedOnce();
                 // If we changed ammo, then need to change UI as well
                 ChangeAmmoUI();
@@ -71,12 +60,9 @@ public class rtEmit : WeaponBase
             _waterGunState = State.Shooting;
             GunUI.SetActive(true);
             WaterBall.speed = WeaponDataStore.WaterGunDataStore.Speed;
-            if (_gpc != null)
-            {
-                _gpc.Owner.GetComponent<Rigidbody>().AddForce(-_gpc.Owner.transform.forward * WeaponDataStore.WaterGunDataStore.BackFireThrust, ForceMode.Impulse);
-                _gpc.Owner.GetComponent<Rigidbody>().AddForce(_gpc.Owner.transform.up * WeaponDataStore.WaterGunDataStore.UpThrust, ForceMode.Impulse);
-            }
-            EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
+            Owner.GetComponent<Rigidbody>().AddForce(-Owner.transform.forward * WeaponDataStore.WaterGunDataStore.BackFireThrust, ForceMode.Impulse);
+            Owner.GetComponent<Rigidbody>().AddForce(Owner.transform.up * WeaponDataStore.WaterGunDataStore.UpThrust, ForceMode.Impulse);
+            EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
         }
         else
         {
@@ -86,22 +72,15 @@ public class rtEmit : WeaponBase
         }
     }
 
-    //when gun leaves hands, UI disappears.
-    public void KillUI()
-    {
-        GunUI.SetActive(false);
-    }
-
     private void _detectPlayer()
     {
         // This layermask means we are only looking for Player1Body - Player6Body
-        //int layermask = (1 << 9) | (1 << 10) | (1 << 11) | (1 << 12) | (1 << 15) | (1 << 16);
         LayerMask layermask = Services.Config.ConfigData.AllPlayerLayer;
         RaycastHit hit;
         if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
         {
             if (hit.transform.GetComponentInParent<PlayerController>() != null)
-                hit.transform.GetComponentInParent<PlayerController>().OnImpact(GetComponent<GunPositionControl>().Owner, ImpactType.WaterGun);
+                hit.transform.GetComponentInParent<PlayerController>().OnImpact(Owner, ImpactType.WaterGun);
         }
     }
 
@@ -119,5 +98,12 @@ public class rtEmit : WeaponBase
         ChangeAmmoUI();
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         gameObject.SetActive(false);
+    }
+
+    public override void OnDrop()
+    {
+        base.OnDrop();
+        Fire(false);
+        GunUI.SetActive(false);
     }
 }

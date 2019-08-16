@@ -67,15 +67,16 @@ public class rtBazooka : WeaponBase
         _ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
     }
 
-    private void Update()
+    protected override void Update()
     {
+        base.Update();
         if (_bazookaState == BazookaStates.Aiming)
         {
             _aim();
         }
         else if (_bazookaState == BazookaStates.Out)
         {
-            if (_gpc.Owner == null) return;
+            if (Owner == null) return;
             Vector3 movement = new Vector3(_HLAxis, 0f, -_VLAxis) * WeaponDataStore.BazookaDataStore.MarkAirMoveSpeed * Time.deltaTime;
             transform.position += movement;
             Vector3 _throwMarkNewPos = _throwMark.position + movement;
@@ -90,9 +91,9 @@ public class rtBazooka : WeaponBase
             _throwMark.position = _throwMarkNewPos;
             transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
             RaycastHit hit;
-            if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.HitExplodeLayer ^ (1 << _gpc.Owner.layer)))
+            if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.HitExplodeLayer ^ (1 << Owner.layer)))
             {
-                if (hit.collider.gameObject == _gpc.Owner) return;
+                if (hit.collider.gameObject == Owner) return;
                 _bazookaState = BazookaStates.Idle;
                 List<GameObject> affectedPlayers = new List<GameObject>();
                 foreach (PlayerController _pc in Services.GameStateManager.PlayerControllers)
@@ -100,17 +101,17 @@ public class rtBazooka : WeaponBase
                     float dis = Vector3.Distance(_pc.transform.position, transform.position);
                     if (_pc.gameObject.activeInHierarchy &&
                         dis < WeaponDataStore.BazookaDataStore.MaxAffectionRange &&
-                        _pc.gameObject != _gpc.Owner &&
+                        _pc.gameObject != Owner &&
                         !Physics.Linecast(_pc.transform.position, transform.position, WeaponDataStore.BazookaDataStore.CanHideLayer))
                     {
                         affectedPlayers.Add(_pc.gameObject);
                         Vector3 dir = _pc.transform.position - transform.position;
                         dir.y = 0f;
-                        _pc.OnImpact(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse, _gpc.Owner, ImpactType.BazookaGun);
+                        _pc.OnImpact(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
                     }
                 }
-                EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));
-                _gpc.Owner.GetComponent<PlayerController>().OnImpact(new StunEffect(WeaponDataStore.BazookaDataStore.SelfStunTime, 0f));
+                EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));
+                Owner.GetComponent<PlayerController>().OnImpact(new StunEffect(WeaponDataStore.BazookaDataStore.SelfStunTime, 0f));
                 _resetThrowMark();
                 _onWeaponUsedOnce();
             }
@@ -135,7 +136,7 @@ public class rtBazooka : WeaponBase
         if (buttondown && _bazookaState == BazookaStates.Idle)
         {
             _bazookaState = BazookaStates.Aiming;
-            _player = ReInput.players.GetPlayer(_gpc.Owner.GetComponent<PlayerController>().PlayerNumber);
+            _player = ReInput.players.GetPlayer(Owner.GetComponent<PlayerController>().PlayerNumber);
             _throwMark.gameObject.SetActive(true);
             Services.GameStateManager.CameraTargets.Add(_throwMark);
             _shadowThrowMark.gameObject.SetActive(true);
@@ -146,11 +147,11 @@ public class rtBazooka : WeaponBase
         else if (!buttondown && _bazookaState == BazookaStates.Aiming)
         {
             _bazookaState = BazookaStates.Out;
-            EventManager.Instance.TriggerEvent(new BazookaFired(gameObject, _gpc.Owner, _gpc.Owner.GetComponent<PlayerController>().PlayerNumber));
+            EventManager.Instance.TriggerEvent(new BazookaFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
             _lineRenderer.enabled = false;
             transform.GetComponent<Rigidbody>().isKinematic = false;
             transform.GetComponent<Rigidbody>().velocity = _startVelocity;
-            _gpc.FollowHand = false;
+            _followHand = false;
         }
     }
 
@@ -162,7 +163,7 @@ public class rtBazooka : WeaponBase
 
     protected override void _onWeaponDespawn()
     {
-        _gpc.FollowHand = true;
+        _followHand = true;
         if (BazookaTrailVFXHolder != null) BazookaTrailVFXHolder.SetActive(false);
         _bazookaState = BazookaStates.Idle;
         _lineRenderer.enabled = false;
@@ -170,9 +171,8 @@ public class rtBazooka : WeaponBase
         _resetThrowMark();
         _ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
         transform.GetComponent<Rigidbody>().isKinematic = false;
-        _gpc.CanBePickedUp = true;
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-        _dropped = false;
+        _hitGroundOnce = false;
         gameObject.SetActive(false);
     }
 

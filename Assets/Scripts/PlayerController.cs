@@ -292,25 +292,10 @@ public class PlayerController : MonoBehaviour
     {
         if (HandObject == null) return;
         // Drop the thing
-        HandObject.SendMessage("Drop");
+        HandObject.GetComponent<WeaponBase>().OnDrop();
         EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
         // Return the body to normal position
         _resetBodyAnimation();
-        // These two are necessary for all objects
-        HandObject.GetComponent<Rigidbody>().isKinematic = false;
-        HandObject.layer = LayerMask.NameToLayer("Pickup");
-        // Specialized checking
-        if (HandObject.CompareTag("Weapon"))
-        {
-            // Stop the shooting
-            HandObject.GetComponent<WeaponBase>().Fire(false);
-            // Disable the UI
-            HandObject.SendMessage("KillUI");
-        }
-        if (HandObject.CompareTag("Team1Resource") || HandObject.CompareTag("Team2Resource"))
-        {
-            HandObject.SendMessage("RegisterLastHolder", PlayerNumber);
-        }
         // Nullify the holder
         HandObject = null;
     }
@@ -935,16 +920,14 @@ public class PlayerController : MonoBehaviour
                 Context._distToGround,
                 _characterPickUpData.PickUpLayer))
             {
-                if (Context.HandObject == null && hit.collider.GetComponent<GunPositionControl>().CanBePickedUp)
+                if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
                 {
                     EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
                     // Tell other necessary components that it has taken something
                     Context.HandObject = hit.collider.gameObject;
 
                     // Tell the collected weapon who picked it up
-                    hit.collider.GetComponent<GunPositionControl>().Owner = Context.gameObject;
-                    hit.collider.GetComponent<Rigidbody>().isKinematic = true;
-                    hit.collider.gameObject.layer = Context.gameObject.layer;
+                    hit.collider.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
                     TransitionTo<HoldingState>();
                     return;
                 }

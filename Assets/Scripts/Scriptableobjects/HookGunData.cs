@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "HookGunData", menuName = "ScriptableObjects/Weapon/HookGun", order = 1)]
-public class HookGunData : ScriptableObject
+public class HookGunData : WeaponDataBase
 {
     public float HookSpeed = 12f;
     public int MaxHookTimes = 15;

@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour
     [Header("Player Data Section")]
     public CharacterData CharacterDataStore;
     [Header("Player Body Setting Section")]
-    public GameObject LegSwingReference;
     public GameObject Chest;
     public GameObject Head;
     [Tooltip("Index 0 is Arm2, 1 is Arm, 2 is Hand")]
@@ -48,6 +47,7 @@ public class PlayerController : MonoBehaviour
     private ImpactMarker _impactMarker;
     IEnumerator _startSlow;
     private bool _isJumping;
+    private Animator _animator;
 
     private FSM<PlayerController> _movementFSM;
     private FSM<PlayerController> _actionFSM;
@@ -93,6 +93,7 @@ public class PlayerController : MonoBehaviour
         _movementFSM.TransitionTo<IdleState>();
         _actionFSM.TransitionTo<IdleActionState>();
         _impactMarker = new ImpactMarker(null, Time.time, ImpactType.Self);
+        _animator = GetComponent<Animator>();
     }
 
     public void Init(int controllernumber)
@@ -295,7 +296,7 @@ public class PlayerController : MonoBehaviour
         HandObject.GetComponent<WeaponBase>().OnDrop();
         EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
         // Return the body to normal position
-        _resetBodyAnimation();
+        // _resetBodyAnimation();
         // Nullify the holder
         HandObject = null;
     }
@@ -340,274 +341,6 @@ public class PlayerController : MonoBehaviour
     }
     #endregion
 
-    #region Animations
-    private void _pickAnimation()
-    {
-        // Arm2: right max: 90 --> -74
-        //       left min: -75 --> 69
-        JointLimits la2l = _leftArm2hj.limits;
-        JointLimits ra2l = _rightArm2hj.limits;
-        la2l.min = 69f;
-        ra2l.max = -74f;
-        _leftArm2hj.limits = la2l;
-        _rightArm2hj.limits = ra2l;
-
-        JointLimits lal = _leftArmhj.limits;
-        JointLimits ral = _rightArmhj.limits;
-        lal.max = 121f;
-        ral.max = 121f;
-        lal.min = 0f;
-        ral.min = 0f;
-        _leftArmhj.limits = lal;
-        _rightArmhj.limits = ral;
-
-        JointSpring ljs = _leftArmhj.spring;
-        JointSpring rjs = _rightArmhj.spring;
-        ljs.targetPosition = 180f;
-        rjs.targetPosition = 180f;
-        _leftArmhj.spring = ljs;
-        _rightArmhj.spring = rjs;
-
-        JointLimits lhl = _leftHandhj.limits;
-        JointLimits rhl = _rightHandhj.limits;
-        lhl.max = 0f;
-        rhl.max = 0f;
-        _leftHandhj.limits = lhl;
-        _rightHandhj.limits = rhl;
-
-        JointSpring tempjs = _chesthj.spring;
-        tempjs.targetPosition = 90f;
-        tempjs.targetPosition = Mathf.Clamp(tempjs.targetPosition, _chesthj.limits.min + 5, _chesthj.limits.max - 5);
-        _chesthj.spring = tempjs;
-    }
-
-    private void _resetBodyAnimation()
-    {
-        _resetArmHandAnimation(_leftArm2hj, _leftArmhj, _leftHandhj, true);
-        _resetArmHandAnimation(_rightArm2hj, _rightArmhj, _rightHandhj, false);
-        _resetSpineAnimation();
-    }
-
-    private void _resetSpineAnimation()
-    {
-        JointSpring js = _chesthj.spring;
-        js.targetPosition = 0f;
-        _chesthj.spring = js;
-    }
-
-    private void _resetArmHandAnimation(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, bool IsLeftHand)
-    {
-        JointLimits lm2 = Arm2hj.limits;
-        JointLimits lm = Armhj.limits;
-        JointLimits hl = Handhj.limits;
-
-        JointSpring js = Armhj.spring;
-        JointSpring hjs = Handhj.spring;
-
-        if (IsLeftHand)
-        {
-            lm2.max = 70f;
-            lm2.min = -75f;
-        }
-        else
-        {
-            lm2.max = 90f;
-            lm2.min = -75f;
-        }
-        hl.min = 0f;
-        hl.max = 90f;
-        lm.min = -90f;
-        lm.max = 90f;
-        js.targetPosition = 0f;
-        hjs.targetPosition = 0f;
-        Handhj.spring = hjs;
-        Handhj.limits = hl;
-        Armhj.spring = js;
-        Armhj.limits = lm;
-        Arm2hj.limits = lm2;
-    }
-
-    private void _hammerOutAnimation()
-    {
-        JointSpring js = _chesthj.spring;
-        js.targetPosition = 30f;
-        _chesthj.spring = js;
-    }
-
-    IEnumerator _pickUpAnimation(HingeJoint Arm2hj, HingeJoint Armhj, bool IsLeftHand, float time)
-    {
-        float elapesdTime = 0f;
-        JointLimits lm2 = Arm2hj.limits;
-        JointLimits lm = Armhj.limits;
-
-        float initLm2LeftMax = lm2.max;
-        float initLm2LeftMin = lm2.min;
-
-        float initLmMax = lm.max;
-        while (elapesdTime < time)
-        {
-            elapesdTime += Time.deltaTime;
-            if (IsLeftHand)
-            {
-                lm2.max = Mathf.Lerp(initLm2LeftMax, 103f, elapesdTime / time);
-                lm2.min = Mathf.Lerp(initLm2LeftMin, 95f, elapesdTime / time);
-            }
-            else
-            {
-                lm2.max = Mathf.Lerp(initLm2LeftMax, -88f, elapesdTime / time);
-                lm2.min = Mathf.Lerp(initLm2LeftMin, -98f, elapesdTime / time);
-            }
-            lm.max = Mathf.Lerp(initLmMax, 180f, elapesdTime / time);
-            Arm2hj.limits = lm2;
-            Armhj.limits = lm;
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-    IEnumerator _pickUpHalfAnimation(HingeJoint Armhj, float time)
-    {
-        float elapesdTime = 0f;
-        JointSpring js = Armhj.spring;
-        float initArmTargetPosition = js.targetPosition;
-
-        while (elapesdTime < time)
-        {
-            elapesdTime += Time.deltaTime;
-            js.targetPosition = Mathf.Lerp(initArmTargetPosition, 90f, elapesdTime / time);
-            Armhj.spring = js;
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-    IEnumerator _powerDropAnimation(float time)
-    {
-        float elapsedTime = 0f;
-        JointSpring js = _chesthj.spring;
-
-        float initspringtagetPosition = js.targetPosition;
-
-        while (elapsedTime <= time)
-        {
-            //DropCharge = elapsedTime / time;
-            elapsedTime += Time.deltaTime;
-            js.targetPosition = Mathf.Lerp(initspringtagetPosition, -100f, elapsedTime / time);
-            _chesthj.spring = js;
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-    IEnumerator _meleeHoldingLeftAnimation(HingeJoint LeftArmhj, float time)
-    {
-        float elapsedTime = 0f;
-        JointSpring ljs = LeftArmhj.spring;
-        float initLATargetPosition = ljs.targetPosition;
-        while (elapsedTime < time)
-        {
-            elapsedTime += Time.deltaTime;
-            ljs.targetPosition = Mathf.Lerp(initLATargetPosition, 80f, _meleeCharge);
-            LeftArmhj.spring = ljs;
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-    IEnumerator _meleeHoldingRightAnimation(HingeJoint Arm2hj, HingeJoint Armhj, HingeJoint Handhj, float time)
-    {
-        float elapesdTime = 0f;
-        JointLimits lm2 = Arm2hj.limits;
-        JointLimits hl = Handhj.limits;
-        JointSpring js = Armhj.spring;
-
-        float initLm2Max = lm2.max;
-        float initLm2Min = lm2.min;
-        float initLmTargetPosition = js.targetPosition;
-        float inithlMax = hl.max;
-        float inithlMin = hl.min;
-
-        EventManager.Instance.TriggerEvent(new PunchStart(gameObject, PlayerNumber, RightHand.transform));
-
-        while (elapesdTime < time)
-        {
-            elapesdTime += Time.deltaTime;
-            _meleeCharge = elapesdTime / time;
-            lm2.max = Mathf.Lerp(initLm2Max, 4f, _meleeCharge);
-            lm2.min = Mathf.Lerp(initLm2Min, -17f, _meleeCharge);
-
-            js.targetPosition = Mathf.Lerp(initLmTargetPosition, -85f, _meleeCharge);
-
-            hl.max = Mathf.Lerp(inithlMax, 130f, _meleeCharge);
-            hl.min = Mathf.Lerp(inithlMin, 110f, _meleeCharge);
-
-            Arm2hj.limits = lm2;
-            Armhj.spring = js;
-            Handhj.limits = hl;
-            yield return new WaitForEndOfFrame();
-        }
-        EventManager.Instance.TriggerEvent(new PunchHolding(gameObject, PlayerNumber, RightHand.transform));
-    }
-
-    IEnumerator _meleePunchLeftHandAnimation(HingeJoint LeftHandhj, float time)
-    {
-        float elapsedTime = 0f;
-        JointSpring ljs = LeftHandhj.spring;
-        float initLATargetPosition = ljs.targetPosition;
-
-        while (elapsedTime < time)
-        {
-            elapsedTime += Time.deltaTime;
-            ljs.targetPosition = Mathf.Lerp(initLATargetPosition, -120f, elapsedTime / time);
-            LeftHandhj.spring = ljs;
-
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-    IEnumerator _meleePunchRightHandAnimation(HingeJoint Armhj, HingeJoint Handhj, float time)
-    {
-        float elapesdTime = 0f;
-        JointLimits hl = Handhj.limits;
-        JointSpring js = Armhj.spring;
-        float initLmTargetPosition = js.targetPosition;
-        float inithlMax = hl.max;
-        float inithlMin = hl.min;
-
-        while (elapesdTime < time)
-        {
-            elapesdTime += Time.deltaTime;
-            js.targetPosition = Mathf.Lerp(initLmTargetPosition, 180f, elapesdTime / time);
-            hl.max = Mathf.Lerp(inithlMax, 12f, elapesdTime / time);
-            hl.min = Mathf.Lerp(inithlMin, -2.8f, elapesdTime / time);
-            Armhj.spring = js;
-            Handhj.limits = hl;
-
-            yield return new WaitForEndOfFrame();
-        }
-        yield return new WaitForSeconds(0.1f);
-    }
-
-    IEnumerator _blockAnimation(HingeJoint Armhj, HingeJoint Handhj, float time)
-    {
-        JointSpring ajs = Armhj.spring;
-        float initaTargetPosition = ajs.targetPosition;
-        JointSpring hjs = Handhj.spring;
-        float inithTargetPosition = hjs.targetPosition;
-        float elapsedTime = 0f;
-        float armtargetpos = CharacterDataStore.CharacterBlockDataStore.ArmTargetPosition;
-        float handtartgetpos = CharacterDataStore.CharacterBlockDataStore.HandTargetPosition;
-        while (elapsedTime < time)
-        {
-            elapsedTime += Time.deltaTime;
-
-            ajs.targetPosition = Mathf.Lerp(initaTargetPosition, armtargetpos, elapsedTime / time);
-            hjs.targetPosition = Mathf.Lerp(inithTargetPosition, handtartgetpos, elapsedTime / time);
-            Armhj.spring = ajs;
-            Handhj.spring = hjs;
-
-            yield return new WaitForEndOfFrame();
-        }
-    }
-
-    #endregion
-
     #region Movment States
     private class MovementState : FSM<PlayerController>.State
     {
@@ -633,7 +366,6 @@ public class PlayerController : MonoBehaviour
                 Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);
                 EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
             }
-            Context.LegSwingReference.GetComponent<Animator>().SetFloat("WalkSpeedMultiplier", Context._walkSpeed);
         }
 
         public override void LateUpdate()
@@ -648,8 +380,8 @@ public class PlayerController : MonoBehaviour
     {
         public override void OnEnter()
         {
-            Context.LegSwingReference.GetComponent<Animator>().enabled = false;
-            Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
+            base.OnEnter();
+            Context._animator.SetBool("IdleDowner", true);
         }
 
         public override void Update()
@@ -660,6 +392,12 @@ public class PlayerController : MonoBehaviour
                 TransitionTo<RunState>();
             }
         }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("IdleDowner", false);
+        }
     }
 
     private class RunState : ControllableMovementState
@@ -667,7 +405,7 @@ public class PlayerController : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.LegSwingReference.GetComponent<Animator>().enabled = true;
+            Context._animator.SetBool("Running", true);
         }
 
         public override void Update()
@@ -695,6 +433,12 @@ public class PlayerController : MonoBehaviour
             Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
             Context.transform.rotation = tr;
         }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("Running", false);
+        }
     }
 
     private class StunMovementState : MovementState
@@ -702,8 +446,7 @@ public class PlayerController : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.LegSwingReference.GetComponent<Animator>().enabled = false;
-            Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
+            Context._animator.SetBool("IdleDowner", true);
             EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform, Context._stunTimer - Time.time));
         }
 
@@ -727,10 +470,9 @@ public class PlayerController : MonoBehaviour
     {
         public override void OnEnter()
         {
-            Context.LegSwingReference.GetComponent<Animator>().enabled = false;
-            Context.LegSwingReference.transform.eulerAngles = Vector3.zero;
+            base.OnEnter();
+            Context._animator.SetBool("IdleDowner", true);
         }
-
         public override void Update()
         {
             base.Update();
@@ -739,6 +481,11 @@ public class PlayerController : MonoBehaviour
             Context.transform.LookAt(lookpos);
             if (_RightTriggerUp)
                 TransitionTo<BazookaMovementLaunchState>();
+        }
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("IdleDowner", false);
         }
     }
 
@@ -755,8 +502,16 @@ public class PlayerController : MonoBehaviour
         public override void Update()
         {
             base.Update();
-            Context.LegSwingReference.GetComponent<Animator>().enabled = (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis));
+            bool isrunning = (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis));
+            Context._animator.SetBool("Running", isrunning);
+            Context._animator.SetBool("IdleDowner", !isrunning);
             Context.transform.position = Context.HandObject.transform.position - _diff;
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("Running", false);
         }
     }
 
@@ -770,9 +525,6 @@ public class PlayerController : MonoBehaviour
             base.OnEnter();
             _diff = Context.HandObject.transform.position - Context.transform.position;
             _rotDiff = Context.HandObject.transform.eulerAngles - Context.transform.eulerAngles;
-            Context.LegSwingReference.GetComponent<Animator>().enabled = false;
-            Context.LegSwingReference.transform.rotation = Quaternion.identity;
-            Context._hammerOutAnimation();
         }
 
         public override void Update()
@@ -780,13 +532,6 @@ public class PlayerController : MonoBehaviour
             base.Update();
             Context.transform.position = Context.HandObject.transform.position + -Context.HandObject.transform.forward * _diff.magnitude;
             Context.transform.eulerAngles = Context.HandObject.transform.eulerAngles + _rotDiff;
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context.LegSwingReference.GetComponent<Animator>().enabled = true;
-            Context._resetSpineAnimation();
         }
     }
 
@@ -802,6 +547,7 @@ public class PlayerController : MonoBehaviour
             _startTime = Time.time;
             Context._rb.isKinematic = true;
             Context._setToSpawn(10f);
+            Context._animator.SetBool("IdleDowner", true);
             foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
         }
 
@@ -865,7 +611,8 @@ public class PlayerController : MonoBehaviour
     {
         public override void OnEnter()
         {
-            Context._resetBodyAnimation();
+            base.OnEnter();
+            Context._animator.SetBool("IdleUpper", true);
             Context._dropHandObject();
         }
 
@@ -889,6 +636,11 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("IdleUpper", false);
+        }
     }
 
     private class PickingState : ActionState
@@ -896,7 +648,8 @@ public class PlayerController : MonoBehaviour
         private CharacterPickUpData _characterPickUpData { get { return Context.CharacterDataStore.CharacterPickUpDataStore; } }
         public override void OnEnter()
         {
-            Context._pickAnimation();
+            base.OnEnter();
+            Context._animator.SetBool("Picking", true);
         }
 
         public override void Update()
@@ -933,16 +686,19 @@ public class PlayerController : MonoBehaviour
                 }
             }
         }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("Picking", false);
+        }
     }
 
     private class HoldingState : ActionState
     {
-        private IEnumerator _lefthandcoroutine;
-        private IEnumerator _righthandcoroutine;
-
         public override void OnEnter()
         {
-            Context._resetSpineAnimation();
+            base.OnEnter();
             Debug.Assert(Context.HandObject != null);
             switch (Context.HandObject.tag)
             {
@@ -950,16 +706,12 @@ public class PlayerController : MonoBehaviour
                 case "FistGun":
                 case "Hammer":
                 case "Weapon":
-                    _lefthandcoroutine = Context._pickUpHalfAnimation(Context._leftArmhj, 0.1f);
-                    _righthandcoroutine = Context._pickUpHalfAnimation(Context._rightArmhj, 0.1f);
+                    Context._animator.SetBool("PickUpHalf", true);
                     break;
                 default:
-                    _lefthandcoroutine = Context._pickUpAnimation(Context._leftArm2hj, Context._leftArmhj, true, 0.1f);
-                    _righthandcoroutine = Context._pickUpAnimation(Context._rightArm2hj, Context._rightArmhj, false, 0.1f);
+                    Context._animator.SetBool("PickUpFull", true);
                     break;
             }
-            Context.StartCoroutine(_lefthandcoroutine);
-            Context.StartCoroutine(_righthandcoroutine);
         }
 
         public override void Update()
@@ -993,33 +745,26 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-            //if (Context._rb.velocity.magnitude >= Context.CharacterDataStore.CharacterMovementDataStore.DropWeaponVelocityThreshold)
-            //	TransitionTo<IdleActionState>();
-        }
-
         public override void OnExit()
         {
-            Context.StopCoroutine(_lefthandcoroutine);
-            Context.StopCoroutine(_righthandcoroutine);
+            base.OnExit();
+            Context._animator.SetBool("PickUpFull", false);
+            Context._animator.SetBool("PickUpHalf", false);
         }
     }
 
     private class DroppingState : ActionState
     {
-        private IEnumerator _dropcoroutine;
-
         public override void OnEnter()
         {
-            _dropcoroutine = Context._powerDropAnimation(2f);
-            Context.StartCoroutine(_dropcoroutine);
+            base.OnEnter();
+            Context._animator.SetBool("Dropping", true);
         }
 
         public override void OnExit()
         {
-            Context.StopCoroutine(_dropcoroutine);
+            base.OnExit();
+            Context._animator.SetBool("Dropping", false);
         }
 
         public override void Update()
@@ -1035,23 +780,32 @@ public class PlayerController : MonoBehaviour
 
     private class PunchHoldingState : ActionState
     {
-        private IEnumerator _punchleftcoroutine;
-        private IEnumerator _punchrightcoroutine;
-
         private float _startHoldingTime;
+        private bool _holding;
 
         public override void OnEnter()
         {
-            _punchrightcoroutine = Context._meleeHoldingRightAnimation(Context._rightArm2hj, Context._rightArmhj, Context._rightHandhj, _charMeleeData.ClockFistTime);
-            _punchleftcoroutine = Context._meleeHoldingLeftAnimation(Context._leftArmhj, _charMeleeData.ClockFistTime);
-            Context.StartCoroutine(_punchrightcoroutine);
-            Context.StartCoroutine(_punchleftcoroutine);
+            base.OnEnter();
+            Context._animator.SetFloat("ClockFistTime", 1f / _charMeleeData.ClockFistTime);
+            Context._animator.SetBool("PunchHolding", true);
+            EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            _holding = false;
             _startHoldingTime = Time.time;
         }
 
         public override void Update()
         {
             base.Update();
+            if (!_holding && Time.time > _startHoldingTime + _charMeleeData.ClockFistTime)
+            {
+                _holding = true;
+                Context._meleeCharge = 1f;
+                EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            }
+            else if (Time.time <= _startHoldingTime + _charMeleeData.ClockFistTime)
+            {
+                Context._meleeCharge = (Time.time - _startHoldingTime) / _charMeleeData.ClockFistTime;
+            }
             if (_RightTriggerUp || Time.time > _startHoldingTime + _charMeleeData.MeleeHoldTime)
             {
                 TransitionTo<PunchReleasingState>();
@@ -1061,24 +815,21 @@ public class PlayerController : MonoBehaviour
 
         public override void OnExit()
         {
-            Context.StopCoroutine(_punchrightcoroutine);
-            Context.StopCoroutine(_punchleftcoroutine);
+            base.OnExit();
+            Context._animator.SetBool("PunchHolding", false);
         }
     }
 
     private class PunchReleasingState : ActionState
     {
-        private IEnumerator _punchleftcoroutine;
-        private IEnumerator _punchrightcoroutine;
         private float _time;
         private bool _hitOnce;
 
         public override void OnEnter()
         {
-            _punchrightcoroutine = Context._meleePunchRightHandAnimation(Context._rightArmhj, Context._rightHandhj, _charMeleeData.FistReleaseTime);
-            _punchleftcoroutine = Context._meleePunchLeftHandAnimation(Context._leftArmhj, _charMeleeData.FistReleaseTime);
-            Context.StartCoroutine(_punchleftcoroutine);
-            Context.StartCoroutine(_punchrightcoroutine);
+            base.OnEnter();
+            Context._animator.SetFloat("FistReleaseTime", 1f / _charMeleeData.FistReleaseTime);
+            Context._animator.SetBool("PunchReleased", true);
             _time = Time.time + _charMeleeData.FistReleaseTime + 0.1f;
             _hitOnce = false;
             if (Context._meleeCharge < _charMeleeData.MeleeChargeThreshold) Context._meleeCharge = 0f;
@@ -1122,26 +873,21 @@ public class PlayerController : MonoBehaviour
 
         public override void OnExit()
         {
-            Context.StopCoroutine(_punchleftcoroutine);
-            Context.StopCoroutine(_punchrightcoroutine);
-            Context._resetBodyAnimation();
+            base.OnExit();
+            Context._animator.SetBool("PunchReleased", false);
             Context._meleeCharge = 0f;
         }
     }
 
     private class BlockingState : ActionState
     {
-        IEnumerator _leftblockcoroutine;
-        IEnumerator _rightblockcoroutine;
         private Vector2 _shieldUISize;
         public override void OnEnter()
         {
+            base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
-            _leftblockcoroutine = Context._blockAnimation(Context._leftArmhj, Context._leftHandhj, 0.1f);
-            _rightblockcoroutine = Context._blockAnimation(Context._rightArmhj, Context._rightHandhj, 0.1f);
             _shieldUISize = Services.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
-            Context.StartCoroutine(_leftblockcoroutine);
-            Context.StartCoroutine(_rightblockcoroutine);
+            Context._animator.SetBool("Blocking", true);
         }
 
         public override void Update()
@@ -1169,8 +915,8 @@ public class PlayerController : MonoBehaviour
 
         public override void OnExit()
         {
-            Context.StopCoroutine(_leftblockcoroutine);
-            Context.StopCoroutine(_rightblockcoroutine);
+            base.OnExit();
+            Context._animator.SetBool("Blocking", false);
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
     }
@@ -1203,7 +949,7 @@ public class PlayerController : MonoBehaviour
         {
             base.OnEnter();
             Context._dropHandObject();
-            Context._resetBodyAnimation();
+            Context._animator.SetBool("IdleUpper", true);
         }
 
         public override void Update()
@@ -1225,7 +971,7 @@ public class PlayerController : MonoBehaviour
         {
             base.OnEnter();
             _startTime = Time.time;
-            Context._resetBodyAnimation();
+            Context._animator.SetBool("IdleUpper", true);
             Context._dropHandObject();
             if (Context.MeleeVFXHolder != null) Destroy(Context.MeleeVFXHolder);
         }
@@ -1238,11 +984,6 @@ public class PlayerController : MonoBehaviour
                 TransitionTo<IdleActionState>();
                 return;
             }
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
         }
     }
     #endregion

@@ -65,7 +65,7 @@ public class CameraController : MonoBehaviour
             {
                 PlayerController pc = go.GetComponent<PlayerController>();
                 if ((pc != null
-                    && pc.LegSwingReference.activeSelf)
+                    && pc.OnDeathHidden[0].activeSelf)
                     || (pc == null))
                 {
                     total += go.position;
@@ -92,7 +92,7 @@ public class CameraController : MonoBehaviour
 
             foreach (PlayerController go in Services.GameStateManager.PlayerControllers)
             {
-                if (go != null && go.LegSwingReference.activeSelf)
+                if (go != null && go.OnDeathHidden[0].activeSelf)
                 {
                     total += go.transform.position;
                     length++;
@@ -153,7 +153,7 @@ public class CameraController : MonoBehaviour
         /// If all players are dead, transition to all dead state
         for (int i = 0; i < Services.GameStateManager.PlayerControllers.Length; i++)
         {
-            if (Services.GameStateManager.PlayerControllers[i].LegSwingReference.activeSelf
+            if (Services.GameStateManager.PlayerControllers[i].OnDeathHidden[0].activeSelf
                 && Services.GameStateManager.PlayerControllers[i] != pd.Player.GetComponent<PlayerController>()) return;
         }
         if (_camFSM.CurrentState.GetType().Equals(typeof(TrackingState))) _camFSM.TransitionTo<AllDeadState>();

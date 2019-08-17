@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Chicken_PunchHolding
+  m_Name: DUck_HoldingFull
   serializedVersion: 6
   m_Legacy: 0
   m_Compressed: 0
@@ -22,7 +22,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
+        value: 69
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -31,7 +31,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 80
+        value: 95
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -41,8 +41,8 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_Spring.targetPosition
-    path: Body__Spine/Body__Spine1/Body_Chest/Body__LeftShoulder/Body__LeftArm
+    attribute: m_Limits.min
+    path: Body__Spine/Body__Spine1/Body_Chest/LeftArm2
     classID: 59
     script: {fileID: 0}
   - curve:
@@ -50,7 +50,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 90
+        value: 70
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -59,7 +59,35 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 4
+        value: 103
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Limits.max
+    path: Body__Spine/Body__Spine1/Body_Chest/LeftArm2
+    classID: 59
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -74
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: -88
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -87,7 +115,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: -17
+        value: -98
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -106,7 +134,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
+        value: 90
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -115,7 +143,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: -85
+        value: 180
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -125,7 +153,35 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_Spring.targetPosition
+    attribute: m_Limits.max
+    path: Body__Spine/Body__Spine1/Body_Chest/Body__LeftShoulder/Body__LeftArm
+    classID: 59
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 90
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 180
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Limits.max
     path: Body__Spine/Body__Spine1/Body_Chest/Body__RightShoulder/Body__RightArm
     classID: 59
     script: {fileID: 0}
@@ -143,25 +199,6 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 130
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_Limits.max
-    path: Body__Spine/Body__Spine1/Body_Chest/Body__RightShoulder/Body__RightArm/Body__RightForeArm
-    classID: 59
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
         value: 0
         inSlope: 0
         outSlope: 0
@@ -169,20 +206,49 @@ AnimationClip:
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Spring.targetPosition
+    path: Body__Spine/Body__Spine1/Body_Chest
+    classID: 59
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
       - serializedVersion: 3
-        time: 1
-        value: 110
+        time: 0
+        value: 180
         inSlope: 0
         outSlope: 0
         tangentMode: 136
         weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_Limits.min
-    path: Body__Spine/Body__Spine1/Body_Chest/Body__RightShoulder/Body__RightArm/Body__RightForeArm
+    attribute: m_Spring.targetPosition
+    path: Body__Spine/Body__Spine1/Body_Chest/Body__LeftShoulder/Body__LeftArm
+    classID: 59
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 180
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Spring.targetPosition
+    path: Body__Spine/Body__Spine1/Body_Chest/Body__RightShoulder/Body__RightArm
     classID: 59
     script: {fileID: 0}
   m_PPtrCurves: []
@@ -194,6 +260,55 @@ AnimationClip:
   m_ClipBindingConstant:
     genericBindings:
     - serializedVersion: 2
+      path: 1690713629
+      attribute: 939403233
+      script: {fileID: 0}
+      typeID: 59
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 1690713629
+      attribute: 200480952
+      script: {fileID: 0}
+      typeID: 59
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 964662397
+      attribute: 200480952
+      script: {fileID: 0}
+      typeID: 59
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 964662397
+      attribute: 939403233
+      script: {fileID: 0}
+      typeID: 59
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 1529839044
+      attribute: 200480952
+      script: {fileID: 0}
+      typeID: 59
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 97434933
+      attribute: 200480952
+      script: {fileID: 0}
+      typeID: 59
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
+      path: 2243337741
+      attribute: 190833156
+      script: {fileID: 0}
+      typeID: 59
+      customType: 0
+      isPPtrCurve: 0
+    - serializedVersion: 2
       path: 1529839044
       attribute: 190833156
       script: {fileID: 0}
@@ -201,36 +316,8 @@ AnimationClip:
       customType: 0
       isPPtrCurve: 0
     - serializedVersion: 2
-      path: 964662397
-      attribute: 200480952
-      script: {fileID: 0}
-      typeID: 59
-      customType: 0
-      isPPtrCurve: 0
-    - serializedVersion: 2
-      path: 964662397
-      attribute: 939403233
-      script: {fileID: 0}
-      typeID: 59
-      customType: 0
-      isPPtrCurve: 0
-    - serializedVersion: 2
       path: 97434933
       attribute: 190833156
-      script: {fileID: 0}
-      typeID: 59
-      customType: 0
-      isPPtrCurve: 0
-    - serializedVersion: 2
-      path: 2269783774
-      attribute: 200480952
-      script: {fileID: 0}
-      typeID: 59
-      customType: 0
-      isPPtrCurve: 0
-    - serializedVersion: 2
-      path: 2269783774
-      attribute: 939403233
       script: {fileID: 0}
       typeID: 59
       customType: 0
@@ -262,7 +349,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
+        value: 69
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -271,7 +358,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 80
+        value: 95
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -281,8 +368,8 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_Spring.targetPosition
-    path: Body__Spine/Body__Spine1/Body_Chest/Body__LeftShoulder/Body__LeftArm
+    attribute: m_Limits.min
+    path: Body__Spine/Body__Spine1/Body_Chest/LeftArm2
     classID: 59
     script: {fileID: 0}
   - curve:
@@ -290,7 +377,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 90
+        value: 70
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -299,7 +386,35 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 4
+        value: 103
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Limits.max
+    path: Body__Spine/Body__Spine1/Body_Chest/LeftArm2
+    classID: 59
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: -74
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: -88
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -327,7 +442,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: -17
+        value: -98
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -346,7 +461,7 @@ AnimationClip:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 0
+        value: 90
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -355,7 +470,7 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: -85
+        value: 180
         inSlope: 0
         outSlope: 0
         tangentMode: 136
@@ -365,7 +480,35 @@ AnimationClip:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_Spring.targetPosition
+    attribute: m_Limits.max
+    path: Body__Spine/Body__Spine1/Body_Chest/Body__LeftShoulder/Body__LeftArm
+    classID: 59
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 90
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 1
+        value: 180
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0.33333334
+        outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Limits.max
     path: Body__Spine/Body__Spine1/Body_Chest/Body__RightShoulder/Body__RightArm
     classID: 59
     script: {fileID: 0}
@@ -383,25 +526,6 @@ AnimationClip:
         outWeight: 0.33333334
       - serializedVersion: 3
         time: 1
-        value: 130
-        inSlope: 0
-        outSlope: 0
-        tangentMode: 136
-        weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
-      m_PreInfinity: 2
-      m_PostInfinity: 2
-      m_RotationOrder: 4
-    attribute: m_Limits.max
-    path: Body__Spine/Body__Spine1/Body_Chest/Body__RightShoulder/Body__RightArm/Body__RightForeArm
-    classID: 59
-    script: {fileID: 0}
-  - curve:
-      serializedVersion: 2
-      m_Curve:
-      - serializedVersion: 3
-        time: 0
         value: 0
         inSlope: 0
         outSlope: 0
@@ -409,20 +533,49 @@ AnimationClip:
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Spring.targetPosition
+    path: Body__Spine/Body__Spine1/Body_Chest
+    classID: 59
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
       - serializedVersion: 3
-        time: 1
-        value: 110
+        time: 0
+        value: 180
         inSlope: 0
         outSlope: 0
         tangentMode: 136
         weightedMode: 0
-        inWeight: 0.33333334
-        outWeight: 0.33333334
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-    attribute: m_Limits.min
-    path: Body__Spine/Body__Spine1/Body_Chest/Body__RightShoulder/Body__RightArm/Body__RightForeArm
+    attribute: m_Spring.targetPosition
+    path: Body__Spine/Body__Spine1/Body_Chest/Body__LeftShoulder/Body__LeftArm
+    classID: 59
+    script: {fileID: 0}
+  - curve:
+      serializedVersion: 2
+      m_Curve:
+      - serializedVersion: 3
+        time: 0
+        value: 180
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 136
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
+      m_PreInfinity: 2
+      m_PostInfinity: 2
+      m_RotationOrder: 4
+    attribute: m_Spring.targetPosition
+    path: Body__Spine/Body__Spine1/Body_Chest/Body__RightShoulder/Body__RightArm
     classID: 59
     script: {fileID: 0}
   m_EulerEditorCurves: []

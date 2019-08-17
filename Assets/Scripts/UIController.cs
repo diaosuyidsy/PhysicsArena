@@ -4,40 +4,36 @@ using UnityEngine;
 
 public class UIController : MonoBehaviour
 {
-    public Transform UI;
     public LayerMask UILayers;
 
     private float yDifference;
     private Vector3 _pos;
-    private Quaternion _rot;
     public float YOffset = 0.1f;
 
-    private void Start ()
+    private void Start()
     {
-        yDifference = transform.position.y - UI.position.y;
-        _pos = transform.position;
-        _rot = transform.rotation;
+        yDifference = transform.parent.position.y - transform.position.y;
     }
 
-    private void Update ()
+    private void Update()
     {
-        _pos = transform.position;
+        _pos = transform.parent.position;
         RaycastHit hit;
-        if (Physics.Raycast (transform.position, Vector3.down, out hit, 100f, UILayers))
+        if (Physics.Raycast(transform.parent.position, Vector3.down, out hit, 10f, UILayers))
         {
             _pos.y = hit.transform.position.y;
             _pos.y += hit.collider.bounds.extents.y + YOffset;
-            float yDiff = Mathf.Abs (_pos.y - transform.position.y);
-            Color temp = UI.GetComponent<SpriteRenderer> ().color;
+            float yDiff = Mathf.Abs(_pos.y - transform.position.y);
+            Color temp = GetComponent<SpriteRenderer>().color;
             temp.a = (-180f * yDiff + 318.75f) / 255f;
-            UI.gameObject.GetComponent<SpriteRenderer> ().color = temp;
+            GetComponent<SpriteRenderer>().color = temp;
         }
         else
         {
             _pos.y = -100f;
         }
-        UI.position = _pos;
-        UI.eulerAngles = new Vector3 (90f, transform.eulerAngles.y, 0f);
+        transform.position = _pos;
+        transform.eulerAngles = new Vector3(90f, transform.parent.eulerAngles.y, 0f);
 
 
     }

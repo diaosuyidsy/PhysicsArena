@@ -27,6 +27,7 @@ public class SuckBallController : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (_rts.isSucking()) return;
         GameObject go = other.gameObject;
         if (go.tag.Contains(_opponentTeamTag) && other.GetType() == typeof(CapsuleCollider))
         {

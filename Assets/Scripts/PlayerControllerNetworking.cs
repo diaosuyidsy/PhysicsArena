@@ -136,7 +136,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
         // }
         // else // Player is hit cause he could not block
         // {
-        // EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerNetworking>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
+        EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerNetworking>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
         // OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
         _rb.AddForce(force, ForceMode.Impulse);
 

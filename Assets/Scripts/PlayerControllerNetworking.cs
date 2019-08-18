@@ -62,6 +62,8 @@ public class PlayerControllerNetworking : NetworkBehaviour
         }
     }
 
+    [SyncVar]
+    public bool Blocking;
     #endregion
 
     private void Awake()
@@ -129,14 +131,15 @@ public class PlayerControllerNetworking : NetworkBehaviour
     public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
     {
         // First check if the player could block the attack
-        // if (_blockable &&
-        //     CanBlock(sender.transform.forward))
+        // if (isLocalPlayer
+        //     && _blockable
+        //     && CanBlock(sender.transform.forward))
         // {
         //     sender.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
         // }
         // else // Player is hit cause he could not block
         // {
-        EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerNetworking>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
+        // EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerNetworking>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
         // OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
         _rb.AddForce(force, ForceMode.Impulse);
 
@@ -148,8 +151,15 @@ public class PlayerControllerNetworking : NetworkBehaviour
     void CmdMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
     {
         Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
-        // target.GetComponent<PlayerControllerNetworking>().OnMeleeHit(force, _meleeCharge, sender, _blockable);
-        RpcMeleeHit(target, force, _meleeCharge, sender, _blockable);
+        if (_blockable
+        && target.GetComponent<PlayerControllerNetworking>().CanBlock(sender.transform.forward))
+        {
+            CmdMeleeHit(sender, -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, target, false);
+        }
+        else
+        {
+            RpcMeleeHit(target, force, _meleeCharge, sender, _blockable);
+        }
     }
 
     [ClientRpc]
@@ -157,6 +167,12 @@ public class PlayerControllerNetworking : NetworkBehaviour
     {
         Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
         target.GetComponent<PlayerControllerNetworking>().OnMeleeHit(force, _meleeCharge, sender, _blockable);
+    }
+
+    [Command]
+    void CmdBlock(bool block)
+    {
+        Blocking = block;
     }
 
     /// <summary>
@@ -167,7 +183,11 @@ public class PlayerControllerNetworking : NetworkBehaviour
     /// <returns></returns>
     public bool CanBlock(Vector3 forwardAngle)
     {
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
+        // if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
+        //     _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+        //     return true;
+        // return false;
+        if (Blocking &&
             _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
             return true;
         return false;
@@ -893,6 +913,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             _shieldUISize = ServicesNetwork.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
             Context._animator.SetBool("Blocking", true);
+            Context.CmdBlock(true);
         }
 
         public override void Update()
@@ -923,6 +944,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
+            Context.CmdBlock(false);
         }
     }
 

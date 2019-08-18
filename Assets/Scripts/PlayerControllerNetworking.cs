@@ -129,16 +129,34 @@ public class PlayerControllerNetworking : NetworkBehaviour
     public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
     {
         // First check if the player could block the attack
-        if (_blockable &&
-            CanBlock(sender.transform.forward))
-        {
-            sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
-        }
-        else // Player is hit cause he could not block
-        {
-            EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
-            OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
-        }
+        // if (_blockable &&
+        //     CanBlock(sender.transform.forward))
+        // {
+        //     sender.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
+        // }
+        // else // Player is hit cause he could not block
+        // {
+        // EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerNetworking>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
+        // OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
+        _rb.AddForce(force, ForceMode.Impulse);
+
+        // CmdImpact(force, gameObject);
+        // }
+    }
+
+    [Command]
+    void CmdMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
+    {
+        Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
+        // target.GetComponent<PlayerControllerNetworking>().OnMeleeHit(force, _meleeCharge, sender, _blockable);
+        RpcMeleeHit(target, force, _meleeCharge, sender, _blockable);
+    }
+
+    [ClientRpc]
+    void RpcMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
+    {
+        Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
+        target.GetComponent<PlayerControllerNetworking>().OnMeleeHit(force, _meleeCharge, sender, _blockable);
     }
 
     /// <summary>
@@ -832,14 +850,16 @@ public class PlayerControllerNetworking : NetworkBehaviour
                 int layermask = ServicesNetwork.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
                 {
-                    if (hit.transform.GetComponentInParent<PlayerController>() == null) return;
+                    if (hit.transform.GetComponentInParent<PlayerControllerNetworking>() == null) return;
                     _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+                    foreach (var rb in hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject.GetComponentsInChildren<Rigidbody>())
                     {
                         rb.velocity = Vector3.zero;
                     }
                     Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
-                    hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
+                    // hit.transform.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
+                    Context.CmdMeleeHit(hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject, force, Context._meleeCharge, Context.gameObject, true);
+                    // Context.CmdImpact(force, hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject);
                 }
             }
             else

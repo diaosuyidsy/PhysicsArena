@@ -10614,7 +10614,7 @@ MonoBehaviour:
   serverOnly: 0
   localPlayerAuthority: 1
   m_AssetId: 
-  m_SceneId: 3202325201
+  m_SceneId: 3752077451
 --- !u!114 &5541101342647959485
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10627,7 +10627,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7de558aa82931f468132c943e689c27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  syncInterval: 0.1
+  syncInterval: 0
   CharacterDataStore: {fileID: 11400000, guid: 7d14baa331efc614583f4c28a2e6c1aa, type: 2}
   Chest: {fileID: 8701612684876536530}
   Head: {fileID: 8701914874886048810}
@@ -10644,6 +10644,7 @@ MonoBehaviour:
   StunVFXHolder: {fileID: 0}
   SlowVFXHolder: {fileID: 0}
   FoodTraverseVFXHolder: {fileID: 0}
+  Blocking: 0
 --- !u!114 &1032090658694163382
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10686,10 +10687,10 @@ MonoBehaviour:
   snapPositionThreshold: 0
   snapRotationThreshold: 0
   snapScaleThreshold: 0
-  positionLerpSpeed: 0.85
+  positionLerpSpeed: 1
   rotationLerpSpeed: 0.85
   scaleLerpSpeed: 0.85
-  timeCorrectionSpeed: 0
+  timeCorrectionSpeed: 0.1
   snapTimeThreshold: 3
   syncPosition: 0
   syncRotation: 0

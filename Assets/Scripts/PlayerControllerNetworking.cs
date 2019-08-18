@@ -243,19 +243,19 @@ public class PlayerControllerNetworking : NetworkBehaviour
     private void _setToSpawn(float yOffset)
     {
         int colorindex = 0;
-        for (int j = 0; j < Services.GameStateManager.PlayersInformation.RewiredID.Length; j++)
+        for (int j = 0; j < ServicesNetwork.GameStateManager.PlayersInformation.RewiredID.Length; j++)
         {
-            if (PlayerNumber == Services.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = Services.GameStateManager.PlayersInformation.ColorIndex[j];
+            if (PlayerNumber == ServicesNetwork.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = ServicesNetwork.GameStateManager.PlayersInformation.ColorIndex[j];
         }
         if (CompareTag("Team1"))
         {
-            Vector3 pos = Services.Config.GameMapData.Team1RespawnPoints[colorindex - 3];
+            Vector3 pos = ServicesNetwork.Config.GameMapData.Team1RespawnPoints[colorindex - 3];
             pos.y += yOffset;
             transform.position = pos;
         }
         else
         {
-            Vector3 pos = Services.Config.GameMapData.Team2RespawnPoints[colorindex];
+            Vector3 pos = ServicesNetwork.Config.GameMapData.Team2RespawnPoints[colorindex];
             pos.y += yOffset;
             transform.position = pos;
         }
@@ -829,7 +829,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
             {
                 RaycastHit hit;
                 // This Layermask get all player's layer except this player's
-                int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
+                int layermask = ServicesNetwork.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
                 {
                     if (hit.transform.GetComponentInParent<PlayerController>() == null) return;
@@ -871,7 +871,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
         {
             base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
-            _shieldUISize = Services.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
+            _shieldUISize = ServicesNetwork.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
             Context._animator.SetBool("Blocking", true);
         }
 

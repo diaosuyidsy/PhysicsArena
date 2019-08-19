@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
-
-public class PlayerNetworkSetup : NetworkBehaviour
+using Photon.Pun;
+public class PlayerNetworkSetup : MonoBehaviourPun
 {
-    public override void OnStartLocalPlayer()
+    private void Awake()
     {
-        GetComponent<PlayerControllerNetworking>().enabled = true;
+        if (!photonView.IsMine)
+        {
+            GetComponent<PlayerControllerNetworking>().enabled = false;
+        }
     }
 }

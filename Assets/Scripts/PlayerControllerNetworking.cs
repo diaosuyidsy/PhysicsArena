@@ -2,9 +2,9 @@
 using UnityEngine;
 using Rewired;
 using System;
-using Mirror;
+using Photon.Pun;
 
-public class PlayerControllerNetworking : NetworkBehaviour
+public class PlayerControllerNetworking : MonoBehaviourPun
 {
     [Header("Player Data Section")]
     public CharacterData CharacterDataStore;
@@ -62,7 +62,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
         }
     }
 
-    [SyncVar]
+    // [SyncVar]
     public bool Blocking;
     #endregion
 
@@ -89,21 +89,21 @@ public class PlayerControllerNetworking : NetworkBehaviour
     // Update is called once per frame
     private void Update()
     {
-        if (!isLocalPlayer) return;
+        if (!photonView.IsMine) return;
         _movementFSM.Update();
         _actionFSM.Update();
     }
 
     private void FixedUpdate()
     {
-        if (!isLocalPlayer) return;
+        if (!photonView.IsMine) return;
         _movementFSM.FixedUpdate();
         _actionFSM.FixedUpdate();
     }
 
     private void LateUpdate()
     {
-        if (!isLocalPlayer) return;
+        if (!photonView.IsMine) return;
         _movementFSM.LateUpdate();
         _actionFSM.LateUpdate();
     }
@@ -147,33 +147,33 @@ public class PlayerControllerNetworking : NetworkBehaviour
         // }
     }
 
-    [Command]
-    void CmdMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
-    {
-        Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
-        if (_blockable
-        && target.GetComponent<PlayerControllerNetworking>().CanBlock(sender.transform.forward))
-        {
-            CmdMeleeHit(sender, -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, target, false);
-        }
-        else
-        {
-            RpcMeleeHit(target, force, _meleeCharge, sender, _blockable);
-        }
-    }
+    // [Command]
+    // void CmdMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
+    // {
+    //     Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
+    //     if (_blockable
+    //     && target.GetComponent<PlayerControllerNetworking>().CanBlock(sender.transform.forward))
+    //     {
+    //         CmdMeleeHit(sender, -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, target, false);
+    //     }
+    //     else
+    //     {
+    //         RpcMeleeHit(target, force, _meleeCharge, sender, _blockable);
+    //     }
+    // }
 
-    [ClientRpc]
-    void RpcMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
-    {
-        Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
-        target.GetComponent<PlayerControllerNetworking>().OnMeleeHit(force, _meleeCharge, sender, _blockable);
-    }
+    // [ClientRpc]
+    // void RpcMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
+    // {
+    //     Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
+    //     target.GetComponent<PlayerControllerNetworking>().OnMeleeHit(force, _meleeCharge, sender, _blockable);
+    // }
 
-    [Command]
-    void CmdBlock(bool block)
-    {
-        Blocking = block;
-    }
+    // [Command]
+    // void CmdBlock(bool block)
+    // {
+    //     Blocking = block;
+    // }
 
     /// <summary>
     /// Can Block The attack or not
@@ -878,7 +878,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
                     }
                     Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
                     // hit.transform.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
-                    Context.CmdMeleeHit(hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject, force, Context._meleeCharge, Context.gameObject, true);
+                    // Context.CmdMeleeHit(hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject, force, Context._meleeCharge, Context.gameObject, true);
                     // Context.CmdImpact(force, hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject);
                 }
             }
@@ -913,7 +913,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             _shieldUISize = ServicesNetwork.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
             Context._animator.SetBool("Blocking", true);
-            Context.CmdBlock(true);
+            // Context.CmdBlock(true);
         }
 
         public override void Update()
@@ -944,7 +944,7 @@ public class PlayerControllerNetworking : NetworkBehaviour
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
-            Context.CmdBlock(false);
+            // Context.CmdBlock(false);
         }
     }
 

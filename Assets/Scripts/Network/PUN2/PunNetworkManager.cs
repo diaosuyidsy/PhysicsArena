@@ -71,7 +71,10 @@ public class PunNetworkManager : MonoBehaviourPunCallbacks
             int numplayerinroom = PhotonNetwork.CountOfPlayersInRooms;
             if (SpawnPosition != null)
                 spawnPos = this.SpawnPosition[numplayerinroom % SpawnPosition.Length].position;
-            PhotonNetwork.Instantiate(PlayerPrefabs[numplayerinroom % PlayerPrefabs.Length].name, spawnPos, Quaternion.identity, 0);
+            GameObject go = PhotonNetwork.Instantiate(PlayerPrefabs[numplayerinroom % PlayerPrefabs.Length].name, spawnPos, Quaternion.identity, 0);
+            EventManager.Instance.TriggerEvent(new GameStart());
+            ServicesNetwork.GameStateManager.CameraTargets.Add(go.transform);
+            ServicesNetwork.GameStateManager.PlayerControllers.Add(go.GetComponent<PlayerControllerNetworking>());
         }
     }
 

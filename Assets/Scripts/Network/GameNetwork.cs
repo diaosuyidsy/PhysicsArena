@@ -17,7 +17,7 @@ public class GameNetwork : MonoBehaviour
     {
         ServicesNetwork.Config = new Config(ConfigData, GameMapData);
         ServicesNetwork.AudioManager = new AudioManager(AudioData);
-        ServicesNetwork.GameFeelManager = new GameFeelManager(GameFeelData);
+        // ServicesNetwork.GameFeelManager = new GameFeelManager(GameFeelData);
         ServicesNetwork.VisualEffectManager = new VFXNetworkManager(VFXData);
         // ServicesNetwork.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
         // ServicesNetwork.StatisticsManager = new StatisticsManager();
@@ -72,8 +72,8 @@ public class GameNetwork : MonoBehaviour
         ServicesNetwork.AudioManager.Destroy();
         ServicesNetwork.AudioManager = null;
 
-        ServicesNetwork.GameFeelManager.Destory();
-        ServicesNetwork.GameFeelManager = null;
+        // ServicesNetwork.GameFeelManager.Destory();
+        // ServicesNetwork.GameFeelManager = null;
 
         ServicesNetwork.VisualEffectManager.Destory();
         ServicesNetwork.VisualEffectManager = null;

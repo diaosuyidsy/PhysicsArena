@@ -12,7 +12,7 @@ using System;
 
 public class GameStateNetworkManager
 {
-    public PlayerController[] PlayerControllers;
+    public List<PlayerControllerNetworking> PlayerControllers;
     public PlayerInformation PlayersInformation;
     public List<Transform> CameraTargets;
 
@@ -87,7 +87,7 @@ public class GameStateNetworkManager
         _pauseResume = _pauseMenu.Find("Resume");
         _pauseQuit = _pauseMenu.Find("Quit");
         _pauseWholeMask = _pauseMenu.Find("WholeMask");
-        PlayerControllers = new PlayerController[PlayersInformation.ColorIndex.Length];
+        PlayerControllers = new List<PlayerControllerNetworking>();
         _statisticPanel = _gameEndCanvas.Find("StatisticPanel");
         _MVPDisplay = _statisticPanel.Find("MVPDisplay");
         _MVPTitle = _statisticPanel.Find("MVPTitle");
@@ -102,11 +102,11 @@ public class GameStateNetworkManager
         {
             _playersOutestHolder[i] = _playersHolder.GetChild(i);
         }
-        for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
-        {
-            PlayerControllers[i] = _playersOutestHolder[PlayersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
-            CameraTargets.Add(PlayerControllers[i].transform);
-        }
+        // for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
+        // {
+        //     PlayerControllers[i] = _playersOutestHolder[PlayersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
+        //     CameraTargets.Add(PlayerControllers[i].transform);
+        // }
         EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);

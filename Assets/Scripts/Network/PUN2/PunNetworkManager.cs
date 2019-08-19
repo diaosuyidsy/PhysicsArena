@@ -29,6 +29,8 @@ public class PunNetworkManager : MonoBehaviourPunCallbacks
         Debug.Log("ConnectAndJoinRandom.ConnectNow() will now call: PhotonNetwork.ConnectUsingSettings().");
         PhotonNetwork.ConnectUsingSettings();
         PhotonNetwork.GameVersion = this.Version + "." + SceneManagerHelper.ActiveSceneBuildIndex;
+        PhotonNetwork.AuthValues = new Photon.Realtime.AuthenticationValues("Player" + Random.Range(0, 100));
+        PhotonNetwork.LocalPlayer.NickName = "Player" + Random.Range(0, 1000000);
     }
 
 

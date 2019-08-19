@@ -18,8 +18,8 @@ public static class ServicesNetwork
         }
     }
 
-    private static GameFeelManager _gameFeelManager;
-    public static GameFeelManager GameFeelManager
+    private static GameFeelNetworkManager _gameFeelManager;
+    public static GameFeelNetworkManager GameFeelManager
     {
         get
         {

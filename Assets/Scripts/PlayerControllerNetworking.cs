@@ -144,7 +144,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         // {
         // EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerNetworking>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
         // OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
-        _rb.AddForce(force, ForceMode.Impulse);
+        // _rb.AddForce(force, ForceMode.Impulse);
 
         // CmdImpact(force, gameObject);
         // }
@@ -158,14 +158,32 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         && CanBlock(sender.transform.forward))
         {
             senderPView.RPC("OnHit",
-             senderPView.Owner,
+             RpcTarget.All,
              -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier);
+
+            senderPView.RPC("OnHitEvent",
+            RpcTarget.All,
+            senderPView.ViewID,
+            _photonview.ViewID,
+            -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier,
+            _meleeCharge,
+            true);
+            return;
         }
         else
         {
             _photonview.RPC("OnHit",
-            _photonview.Owner,
+             RpcTarget.All,
             force);
+
+            _photonview.RPC("OnHitEvent",
+            RpcTarget.All,
+            _photonview.ViewID,
+            senderPView.ViewID,
+            force,
+            _meleeCharge,
+            false);
+            return;
         }
     }
 
@@ -179,26 +197,17 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     }
 
     [PunRPC]
-    public void OnMeleeHitPun(object[] message)
+    public void OnHitEvent(int hitterViewID, int hittedViewID, Vector3 force, float meleeCharge, bool isABlock)
     {
-        Vector3 _force = (Vector3)message[0];
-        bool _blockable = (bool)message[3];
-        GameObject sender = PhotonNetwork.GetPhotonView((int)message[2]).gameObject;
-        float _meleeCharge = (float)message[1];
-        if (_blockable
-        && CanBlock(sender.transform.forward))
-        {
-            sender.GetComponent<PhotonView>().RPC("OnHit"
-            , RpcTarget.All
-            , -_force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier
-            );
-        }
-        else
-        {
-            _photonview.RPC("OnHit",
-            RpcTarget.All
-            , _force);
-        }
+        GameObject hitter = PhotonNetwork.GetPhotonView(hitterViewID).gameObject;
+        GameObject hitted = PhotonNetwork.GetPhotonView(hittedViewID).gameObject;
+        EventManager.Instance.TriggerEvent(new PlayerHit(hitter,
+        hitted,
+        force,
+        hitter.GetComponent<PlayerControllerNetworking>().PlayerNumber,
+        hitted.GetComponent<PlayerControllerNetworking>().PlayerNumber,
+        meleeCharge,
+        isABlock));
     }
 
     [PunRPC]
@@ -926,11 +935,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
                     }
                     Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
                     PhotonView pView = hit.transform.GetComponentInParent<PhotonView>();
-                    // if (pView)
-                    //     pView.RPC("OnMeleeHitPun"
-                    //     , pView.Owner
-                    //     , new object[] { force, Context._meleeCharge, Context._photonview.ViewID, true });
-                    // hit.transform.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
+
                     hit.transform.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(force, Context._meleeCharge, Context._photonview.ViewID, true);
                 }
             }

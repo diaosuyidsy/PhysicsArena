@@ -37,6 +37,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun
     IEnumerator _startSlow;
     private bool _isJumping;
     private Animator _animator;
+    private PhotonView _photonview;
 
     private FSM<PlayerControllerNetworking> _movementFSM;
     private FSM<PlayerControllerNetworking> _actionFSM;
@@ -78,6 +79,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun
         _actionFSM.TransitionTo<IdleActionState>();
         _impactMarker = new ImpactMarker(null, Time.time, ImpactType.Self);
         _animator = GetComponent<Animator>();
+        _photonview = GetComponent<PhotonView>();
     }
 
     public void Init(int controllernumber)
@@ -110,6 +112,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!photonView.IsMine) return;
         if (other.CompareTag("DeathZone"))
         {
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
@@ -120,6 +123,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun
 
     private void OnCollisionEnter(Collision other)
     {
+        if (!photonView.IsMine) return;
         if (CharacterDataStore.CharacterMovementDataStore.JumpMask == (CharacterDataStore.CharacterMovementDataStore.JumpMask | (1 << other.gameObject.layer)) && _isJumping)
         {
             _isJumping = false;
@@ -145,6 +149,35 @@ public class PlayerControllerNetworking : MonoBehaviourPun
 
         // CmdImpact(force, gameObject);
         // }
+    }
+
+    [PunRPC]
+    public void OnMeleeHitPun(object[] message)
+    {
+        Vector3 _force = (Vector3)message[0];
+        bool _blockable = (bool)message[3];
+        GameObject sender = PhotonNetwork.GetPhotonView((int)message[2]).gameObject;
+        float _meleeCharge = (float)message[1];
+        if (_blockable
+        && CanBlock(sender.transform.forward))
+        {
+            sender.GetComponent<PhotonView>().RPC("OnHit"
+            , RpcTarget.All
+            , -_force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier
+            );
+        }
+        else
+        {
+            _photonview.RPC("OnHit",
+            RpcTarget.All
+            , _force);
+        }
+    }
+
+    [PunRPC]
+    public void OnHit(Vector3 force)
+    {
+        _rb.AddForce(force, ForceMode.Impulse);
     }
 
     // [Command]
@@ -183,14 +216,14 @@ public class PlayerControllerNetworking : MonoBehaviourPun
     /// <returns></returns>
     public bool CanBlock(Vector3 forwardAngle)
     {
-        // if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
-        //     _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
-        //     return true;
-        // return false;
-        if (Blocking &&
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
             _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
             return true;
         return false;
+        // if (Blocking &&
+        //     _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+        //     return true;
+        // return false;
     }
 
     /// <summary>
@@ -877,6 +910,11 @@ public class PlayerControllerNetworking : MonoBehaviourPun
                         rb.velocity = Vector3.zero;
                     }
                     Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
+                    PhotonView pView = hit.transform.GetComponentInParent<PhotonView>();
+                    if (pView)
+                        pView.RPC("OnMeleeHitPun"
+                        , pView.Owner
+                        , new object[] { force, Context._meleeCharge, Context._photonview.ViewID, true });
                     // hit.transform.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
                     // Context.CmdMeleeHit(hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject, force, Context._meleeCharge, Context.gameObject, true);
                     // Context.CmdImpact(force, hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject);

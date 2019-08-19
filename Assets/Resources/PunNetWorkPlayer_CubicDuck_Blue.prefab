@@ -10469,7 +10469,7 @@ GameObject:
   - component: {fileID: 5541101342647959485}
   - component: {fileID: -2495958964268542262}
   - component: {fileID: 1283742849209648352}
-  - component: {fileID: -3825562696050764202}
+  - component: {fileID: -3692740006933840279}
   m_Layer: 12
   m_Name: PunNetWorkPlayer_CubicDuck_Blue
   m_TagString: Team2
@@ -10641,7 +10641,7 @@ MonoBehaviour:
   OwnershipTransfer: 0
   ObservedComponents:
   - {fileID: 1283742849209648352}
-  - {fileID: -3825562696050764202}
+  - {fileID: 0}
   viewIdField: 0
   InstantiationId: 0
   isRuntimeInstantiated: 0
@@ -10694,7 +10694,7 @@ MonoBehaviour:
   useLocalTransformOnly: 0
   maxPositionDifferenceForVelocitySyncing: 10
   receivedStatesCounter: 0
---- !u!114 &-3825562696050764202
+--- !u!114 &-3692740006933840279
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -10708,51 +10708,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ShowLayerWeightsInspector: 1
   ShowParameterInspector: 1
-  m_SynchronizeParameters:
-  - Type: 4
-    SynchronizeType: 2
-    Name: Running
-  - Type: 4
-    SynchronizeType: 2
-    Name: IdleDowner
-  - Type: 4
-    SynchronizeType: 2
-    Name: IdleUpper
-  - Type: 4
-    SynchronizeType: 2
-    Name: Picking
-  - Type: 4
-    SynchronizeType: 2
-    Name: PickUpFull
-  - Type: 4
-    SynchronizeType: 2
-    Name: PickUpHalf
-  - Type: 4
-    SynchronizeType: 2
-    Name: Dropping
-  - Type: 4
-    SynchronizeType: 2
-    Name: PunchHolding
-  - Type: 4
-    SynchronizeType: 2
-    Name: PunchReleased
-  - Type: 4
-    SynchronizeType: 2
-    Name: Blocking
-  - Type: 1
-    SynchronizeType: 2
-    Name: ClockFistTime
-  - Type: 1
-    SynchronizeType: 2
-    Name: FistReleaseTime
-  - Type: 9
-    SynchronizeType: 2
-    Name: ForceResetUpper
-  m_SynchronizeLayers:
-  - SynchronizeType: 2
-    LayerIndex: 0
-  - SynchronizeType: 2
-    LayerIndex: 1
+  m_SynchronizeParameters: []
+  m_SynchronizeLayers: []
 --- !u!1 &8701802674409047918
 GameObject:
   m_ObjectHideFlags: 0

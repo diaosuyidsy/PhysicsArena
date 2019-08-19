@@ -152,18 +152,19 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
 
     public void OnMeleeHit(Vector3 force, float _meleeCharge, int senderViewID, bool _blockable)
     {
-        GameObject sender = PhotonNetwork.GetPhotonView(senderViewID).gameObject;
+        PhotonView senderPView = PhotonNetwork.GetPhotonView(senderViewID);
+        GameObject sender = senderPView.gameObject;
         if (_blockable
         && CanBlock(sender.transform.forward))
         {
-            sender.GetComponent<PhotonView>().RPC("OnHit",
-            RpcTarget.All,
-            -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier);
+            senderPView.RPC("OnHit",
+             senderPView.Owner,
+             -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier);
         }
         else
         {
             _photonview.RPC("OnHit",
-            RpcTarget.All,
+            _photonview.Owner,
             force);
         }
     }

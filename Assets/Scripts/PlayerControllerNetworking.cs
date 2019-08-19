@@ -135,8 +135,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
     {
         // First check if the player could block the attack
-        // if (isLocalPlayer
-        //     && _blockable
+        // if (_blockable
         //     && CanBlock(sender.transform.forward))
         // {
         //     sender.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
@@ -149,6 +148,24 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
 
         // CmdImpact(force, gameObject);
         // }
+    }
+
+    public void OnMeleeHit(Vector3 force, float _meleeCharge, int senderViewID, bool _blockable)
+    {
+        GameObject sender = PhotonNetwork.GetPhotonView(senderViewID).gameObject;
+        if (_blockable
+        && CanBlock(sender.transform.forward))
+        {
+            sender.GetComponent<PhotonView>().RPC("OnHit",
+            RpcTarget.All,
+            -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier);
+        }
+        else
+        {
+            _photonview.RPC("OnHit",
+            RpcTarget.All,
+            force);
+        }
     }
 
     [PunRPC]
@@ -189,6 +206,12 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         _rb.AddForce(force, ForceMode.Impulse);
     }
 
+    [PunRPC]
+    public void OnBlock(bool blocking)
+    {
+        Blocking = blocking;
+    }
+
     /// <summary>
     /// Can Block The attack or not
     /// Used by hook and hit
@@ -197,14 +220,14 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     /// <returns></returns>
     public bool CanBlock(Vector3 forwardAngle)
     {
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
-            _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
-            return true;
-        return false;
-        // if (Blocking &&
+        // if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
         //     _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
         //     return true;
         // return false;
+        if (Blocking &&
+            _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+            return true;
+        return false;
     }
 
     /// <summary>
@@ -902,13 +925,12 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
                     }
                     Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
                     PhotonView pView = hit.transform.GetComponentInParent<PhotonView>();
-                    if (pView)
-                        pView.RPC("OnMeleeHitPun"
-                        , pView.Owner
-                        , new object[] { force, Context._meleeCharge, Context._photonview.ViewID, true });
+                    // if (pView)
+                    //     pView.RPC("OnMeleeHitPun"
+                    //     , pView.Owner
+                    //     , new object[] { force, Context._meleeCharge, Context._photonview.ViewID, true });
                     // hit.transform.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
-                    // Context.CmdMeleeHit(hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject, force, Context._meleeCharge, Context.gameObject, true);
-                    // Context.CmdImpact(force, hit.transform.GetComponentInParent<PlayerControllerNetworking>().gameObject);
+                    hit.transform.GetComponentInParent<PlayerControllerNetworking>().OnMeleeHit(force, Context._meleeCharge, Context._photonview.ViewID, true);
                 }
             }
             else
@@ -942,7 +964,9 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             _shieldUISize = ServicesNetwork.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
             Context._animator.SetBool("Blocking", true);
-            // Context.CmdBlock(true);
+            Context._photonview.RPC("OnBlock"
+            , RpcTarget.All
+            , true);
         }
 
         public override void Update()
@@ -973,7 +997,9 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
-            // Context.CmdBlock(false);
+            Context._photonview.RPC("OnBlock"
+            , RpcTarget.All
+            , false);
         }
     }
 

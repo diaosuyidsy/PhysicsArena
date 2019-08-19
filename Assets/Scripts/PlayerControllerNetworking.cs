@@ -4,7 +4,7 @@ using Rewired;
 using System;
 using Photon.Pun;
 
-public class PlayerControllerNetworking : MonoBehaviourPun
+public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagicCallback
 {
     [Header("Player Data Section")]
     public CharacterData CharacterDataStore;
@@ -152,6 +152,15 @@ public class PlayerControllerNetworking : MonoBehaviourPun
     }
 
     [PunRPC]
+    public void OnDeath(bool dead)
+    {
+        foreach (GameObject item in OnDeathHidden)
+        {
+            item.SetActive(!dead);
+        }
+    }
+
+    [PunRPC]
     public void OnMeleeHitPun(object[] message)
     {
         Vector3 _force = (Vector3)message[0];
@@ -179,34 +188,6 @@ public class PlayerControllerNetworking : MonoBehaviourPun
     {
         _rb.AddForce(force, ForceMode.Impulse);
     }
-
-    // [Command]
-    // void CmdMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
-    // {
-    //     Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
-    //     if (_blockable
-    //     && target.GetComponent<PlayerControllerNetworking>().CanBlock(sender.transform.forward))
-    //     {
-    //         CmdMeleeHit(sender, -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, target, false);
-    //     }
-    //     else
-    //     {
-    //         RpcMeleeHit(target, force, _meleeCharge, sender, _blockable);
-    //     }
-    // }
-
-    // [ClientRpc]
-    // void RpcMeleeHit(GameObject target, Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
-    // {
-    //     Debug.Assert(target.GetComponent<PlayerControllerNetworking>() != null);
-    //     target.GetComponent<PlayerControllerNetworking>().OnMeleeHit(force, _meleeCharge, sender, _blockable);
-    // }
-
-    // [Command]
-    // void CmdBlock(bool block)
-    // {
-    //     Blocking = block;
-    // }
 
     /// <summary>
     /// Can Block The attack or not
@@ -313,20 +294,20 @@ public class PlayerControllerNetworking : MonoBehaviourPun
     #region Helper Method
     private void _setToSpawn(float yOffset)
     {
-        int colorindex = 0;
-        for (int j = 0; j < ServicesNetwork.GameStateManager.PlayersInformation.RewiredID.Length; j++)
-        {
-            if (PlayerNumber == ServicesNetwork.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = ServicesNetwork.GameStateManager.PlayersInformation.ColorIndex[j];
-        }
+        // int colorindex = 0;
+        // for (int j = 0; j < ServicesNetwork.GameStateManager.PlayersInformation.RewiredID.Length; j++)
+        // {
+        //     if (PlayerNumber == ServicesNetwork.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = ServicesNetwork.GameStateManager.PlayersInformation.ColorIndex[j];
+        // }
         if (CompareTag("Team1"))
         {
-            Vector3 pos = ServicesNetwork.Config.GameMapData.Team1RespawnPoints[colorindex - 3];
+            Vector3 pos = ServicesNetwork.Config.GameMapData.Team1RespawnPoints[0];
             pos.y += yOffset;
             transform.position = pos;
         }
         else
         {
-            Vector3 pos = ServicesNetwork.Config.GameMapData.Team2RespawnPoints[colorindex];
+            Vector3 pos = ServicesNetwork.Config.GameMapData.Team2RespawnPoints[0];
             pos.y += yOffset;
             transform.position = pos;
         }
@@ -394,6 +375,11 @@ public class PlayerControllerNetworking : MonoBehaviourPun
     {
         RaycastHit hit;
         return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+    }
+
+    public void OnPhotonInstantiate(PhotonMessageInfo info)
+    {
+        info.Sender.TagObject = gameObject;
     }
     #endregion
 
@@ -604,7 +590,10 @@ public class PlayerControllerNetworking : MonoBehaviourPun
             Context._rb.isKinematic = true;
             Context._setToSpawn(10f);
             Context._animator.SetBool("IdleDowner", true);
-            foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
+            Context._photonview.RPC("OnDeath"
+            , RpcTarget.All
+            , true);
+            // foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
         }
 
         public override void Update()
@@ -623,8 +612,10 @@ public class PlayerControllerNetworking : MonoBehaviourPun
             base.OnExit();
             Context._rb.isKinematic = false;
             Context._setToSpawn(0f);
-            foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(true); }
-
+            // foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(true); }
+            Context._photonview.RPC("OnDeath"
+                        , RpcTarget.All
+                        , false);
         }
     }
     #endregion

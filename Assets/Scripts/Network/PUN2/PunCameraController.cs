@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Realtime;
+using Photon.Pun;
 
-public class PunCameraController : MonoBehaviour
+public class PunCameraController : MonoBehaviourPun
 {
     [HideInInspector]
     public Vector3 FollowTarget;

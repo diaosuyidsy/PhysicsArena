@@ -5,7 +5,7 @@ using Photon.Pun;
 using Photon.Realtime;
 using UnityEngine.SceneManagement;
 
-public class PunNetworkManager : MonoBehaviourPunCallbacks
+public class PunNetworkManager : MonoBehaviourPunCallbacks, IInRoomCallbacks
 {
     public bool AutoConnect = true;
 
@@ -73,9 +73,6 @@ public class PunNetworkManager : MonoBehaviourPunCallbacks
                 spawnPos = this.SpawnPosition[numplayerinroom % SpawnPosition.Length].position;
             GameObject go = PhotonNetwork.Instantiate(PlayerPrefabs[numplayerinroom % PlayerPrefabs.Length].name, spawnPos, Quaternion.identity, 0);
             EventManager.Instance.TriggerEvent(new GameStart());
-            ServicesNetwork.GameStateManager.CameraTargets.Add(go.transform);
-            ServicesNetwork.GameStateManager.PlayerControllers.Add(go.GetComponent<PlayerControllerNetworking>());
         }
     }
-
 }

@@ -9,12 +9,15 @@ using CharTween;
 using UnityEngine.SceneManagement;
 using TextFx;
 using System;
+using Photon.Realtime;
+using Photon.Pun;
+using System.Linq;
 
 public class GameStateNetworkManager
 {
     public List<PlayerControllerNetworking> PlayerControllers;
     public PlayerInformation PlayersInformation;
-    public List<Transform> CameraTargets;
+    public List<Transform> CameraTargets => PhotonNetwork.PlayerList.Select(i => (((GameObject)i.TagObject).transform)).ToList();
 
     private GameMapData _gameMapdata;
     private ConfigData _configData;
@@ -97,7 +100,7 @@ public class GameStateNetworkManager
         _MVPPlayerHolder = _MVP.Find("MVPPlayerHolder");
         _MVPSpotLight = _MVP.Find("MVPSpotLight");
         _MVPPodium = _MVP.Find("MVPPodium");
-        CameraTargets = new List<Transform>();
+        // CameraTargets = new List<Transform>();
         for (int i = 0; i < 6; i++)
         {
             _playersOutestHolder[i] = _playersHolder.GetChild(i);
@@ -164,12 +167,12 @@ public class GameStateNetworkManager
 
     private void _onPlayerDied(PlayerDied pd)
     {
-        CameraTargets.Remove(pd.Player.transform);
+        // CameraTargets.Remove(pd.Player.transform);
     }
 
     private void _onPlayerRespawn(PlayerRespawned pr)
     {
-        CameraTargets.Add(pr.Player.transform);
+        // CameraTargets.Add(pr.Player.transform);
     }
 
     private abstract class GameState : FSM<GameStateNetworkManager>.State

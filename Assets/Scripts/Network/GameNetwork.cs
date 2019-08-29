@@ -15,6 +15,7 @@ public class GameNetwork : MonoBehaviour
 
     private void Awake()
     {
+        ServicesNetwork.NetworkEventManager = new NetworkEventManager();
         ServicesNetwork.Config = new Config(ConfigData, GameMapData);
         ServicesNetwork.AudioManager = new AudioManager(AudioData);
         ServicesNetwork.GameFeelManager = new GameFeelNetworkManager(GameFeelData);
@@ -89,6 +90,9 @@ public class GameNetwork : MonoBehaviour
 
         ServicesNetwork.GameStateManager.Destroy();
         ServicesNetwork.GameStateManager = null;
+
+        ServicesNetwork.NetworkEventManager.Destroy();
+        ServicesNetwork.NetworkEventManager = null;
 
         // ServicesNetwork.GameObjectiveManager.Destroy();
         // ServicesNetwork.GameObjectiveManager = null;

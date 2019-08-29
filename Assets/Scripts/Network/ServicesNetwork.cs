@@ -129,4 +129,18 @@ public static class ServicesNetwork
             _gameObjectiveManager = value;
         }
     }
+
+    private static NetworkEventManager _networkEventManager;
+    public static NetworkEventManager NetworkEventManager
+    {
+        get
+        {
+            Debug.Assert(_networkEventManager != null);
+            return _networkEventManager;
+        }
+        set
+        {
+            _networkEventManager = value;
+        }
+    }
 }

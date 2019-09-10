@@ -88,6 +88,26 @@ public static class Utility
     }
 }
 
+public class PunchMessage
+{
+    public Vector3 Force;
+    public float MeleeCharge;
+    public GameObject Sender;
+    public bool Blockable;
+
+    public PunchMessage()
+    {
+
+    }
+    public PunchMessage(Vector3 force, float meleeCharge, GameObject sender, bool blockable)
+    {
+        Force = force;
+        MeleeCharge = meleeCharge;
+        Sender = sender;
+        Blockable = blockable;
+    }
+}
+
 public class StatsTuple
 {
     public int Index;

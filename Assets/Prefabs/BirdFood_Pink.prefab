@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 4828324662055006}
   - component: {fileID: 54576304729107240}
   - component: {fileID: 65968432936572096}
-  - component: {fileID: 114456263922335804}
   - component: {fileID: 114341152802089534}
   m_Layer: 20
   m_Name: BirdFood_Pink
@@ -65,25 +64,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.28955817, y: 0.11216251, z: 0.2277019}
   m_Center: {x: 0.010000005, y: 0, z: 0}
---- !u!114 &114456263922335804
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1101020832636924}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8736a190d38e4d6c80799fbd3bcafe6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Owner: {fileID: 0}
-  DownAngle: 10
-  FaceAngleOffset: 90
-  XOffset: 0
-  VerticalOffset: 0.08
-  CanBePickedUp: 1
-  FollowHand: 1
 --- !u!114 &114341152802089534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -97,6 +77,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WeaponDataStore: {fileID: 11400000, guid: e7c515a3e28814c41a3446a425a78bd8, type: 2}
+  WeaponDataBase: {fileID: 11400000, guid: e68950b442d2ba04aa46774f7a020950, type: 2}
+  CanBePickedUp: 0
   LastHolder: 7
   PickUpVFXHolder: {fileID: 0}
 --- !u!1 &8404719778553296370

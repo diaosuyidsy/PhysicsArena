@@ -16,12 +16,48 @@ MonoBehaviour:
   YRotation: 0
   ZRotation: 0
   YOffset: 0
-  BoomerangSpeed: 7
+  ZOffset: 0
+  XOffset: -0.18
+  BoomerangSpeed: 10
   OnHitForce: 900
   CurveMultiplier: 1
   LocalMovePoints:
-  - {x: -1.46, y: 0.5, z: 1.66}
-  - {x: 0, y: 0.5, z: 2.64}
-  - {x: 1.26, y: 0.5, z: 1.61}
-  - {x: -1.34, y: 0.5, z: -1.2}
-  MaxAmmo: 1
+  - {x: -1.46, y: 0, z: 1.66}
+  - {x: 0, y: 0, z: 2.64}
+  - {x: 1.26, y: 0, z: 1.61}
+  - {x: 0, y: 0, z: 0}
+  - {x: -0.93, y: 0, z: -0.99}
+  BoomerangYOffset: 1
+  BoomEase:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  MaxAmmo: 3
+  CanHitLayer:
+    serializedVersion: 2
+    m_Bits: 105984
+  ObstacleLayer:
+    serializedVersion: 2
+    m_Bits: 278528
+  HitRadius: 1
+  HitMaxDistance: 0.02

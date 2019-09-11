@@ -236,11 +236,8 @@ public class PlayerController : MonoBehaviour
 
     public void ForceDropHandObject()
     {
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState))
-            || _actionFSM.CurrentState.GetType().Equals(typeof(HammerActionState)))
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
             _actionFSM.TransitionTo<IdleActionState>();
-        if (_movementFSM.CurrentState.GetType().Equals(typeof(HammerMovementOutState)))
-            _movementFSM.TransitionTo<IdleState>();
     }
 
     /// <summary>
@@ -515,27 +512,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private class HammerMovementOutState : MovementState
-    {
-        private Vector3 _diff;
-        private Vector3 _rotDiff;
-
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _diff = Context.HandObject.transform.position - Context.transform.position;
-            _rotDiff = Context.HandObject.transform.eulerAngles - Context.transform.eulerAngles;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            Context.transform.position = Context.HandObject.transform.position + -Context.HandObject.transform.forward * _diff.magnitude;
-            Context.transform.eulerAngles = Context.HandObject.transform.eulerAngles + _rotDiff;
-        }
-    }
-
-
     private class DeadState : FSM<PlayerController>.State
     {
         private float _startTime;
@@ -702,14 +678,14 @@ public class PlayerController : MonoBehaviour
             Debug.Assert(Context.HandObject != null);
             switch (Context.HandObject.tag)
             {
-                case "Hook":
-                case "FistGun":
-                case "Hammer":
-                case "Weapon":
+                case "Weapon_OnChest":
                     Context._animator.SetBool("PickUpHalf", true);
                     break;
-                default:
+                case "Weapon_OnHead":
                     Context._animator.SetBool("PickUpFull", true);
+                    break;
+                default:
+                    Context._animator.SetBool("IdleUpper", true);
                     break;
             }
         }
@@ -727,16 +703,14 @@ public class PlayerController : MonoBehaviour
                 WeaponBase wb = Context.HandObject.GetComponent<WeaponBase>();
                 Context._helpAim(wb.HelpAimAngle, wb.HelpAimDistance);
                 Context.HandObject.GetComponent<WeaponBase>().Fire(true);
-                switch (Context.HandObject.tag)
+                if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtBazooka)))
                 {
-                    case "Bazooka":
-                        Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
-                        TransitionTo<BazookaActionState>();
-                        break;
-                    case "Hammer":
-                        Context._movementFSM.TransitionTo<HammerMovementOutState>();
-                        TransitionTo<HammerActionState>();
-                        break;
+                    Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
+                    TransitionTo<BazookaActionState>();
+                }
+                else if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtBoomerang)))
+                {
+                    TransitionTo<BoomerangActionState>();
                 }
             }
             if (_RightTriggerUp)
@@ -938,9 +912,28 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    private class HammerActionState : WeaponActionState
+    private class BoomerangActionState : WeaponActionState
     {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context.OnImpact(new PermaSlowEffect(0f, 0.5f));
+        }
+        public override void Update()
+        {
+            base.Update();
+            if (_RightTriggerUp)
+            {
+                Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+                TransitionTo<IdleActionState>();
+            }
+        }
 
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context.OnImpact(new RemovePermaSlowEffect(0f, 0.5f));
+        }
     }
 
     private class StunActionState : ActionState

@@ -235,6 +235,7 @@ public enum ImpactType
     FistGun,
     BazookaGun,
     HammerGun,
+    Boomerang,
     Melee,
     Block,
     Self,

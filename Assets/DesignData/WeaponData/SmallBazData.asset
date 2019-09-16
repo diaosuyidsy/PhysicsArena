@@ -18,23 +18,17 @@ MonoBehaviour:
   YOffset: 0
   ZOffset: 0
   XOffset: 0
-  BoomerangSpeed: 9
+  Radius: 2
   OnHitForce: 900
-  CurveMultiplier: 1
-  LocalMovePoints: []
-  BoomerangYOffset: 0
-  BoomEase:
-    serializedVersion: 2
-    m_Curve: []
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  UpwardFinalY: 10
+  UpwardDuration: 1
+  UpwardEase: 6
+  InAirDuration: 2
+  DownwardAccelaration: 15
   MaxAmmo: 1
-  CanHitLayer:
+  HitExplodeLayer:
     serializedVersion: 2
-    m_Bits: 0
-  ObstacleLayer:
+    m_Bits: 376320
+  CanHideLayer:
     serializedVersion: 2
-    m_Bits: 0
-  HitRadius: 0.5
-  HitMaxDistance: 0.1
+    m_Bits: 262144

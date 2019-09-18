@@ -61542,7 +61542,7 @@ GameObject:
   - component: {fileID: 4827347863436092839}
   m_Layer: 20
   m_Name: SuckGun
-  m_TagString: SuckGun
+  m_TagString: Weapon_OnHead
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -61608,6 +61608,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   WeaponDataStore: {fileID: 11400000, guid: e7c515a3e28814c41a3446a425a78bd8, type: 2}
   WeaponDataBase: {fileID: 11400000, guid: 3277dee428dfdf3469d2cc72a3e5e114, type: 2}
+  CanBePickedUp: 0
 --- !u!136 &4827347863436092839
 CapsuleCollider:
   m_ObjectHideFlags: 0

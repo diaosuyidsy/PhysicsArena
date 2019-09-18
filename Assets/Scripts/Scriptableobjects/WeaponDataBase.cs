@@ -8,4 +8,6 @@ public abstract class WeaponDataBase : ScriptableObject
     public float YRotation;
     public float ZRotation;
     public float YOffset;
+    public float ZOffset;
+    public float XOffset;
 }

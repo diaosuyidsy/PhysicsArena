@@ -1,0 +1,63 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ea840791c950f242bf91fb0986f7751, type: 3}
+  m_Name: BoomerangData
+  m_EditorClassIdentifier: 
+  XRotation: 0
+  YRotation: 0
+  ZRotation: 0
+  YOffset: 0
+  ZOffset: 0
+  XOffset: -0.18
+  BoomerangSpeed: 10
+  OnHitForce: 900
+  CurveMultiplier: 1
+  LocalMovePoints:
+  - {x: -1.46, y: 0, z: 1.66}
+  - {x: 0, y: 0, z: 2.64}
+  - {x: 1.26, y: 0, z: 1.61}
+  - {x: 0, y: 0, z: 0}
+  - {x: -0.93, y: 0, z: -0.99}
+  BoomerangYOffset: 1
+  BoomEase:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 1
+      outSlope: 1
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  MaxAmmo: 3
+  CanHitLayer:
+    serializedVersion: 2
+    m_Bits: 105984
+  ObstacleLayer:
+    serializedVersion: 2
+    m_Bits: 278528
+  HitRadius: 1
+  HitMaxDistance: 0.02

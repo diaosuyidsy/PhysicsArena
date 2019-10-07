@@ -82,6 +82,8 @@ Shader "Toony Colors Pro 2/Examples/Default/Comic Book"
 		CGINCLUDE
 
 		#include "UnityCG.cginc"
+		
+		
 
 		struct a2v
 		{
@@ -205,6 +207,13 @@ Shader "Toony Colors Pro 2/Examples/Default/Comic Book"
 		//================================================================
 
 		Tags { "RenderType"="Opaque" }
+		
+		Stencil{
+		    Ref 1
+		    Comp Notequal
+		    Pass keep
+		    
+		}
 
 		CGPROGRAM
 
@@ -428,6 +437,7 @@ Shader "Toony Colors Pro 2/Examples/Default/Comic Book"
 			Offset [_Offset1],[_Offset2]
 
 			Tags { "LightMode"="ForwardBase" "IgnoreProjectors"="True" }
+
 
 			CGPROGRAM
 

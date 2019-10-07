@@ -29,7 +29,12 @@ Shader "Hidden/Toony Colors Pro 2/Outline Only"
 	{
 		Tags { "RenderType"="Opaque" }
 		LOD 200
-		
+		Stencil{
+		    Ref 1
+		    Comp Notequal
+		    Pass keep
+		    
+		}
 		CGINCLUDE
 		#include "UnityCG.cginc"
 		#include "../Include/TCP2_Outline_Include.cginc"
@@ -92,7 +97,12 @@ Shader "Hidden/Toony Colors Pro 2/Outline Only"
 	{
 		Tags { "RenderType"="Opaque" }
 		LOD 150
-		
+		Stencil{
+		    Ref 1
+		    Comp Notequal
+		    Pass keep
+		    
+		}
 		//CGINCLUDE
 		//#include "UnityCG.cginc"
 		//#include "../Include/TCP2_Outline_Include.cginc"

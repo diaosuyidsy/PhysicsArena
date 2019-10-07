@@ -73,6 +73,13 @@ Shader "Toony Colors Pro 2/Standard PBS"
 	{
 		Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
 		LOD 300
+		
+		Stencil{
+		    Ref 1
+		    Comp Notequal
+		    Pass keep
+		    
+		}
 	
 
 		// ------------------------------------------------------------------
@@ -245,6 +252,13 @@ Shader "Toony Colors Pro 2/Standard PBS"
 	{
 		Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
 		LOD 150
+		
+		Stencil{
+		    Ref 1
+		    Comp Notequal
+		    Pass keep
+		    
+		}
 
 		// ------------------------------------------------------------------
 		//  Base forward pass (directional light, emission, lightmaps, ...)

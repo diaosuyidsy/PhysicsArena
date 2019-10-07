@@ -17,6 +17,13 @@
 	}
 	SubShader {
 		Tags { "RenderType" = "Transparent" "Queue" = "Transparent" }
+		
+		Stencil{
+		    Ref 1
+		    Comp Notequal
+		    Pass keep
+		    
+		}
 		Pass {
 			Blend SrcAlpha OneMinusSrcAlpha
 			

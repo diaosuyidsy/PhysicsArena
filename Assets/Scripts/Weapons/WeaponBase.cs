@@ -26,7 +26,10 @@ public abstract class WeaponBase : MonoBehaviour
         {
             Vector3 targetposition = (Owner.GetComponent<PlayerController>().LeftHand.transform.position
             + Owner.GetComponent<PlayerController>().RightHand.transform.position) / 2f;
-            transform.position = new Vector3(targetposition.x, targetposition.y + WeaponDataBase.YOffset, targetposition.z);
+            transform.position = targetposition;
+            transform.position += transform.right * WeaponDataBase.XOffset;
+            transform.position += transform.up * WeaponDataBase.YOffset;
+            transform.position += transform.forward * WeaponDataBase.ZOffset;
             transform.eulerAngles = new Vector3(WeaponDataBase.XRotation, Owner.transform.eulerAngles.y + WeaponDataBase.YRotation, WeaponDataBase.ZRotation);
         }
     }

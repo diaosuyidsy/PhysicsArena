@@ -7,6 +7,10 @@ using DG.Tweening;
 public class BoomerangData : WeaponDataBase
 {
     public float BoomerangSpeed = 9f;
+    public Vector3 BoomerangVelocity = new Vector3(2f, 0f, 2f);
+    public Vector3 BoomerangAmplitude = new Vector3(2f, 0f, 2f);
+    public float StartAffectiveDuration = 0.1f;
+    public float EndAffectiveDuration = 1f;
     public float OnHitForce = 900f;
     public float CurveMultiplier = 1f;
     public Vector3[] LocalMovePoints;
@@ -16,6 +20,9 @@ public class BoomerangData : WeaponDataBase
     public LayerMask CanHitLayer;
     public LayerMask ObstacleLayer;
     [Header("Hit Scan Config")]
+    public float ForwardCastAmount = 0.1f;
+    public float UpCastAmount = 0.1f;
     public float HitRadius = 0.5f;
     public float HitMaxDistance = 0.1f;
+    public float BoomerangReflectionForce = 100f;
 }

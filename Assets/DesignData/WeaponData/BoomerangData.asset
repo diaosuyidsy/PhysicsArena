@@ -16,17 +16,21 @@ MonoBehaviour:
   YRotation: 0
   ZRotation: 0
   YOffset: 0
-  ZOffset: 0
-  XOffset: -0.18
+  ZOffset: 0.2
+  XOffset: 0
   BoomerangSpeed: 10
-  OnHitForce: 900
+  BoomerangVelocity: {x: 5, y: 0, z: -5}
+  BoomerangAmplitude: {x: 9, y: 0, z: 13}
+  StartAffectiveDuration: 0.1
+  EndAffectiveDuration: 1
+  OnHitForce: 800
   CurveMultiplier: 1
   LocalMovePoints:
   - {x: -1.46, y: 0, z: 1.66}
   - {x: 0, y: 0, z: 2.64}
   - {x: 1.26, y: 0, z: 1.61}
-  - {x: 0, y: 0, z: 0}
-  - {x: -0.93, y: 0, z: -0.99}
+  - {x: 0, y: 0, z: -0.53}
+  - {x: -1.13, y: 0, z: -3.03}
   BoomerangYOffset: 1
   BoomEase:
     serializedVersion: 2
@@ -59,5 +63,8 @@ MonoBehaviour:
   ObstacleLayer:
     serializedVersion: 2
     m_Bits: 278528
-  HitRadius: 1
-  HitMaxDistance: 0.02
+  ForwardCastAmount: 0.2
+  UpCastAmount: 0.2
+  HitRadius: 0.2
+  HitMaxDistance: 0.4
+  BoomerangReflectionForce: 4

@@ -207,13 +207,7 @@ Shader "Toony Colors Pro 2/Examples/Default/Comic Book"
 		//================================================================
 
 		Tags { "RenderType"="Opaque" }
-		
-		Stencil{
-		    Ref 1
-		    Comp Notequal
-		    Pass keep
-		    
-		}
+
 
 		CGPROGRAM
 

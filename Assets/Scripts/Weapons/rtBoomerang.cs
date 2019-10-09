@@ -5,13 +5,6 @@ using DG.Tweening;
 
 public class rtBoomerang : WeaponBase
 {
-    private enum BoomerangState
-    {
-        In,
-        Out,
-    }
-    private BoomerangState _boomerangState;
-    private Tweener _pathMoveTweener;
     private GameObject _firer;
     private HashSet<PlayerController> _hitSet;
     private DOTweenAnimation _meshRotate;
@@ -19,84 +12,58 @@ public class rtBoomerang : WeaponBase
     private float _fireTime;
     private Rigidbody _rb;
     private bool _canHit;
+    private LineRenderer _lr;
+    private List<Vector3> _axuilaryLinePoints;
+
+    private FSM<rtBoomerang> _boomerangFSM;
 
     protected override void Awake()
     {
         base.Awake();
         _ammo = WeaponDataStore.BoomerangDataStore.MaxAmmo;
-        _boomerangState = BoomerangState.In;
         _hitSet = new HashSet<PlayerController>();
         _meshRotate = GetComponentInChildren<DOTweenAnimation>();
         _rb = GetComponent<Rigidbody>();
+        _lr = GetComponent<LineRenderer>();
+        _axuilaryLinePoints = new List<Vector3>();
+        _boomerangFSM = new FSM<rtBoomerang>(this);
+        _boomerangFSM.TransitionTo<BoomerangInState>();
     }
 
     protected override void Update()
     {
         base.Update();
-        if (_boomerangState == BoomerangState.Out)
-        {
-            _movement();
-            RaycastHit hit;
-            if (Physics.SphereCast(transform.position + _rb.velocity.normalized * WeaponDataStore.BoomerangDataStore.ForwardCastAmount + Vector3.up * WeaponDataStore.BoomerangDataStore.UpCastAmount,
-                WeaponDataStore.BoomerangDataStore.HitRadius,
-                Vector3.down,
-                out hit, WeaponDataStore.BoomerangDataStore.HitMaxDistance,
-                WeaponDataStore.BoomerangDataStore.CanHitLayer))
-            {
-                if (hit.collider.GetComponent<WeaponBase>() != null) return;
-                PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
-                if (pc != null && pc.CanBlock(transform.forward))
-                {
-                    _boomerangState = BoomerangState.In;
-                    _meshRotate.DOPause();
-                    _meshRotate.transform.localEulerAngles = Vector3.zero;
-                    _pathMoveTweener.Kill();
-                    _hitSet.Clear();
-                    _rb.velocity = Vector3.zero;
-                    _rb.AddForce(WeaponDataStore.BoomerangDataStore.BoomerangReflectionForce * Vector3.up, ForceMode.Impulse);
-                    _onWeaponUsedOnce();
-                    return;
-                }
-                if (pc != null && !_hitSet.Contains(pc) && _canHit)
-                {
-                    pc.OnImpact((pc.transform.position - transform.position).normalized * WeaponDataStore.BoomerangDataStore.OnHitForce, ForceMode.Impulse, _firer, ImpactType.Boomerang);
-                    _hitSet.Add(pc);
-                }
-            }
-        }
+        _boomerangFSM.Update();
     }
 
-    protected override void OnCollisionEnter(Collision other)
+    private void FixedUpdate()
     {
-        base.OnCollisionEnter(other);
-        if (_boomerangState == BoomerangState.In) return;
+        _boomerangFSM.FixedUpdate();
+    }
+
+    protected override void OnTriggerEnter(Collider other)
+    {
+        base.OnTriggerEnter(other);
+        if (_boomerangFSM.CurrentState.GetType().Equals(typeof(BoomerangInState))) return;
         if (WeaponDataStore.BoomerangDataStore.ObstacleLayer == (WeaponDataStore.BoomerangDataStore.ObstacleLayer | (1 << other.gameObject.layer)))
         {
             print("Hit Obstacles");
-            _boomerangState = BoomerangState.In;
-            _meshRotate.DOPause();
-            _meshRotate.transform.localEulerAngles = Vector3.zero;
-            _pathMoveTweener.Kill();
-            _canHit = false;
-            _hitSet.Clear();
             _rb.velocity = Vector3.zero;
-            _rb.AddForce(WeaponDataStore.BoomerangDataStore.BoomerangReflectionForce * Vector3.up, ForceMode.Impulse);
-            _onWeaponUsedOnce();
+            _rb.AddForce(WeaponDataStore.BoomerangDataStore.BoomerangReflectionForce * Vector3.up, ForceMode.VelocityChange);
+            _boomerangFSM.TransitionTo<BoomerangInState>();
         }
     }
 
-    private void _movement()
+    private void _updateUI()
     {
-        float xSpeed = (WeaponDataStore.BoomerangDataStore.BoomerangVelocity.x * (_fireTime - Time.timeSinceLevelLoad));
-        float zSpeed = (WeaponDataStore.BoomerangDataStore.BoomerangVelocity.z * (_fireTime - Time.timeSinceLevelLoad));
-        float deltaX = 0f;
-        float deltaZ = 0f;
-        deltaX = WeaponDataStore.BoomerangDataStore.BoomerangAmplitude.x * Mathf.Cos(xSpeed);
-        deltaZ = WeaponDataStore.BoomerangDataStore.BoomerangAmplitude.z * Mathf.Sin(zSpeed);
-        Vector3 delatPos = new Vector3(deltaX, 0f, deltaZ);
-        _rb.velocity = transform.forward * deltaZ + transform.right * deltaX;
-        _rb.useGravity = false;
-        // transform.position = _initialPos + delatPos;
+        RaycastHit hit;
+        float y = transform.position.y;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity, WeaponDataStore.BoomerangDataStore.GroundLayer))
+        {
+            y = hit.point.y;
+        }
+
+
     }
 
     public override void Fire(bool buttondown)
@@ -104,37 +71,14 @@ public class rtBoomerang : WeaponBase
         if (!buttondown)
         {
             _firer = Owner;
-            _boomerangState = BoomerangState.Out;
-            _meshRotate.DORestart();
-            _initialPos = transform.position;
-            _fireTime = Time.timeSinceLevelLoad;
-            Vector3[] localPath = new Vector3[WeaponDataStore.BoomerangDataStore.LocalMovePoints.Length];
-            for (int i = 0; i < WeaponDataStore.BoomerangDataStore.LocalMovePoints.Length; i++)
-            {
-                localPath[i] = transform.position + transform.forward * WeaponDataStore.BoomerangDataStore.LocalMovePoints[i].z + transform.right * WeaponDataStore.BoomerangDataStore.LocalMovePoints[i].x;
-            }
-            Sequence sequence = DOTween.Sequence();
-            sequence.AppendInterval(WeaponDataStore.BoomerangDataStore.StartAffectiveDuration);
-            sequence.AppendCallback(() => _canHit = true);
-            sequence.AppendInterval(WeaponDataStore.BoomerangDataStore.EndAffectiveDuration);
-            sequence.AppendCallback(() =>
-            {
-                _rb.velocity = _rb.velocity.normalized * WeaponDataStore.BoomerangDataStore.BoomerangSpeed;
-                _rb.useGravity = true;
-                _meshRotate.DOPause();
-                _meshRotate.transform.localEulerAngles = Vector3.zero;
-                _boomerangState = BoomerangState.In;
-                _hitSet.Clear();
-                _canHit = false;
-            });
-            _onWeaponUsedOnce();
+            _boomerangFSM.TransitionTo<BoomerangOutState>();
         }
     }
 
     protected override void _onWeaponDespawn()
     {
-        _boomerangState = BoomerangState.In;
         _meshRotate.DOPause();
+        _boomerangFSM.TransitionTo<BoomerangInState>();
         _meshRotate.transform.localEulerAngles = Vector3.zero;
         _ammo = WeaponDataStore.BoomerangDataStore.MaxAmmo;
         _hitSet.Clear();
@@ -147,11 +91,97 @@ public class rtBoomerang : WeaponBase
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Vector3[] localMovePoints = WeaponDataStore.BoomerangDataStore.LocalMovePoints;
-        for (int i = 0; i < localMovePoints.Length; i++)
+        Vector3 centerPoint = WeaponDataStore.BoomerangDataStore.CircleCenter;
+        Gizmos.DrawSphere(transform.position + transform.forward * centerPoint.z + transform.right * centerPoint.x, 0.2f);
+
+    }
+
+    private abstract class BoomerangStates : FSM<rtBoomerang>.State
+    {
+        protected BoomerangData BoomerangData;
+        public override void Init()
         {
-            // Gizmos.DrawSphere(transform.position + localMovePoints[i], 0.2f);
-            Gizmos.DrawSphere(transform.position + transform.forward * localMovePoints[i].z + transform.right * localMovePoints[i].x, 0.2f);
+            base.Init();
+            BoomerangData = Context.WeaponDataStore.BoomerangDataStore;
+        }
+    }
+
+    private class BoomerangInState : BoomerangStates
+    {
+
+    }
+
+    private class BoomerangOutState : BoomerangStates
+    {
+        private Vector3 _centerPoint;
+        private float _timer;
+        private bool _firstFrame;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._meshRotate.DORestart();
+            Vector3 _initDir = Quaternion.Euler(0f, BoomerangData.BoomerangInitialLeftwardAngle, 0f) * Context.transform.forward;
+            _initDir.Normalize();
+            // Add Initial Force based on initila leftward angles
+            Context._rb.AddForce(_initDir * BoomerangData.BoomerangInitialSpeed, ForceMode.VelocityChange);
+            _centerPoint = Context.transform.position + Context.transform.forward * BoomerangData.CircleCenter.z + Context.transform.right * BoomerangData.CircleCenter.x;
+            Context.GetComponent<Collider>().isTrigger = true;
+            Context._rb.useGravity = false;
+            _timer = Time.timeSinceLevelLoad + BoomerangData.BoomerangMaxOutTime;
+            Context._onWeaponUsedOnce();
+            Context._hitSet.Clear();
+            _firstFrame = true;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<BoomerangInState>();
+                return;
+            }
+            RaycastHit hit;
+            if (!_firstFrame && Physics.SphereCast(Context.transform.position + Context._rb.velocity.normalized * BoomerangData.ForwardCastAmount + Vector3.up * BoomerangData.UpCastAmount,
+                BoomerangData.HitRadius,
+                Vector3.down,
+                out hit, BoomerangData.HitMaxDistance,
+                BoomerangData.CanHitLayer))
+            {
+                if (hit.collider.GetComponent<WeaponBase>() != null) return;
+                PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
+                if (pc != null && pc.CanBlock(Context.transform.forward))
+                {
+                    Context._rb.velocity = Vector3.zero;
+                    Context._rb.AddForce(BoomerangData.BoomerangReflectionForce * Vector3.up, ForceMode.VelocityChange);
+                    TransitionTo<BoomerangInState>();
+                    return;
+                }
+                if (pc != null && !Context._hitSet.Contains(pc))
+                {
+                    pc.OnImpact((pc.transform.position - Context.transform.position).normalized * BoomerangData.OnHitForce, ForceMode.Impulse, Context._firer, ImpactType.Boomerang);
+                    Context._hitSet.Add(pc);
+                }
+            }
+            _firstFrame = false;
+        }
+
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            // First Set Angular Velocity
+            Context._rb.AddForce(
+                (_centerPoint - Context.transform.position).normalized * BoomerangData.BoomerangAngleVelocity, ForceMode.Acceleration);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._rb.useGravity = true;
+            Context.GetComponent<Collider>().isTrigger = false;
+            Context._meshRotate.DOPause();
+            Context._meshRotate.transform.localEulerAngles = Vector3.zero;
         }
     }
 }

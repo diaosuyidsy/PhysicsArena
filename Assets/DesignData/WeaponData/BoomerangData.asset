@@ -18,44 +18,12 @@ MonoBehaviour:
   YOffset: 0
   ZOffset: 0.2
   XOffset: 0
-  BoomerangSpeed: 10
-  BoomerangVelocity: {x: 5, y: 0, z: -5}
-  BoomerangAmplitude: {x: 6, y: 0, z: 10}
-  StartAffectiveDuration: 0.1
-  EndAffectiveDuration: 1.2
-  OnHitForce: 1200
-  CurveMultiplier: 1
-  LocalMovePoints:
-  - {x: -1.46, y: 0, z: 1.66}
-  - {x: 0, y: 0, z: 2.64}
-  - {x: 1.26, y: 0, z: 1.61}
-  - {x: 0, y: 0, z: -0.53}
-  - {x: -1.13, y: 0, z: -3.03}
-  BoomerangYOffset: 1
-  BoomEase:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 1
-      outSlope: 1
-      tangentMode: 34
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
+  BoomerangInitialSpeed: 15
+  BoomerangInitialLeftwardAngle: -60
+  CircleCenter: {x: 0.5, y: 0, z: 1}
+  BoomerangAngleVelocity: 70
+  BoomerangMaxOutTime: 1.1
+  OnHitForce: 900
   MaxAmmo: 3
   CanHitLayer:
     serializedVersion: 2
@@ -67,4 +35,8 @@ MonoBehaviour:
   UpCastAmount: 0.2
   HitRadius: 0.2
   HitMaxDistance: 0.4
-  BoomerangReflectionForce: 4
+  BoomerangReflectionForce: 1
+  Step: 0.1
+  GroundLayer:
+    serializedVersion: 2
+    m_Bits: 8192

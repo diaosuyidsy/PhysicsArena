@@ -1,0 +1,102 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e1a1b76f45552cc46b47ae11c86de24d, type: 3}
+  m_Name: PlayGroundMapData
+  m_EditorClassIdentifier: 
+  GameMapMode: 4
+  Team1RespawnPoints:
+  - {x: 14.4, y: 0.573, z: -16.96}
+  - {x: 13.7, y: 0.573, z: -17.75}
+  - {x: 14.41, y: 0.573, z: -18.33}
+  Team2RespawnPoints:
+  - {x: 19.6, y: 0.573, z: -17}
+  - {x: 20.1, y: 0.573, z: -17.7}
+  - {x: 19.5, y: 0.573, z: -18.3}
+  TutorialImageMoveInDuration: 0.5
+  TutorialImageMoveInEase: 27
+  HoldAMoveInDuration: 0.2
+  HoldAMoveInDelay: 0.2
+  FillASpeed: 2
+  ChickenLandingPosition:
+  - {x: 15.8, y: 20, z: -18.1}
+  - {x: 14.8, y: 20, z: -18.5}
+  - {x: 16.12, y: 20, z: -18.86}
+  DuckLandingPostion:
+  - {x: 17.9, y: 20, z: -18.1}
+  - {x: 18.9, y: 20, z: -18.5}
+  - {x: 17.7, y: 20, z: -18.9}
+  BirdsFlyDownDuration: 1
+  BirdsFlyDownDelay:
+  - 0
+  - 0.4
+  - 0.4
+  - 0.4
+  - 0.4
+  - 0.4
+  BirdsFlyDownEase: 11
+  CameraMoveToPosition: {x: 17.13, y: 8.2, z: -25.6}
+  CameraMoveDuration: 2
+  CameraMoveDelay: 0
+  CameraTargetFOV: 15
+  CameraMoveEase: 12
+  CountDownStartDelay: 1
+  FightEase: 24
+  FightDelay: 0.4
+  FightScale: 2
+  FightDuration: 0.5
+  FightStayOnScreenDuration: 0.2
+  DarkCornerMiddlePercentage: 0.25
+  DarkCornerFinalPercentage: 0
+  DarkCornerToMiddleDuration: 2
+  DarkCornerToFinalDuration: 1
+  DarkCornerMiddleStayDuration: 1
+  TitleTextInCurve: 27
+  TitleTextInDuration: 0.4
+  TitleStayDuration: 1
+  TitleTextOutDuration: 0.4
+  TitleTextInDelay: 0.5
+  BackgroundMusicMixer: {fileID: 24100000, guid: 42e1f810734d8a447bb905f6bc63d0e5,
+    type: 2}
+  WeaponSpawnCD: 1
+  MaxAmountWeaponAtOnetime: 3
+  WeaponsInformation:
+  - WeaponName: SuckGun
+    WeaponSetNumber: 2
+    WeaponPrefab: {fileID: 4836811480432223405, guid: 72c3811b922351f46a96df8c012db16c,
+      type: 3}
+  - WeaponName: HookGun
+    WeaponSetNumber: 2
+    WeaponPrefab: {fileID: 5280293990200061506, guid: 80806367fc5c8174db77f42a640ecca8,
+      type: 3}
+  - WeaponName: BazookaGun
+    WeaponSetNumber: 1
+    WeaponPrefab: {fileID: 7308740760496570814, guid: d7e68fc47f9187543a36b1f7064fbc2f,
+      type: 3}
+  - WeaponName: FistGun
+    WeaponSetNumber: 4
+    WeaponPrefab: {fileID: 2747658201903773669, guid: cb7333462bf862649befe75401ebcf48,
+      type: 3}
+  - WeaponName: WaterGun
+    WeaponSetNumber: 4
+    WeaponPrefab: {fileID: 5372403526962513977, guid: 9a4898bcb2e7bdf489c4a6305e4a6d40,
+      type: 3}
+  - WeaponName: SmallBaz
+    WeaponSetNumber: 0
+    WeaponPrefab: {fileID: 7538341981120125636, guid: e1b8787b48be05847b559a505b945fc5,
+      type: 3}
+  - WeaponName: Boomerang
+    WeaponSetNumber: 1000000
+    WeaponPrefab: {fileID: 7538341981120125636, guid: 50dd9b962222adf45af0e9b777f95f4e,
+      type: 3}
+  WeaponSpawnerSize: {x: 5, y: 0, z: 5}
+  WorldCenter: {x: 17.3, y: -1.34, z: -17.1}
+  WorldSize: {x: 15.9, y: 0, z: 14.3}

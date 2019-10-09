@@ -12,7 +12,7 @@ public class ScrollArea : MonoBehaviour
         PlayerController pc = other.GetComponent<PlayerController>();
         if (pc != null)
         {
-            pc.OnImpact(transform.forward * ScrollAmount, ForceMode.VelocityChange, null, ImpactType.Self);
+            pc.OnImpact(-transform.right * ScrollAmount, ForceMode.VelocityChange, null, ImpactType.Self);
         }
     }
 }

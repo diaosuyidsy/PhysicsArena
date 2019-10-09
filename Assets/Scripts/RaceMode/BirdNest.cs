@@ -12,12 +12,13 @@ public class BirdNest : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Team"))
+        if (other.tag.Contains("Team"))
         {
             int colorindex = 0;
             for (int j = 0; j < Services.GameStateManager.PlayersInformation.RewiredID.Length; j++)
             {
-                if (other.GetComponent<PlayerController>().PlayerNumber == Services.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = Services.GameStateManager.PlayersInformation.ColorIndex[j];
+                if (other.GetComponent<PlayerController>().PlayerNumber == Services.GameStateManager.PlayersInformation.RewiredID[j])
+                    colorindex = Services.GameStateManager.PlayersInformation.ColorIndex[j];
             }
             _s.ChangeRespawnPoint(colorindex, transform.position, other.tag);
             _s.CollectEgg(colorindex);

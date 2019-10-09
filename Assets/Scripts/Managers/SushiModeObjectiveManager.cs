@@ -14,8 +14,9 @@ public class SushiModeObjectiveManager : ObjectiveManager
     private float[] _playerSpentTime;
     private int _playerThatEndedTheMatch;
 
-    public SushiModeObjectiveManager() : base()
+    public SushiModeObjectiveManager(SushiModeData _smd) : base()
     {
+        _sushiModeData = _smd;
         _playerCurrentHoldingEggs = new int[6];
         _playerTotalCollectedEggs = new int[6];
         _playerSpentTime = new float[6];
@@ -25,13 +26,9 @@ public class SushiModeObjectiveManager : ObjectiveManager
         Debug.Assert(CurrentHolding != null, "GAME UI NEEDS ATTENTION");
     }
 
-    public SushiModeObjectiveManager(SushiModeData _smd) : base()
-    {
-        _sushiModeData = _smd;
-    }
-
     public void ChangeRespawnPoint(int coloindex, Vector3 Pos, string tag)
     {
+        Debug.Log(coloindex);
         if (tag.Equals("Team1"))
         {
             Services.Config.Team1RespawnPoints[coloindex - 3] = Pos;
@@ -91,6 +88,7 @@ public class SushiModeObjectiveManager : ObjectiveManager
         {
             _playerSpentTime[colorindex] = Time.time - _playerStartTime;
             _playerThatEndedTheMatch++;
+            Debug.Log("Player that ended the match" + _playerThatEndedTheMatch);
         }
         if (_playerThatEndedTheMatch >= Services.GameStateManager.PlayersInformation.RewiredID.Length)
         {
@@ -105,7 +103,7 @@ public class SushiModeObjectiveManager : ObjectiveManager
             Debug.Log("TEAM 1 Score: " + team1Score.ToString());
             Debug.Log("TEAM 2 Score: " + team2Score.ToString());
             int winner = team1Score > team2Score ? 2 : 1;
-            OnWin(winner, Vector3.zero);
+            // OnWin(winner, Vector3.zero);
         }
     }
 }

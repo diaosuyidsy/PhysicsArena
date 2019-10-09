@@ -25,7 +25,9 @@ public class BoomerangData : WeaponDataBase
     public float BoomerangReflectionForce = 1f;
 
     [Header("Auxilary Line Config")]
-    public float Step = 0.1f;
+    public float Step = 0.02f;
+    [Range(0.01f, 2f)]
+    public float Time = 1f;
     public LayerMask GroundLayer;
 
 }

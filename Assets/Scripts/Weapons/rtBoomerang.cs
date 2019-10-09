@@ -16,6 +16,7 @@ public class rtBoomerang : WeaponBase
     private List<Vector3> _axuilaryLinePoints;
 
     private FSM<rtBoomerang> _boomerangFSM;
+    private bool _UIShow;
 
     protected override void Awake()
     {
@@ -26,6 +27,11 @@ public class rtBoomerang : WeaponBase
         _rb = GetComponent<Rigidbody>();
         _lr = GetComponent<LineRenderer>();
         _axuilaryLinePoints = new List<Vector3>();
+        for (int i = 0; i < WeaponDataStore.BoomerangDataStore.Time / WeaponDataStore.BoomerangDataStore.Step; i++)
+        {
+            _axuilaryLinePoints.Add(Vector3.zero);
+        }
+        _lr.positionCount = _axuilaryLinePoints.Count;
         _boomerangFSM = new FSM<rtBoomerang>(this);
         _boomerangFSM.TransitionTo<BoomerangInState>();
     }
@@ -34,6 +40,8 @@ public class rtBoomerang : WeaponBase
     {
         base.Update();
         _boomerangFSM.Update();
+        if (_UIShow)
+            _updateUI();
     }
 
     private void FixedUpdate()
@@ -57,13 +65,30 @@ public class rtBoomerang : WeaponBase
     private void _updateUI()
     {
         RaycastHit hit;
-        float y = transform.position.y;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, Mathf.Infinity, WeaponDataStore.BoomerangDataStore.GroundLayer))
+        BoomerangData bd = WeaponDataStore.BoomerangDataStore;
+        float yy = transform.position.y;
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 50f, WeaponDataStore.BoomerangDataStore.GroundLayer))
         {
-            y = hit.point.y;
+            print(hit.point.y);
+            yy = hit.point.y;
         }
 
-
+        for (int i = 0; i < _axuilaryLinePoints.Count; i++)
+        {
+            float t = i * bd.Step;
+            float ax0 = bd.BoomerangAngleVelocity;
+            float az0 = 0f;
+            float t0 = bd.Time / 2f;
+            float vx0 = bd.BoomerangInitialSpeed * Mathf.Sin(bd.BoomerangInitialLeftwardAngle * Mathf.Deg2Rad);
+            float vz0 = bd.BoomerangInitialSpeed * Mathf.Cos(bd.BoomerangInitialLeftwardAngle * Mathf.Deg2Rad);
+            float sx = (-ax0 / (12f * t0 * t0)) * Mathf.Pow(t, 4) + (ax0 / (3f * t0)) * Mathf.Pow(t, 3) + vx0 * t;
+            float sz = (az0 / (12f * t0 * t0)) * Mathf.Pow(t, 4) - (az0 / (3f * t0)) * Mathf.Pow(t, 3) + (az0 / 2f) * t * t + vz0 * t;
+            _axuilaryLinePoints[i] = transform.position + transform.forward * sz + transform.right * sx;
+            Vector3 temp = _axuilaryLinePoints[i];
+            temp.y = yy;
+            _axuilaryLinePoints[i] = temp;
+        }
+        _lr.SetPositions(_axuilaryLinePoints.ToArray());
     }
 
     public override void Fire(bool buttondown)
@@ -72,6 +97,11 @@ public class rtBoomerang : WeaponBase
         {
             _firer = Owner;
             _boomerangFSM.TransitionTo<BoomerangOutState>();
+        }
+        else
+        {
+            _UIShow = true;
+            _lr.enabled = true;
         }
     }
 
@@ -108,7 +138,18 @@ public class rtBoomerang : WeaponBase
 
     private class BoomerangInState : BoomerangStates
     {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._UIShow = false;
+            Context._lr.enabled = false;
+        }
 
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._lr.enabled = false;
+        }
     }
 
     private class BoomerangOutState : BoomerangStates

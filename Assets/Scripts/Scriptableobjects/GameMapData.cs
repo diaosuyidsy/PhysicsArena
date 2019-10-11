@@ -12,6 +12,7 @@ public class GameMapData : ScriptableObject
     [Header("General Map Settings")]
     public Vector3[] Team1RespawnPoints;
     public Vector3[] Team2RespawnPoints;
+    public float RespawnTime = 5f;
 
     [Header("Tutorial State Setting")]
     public float TutorialImageMoveInDuration = 0.2f;

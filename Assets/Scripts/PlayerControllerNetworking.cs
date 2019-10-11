@@ -614,7 +614,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     private class DeadState : FSM<PlayerControllerNetworking>.State
     {
         private float _startTime;
-        private float _respawnTime { get { return Context.CharacterDataStore.CharacterMovementDataStore.RespawnTime; } }
+        private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
 
         public override void OnEnter()
         {
@@ -1053,7 +1053,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     private class ActionDeadState : ActionState
     {
         private float _startTime;
-        private float _respawnTime { get { return Context.CharacterDataStore.CharacterMovementDataStore.RespawnTime; } }
+        private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
 
         public override void OnEnter()
         {

@@ -515,7 +515,7 @@ public class PlayerController : MonoBehaviour
     private class DeadState : FSM<PlayerController>.State
     {
         private float _startTime;
-        private float _respawnTime { get { return Context.CharacterDataStore.CharacterMovementDataStore.RespawnTime; } }
+        private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
 
         public override void OnEnter()
         {
@@ -681,6 +681,8 @@ public class PlayerController : MonoBehaviour
                 case "Weapon_OnChest":
                     Context._animator.SetBool("PickUpHalf", true);
                     break;
+                case "Team1Resource":
+                case "Team2Resource":
                 case "Weapon_OnHead":
                     Context._animator.SetBool("PickUpFull", true);
                     break;
@@ -962,7 +964,7 @@ public class PlayerController : MonoBehaviour
     private class ActionDeadState : ActionState
     {
         private float _startTime;
-        private float _respawnTime { get { return Context.CharacterDataStore.CharacterMovementDataStore.RespawnTime; } }
+        private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
 
         public override void OnEnter()
         {

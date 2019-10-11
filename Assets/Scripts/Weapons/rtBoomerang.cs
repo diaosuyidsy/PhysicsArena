@@ -69,7 +69,6 @@ public class rtBoomerang : WeaponBase
         float yy = transform.position.y;
         if (Physics.Raycast(transform.position, Vector3.down, out hit, 50f, WeaponDataStore.BoomerangDataStore.GroundLayer))
         {
-            print(hit.point.y);
             yy = hit.point.y;
         }
 

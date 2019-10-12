@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
 using System;
@@ -37,15 +38,7 @@ public class PlayerController : MonoBehaviour
     private float _blockCharge;
     private float _lastTimeUseBlock;
     private Vector3 _freezeBody;
-    private HingeJoint _chesthj;
-    private HingeJoint _leftArm2hj;
-    private HingeJoint _rightArm2hj;
-    private HingeJoint _leftArmhj;
-    private HingeJoint _rightArmhj;
-    private HingeJoint _leftHandhj;
-    private HingeJoint _rightHandhj;
     private ImpactMarker _impactMarker;
-    IEnumerator _startSlow;
     private bool _isJumping;
     private Animator _animator;
 
@@ -72,7 +65,9 @@ public class PlayerController : MonoBehaviour
             else return _walkSpeedMultiplier;
         }
     }
-
+    private List<Rigidbody> _playerBodies;
+    private IEnumerator _deadInvincible;
+    private int _playerBodiesLayer;
     #endregion
 
     private void Awake()
@@ -83,17 +78,19 @@ public class PlayerController : MonoBehaviour
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
         _freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
-        _chesthj = Chest.GetComponent<HingeJoint>();
-        _leftArm2hj = LeftArms[0].GetComponent<HingeJoint>();
-        _rightArm2hj = RightArms[0].GetComponent<HingeJoint>();
-        _leftArmhj = LeftArms[1].GetComponent<HingeJoint>();
-        _rightArmhj = RightArms[1].GetComponent<HingeJoint>();
-        _leftHandhj = LeftArms[2].GetComponent<HingeJoint>();
-        _rightHandhj = RightArms[2].GetComponent<HingeJoint>();
         _movementFSM.TransitionTo<IdleState>();
         _actionFSM.TransitionTo<IdleActionState>();
         _impactMarker = new ImpactMarker(null, Time.time, ImpactType.Self);
         _animator = GetComponent<Animator>();
+        _playerBodies = new List<Rigidbody>();
+        _playerBodiesLayer = gameObject.layer;
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
+        {
+            if (rb.gameObject.layer != LayerMask.NameToLayer("NoCollision"))
+            {
+                _playerBodies.Add(rb);
+            }
+        }
     }
 
     public void Init(int controllernumber)
@@ -296,6 +293,21 @@ public class PlayerController : MonoBehaviour
         // _resetBodyAnimation();
         // Nullify the holder
         HandObject = null;
+    }
+
+    private IEnumerator _deadInvincibleIenumerator(float time)
+    {
+        foreach (Rigidbody rb in _playerBodies)
+        {
+            rb.gameObject.layer = LayerMask.NameToLayer("ReviveInvincible");
+        }
+
+        yield return new WaitForSeconds(time);
+
+        foreach (Rigidbody rb in _playerBodies)
+        {
+            rb.gameObject.layer = _playerBodiesLayer;
+        }
     }
 
     private void _helpAim(float maxangle, float maxRange)
@@ -525,6 +537,8 @@ public class PlayerController : MonoBehaviour
             Context._setToSpawn(10f);
             Context._animator.SetBool("IdleDowner", true);
             foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
+            if (Context._deadInvincible != null)
+                Context.StopCoroutine(Context._deadInvincible);
         }
 
         public override void Update()
@@ -544,7 +558,8 @@ public class PlayerController : MonoBehaviour
             Context._rb.isKinematic = false;
             Context._setToSpawn(0f);
             foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(true); }
-
+            Context._deadInvincible = Context._deadInvincibleIenumerator(Services.Config.GameMapData.InvincibleTime);
+            Context.StartCoroutine(Context._deadInvincible);
         }
     }
     #endregion
@@ -824,7 +839,7 @@ public class PlayerController : MonoBehaviour
             {
                 RaycastHit hit;
                 // This Layermask get all player's layer except this player's
-                int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
+                int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer) ^ LayerMask.NameToLayer("ReviveInvincible");
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
                 {
                     if (hit.transform.GetComponentInParent<PlayerController>() == null) return;

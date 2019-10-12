@@ -187,6 +187,13 @@ public class rtHook : WeaponBase
     public override void OnDrop()
     {
         base.OnDrop();
+        if (Hooked != null)
+        {
+            foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.isKinematic = false;
+            }
+        }
         Hooked = null;
     }
 

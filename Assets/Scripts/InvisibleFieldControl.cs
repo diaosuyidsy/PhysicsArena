@@ -5,6 +5,7 @@ using UnityEngine;
 public class InvisibleFieldControl : MonoBehaviour
 {
     public float VisibleOnHitTime = 0.5f;
+    private readonly int _visibleRenderQueue = 1998;
     private void Awake()
     {
         EventManager.Instance.AddHandler<PunchHolding>(_onPlayerHoldPunch);
@@ -17,9 +18,7 @@ public class InvisibleFieldControl : MonoBehaviour
 
     private void _onPlayerHoldPunch(PunchHolding ev)
     {
-        ev.Player.GetComponentInChildren<SkinnedMeshRenderer>().material.renderQueue = 1999;
-        print("Hello");
-        print(ev.Player.GetComponentInChildren<SkinnedMeshRenderer>().material.name);
+        ev.Player.GetComponentInChildren<SkinnedMeshRenderer>().material.renderQueue = _visibleRenderQueue;
     }
 
     private void _onPlayerReleasedPunch(PunchReleased ev)
@@ -47,7 +46,7 @@ public class InvisibleFieldControl : MonoBehaviour
 
     private void _onBlockStart(BlockStart ev)
     {
-        ev.Player.GetComponentInChildren<SkinnedMeshRenderer>().material.renderQueue = 1999;
+        ev.Player.GetComponentInChildren<SkinnedMeshRenderer>().material.renderQueue = _visibleRenderQueue;
 
     }
 
@@ -58,7 +57,7 @@ public class InvisibleFieldControl : MonoBehaviour
 
     IEnumerator _startInvisible(float time, GameObject Player)
     {
-        Player.GetComponentInChildren<SkinnedMeshRenderer>().material.renderQueue = 1999;
+        Player.GetComponentInChildren<SkinnedMeshRenderer>().material.renderQueue = _visibleRenderQueue;
         yield return new WaitForSeconds(time);
         Player.GetComponentInChildren<SkinnedMeshRenderer>().material.renderQueue = 2000;
     }

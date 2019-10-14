@@ -248,6 +248,18 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    public void HookedStatic(bool start)
+    {
+        if (start)
+        {
+            _movementFSM.TransitionTo<HookGunStaticMovementState>();
+        }
+        else
+        {
+            _movementFSM.TransitionTo<IdleState>();
+        }
+    }
+
     #region Helper Method
     private void _setToSpawn(float yOffset)
     {
@@ -355,6 +367,8 @@ public class PlayerController : MonoBehaviour
     {
         protected float _HLAxis { get { return Context._player.GetAxis("Move Horizontal"); } }
         protected float _VLAxis { get { return Context._player.GetAxis("Move Vertical"); } }
+        protected float _HLAxisRaw { get { return Context._player.GetAxisRaw("Move Horizontal"); } }
+        protected float _VLAxisRaw { get { return Context._player.GetAxisRaw("Move Vertical"); } }
         protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
         protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
         protected CharacterMovementData _charMovData { get { return Context.CharacterDataStore.CharacterMovementDataStore; } }
@@ -420,7 +434,7 @@ public class PlayerController : MonoBehaviour
         public override void Update()
         {
             base.Update();
-            if (Mathf.Approximately(_HLAxis, 0f) && Mathf.Approximately(_VLAxis, 0f)) TransitionTo<IdleState>();
+            if (_HLAxisRaw == 0f && _VLAxisRaw == 0f) TransitionTo<IdleState>();
         }
 
         public override void FixedUpdate()
@@ -521,6 +535,36 @@ public class PlayerController : MonoBehaviour
         {
             base.OnExit();
             Context._animator.SetBool("Running", false);
+        }
+    }
+
+    private class HookGunStaticMovementState : MovementState
+    {
+        private Vector3 _diff;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            foreach (Rigidbody rb in Context.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.isKinematic = true;
+            }
+            _diff = Context.HandObject.transform.position - Context.transform.position;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            Context.transform.position = Context.HandObject.transform.position - _diff;
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            foreach (Rigidbody rb in Context.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.isKinematic = false;
+            }
         }
     }
 
@@ -839,7 +883,9 @@ public class PlayerController : MonoBehaviour
             {
                 RaycastHit hit;
                 // This Layermask get all player's layer except this player's
-                int layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer) ^ LayerMask.NameToLayer("ReviveInvincible");
+                int layermask = 0;
+                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Services.Config.ConfigData.AllPlayerLayer;
+                else layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
                 {
                     if (hit.transform.GetComponentInParent<PlayerController>() == null) return;
@@ -979,7 +1025,7 @@ public class PlayerController : MonoBehaviour
     private class ActionDeadState : ActionState
     {
         private float _startTime;
-        private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
+        private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime + Services.Config.GameMapData.InvincibleTime; } }
 
         public override void OnEnter()
         {

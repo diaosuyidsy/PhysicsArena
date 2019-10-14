@@ -13,6 +13,7 @@ public class rtHook : WeaponBase
     private GameObject _hook;
     private Vector3 _hookinitlocalPos;
     private Vector3 _hookinitlocalScale;
+    private Vector3 _hookinitialLocalRotation;
     private GameObject _hookmax;
     private Vector3 _hookmaxPos = Vector3.zero;
     private HookControl _hc;
@@ -29,10 +30,13 @@ public class rtHook : WeaponBase
         OnTarget,
         FlyingIn,
         Broken,
+        StaticFlyingIn,
     }
     private State _hookState;
     private bool _released;
     private float _brokenTimer;
+
+    private FSM<rtHook> _hookFSM;
 
     protected override void Awake()
     {
@@ -43,10 +47,13 @@ public class rtHook : WeaponBase
         _hc = _hook.GetComponent<HookControl>();
         _hookinitlocalPos = new Vector3(_hook.transform.localPosition.x, _hook.transform.localPosition.y, _hook.transform.localPosition.z);
         _hookinitlocalScale = new Vector3(_hook.transform.localScale.x, _hook.transform.localScale.y, _hook.transform.localScale.z);
+        _hookinitialLocalRotation = new Vector3(_hook.transform.localEulerAngles.x, _hook.transform.localEulerAngles.y, _hook.transform.localEulerAngles.z);
         _hookmax = transform.GetChild(1).gameObject;
         _hookState = State.Empty;
         _ammo = WeaponDataStore.HookGunDataStore.MaxHookTimes;
         _lr = GetComponent<LineRenderer>();
+        _hookFSM = new FSM<rtHook>(this);
+        _hookFSM.TransitionTo<IdleState>();
     }
 
     protected override void Update()
@@ -54,7 +61,7 @@ public class rtHook : WeaponBase
         base.Update();
         _lr.SetPosition(0, _hookendpoint.position);
         _lr.SetPosition(1, _hookstartpoint.position);
-
+        // _hookFSM.Update();
         if (_hookState == State.FlyingOut)
         {
             Vector3 nextpos = (_hookmaxPos - _hook.transform.position).normalized;
@@ -135,6 +142,23 @@ public class rtHook : WeaponBase
                 _hookState = State.Empty;
             }
         }
+
+        if (_hookState == State.StaticFlyingIn)
+        {
+            Vector3 nextpos = (_hook.transform.position - transform.position).normalized;
+            transform.Translate(nextpos * Time.deltaTime * WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
+            if (Vector3.Distance(transform.position, _hook.transform.position) <= 0.5f)
+            {
+                Owner.GetComponent<PlayerController>().HookedStatic(false);
+                _hookState = State.Empty;
+                _followHand = true;
+                _hc.CanHook = true;
+                _hook.transform.parent = transform;
+                _hook.transform.localPosition = _hookinitlocalPos;
+                _hook.transform.localScale = _hookinitlocalScale;
+                return;
+            }
+        }
     }
 
     public override void Fire(bool buttondown)
@@ -142,6 +166,11 @@ public class rtHook : WeaponBase
         // If button down
         if (buttondown)
         {
+            // if (_hookFSM.CurrentState.GetType().Equals(typeof(IdleState)))
+            // {
+            //     _hookFSM.TransitionTo<FlyingOutState>();
+            //     // EventManager.Instance.TriggerEvent(new HookGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
+            // }
             if (_hookState == State.Empty)
             {
                 // Then we could fire the hook
@@ -195,6 +224,13 @@ public class rtHook : WeaponBase
             }
         }
         Hooked = null;
+    }
+
+    public void HookStaticObject()
+    {
+        _hookState = State.StaticFlyingIn;
+        _followHand = false;
+        Owner.GetComponent<PlayerController>().HookedStatic(true);
     }
 
     public void HookOnHit(GameObject hit)
@@ -260,5 +296,59 @@ public class rtHook : WeaponBase
 
         Hooked = null;
         gameObject.SetActive(false);
+    }
+
+    private abstract class HookState : FSM<rtHook>.State { }
+
+    private class IdleState : HookState
+    {
+
+    }
+
+    private class FlyingOutState : HookState
+    {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context.CanCarryBack = true;
+            Context._hc.CanHook = true;
+            // Record where the hook should go to in world position
+            Context._hookmaxPos = new Vector3(Context._hookmax.transform.position.x, Context._hookmax.transform.position.y, Context._hookmax.transform.position.z);
+            // Also need to make hook out of parent
+            Context._hook.transform.parent = null;
+            EventManager.Instance.TriggerEvent(new HookGunFired(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerController>().PlayerNumber));
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            Vector3 nextpos = (Context._hookmaxPos - Context._hook.transform.position).normalized;
+            Context._hook.transform.Translate(nextpos * Time.deltaTime * Context.WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
+            if (Vector3.Distance(Context._hook.transform.position, Context._hookmaxPos) <= 0.1f)
+            {
+                TransitionTo<FlyingInState>();
+                return;
+            }
+        }
+    }
+
+    private class OnTargetState : HookState
+    {
+
+    }
+
+    private class FlyingInState : HookState
+    {
+
+    }
+
+    private class BrokenState : HookState
+    {
+
+    }
+
+    private class StaticFlyingIn : HookState
+    {
+
     }
 }

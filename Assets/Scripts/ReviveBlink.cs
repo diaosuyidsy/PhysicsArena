@@ -4,12 +4,12 @@ using UnityEngine;
 
 public class ReviveBlink : MonoBehaviour
 {
-    public float BlinkTime = 3f;
+    private float BlinkTime = 3f;
     private bool isBlinking = false;
     private void Awake()
     {
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawned);
-
+        BlinkTime = Services.Config.GameMapData.InvincibleTime;
     }
 
     private void _onPlayerRespawned(PlayerRespawned ev)

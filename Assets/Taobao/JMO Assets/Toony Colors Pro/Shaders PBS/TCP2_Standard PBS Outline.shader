@@ -84,12 +84,7 @@
 		Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
 		LOD 300
 		
-		Stencil{
-		    Ref 1
-		    Comp Notequal
-		    Pass keep
-		    
-		}
+
 	
 
 		// ------------------------------------------------------------------
@@ -265,12 +260,7 @@
 	{
 		Tags { "RenderType"="Opaque" "PerformanceChecks"="False" }
 		LOD 150
-        Stencil{
-		    Ref 1
-		    Comp Notequal
-		    Pass keep
-		    
-		}
+
 		// ------------------------------------------------------------------
 		//  Base forward pass (directional light, emission, lightmaps, ...)
 		Pass

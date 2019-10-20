@@ -250,3 +250,10 @@ public enum ImpactType
     Block,
     Self,
 }
+
+[Serializable]
+public enum RuleType
+{
+    Punch,
+    Gravity,
+}

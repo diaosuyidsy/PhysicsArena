@@ -5,6 +5,7 @@ using UnityEngine;
 public class ReviveBlink : MonoBehaviour
 {
     private float BlinkTime = 3f;
+    private float BlinkSpeed = 10f;
     private bool isBlinking = false;
     private void Awake()
     {
@@ -21,7 +22,7 @@ public class ReviveBlink : MonoBehaviour
             
             if (r!= null && r.material.name.Contains("CustomComic"))
             {
-                StartCoroutine(_startBlinking(BlinkTime, r.material));
+                StartCoroutine(_startBlinking(BlinkTime, r));
             }
 
             
@@ -32,11 +33,26 @@ public class ReviveBlink : MonoBehaviour
     }
 
 
-    IEnumerator _startBlinking(float time, Material mat)
+    IEnumerator _startBlinking(float time, Renderer r)
     {
-        mat.SetFloat("_IsBlinking", 1);
-        yield return new WaitForSeconds(time);
-        mat.SetFloat("_IsBlinking", 0);
+        float curTime = 0;
+        float deltaTime = BlinkSpeed * Time.deltaTime;
+        while (curTime < time)
+        {
+            if (r.enabled)
+            {
+                r.enabled = false;
+            }
+            else
+            {
+                r.enabled = true;
+            }
+
+            curTime += deltaTime;
+            yield return new WaitForSeconds(deltaTime);
+        }
+
+        r.enabled = true;
     }
     
     

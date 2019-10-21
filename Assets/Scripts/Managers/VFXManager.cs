@@ -5,6 +5,8 @@ using UnityEngine;
 public class VFXManager
 {
 	public VFXData VFXDataStore;
+	private float _blinkTime = 3f;
+	private float _blinkDeltaTime = 10f;
 
 	public VFXManager(VFXData _vfxdata)
 	{
@@ -231,6 +233,41 @@ public class VFXManager
 		GameObject.Instantiate(parryvfx, pc.transform);
 		GameObject.Instantiate(parryvfx, pc.BlockVFXHolder.transform);
 	}
+
+	private void _onPlayerRespawned(PlayerRespawned ev)
+	{
+		foreach (Transform child in ev.Player.transform)
+		{
+			Renderer r = child.gameObject.GetComponent<Renderer>();
+
+			if (r != null && r.material.name.Contains("CustomComic"))
+			{
+				ev.Player.GetComponent<PlayerController>().StartCoroutine(_startBlinking(_blinkTime, r));
+			}
+		}
+	}
+	IEnumerator _startBlinking(float time, Renderer r)
+	{
+		float curTime = 0;
+		float deltaTime = _blinkDeltaTime * Time.deltaTime;
+		while (curTime < time)
+		{
+			if (r.enabled)
+			{
+				r.enabled = false;
+			}
+			else
+			{
+				r.enabled = true;
+			}
+
+			curTime += deltaTime;
+			yield return new WaitForSeconds(deltaTime);
+		}
+
+		r.enabled = true;
+	}
+
 	#endregion
 
 	private GameObject _instantiateVFX(GameObject _vfx, Vector3 _pos, Quaternion _rot)
@@ -264,7 +301,10 @@ public class VFXManager
 		EventManager.Instance.AddHandler<FistGunCharged>(_onFistGunRecharged);
 		EventManager.Instance.AddHandler<BazookaFired>(_onBazookaLaunched);
 		EventManager.Instance.AddHandler<Blocked>(_onBlocked);
+		EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawned);
+		_blinkTime = Services.Config.GameMapData.InvincibleTime;
 	}
+	
 
 	private void OnDisable()
 	{
@@ -292,6 +332,8 @@ public class VFXManager
 		EventManager.Instance.RemoveHandler<FistGunCharged>(_onFistGunRecharged);
 		EventManager.Instance.RemoveHandler<BazookaFired>(_onBazookaLaunched);
 		EventManager.Instance.RemoveHandler<Blocked>(_onBlocked);
+		EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawned);
+
 	}
 
 	public void Destory()

@@ -27,10 +27,11 @@ public class EggNest : MonoBehaviour
             {
                 if (other.GetComponent<PlayerController>().PlayerNumber == Services.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = Services.GameStateManager.PlayersInformation.ColorIndex[j];
             }
-            // _s.ChangeRespawnPoint(colorindex, transform.position, other.tag);
             if (!Eggs[colorindex] && _s.PickUpEgg(colorindex))
             {
                 Eggs[colorindex] = true;
+                // Pick up the Egg as UI
+                transform.parent.GetChild(1).GetChild(colorindex).GetComponent<Renderer>().enabled = false;
             }
         }
     }
@@ -38,5 +39,6 @@ public class EggNest : MonoBehaviour
     private void OnCollectEgg(CollectEgg ev)
     {
         Eggs[ev.ColorIndex] = false;
+        transform.parent.GetChild(1).GetChild(ev.ColorIndex).GetComponent<Renderer>().enabled = true;
     }
 }

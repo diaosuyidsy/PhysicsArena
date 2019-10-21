@@ -33,6 +33,9 @@ public class Game : MonoBehaviour
             case GameMapMode.RaceMode:
                 Services.GameObjectiveManager = new SushiModeObjectiveManager((SushiModeData)ModeSepcificData);
                 break;
+            case GameMapMode.SoccerMode:
+                Services.GameObjectiveManager = new SoccerModeObjectiveManager((SoccerMapData)ModeSepcificData);
+                break;
             default:
                 Services.GameObjectiveManager = new EmptyObjectiveManager();
                 break;

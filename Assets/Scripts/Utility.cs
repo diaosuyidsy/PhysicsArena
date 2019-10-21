@@ -220,6 +220,7 @@ public enum GameMapMode
     ObjectiveMode,
     BrawlMode,
     RaceMode,
+    SoccerMode,
 }
 
 public enum TeamNum

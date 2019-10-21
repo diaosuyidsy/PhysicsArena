@@ -565,3 +565,16 @@ public class Blocked : GameEvent
         BlockerPlayerNumber = blockerPlayerNumber;
     }
 }
+
+#region MapEvent
+
+public class OnScore : GameEvent
+{
+    public int Team;
+
+    public OnScore(int team)
+    {
+        Team = team;
+    }
+}
+#endregion

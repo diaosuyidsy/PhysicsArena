@@ -261,6 +261,18 @@ public class PlayerController : MonoBehaviour
     }
 
     #region Helper Method
+    private bool _frontIsCliff()
+    {
+        RaycastHit hit;
+        float colliderRadius = GetComponent<CapsuleCollider>().radius;
+        Physics.Raycast(transform.position + transform.forward * (colliderRadius + CharacterDataStore.CharacterMovementDataStore.FrontIsCliff),
+                        Vector3.down,
+                        out hit,
+                        50f,
+                        CharacterDataStore.CharacterMovementDataStore.JumpMask);
+        if (hit.collider == null) return true;
+        return false;
+    }
     private void _setToSpawn(float yOffset)
     {
         int colorindex = 0;
@@ -416,6 +428,15 @@ public class PlayerController : MonoBehaviour
             }
         }
 
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            if (Context._frontIsCliff() && Context._isGrounded())
+            {
+                Context._rb.AddForce(-Context.transform.forward * Context.CharacterDataStore.CharacterMovementDataStore.CliffPreventionForce, ForceMode.Acceleration);
+            }
+        }
+
         public override void OnExit()
         {
             base.OnExit();
@@ -425,10 +446,12 @@ public class PlayerController : MonoBehaviour
 
     private class RunState : ControllableMovementState
     {
+        private float _runTowardsCliffTime;
         public override void OnEnter()
         {
             base.OnEnter();
             Context._animator.SetBool("Running", true);
+            _runTowardsCliffTime = 0f;
         }
 
         public override void Update()
@@ -455,6 +478,14 @@ public class PlayerController : MonoBehaviour
             Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
             Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
             Context.transform.rotation = tr;
+            if (Context._frontIsCliff() && isonground)
+            {
+                _runTowardsCliffTime += Time.fixedDeltaTime;
+                if (_runTowardsCliffTime < Context.CharacterDataStore.CharacterMovementDataStore.CliffPreventionTimer)
+                    Context._rb.AddForce(-Context.transform.forward * Context.CharacterDataStore.CharacterMovementDataStore.CliffPreventionForce, ForceMode.Acceleration);
+            }
+            else
+                _runTowardsCliffTime = 0f;
         }
 
         public override void OnExit()

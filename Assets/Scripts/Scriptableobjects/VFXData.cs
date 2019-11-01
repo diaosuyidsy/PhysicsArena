@@ -9,6 +9,7 @@ public class VFXData : ScriptableObject
     public GameObject DeathVFX;
     public GameObject VanishVFX;
     public GameObject HitVFX;
+    public Vector3 HitOffset = Vector3.one;
     public GameObject JumpGrassVFX;
     public GameObject JumpConcreteVFX;
     public GameObject JumpYellowStoneVFX;
@@ -39,5 +40,5 @@ public class VFXData : ScriptableObject
     public GameObject ChickenBlockShieldStarVFX;
     public GameObject DuckBlockParryVFX;
     public GameObject DuckBlockShieldStarVFX;
-
+    
 }

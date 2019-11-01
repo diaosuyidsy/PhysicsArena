@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
 
     [HideInInspector] public GameObject HandObject;
     [HideInInspector] public GameObject MeleeVFXHolder;
+    [HideInInspector] public GameObject MeleeVFXHolder2;
     [HideInInspector] public GameObject BlockVFXHolder;
     [HideInInspector] public GameObject BlockUIVFXHolder;
     [HideInInspector] public GameObject StunVFXHolder;

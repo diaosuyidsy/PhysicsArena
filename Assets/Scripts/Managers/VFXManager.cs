@@ -17,7 +17,8 @@ public class VFXManager
 	#region Event Handlers
 	private void _onPlayerHit(PlayerHit ph)
 	{
-		Vector3 hittedPos = ph.Hitted.transform.position;
+        //		Vector3 hittedPos = ph.Hitted.transform.position;
+        Vector3 hittedPos = ph.Hiter.transform.position + ph.Hiter.transform.forward * VFXDataStore.HitOffset.z + ph.Hiter.transform.right * VFXDataStore.HitOffset.x + ph.Hiter.transform.up * VFXDataStore.HitOffset.y;
 		Vector3 force = ph.Force;
 		if (ph.MeleeCharge > 0.1f)
 			_instantiateVFX(VFXDataStore.HitVFX, hittedPos, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
@@ -94,9 +95,9 @@ public class VFXManager
 	private void _onPunchStart(PunchStart ps)
 	{
 		GameObject VFX = ps.Player.CompareTag("Team1") ? VFXDataStore.ChickenMeleeChargingVFX : VFXDataStore.DuckMeleeChargingVFX;
-		GameObject MeleeVFXHolder = ps.Player.GetComponent<PlayerController>().MeleeVFXHolder;
+		GameObject MeleeVFXHolder = ps.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
 		if (MeleeVFXHolder != null) GameObject.Destroy(MeleeVFXHolder);
-		ps.Player.GetComponent<PlayerController>().MeleeVFXHolder = GameObject.Instantiate(VFX, ps.PlayerRightHand, false);
+		ps.Player.GetComponent<PlayerController>().MeleeVFXHolder2 = GameObject.Instantiate(VFX, ps.PlayerRightHand, false);
 
 	}
 
@@ -110,10 +111,11 @@ public class VFXManager
 
 	private void _onPunchReleased(PunchReleased pr)
 	{
+        GameObject MeleeVFXHolder2 = pr.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
+        if (MeleeVFXHolder2 != null) GameObject.Destroy(MeleeVFXHolder2);
+    }
 
-	}
-
-	private void _onPunchDone(PunchDone pd)
+    private void _onPunchDone(PunchDone pd)
 	{
 		GameObject MeleeVFXHolder = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder;
 		if (MeleeVFXHolder != null) GameObject.Destroy(MeleeVFXHolder);

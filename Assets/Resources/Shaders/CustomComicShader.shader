@@ -201,6 +201,12 @@ Shader "CustomComicShader"
 		{
 			Name "ShadowCaster"
 			Tags{ "LightMode" = "ShadowCaster" }
+			Stencil
+		    {
+			Ref 1
+			Comp NotEqual
+			Pass Keep
+		    }
 			ZWrite On
 			CGPROGRAM
 			#pragma vertex vert

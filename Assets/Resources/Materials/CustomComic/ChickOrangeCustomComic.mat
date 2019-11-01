@@ -23,6 +23,10 @@ Material:
         m_Texture: {fileID: 2800000, guid: fcd499491e553e84a99bcb03fa869fd7, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _HalftoneTexture:
+        m_Texture: {fileID: 2800000, guid: 1defb449ad9e75b48bee9bee67bd1dd7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -41,18 +45,22 @@ Material:
     - _BlinkSpeed: 20
     - _Cutoff: 0.5
     - _Gloss: 0.079
+    - _HalftonePower: 0.18
+    - _HalftoneScale: 13.4
     - _IsBlinking: 0
     - _OutlineWidth: 0.05
     - _RimOffset: 0.838
     - _RimPower: 0
-    - _ShadowOffset: 0.44
+    - _ShadowOffset: 6.35
     - _ShadowStrength: 0.883
     - _SpecIntensity: 0.273
     - _SpecTransition: 0.453
+    - _Use_Screen_Space: 0
     - __dirty: 0
     m_Colors:
-    - _ASEOutlineColor: {r: 1, g: 1, b: 1, a: 0}
+    - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
     - _Color: {r: 0.90588236, g: 0.6458214, b: 0.6431373, a: 0}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 0}
     - _RimColor: {r: 1, g: 0.7773697, b: 0.3349057, a: 0}
+    - _ShadowColor: {r: 0.7411765, g: 0.6117647, b: 0.8784314, a: 1}
     - _SpecTint: {r: 0.8207547, g: 0.2816651, b: 0, a: 0}

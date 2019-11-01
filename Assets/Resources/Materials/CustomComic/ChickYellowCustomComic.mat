@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: ChickYellowCustomComic
   m_Shader: {fileID: 4800000, guid: 03f07ed366daef04da6bce04d9f48994, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _KEYWORD1_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -23,12 +23,24 @@ Material:
         m_Texture: {fileID: 2800000, guid: ed430e9feb8a29d4e90be7aa48433813, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _HalftoneTexture:
+        m_Texture: {fileID: 2800000, guid: 1defb449ad9e75b48bee9bee67bd1dd7, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _Texture1:
+        m_Texture: {fileID: 2800000, guid: 480f2c3cf2a67b249be3f5138b7a7d1e, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _TextureSample0:
         m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureSample1:
+        m_Texture: {fileID: 2800000, guid: 480f2c3cf2a67b249be3f5138b7a7d1e, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _ToonRamp:
@@ -44,24 +56,37 @@ Material:
     - _BlinkPower: 1.8
     - _BlinkSpeed: 20
     - _Cutoff: 0.5
+    - _EdgeBlur: 0.15784194
+    - _EdgeOffset: 0
+    - _EdgeWidth: 0.031
     - _Float0: 0.567
+    - _Float2: 1.49
+    - _Float3: 27.11
     - _Gloss: 0.079
+    - _HalfToneScale: 27.11
+    - _HalftonePower: 0.18
+    - _HalftoneScale: 13.3
     - _IsBlinking: 0
+    - _Keyword0: 0
+    - _Keyword1: 1
     - _Max: 1.12
     - _Min: 1.1
     - _OutlineWidth: 0.055
     - _RimOffset: 0.838
-    - _RimPower: 0
-    - _ShadowOffset: 0.44
-    - _ShadowStrength: 0.941
+    - _RimPower: 0.92
+    - _ShadowOffset: 6.35
+    - _ShadowStrength: 0.95
     - _SpecIntensity: 0.273
     - _SpecPower: 0.164
     - _SpecTransition: 0.453
+    - _Use_Screen_Space: 0
     - __dirty: 0
     m_Colors:
-    - _ASEOutlineColor: {r: 1, g: 1, b: 1, a: 0}
-    - _Color: {r: 0.77254903, g: 0.6386498, b: 0.39607844, a: 0}
+    - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
+    - _Color: {r: 0.8018868, g: 0.6312547, b: 0.3252937, a: 0}
+    - _EdgeColor: {r: 0.7735849, g: 0.4743681, b: 0.59444845, a: 1}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 0}
-    - _RimColor: {r: 1, g: 0.7773697, b: 0.33490568, a: 0}
+    - _RimColor: {r: 1, g: 0.77736974, b: 0.3349048, a: 0}
+    - _ShadowColor: {r: 0.7590013, g: 0.5939835, b: 0.8867924, a: 1}
     - _SpecColor: {r: 1, g: 0.759434, b: 0.759434, a: 0}
-    - _SpecTint: {r: 0.8207547, g: 0.28166512, b: 0, a: 0}
+    - _SpecTint: {r: 0.8207547, g: 0.28166425, b: 0, a: 0}

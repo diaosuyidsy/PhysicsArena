@@ -101,7 +101,7 @@ public class rtSuck : WeaponBase
         foreach (GameObject go in gos)
         {
             Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * WeaponDataStore.SuckGunDataStore.SuckStrength;
-            go.GetComponent<PlayerController>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
+            go.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
         }
         yield return new WaitForSeconds(0.3f);
         ////Second prototype

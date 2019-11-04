@@ -21,4 +21,5 @@ public class CharacterMeleeData : ScriptableObject
     public float PunchForce = 800f;
     [Tooltip("How much time player can hold the punch, default is infinity")]
     public float MeleeHoldTime = Mathf.Infinity;
+    public LayerMask CanHitLayer;
 }

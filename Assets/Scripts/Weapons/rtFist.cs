@@ -43,11 +43,12 @@ public class rtFist : WeaponBase
             if (Physics.SphereCast(_fistDup.transform.position, WeaponDataStore.FistGunDataStore.FistHitScanRadius, -_fistDup.transform.right, out hit, WeaponDataStore.FistGunDataStore.FistHitScanDist, WeaponDataStore.FistGunDataStore.AllThingFistCanCollideLayer ^ (1 << _fireOwner.layer)))
             {
                 if (hit.collider.GetComponent<WeaponBase>() != null) return;
+                IHittable IHittable = hit.collider.GetComponentInParent<IHittable>();
                 PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
-                if (pc != null && !pc.CanBlock(-_fistDup.transform.right))
+                if (IHittable != null && !IHittable.CanBlock(-_fistDup.transform.right))
                 {
-                    pc.OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner, ImpactType.FistGun);
-                    EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, Owner, pc.gameObject, Owner.GetComponent<PlayerController>().PlayerNumber, pc.PlayerNumber));
+                    IHittable.OnImpact(-_fistDup.transform.right * WeaponDataStore.FistGunDataStore.FistHitForce, ForceMode.Impulse, _fireOwner, ImpactType.FistGun);
+                    EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, Owner, ((MonoBehaviour)IHittable).gameObject, Owner.GetComponent<PlayerController>().PlayerNumber, pc == null ? 6 : pc.PlayerNumber));
                 }
                 else if (pc != null)
                 {

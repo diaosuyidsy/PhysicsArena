@@ -4,7 +4,7 @@ using UnityEngine;
 using Rewired;
 using System;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IHittable
 {
     [Header("Player Data Section")]
     public CharacterData CharacterDataStore;
@@ -138,22 +138,6 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // If is blockable, meaning the hit could be blocked
-    public void OnMeleeHit(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
-    {
-        // First check if the player could block the attack
-        if (_blockable &&
-            CanBlock(sender.transform.forward))
-        {
-            sender.GetComponentInParent<PlayerController>().OnMeleeHit(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
-        }
-        else // Player is hit cause he could not block
-        {
-            EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
-            OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
-        }
-    }
-
     /// <summary>
     /// Can Block The attack or not
     /// Used by hook and hit
@@ -166,6 +150,21 @@ public class PlayerController : MonoBehaviour
             _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
             return true;
         return false;
+    }
+
+    public void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
+    {
+        // First check if the player could block the attack
+        if (_blockable &&
+            CanBlock(sender.transform.forward))
+        {
+            sender.GetComponentInParent<IHittable>().OnImpact(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
+        }
+        else // Player is hit cause he could not block
+        {
+            EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
+            OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
+        }
     }
 
     /// <summary>
@@ -373,6 +372,7 @@ public class PlayerController : MonoBehaviour
         RaycastHit hit;
         return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
     }
+
     #endregion
 
     #region Movment States
@@ -916,18 +916,18 @@ public class PlayerController : MonoBehaviour
                 RaycastHit hit;
                 // This Layermask get all player's layer except this player's
                 int layermask = 0;
-                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Services.Config.ConfigData.AllPlayerLayer;
-                else layermask = Services.Config.ConfigData.AllPlayerLayer ^ (1 << Context.gameObject.layer);
+                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CharacterMeleeDataStore.CanHitLayer;
+                else layermask = Context.CharacterDataStore.CharacterMeleeDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
                 {
-                    if (hit.transform.GetComponentInParent<PlayerController>() == null) return;
+                    if (hit.transform.GetComponent<IHittable>() == null) return;
                     _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+                    foreach (var rb in hit.transform.gameObject.GetComponentsInChildren<Rigidbody>())
                     {
                         rb.velocity = Vector3.zero;
                     }
                     Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
-                    hit.transform.GetComponentInParent<PlayerController>().OnMeleeHit(force, Context._meleeCharge, Context.gameObject, true);
+                    hit.transform.GetComponent<IHittable>().OnImpact(force, Context._meleeCharge, Context.gameObject, true);
                 }
             }
             else

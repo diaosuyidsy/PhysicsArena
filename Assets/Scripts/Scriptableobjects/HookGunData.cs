@@ -14,5 +14,6 @@ public class HookGunData : WeaponDataBase
     public float HookBlockReloadTime = 5f;
     public float HelpAimAngle = 30f;
     public float HelpAimDistance = 30f;
+    public LayerMask BackwardHookableLayer;
     public LayerMask HookableLayer;
 }

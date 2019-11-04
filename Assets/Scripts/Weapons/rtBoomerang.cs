@@ -6,7 +6,7 @@ using DG.Tweening;
 public class rtBoomerang : WeaponBase
 {
     private GameObject _firer;
-    private HashSet<PlayerController> _hitSet;
+    private HashSet<IHittable> _hitSet;
     private DOTweenAnimation _meshRotate;
     private Vector3 _initialPos;
     private float _fireTime;
@@ -22,7 +22,7 @@ public class rtBoomerang : WeaponBase
     {
         base.Awake();
         _ammo = WeaponDataStore.BoomerangDataStore.MaxAmmo;
-        _hitSet = new HashSet<PlayerController>();
+        _hitSet = new HashSet<IHittable>();
         _meshRotate = GetComponentInChildren<DOTweenAnimation>();
         _rb = GetComponent<Rigidbody>();
         _lr = GetComponent<LineRenderer>();
@@ -189,7 +189,7 @@ public class rtBoomerang : WeaponBase
                 BoomerangData.CanHitLayer))
             {
                 if (hit.collider.GetComponent<WeaponBase>() != null) return;
-                PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
+                IHittable pc = hit.collider.GetComponentInParent<IHittable>();
                 if (pc != null && pc.CanBlock(Context.transform.forward))
                 {
                     Context._rb.velocity = Vector3.zero;
@@ -199,7 +199,7 @@ public class rtBoomerang : WeaponBase
                 }
                 if (pc != null && !Context._hitSet.Contains(pc))
                 {
-                    pc.OnImpact((pc.transform.position - Context.transform.position).normalized * BoomerangData.OnHitForce, ForceMode.Impulse, Context._firer, ImpactType.Boomerang);
+                    pc.OnImpact((((MonoBehaviour)pc).transform.position - Context.transform.position).normalized * BoomerangData.OnHitForce, ForceMode.Impulse, Context._firer, ImpactType.Boomerang);
                     Context._hitSet.Add(pc);
                 }
             }

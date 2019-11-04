@@ -30753,21 +30753,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 224014487168222038, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -868.00006
-      objectReference: {fileID: 0}
-    - target: {fileID: 224230160525881856, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -652
-      objectReference: {fileID: 0}
-    - target: {fileID: 224230160525881856, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -868.00006
-      objectReference: {fileID: 0}
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 16.8
@@ -30799,6 +30784,33 @@ PrefabInstance:
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 3}
       propertyPath: m_RootOrder
       value: 11
+      objectReference: {fileID: 0}
+    - target: {fileID: 7890119827314578077, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 3}
+      propertyPath: GameMapData
+      value: 
+      objectReference: {fileID: 11400000, guid: 8b297a9a1636fd54ca27af88ca8f5b23,
+        type: 2}
+    - target: {fileID: 7890119827314578077, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 3}
+      propertyPath: ModeSepcificData
+      value: 
+      objectReference: {fileID: 11400000, guid: 2a2f8d5f547c2f94db02d6952aaf22f3,
+        type: 2}
+    - target: {fileID: 224014487168222038, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -868.00006
+      objectReference: {fileID: 0}
+    - target: {fileID: 224230160525881856, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -652
+      objectReference: {fileID: 0}
+    - target: {fileID: 224230160525881856, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -868.00006
       objectReference: {fileID: 0}
     - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
         type: 3}
@@ -30954,18 +30966,6 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: -115.29999
       objectReference: {fileID: 0}
-    - target: {fileID: 7890119827314578077, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 3}
-      propertyPath: GameMapData
-      value: 
-      objectReference: {fileID: 11400000, guid: 8b297a9a1636fd54ca27af88ca8f5b23,
-        type: 2}
-    - target: {fileID: 7890119827314578077, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 3}
-      propertyPath: ModeSepcificData
-      value: 
-      objectReference: {fileID: 11400000, guid: 2a2f8d5f547c2f94db02d6952aaf22f3,
-        type: 2}
     - target: {fileID: 4147661917229758, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 3}
       propertyPath: m_LocalPosition.x
       value: -6.7699995
@@ -62879,7 +62879,7 @@ GameObject:
   - component: {fileID: 1803328352}
   - component: {fileID: 1803328351}
   - component: {fileID: 1803328355}
-  m_Layer: 0
+  m_Layer: 24
   m_Name: Ball
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -62987,6 +62987,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   InitialPosition: {x: 0, y: 0, z: 0}
+  SoccerForceDamper: 0.01
 --- !u!1 &1805544376
 GameObject:
   m_ObjectHideFlags: 0

@@ -21,4 +21,5 @@ public class BazookaData : WeaponDataBase
     public LayerMask CanHideLayer;
     public LayerMask LineCastLayer;
     public LayerMask HitExplodeLayer;
+    public LayerMask CanHitLayer;
 }

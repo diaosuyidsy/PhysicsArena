@@ -6,8 +6,6 @@ public class rtHook : WeaponBase
 {
     [HideInInspector]
     public GameObject Hooked = null;
-    [HideInInspector]
-    public bool HookCanBend = true;
     public override float HelpAimAngle { get { return WeaponDataStore.HookGunDataStore.HelpAimAngle; } }
     public override float HelpAimDistance { get { return WeaponDataStore.HookGunDataStore.HelpAimDistance; } }
     private GameObject _hook;
@@ -85,11 +83,11 @@ public class rtHook : WeaponBase
                 Vector3 finalVec = force - vec2;
                 force = (force + finalVec * 10f).normalized;
 
-                Hooked.GetComponent<Rigidbody>().AddForce(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse);
+                Hooked.GetComponent<IHittable>().OnImpact(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
                 Hooked = null;
             }
             Vector3 nextpos = (transform.position - _hook.transform.position).normalized;
-            if (HookCanBend && Hooked != null)
+            if (Hooked != null)
             {
                 Vector3 vec2 = transform.right;
                 Vector3 finalVec = nextpos - vec2;
@@ -198,7 +196,7 @@ public class rtHook : WeaponBase
                 Vector3 finalVec = force - vec2;
                 force = (force + finalVec * 10f).normalized;
 
-                Hooked.GetComponent<Rigidbody>().AddForce(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse);
+                Hooked.GetComponent<IHittable>().OnImpact(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
                 Hooked = null;
             }
             if (_hookState == State.FlyingOut)
@@ -235,7 +233,7 @@ public class rtHook : WeaponBase
 
     public void HookOnHit(GameObject hit)
     {
-        if (hit.GetComponent<PlayerController>().CanBlock(-_hook.transform.right))
+        if (hit.GetComponent<IHittable>().CanBlock(-_hook.transform.right))
         {
             GameObject hookDup = Instantiate(_hook, _hook.transform.position, _hook.transform.rotation);
             EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, hookDup));
@@ -259,13 +257,14 @@ public class rtHook : WeaponBase
         }
         _hookState = State.OnTarget;
         Hooked = hit;
-        Hooked.GetComponent<PlayerController>().OnImpact(Owner, ImpactType.HookGun);
+        Hooked.GetComponent<IHittable>().OnImpact(Owner, ImpactType.HookGun);
         foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
         {
             rb.isKinematic = true;
         }
         StartCoroutine(hookhelper(WeaponDataStore.HookGunDataStore.HookedTime));
-        EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _hook, hit, hit.GetComponent<PlayerController>().PlayerNumber));
+        EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _hook, hit,
+        hit.GetComponent<PlayerController>() == null ? 6 : hit.GetComponent<PlayerController>().PlayerNumber));
     }
 
     IEnumerator hookhelper(float time)

@@ -96,7 +96,7 @@ public class rtHammer : WeaponBase
             {
                 dir = dir.normalized;
                 dir.y = WeaponDataStore.HammerDataStore.UpwardMultiplier;
-                other.gameObject.GetComponent<PlayerController>().OnImpact(dir * WeaponDataStore.HammerDataStore.CollideForce, ForceMode.Impulse, Owner, ImpactType.HammerGun);
+                other.gameObject.GetComponent<IHittable>().OnImpact(dir * WeaponDataStore.HammerDataStore.CollideForce, ForceMode.Impulse, Owner, ImpactType.HammerGun);
             }
         }
     }

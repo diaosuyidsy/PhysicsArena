@@ -79,8 +79,8 @@ public class rtEmit : WeaponBase
         RaycastHit hit;
         if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
         {
-            if (hit.transform.GetComponentInParent<PlayerController>() != null)
-                hit.transform.GetComponentInParent<PlayerController>().OnImpact(Owner, ImpactType.WaterGun);
+            if (hit.transform.GetComponentInParent<IHittable>() != null)
+                hit.transform.GetComponentInParent<IHittable>().OnImpact(Owner, ImpactType.WaterGun);
         }
     }
 

@@ -9,7 +9,7 @@ public class ScrollArea : MonoBehaviour
     private void OnTriggerStay(Collider other)
     {
         if (!other.tag.Contains("Team")) return;
-        PlayerController pc = other.GetComponent<PlayerController>();
+        IHittable pc = other.GetComponent<IHittable>();
         if (pc != null)
         {
             pc.OnImpact(-transform.right * ScrollAmount, ForceMode.VelocityChange, null, ImpactType.Self);

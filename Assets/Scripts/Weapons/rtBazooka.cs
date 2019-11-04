@@ -96,22 +96,21 @@ public class rtBazooka : WeaponBase
                 if (hit.collider.gameObject == Owner) return;
                 _bazookaState = BazookaStates.Idle;
                 List<GameObject> affectedPlayers = new List<GameObject>();
-                foreach (PlayerController _pc in Services.GameStateManager.PlayerControllers)
+                Collider[] hitColliders = Physics.OverlapSphere(transform.position,
+                                                                    WeaponDataStore.BazookaDataStore.MaxAffectionRange,
+                                                                    WeaponDataStore.BazookaDataStore.CanHitLayer);
+                foreach (Collider _c in hitColliders)
                 {
-                    float dis = Vector3.Distance(_pc.transform.position, transform.position);
-                    if (_pc.gameObject.activeInHierarchy &&
-                        dis < WeaponDataStore.BazookaDataStore.MaxAffectionRange &&
-                        _pc.gameObject != Owner &&
-                        !Physics.Linecast(_pc.transform.position, transform.position, WeaponDataStore.BazookaDataStore.CanHideLayer))
-                    {
-                        affectedPlayers.Add(_pc.gameObject);
-                        Vector3 dir = _pc.transform.position - transform.position;
-                        dir.y = 0f;
-                        _pc.OnImpact(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
-                    }
+                    IHittable ih = _c.GetComponent<IHittable>();
+                    if (ih == null || Owner == _c.gameObject ||
+                    Physics.Linecast(_c.transform.position, transform.position, WeaponDataStore.BazookaDataStore.CanHideLayer)) continue;
+                    affectedPlayers.Add(_c.gameObject);
+                    Vector3 dir = _c.transform.position - transform.position;
+                    dir.y = 0f;
+                    ih.OnImpact(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
                 }
                 EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));
-                Owner.GetComponent<PlayerController>().OnImpact(new StunEffect(WeaponDataStore.BazookaDataStore.SelfStunTime, 0f));
+                Owner.GetComponent<IHittable>().OnImpact(new StunEffect(WeaponDataStore.BazookaDataStore.SelfStunTime, 0f));
                 _resetThrowMark();
                 _onWeaponUsedOnce();
             }

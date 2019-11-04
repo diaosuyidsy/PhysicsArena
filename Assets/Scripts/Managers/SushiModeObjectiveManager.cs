@@ -31,11 +31,11 @@ public class SushiModeObjectiveManager : ObjectiveManager
         Debug.Log(coloindex);
         if (tag.Equals("Team1"))
         {
-            Services.Config.Team1RespawnPoints[coloindex - 3] = Pos;
+            Services.Config.Team1RespawnPoints[coloindex % 3] = Pos;
         }
         else
         {
-            Services.Config.Team2RespawnPoints[coloindex] = Pos;
+            Services.Config.Team2RespawnPoints[coloindex % 3] = Pos;
         }
     }
 

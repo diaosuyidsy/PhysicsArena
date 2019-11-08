@@ -51,5 +51,10 @@ namespace AmplifyShaderEditor
 		{
 			AmplifyShaderEditorWindow.CreateNewTemplateShader( "003dfa9c16768d048b74f75c088119d8" );
 		}
+		[MenuItem( "Assets/Create/Amplify Shader/Legacy/DoFMultiPass", false, 85 )]
+		public static void ApplyTemplate9()
+		{
+			AmplifyShaderEditorWindow.CreateNewTemplateShader( "ca5196d2b87315949a20b4e2139d10c4" );
+		}
 	}
 }

@@ -3,21 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[ExecuteInEditMode, ImageEffectAllowedInSceneView]
+//[ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class DepthOfFieldEffect : MonoBehaviour
 {
     [Range(-1f, 1f)]
-    public float redChannelMove = 0.4f;
+    public float redChannelMove = 0.408f;
     [Range(-1f, 1f)]
-    public float blueChannelMove = 0.4f;
+    public float blueChannelMove = -0.368f;
     [Range(-1f, 1f)]
-    public float greenChannelMove = 0.4f;
+    public float greenChannelMove = 0f;
     [Range(0.1f, 100f)]
     public float focusDistance = 10f;
     [Range(0.1f, 15f)]
-    public float focusRange = 10f;
+    public float focusRange = 7.6f;
     [Range(1f, 10f)]
-    public float bokehRadius = 4f;
+    public float bokehRadius = 10f;
     [HideInInspector]
     public Shader dofShader;
 

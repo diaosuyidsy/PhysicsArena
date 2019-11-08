@@ -79819,6 +79819,11 @@ PrefabInstance:
       propertyPath: m_RenderingPath
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 20459301899154910, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 3}
+      propertyPath: m_CullingMask.m_Bits
+      value: 4294967295
+      objectReference: {fileID: 0}
     - target: {fileID: 4195833958785946, guid: f8d6c631da37749db9f9744813be0f39, type: 3}
       propertyPath: m_LocalPosition.x
       value: 17.13
@@ -79849,7 +79854,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4195833958785946, guid: f8d6c631da37749db9f9744813be0f39, type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 114076445684659868, guid: f8d6c631da37749db9f9744813be0f39,
         type: 3}
@@ -79961,6 +79966,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 114982356382100536, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 3}
+      propertyPath: antialiasingMode
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8d6c631da37749db9f9744813be0f39, type: 3}
 --- !u!4 &2082989922 stripped
@@ -80025,6 +80035,65 @@ MonoBehaviour:
   shakeDuration: 0
   shakeAmount: 0.2
   decreaseFactor: 1
+--- !u!114 &2082989927
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082989923}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8a338d679868f45439ea43c7ae035e36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  settings:
+    visualizeFocus: 0
+    tweakMode: 0
+    filteringQuality: 2
+    apertureShape: 0
+    apertureOrientation: 0
+  focus:
+    transform: {fileID: 0}
+    focusPlane: 10.6775
+    range: 21.355
+    nearPlane: 0
+    nearFalloff: 16.9
+    farPlane: 21.355
+    farFalloff: 14.2
+    nearBlurRadius: 15
+    farBlurRadius: 30.6
+  bokehTexture:
+    texture: {fileID: 0}
+    scale: 1
+    intensity: 50
+    threshold: 2
+    spawnHeuristic: 0.15
+  m_FilmicDepthOfFieldShader: {fileID: 4800000, guid: bff0e5458fb914f5c9985ba4f09171d2,
+    type: 3}
+  m_MedianFilterShader: {fileID: 4800000, guid: a058b22d4123add4b807e832604e5e7b,
+    type: 3}
+  m_TextureBokehShader: {fileID: 4800000, guid: c961b8ed1f00f924d804ada5143bd0e8,
+    type: 3}
+--- !u!114 &2082989928
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082989923}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5881dffdceecca645bd1b6436ca976e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  redChannelMove: 0.408
+  blueChannelMove: -0.368
+  greenChannelMove: 0
+  focusDistance: 35
+  focusRange: 7.6
+  bokehRadius: 10
+  dofShader: {fileID: 4800000, guid: e251ee37d0604714abf8af52ca380798, type: 3}
 --- !u!1001 &2087603899
 PrefabInstance:
   m_ObjectHideFlags: 0

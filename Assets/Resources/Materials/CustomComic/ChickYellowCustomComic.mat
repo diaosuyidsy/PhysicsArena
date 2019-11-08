@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: ChickYellowCustomComic
   m_Shader: {fileID: 4800000, guid: 03f07ed366daef04da6bce04d9f48994, type: 3}
-  m_ShaderKeywords: _KEYWORD1_ON
+  m_ShaderKeywords: _KEYWORD1_ON _USE_SCREEN_SPACE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -64,8 +64,8 @@ Material:
     - _Float3: 27.11
     - _Gloss: 0.079
     - _HalfToneScale: 27.11
-    - _HalftonePower: 0.18
-    - _HalftoneScale: 13.3
+    - _HalftonePower: 0.15
+    - _HalftoneScale: 4
     - _IsBlinking: 0
     - _Keyword0: 0
     - _Keyword1: 1
@@ -79,7 +79,7 @@ Material:
     - _SpecIntensity: 0.273
     - _SpecPower: 0.164
     - _SpecTransition: 0.453
-    - _Use_Screen_Space: 0
+    - _Use_Screen_Space: 1
     - __dirty: 0
     m_Colors:
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}

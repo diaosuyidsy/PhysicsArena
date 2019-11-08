@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//[ExecuteInEditMode, ImageEffectAllowedInSceneView]
+[ExecuteInEditMode, ImageEffectAllowedInSceneView]
 public class DepthOfFieldEffect : MonoBehaviour
 {
     [Range(-1f, 1f)]

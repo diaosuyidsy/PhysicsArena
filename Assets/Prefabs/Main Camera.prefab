@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 114982356382100536}
   - component: {fileID: 82697173938787356}
   - component: {fileID: 114322385920369306}
+  - component: {fileID: 3146859649163388282}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -69,7 +70,7 @@ Camera:
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_RenderingPath: 3
+  m_RenderingPath: 1
   m_TargetTexture: {fileID: 0}
   m_TargetDisplay: 0
   m_TargetEye: 3
@@ -294,3 +295,22 @@ MonoBehaviour:
   Length: 602.8
   CenterPosition: {x: 524.7, y: 445.5}
   Material: {fileID: 2100000, guid: 4751e4c7a57da8c43af731d393884a25, type: 2}
+--- !u!114 &3146859649163388282
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1995234145574352}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5881dffdceecca645bd1b6436ca976e0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  redChannelMove: 0.408
+  blueChannelMove: -0.368
+  greenChannelMove: 0
+  focusDistance: 35
+  focusRange: 7.6
+  bokehRadius: 10
+  dofShader: {fileID: 4800000, guid: e251ee37d0604714abf8af52ca380798, type: 3}

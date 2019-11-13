@@ -9,7 +9,7 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: ChickRoseCustomComic
   m_Shader: {fileID: 4800000, guid: 03f07ed366daef04da6bce04d9f48994, type: 3}
-  m_ShaderKeywords: 
+  m_ShaderKeywords: _USE_SCREEN_SPACE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -45,8 +45,8 @@ Material:
     - _BlinkSpeed: 20
     - _Cutoff: 0.5
     - _Gloss: 0.079
-    - _HalftonePower: 0.18
-    - _HalftoneScale: 13.3
+    - _HalftonePower: 0.15
+    - _HalftoneScale: 4
     - _IsBlinking: 0
     - _OutlineWidth: 0.055
     - _RimOffset: 0.838
@@ -55,7 +55,7 @@ Material:
     - _ShadowStrength: 0.941
     - _SpecIntensity: 0.273
     - _SpecTransition: 0.453
-    - _Use_Screen_Space: 0
+    - _Use_Screen_Space: 1
     - __dirty: 0
     m_Colors:
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}

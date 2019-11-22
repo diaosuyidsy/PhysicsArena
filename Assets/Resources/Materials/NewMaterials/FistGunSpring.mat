@@ -7,9 +7,9 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ChickYellowCustomComic
+  m_Name: FistGunSpring
   m_Shader: {fileID: 4800000, guid: 03f07ed366daef04da6bce04d9f48994, type: 3}
-  m_ShaderKeywords: _KEYWORD1_ON _USE_SCREEN_SPACE_ON
+  m_ShaderKeywords: _USE_SCREEN_SPACE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -20,31 +20,51 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 2800000, guid: ed430e9feb8a29d4e90be7aa48433813, type: 3}
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HalftoneTexture:
         m_Texture: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _Texture1:
-        m_Texture: {fileID: 2800000, guid: 480f2c3cf2a67b249be3f5138b7a7d1e, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _TextureSample0:
+    - _OcclusionMap:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _TextureSample1:
-        m_Texture: {fileID: 2800000, guid: 480f2c3cf2a67b249be3f5138b7a7d1e, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _ToonRamp:
-        m_Texture: {fileID: 2800000, guid: 4d3414517f9e99a4a95ae23b831c0861, type: 3}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _texcoord:
@@ -52,41 +72,37 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _ASEOutlineWidth: 0.085
-    - _BlinkPower: 1.8
-    - _BlinkSpeed: 20
+    - _ASEOutlineWidth: 0.035
+    - _BumpScale: 1
     - _Cutoff: 0.5
-    - _EdgeBlur: 0.15784194
-    - _EdgeOffset: 0
-    - _EdgeWidth: 0.031
-    - _Float0: 0.567
-    - _Float2: 1.49
-    - _Float3: 27.11
+    - _DetailNormalMapScale: 1
+    - _DstBlend: 0
     - _Gloss: 0.079
-    - _HalfToneScale: 27.11
+    - _GlossMapScale: 1
+    - _Glossiness: 0.5
+    - _GlossyReflections: 1
     - _HalftonePower: 0.6
-    - _HalftoneScale: 10.56
-    - _IsBlinking: 0
-    - _Keyword0: 0
-    - _Keyword1: 1
-    - _Max: 1.12
-    - _Min: 1.1
-    - _OutlineWidth: 0.055
+    - _Metallic: 0
+    - _Mode: 0
+    - _OcclusionStrength: 1
+    - _Parallax: 0.02
     - _RimOffset: 0.682
     - _RimPower: 0.26
     - _ShadowOffset: 6.35
     - _ShadowStrength: 0.941
-    - _SpecIntensity: 0.241
-    - _SpecPower: 0.164
+    - _SmoothnessTextureChannel: 0
+    - _SpecIntensity: 0
     - _SpecTransition: 0.453
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _UVSec: 0
     - _Use_Screen_Space: 1
+    - _ZWrite: 1
     - __dirty: 0
     m_Colors:
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.8018868, g: 0.6312547, b: 0.3252937, a: 0}
-    - _EdgeColor: {r: 0.7735849, g: 0.4743681, b: 0.59444845, a: 1}
-    - _OutlineColor: {r: 1, g: 1, b: 1, a: 0}
-    - _RimColor: {r: 0.7490196, g: 0.9529412, b: 1, a: 1}
-    - _ShadowColor: {r: 0.7411765, g: 0.6117647, b: 0.8784314, a: 1}
-    - _SpecColor: {r: 1, g: 0.759434, b: 0.759434, a: 0}
-    - _SpecTint: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _RimColor: {r: 0.7490196, g: 0.9529411, b: 1, a: 0}
+    - _ShadowColor: {r: 0.7607843, g: 0.5921568, b: 0.8862745, a: 1}
+    - _SpecTint: {r: 1, g: 1, b: 1, a: 0}

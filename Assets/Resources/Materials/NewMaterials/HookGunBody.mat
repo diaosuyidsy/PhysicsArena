@@ -7,9 +7,10 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: ChickOrangeCustomComic
+  m_Name: HookGunBody
   m_Shader: {fileID: 4800000, guid: 03f07ed366daef04da6bce04d9f48994, type: 3}
-  m_ShaderKeywords: _USE_SCREEN_SPACE_ON
+  m_ShaderKeywords: OUTLINES TCP2_DISABLE_WRAPPED_LIGHT TCP2_STYLIZED_FRESNEL TCP2_ZSMOOTH_ON
+    _USE_SCREEN_SPACE_ON
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
@@ -20,7 +21,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 2800000, guid: fcd499491e553e84a99bcb03fa869fd7, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HalftoneTexture:
@@ -31,36 +32,25 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _ToonRamp:
-        m_Texture: {fileID: 2800000, guid: 4d3414517f9e99a4a95ae23b831c0861, type: 3}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
     - _texcoord:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _ASEOutlineWidth: 0.085
-    - _BlinkPower: 1.8
-    - _BlinkSpeed: 20
-    - _Cutoff: 0.5
-    - _Gloss: 0.079
+    - _ASEOutlineWidth: 0.025
+    - _Gloss: 0
     - _HalftonePower: 0.6
-    - _HalftoneScale: 10.56
-    - _IsBlinking: 0
-    - _OutlineWidth: 0.05
     - _RimOffset: 0.682
     - _RimPower: 0.26
-    - _ShadowOffset: 6.35
-    - _ShadowStrength: 0.941
-    - _SpecIntensity: 0.241
+    - _ShadowOffset: 9.67
+    - _ShadowStrength: 0.939
+    - _SpecIntensity: 0
     - _SpecTransition: 0.453
     - _Use_Screen_Space: 1
     - __dirty: 0
     m_Colors:
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.90588236, g: 0.6458214, b: 0.6431373, a: 0}
-    - _OutlineColor: {r: 1, g: 1, b: 1, a: 0}
-    - _RimColor: {r: 0.7490196, g: 0.9529412, b: 1, a: 1}
-    - _ShadowColor: {r: 0.7411765, g: 0.6117647, b: 0.8784314, a: 1}
-    - _SpecTint: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 0.4292453, b: 0.71514004, a: 0}
+    - _RimColor: {r: 0.7490196, g: 0.9529411, b: 1, a: 0}
+    - _ShadowColor: {r: 0.7607843, g: 0.5921568, b: 0.8862745, a: 1}
+    - _SpecTint: {r: 1, g: 1, b: 1, a: 0}

@@ -26,6 +26,8 @@ public class GameFeelManager
         /// If the hiter number is below 0, means it's a block
         /// and blocked attack don't have a hitter
         _vibrateController(ph.HiterPlayerNumber, 1.0f * charge, 0.15f * charge);
+        Debug.Log("on player hit");
+        EventManager.Instance.TriggerEvent(new HitStopEvent(GameFeelData.MeleeHitStopInformation.Frames, GameFeelData.MeleeHitStopInformation.TimeScale));
     }
 
     private void _onPlayerDied(PlayerDied pd)

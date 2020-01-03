@@ -206,6 +206,13 @@ public class ViberationInformation
 }
 
 [Serializable]
+public class HitStopInformation
+{
+    public int Frames;
+    public float TimeScale = 0.1f;
+}
+
+[Serializable]
 public class SushiRespawnInformation
 {
     public GameObject RespawnTriggerGameObject;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
 using System;
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviour, IHittable
 {
@@ -38,6 +39,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private float _meleeCharge;
     private float _blockCharge;
     private float _lastTimeUseBlock;
+    private float _sideStepTimer;
     private Vector3 _freezeBody;
     private ImpactMarker _impactMarker;
     private Animator _animator;
@@ -154,6 +156,9 @@ public class PlayerController : MonoBehaviour, IHittable
 
     public void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
     {
+        // Check if is side stepping
+        if (_movementFSM.CurrentState.GetType().Equals(typeof(SideSteppingState)))
+            return;
         // First check if the player could block the attack
         if (_blockable &&
             CanBlock(sender.transform.forward))
@@ -384,17 +389,23 @@ public class PlayerController : MonoBehaviour, IHittable
         protected float _VLAxisRaw { get { return Context._player.GetAxisRaw("Move Vertical"); } }
         protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
         protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
-        protected CharacterMovementData _charMovData { get { return Context.CharacterDataStore.CharacterMovementDataStore; } }
+        protected bool _B { get { return Context._player.GetButton("Block"); } }
 
+        protected CharacterMovementData _charMovData { get { return Context.CharacterDataStore.CharacterMovementDataStore; } }
+        protected CharacterMeleeData _charMeleeData { get { return Context.CharacterDataStore.CharacterMeleeDataStore; } }
         public void OnEnterDeathZone()
         {
             Parent.TransitionTo<DeadState>();
+        }
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            print(GetType().Name);
         }
     }
 
     private class ControllableMovementState : MovementState
     {
-
         public override void LateUpdate()
         {
             base.LateUpdate();
@@ -422,6 +433,11 @@ public class PlayerController : MonoBehaviour, IHittable
             if (_jump && Context._isGrounded())
             {
                 TransitionTo<JumpState>();
+                return;
+            }
+            if (_B && Context.CharacterDataStore.CharacterBlockDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<SideSteppingState>();
                 return;
             }
         }
@@ -496,6 +512,12 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<JumpState>();
                 return;
             }
+
+            if (_B && Context.CharacterDataStore.CharacterBlockDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<SideSteppingState>();
+                return;
+            }
         }
 
         public override void FixedUpdate()
@@ -534,6 +556,51 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    private class SideSteppingState : ControllableMovementState
+    {
+        private float _timer;
+        private Vector3 _originalForward;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._sideStepTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.CharacterBlockDataStore.SideSteppingCD;
+            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.CharacterBlockDataStore.SideSteppingDuration;
+            _originalForward = Context.transform.forward;
+            Context._rb.AddForce(_originalForward * Context.CharacterDataStore.CharacterBlockDataStore.SideSteppingInitForce, ForceMode.VelocityChange);
+            Context._animator.SetBool("SideStep", true);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<IdleState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("SideStep", false);
+        }
+    }
+
+    private class ButtStrikeMovementState : MovementState
+    {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._animator.SetBool("IdleDowner", true);
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("IdleDowner", false);
+        }
+    }
     private class StunMovementState : MovementState
     {
         public override void OnEnter()
@@ -729,12 +796,17 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PickingState>();
                 return;
             }
-            if (_RightTrigger)
+            if (_RightTrigger && !_charMeleeData.IsButtHitting)
             {
                 TransitionTo<PunchHoldingState>();
                 return;
             }
-            if (_B && Context._blockCharge <= _charBlockData.MaxBlockCD)
+            if (_RightTriggerDown && _charMeleeData.IsButtHitting)
+            {
+                TransitionTo<ButtAnticipationState>();
+                return;
+            }
+            if (_B && Context._blockCharge <= _charBlockData.MaxBlockCD && !Context.CharacterDataStore.CharacterBlockDataStore.IsSideStepping)
             {
                 TransitionTo<BlockingState>();
                 return;
@@ -989,6 +1061,120 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._meleeCharge = 0f;
         }
     }
+
+    private class ButtAnticipationState : ActionState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _timer = _charMeleeData.ButtAnticipationDuration + Time.timeSinceLevelLoad;
+            Context._rb.velocity = Vector3.zero;
+            Context._movementFSM.TransitionTo<ButtStrikeMovementState>();
+            Context._animator.SetBool("ButtAnticipation", true);
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<ButtStrikeState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._animator.SetBool("ButtAnticipation", false);
+        }
+    }
+
+    private class ButtStrikeState : ActionState
+    {
+        private float _timer;
+        private bool _hitOnce;
+        private Tweener _hitTween;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _timer = _charMeleeData.ButtStrikeDuration + Time.timeSinceLevelLoad;
+            _hitOnce = false;
+            _hitTween = Context.transform.DOMove(-Context.transform.forward * _charMeleeData.ButtStrikeForwardPush, _charMeleeData.ButtStrikeDuration)
+            .SetRelative(true)
+            .SetEase(_charMeleeData.ButtStrikePushEase);
+            Context._animator.SetBool("ButtStrike", true);
+
+        }
+
+        public override void Update()
+        {
+            base.Update();
+
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<ButtRecoveryState>();
+                return;
+            }
+            else
+            {
+                RaycastHit hit;
+                // This Layermask get all player's layer except this player's
+                int layermask = 0;
+                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CharacterMeleeDataStore.CanHitLayer;
+                else layermask = Context.CharacterDataStore.CharacterMeleeDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
+                if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, -Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
+                {
+                    if (hit.transform.GetComponentInParent<IHittable>() == null) return;
+                    _hitOnce = true;
+                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+                    {
+                        rb.velocity = Vector3.zero;
+                    }
+                    Vector3 force = -Context.transform.forward * _charMeleeData.ButtStrikeStrength;
+                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    TransitionTo<ButtRecoveryState>();
+                    return;
+                }
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            _hitTween.Kill();
+            Context._animator.SetBool("ButtStrike", false);
+        }
+    }
+
+    private class ButtRecoveryState : ActionState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _timer = _charMeleeData.ButtRecoveryDuration + Time.timeSinceLevelLoad;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<IdleActionState>();
+                return;
+            }
+        }
+
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._movementFSM.TransitionTo<IdleState>();
+        }
+    }
+
 
     private class BlockingState : ActionState
     {

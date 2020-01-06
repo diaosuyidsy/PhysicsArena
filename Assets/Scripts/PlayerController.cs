@@ -40,7 +40,6 @@ public class PlayerController : MonoBehaviour, IHittable
     private float _lastTimeUseBlock;
     private Vector3 _freezeBody;
     private ImpactMarker _impactMarker;
-    private bool _isJumping;
     private Animator _animator;
 
     private FSM<PlayerController> _movementFSM;
@@ -131,9 +130,10 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private void OnCollisionEnter(Collision other)
     {
-        if (CharacterDataStore.CharacterMovementDataStore.JumpMask == (CharacterDataStore.CharacterMovementDataStore.JumpMask | (1 << other.gameObject.layer)) && _isJumping)
+        if (CharacterDataStore.CharacterMovementDataStore.JumpMask == (CharacterDataStore.CharacterMovementDataStore.JumpMask | (1 << other.gameObject.layer)) &&
+        _movementFSM.CurrentState.GetType().Equals(typeof(JumpState)))
         {
-            _isJumping = false;
+            _movementFSM.TransitionTo<IdleState>();
             EventManager.Instance.TriggerEvent(new PlayerLand(gameObject, OnDeathHidden[1], PlayerNumber, _getGroundTag()));
         }
     }
@@ -394,15 +394,6 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class ControllableMovementState : MovementState
     {
-        public override void Update()
-        {
-            if (_jump && Context._isGrounded())
-            {
-                Context._isJumping = true;
-                Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);
-                EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
-            }
-        }
 
         public override void LateUpdate()
         {
@@ -423,9 +414,15 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis))
+            if (_HLAxisRaw != 0f || _VLAxisRaw != 0f)
             {
                 TransitionTo<RunState>();
+                return;
+            }
+            if (_jump && Context._isGrounded())
+            {
+                TransitionTo<JumpState>();
+                return;
             }
         }
 
@@ -445,6 +442,37 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    private class JumpState : ControllableMovementState
+    {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);
+            EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed * Context._walkSpeed;
+            Vector3 velocityChange = targetVelocity - Context._rb.velocity;
+            velocityChange.x = Mathf.Clamp(velocityChange.x, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
+            velocityChange.z = Mathf.Clamp(velocityChange.z, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
+            velocityChange.y = 0f;
+
+            Context._rb.AddForce(velocityChange * _charMovData.InAirSpeedMultiplier, ForceMode.VelocityChange);
+
+            if (_HLAxis != 0f && _VLAxis != 0f)
+            {
+                Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
+                Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
+                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
+                Context.transform.rotation = tr;
+            }
+
+        }
+    }
+
     private class RunState : ControllableMovementState
     {
         private float _runTowardsCliffTime;
@@ -458,11 +486,21 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_HLAxisRaw == 0f && _VLAxisRaw == 0f) TransitionTo<IdleState>();
+            if (_HLAxisRaw == 0f && _VLAxisRaw == 0f)
+            {
+                TransitionTo<IdleState>();
+                return;
+            }
+            if (_jump && Context._isGrounded())
+            {
+                TransitionTo<JumpState>();
+                return;
+            }
         }
 
         public override void FixedUpdate()
         {
+            base.FixedUpdate();
             bool isonground = Context._isGrounded();
             Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed * Context._walkSpeed;
             Vector3 velocityChange = targetVelocity - Context._rb.velocity;
@@ -691,7 +729,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PickingState>();
                 return;
             }
-            if (_RightTriggerDown)
+            if (_RightTrigger)
             {
                 TransitionTo<PunchHoldingState>();
                 return;
@@ -937,11 +975,11 @@ public class PlayerController : MonoBehaviour, IHittable
                 return;
             }
 
-            if (_RightTriggerDown)
-            {
-                TransitionTo<PunchHoldingState>();
-                return;
-            }
+            // if (_RightTriggerDown)
+            // {
+            //     TransitionTo<PunchHoldingState>();
+            //     return;
+            // }
         }
 
         public override void OnExit()

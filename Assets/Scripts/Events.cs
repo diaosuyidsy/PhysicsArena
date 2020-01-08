@@ -540,6 +540,18 @@ public class BazookaBombed : GameEvent
 
 #endregion
 
+public class HitStopEvent : GameEvent
+{
+    public int StopFrames;
+    public float TimeScale;
+
+    public HitStopEvent(int stopFrames, float timeScale)
+    {
+        StopFrames = stopFrames;
+        TimeScale = timeScale;
+    }
+}
+
 public class FoodDelivered : GameEvent
 {
     public GameObject Food { get; }

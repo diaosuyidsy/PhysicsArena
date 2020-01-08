@@ -19,4 +19,5 @@ public class GameFeelData : ScriptableObject
     public ViberationInformation BazookaBomberViberationInformation;
     public ViberationInformation BazookaBombedViberationInformation;
     public ViberationInformation FoodDeliveredViberationInformation;
+    public HitStopInformation MeleeHitStopInformation;
 }

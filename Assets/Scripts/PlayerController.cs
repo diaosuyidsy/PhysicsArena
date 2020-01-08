@@ -17,6 +17,8 @@ public class PlayerController : MonoBehaviour, IHittable
     public GameObject[] RightArms;
     public GameObject LeftHand;
     public GameObject RightHand;
+    public GameObject LeftFoot;
+    public GameObject RightFoot;
     public GameObject[] OnDeathHidden;
 
     public int PlayerNumber;
@@ -240,11 +242,12 @@ public class PlayerController : MonoBehaviour, IHittable
     /// <summary>
     /// This function is called from FootSteps on LegSwingRefernece
     /// </summary>
-    public void FootStep()
+    /// <param name="foot">0 is right foot, 1 is left foot</param>
+    public void FootStep(int foot = 0)
     {
         if (_isGrounded())
         {
-            EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[1], _getGroundTag()));
+            EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[1], foot == 0 ? RightFoot : LeftFoot, _getGroundTag(), gameObject, foot));
         }
     }
 

@@ -31,7 +31,7 @@ public class GameFeelManager
         ph.Hitted.transform.DOShakePosition(GameFeelData.MeleeHitStopInformation.Frames * Time.unscaledDeltaTime,
         GameFeelData.MeleeHitStopInformation.Viberation,
         GameFeelData.MeleeHitStopInformation.Vibrato,
-        GameFeelData.MeleeHitStopInformation.Randomness).SetUpdate(true);
+        GameFeelData.MeleeHitStopInformation.Randomness).SetUpdate(true).SetEase(GameFeelData.MeleeHitStopInformation.ViberationEase);
         EventManager.Instance.TriggerEvent(new HitStopEvent(GameFeelData.MeleeHitStopInformation.Frames, GameFeelData.MeleeHitStopInformation.TimeScale));
     }
 

@@ -1,0 +1,70 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 77f59a2ecbe94604094d30020f1b14bd, type: 3}
+  m_Name: CharacterData
+  m_EditorClassIdentifier: 
+  WalkSpeed: 3.5
+  MaxVelocityChange: 2
+  InAirSpeedMultiplier: 0.1
+  FacingCliffMultiplier: 1
+  PickupSpeed: 2
+  JumpCD: 0
+  JumpForce: 230
+  JumpMask:
+    serializedVersion: 2
+    m_Bits: 286720
+  MinRotationSpeed: 8
+  MaxRotationSpeed: 15
+  DropWeaponForceThreshold: 500
+  FrontIsCliff: 0.2
+  CliffPreventionForce: 100
+  CliffPreventionTimer: 0.4
+  MaxBlockCD: 1.5
+  BlockRegenInterval: 2
+  BlockRegenRate: 1
+  ArmTargetPosition: 100
+  HandTargetPosition: 120
+  BlockMultiplier: 2
+  BlockAngle: 90
+  IsSideStepping: 0
+  SideSteppingInitForce: 70
+  SideSteppingDuration: 0.3
+  SideSteppingCD: 1
+  ClockFistTime: 0.3
+  FistReleaseTime: 0.3
+  SelfPushForce: 200
+  MeleeChargeThreshold: 0.75
+  PunchRadius: 0.3
+  PunchDistance: 0.05
+  PunchForce: 900
+  MeleeHoldTime: 10
+  CanHitLayer:
+    serializedVersion: 2
+    m_Bits: 16883200
+  IsButtHitting: 0
+  ButtAnticipationDuration: 0.4
+  ButtAnticipationForwardPush: 3
+  ButtStrikeDuration: 0.3
+  ButtStrikeStrength: 900
+  ButtStrikeRaidus: 0.4
+  ButtStrikeDistance: 0.05
+  ButtStrikeStopDistance: 0.3
+  ButtStrikeForwardPush: 2
+  ButtStrikePushEase: 6
+  ButtRecoveryDuration: 0
+  ButtHitStopLayer:
+    serializedVersion: 2
+    m_Bits: 262144
+  Radius: 0.25
+  PickUpLayer:
+    serializedVersion: 2
+    m_Bits: 1048576

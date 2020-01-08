@@ -124,7 +124,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     private void OnCollisionEnter(Collision other)
     {
         if (!photonView.IsMine) return;
-        if (CharacterDataStore.CharacterMovementDataStore.JumpMask == (CharacterDataStore.CharacterMovementDataStore.JumpMask | (1 << other.gameObject.layer)) && _isJumping)
+        if (CharacterDataStore.JumpMask == (CharacterDataStore.JumpMask | (1 << other.gameObject.layer)) && _isJumping)
         {
             _isJumping = false;
             EventManager.Instance.TriggerEvent(new PlayerLand(gameObject, OnDeathHidden[1], PlayerNumber, _getGroundTag()));
@@ -159,13 +159,13 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         {
             senderPView.RPC("OnHit",
              RpcTarget.All,
-             -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier);
+             -force * CharacterDataStore.BlockMultiplier);
 
             senderPView.RPC("OnHitEvent",
             RpcTarget.All,
             senderPView.ViewID,
             _photonview.ViewID,
-            -force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier,
+            -force * CharacterDataStore.BlockMultiplier,
             _meleeCharge,
             true);
             return;
@@ -235,7 +235,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         //     return true;
         // return false;
         if (Blocking &&
-            _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+            _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle))
             return true;
         return false;
     }
@@ -250,7 +250,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     {
         _rb.AddForce(force, forcemode);
         OnImpact(enforcer, impactType);
-        if (force.magnitude > CharacterDataStore.CharacterMovementDataStore.DropWeaponForceThreshold &&
+        if (force.magnitude > CharacterDataStore.DropWeaponForceThreshold &&
             _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
         {
             _actionFSM.TransitionTo<IdleActionState>();
@@ -349,7 +349,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     private string _getGroundTag()
     {
         RaycastHit hit;
-        Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+        Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.JumpMask);
         if (hit.collider == null) return "";
         return hit.collider.tag;
     }
@@ -407,7 +407,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     private bool _isGrounded()
     {
         RaycastHit hit;
-        return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+        return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.JumpMask);
     }
 
     public void OnPhotonInstantiate(PhotonMessageInfo info)
@@ -423,7 +423,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         protected float _VLAxis { get { return Context._player.GetAxis("Move Vertical"); } }
         protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
         protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
-        protected CharacterMovementData _charMovData { get { return Context.CharacterDataStore.CharacterMovementDataStore; } }
+        protected CharacterData _charMovData { get { return Context.CharacterDataStore; } }
 
         public void OnEnterDeathZone()
         {
@@ -668,8 +668,8 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         protected bool _BDown { get { return Context._player.GetButtonDown("Block"); } }
         protected bool _BUp { get { return Context._player.GetButtonUp("Block"); } }
 
-        protected CharacterMeleeData _charMeleeData { get { return Context.CharacterDataStore.CharacterMeleeDataStore; } }
-        protected CharacterBlockData _charBlockData { get { return Context.CharacterDataStore.CharacterBlockDataStore; } }
+        protected CharacterData _charMeleeData { get { return Context.CharacterDataStore; } }
+        protected CharacterData _charBlockData { get { return Context.CharacterDataStore; } }
 
         public override void Update()
         {
@@ -725,7 +725,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
 
     private class PickingState : ActionState
     {
-        private CharacterPickUpData _characterPickUpData { get { return Context.CharacterDataStore.CharacterPickUpDataStore; } }
+        private CharacterData _characterPickUpData { get { return Context.CharacterDataStore; } }
         public override void OnEnter()
         {
             base.OnEnter();

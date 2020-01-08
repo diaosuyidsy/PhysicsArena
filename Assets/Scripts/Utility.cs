@@ -213,6 +213,7 @@ public class HitStopInformation
     public Vector3 Viberation = Vector3.one;
     public int Vibrato = 50;
     public float Randomness = 90f;
+    public Ease ViberationEase = Ease.OutQuad;
 }
 
 [Serializable]

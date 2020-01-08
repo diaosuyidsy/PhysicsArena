@@ -10,6 +10,7 @@ public class CharacterMovementData : ScriptableObject
     public float InAirSpeedMultiplier = 0.5f;
     public float FacingCliffMultiplier = 0.3f;
     public float PickupSpeed = 2f;
+    public float JumpCD = 0f;
     public float JumpForce = 230f;
     public LayerMask JumpMask;
     public float MinRotationSpeed = 4f;

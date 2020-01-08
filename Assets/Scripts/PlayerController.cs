@@ -40,6 +40,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private float _blockCharge;
     private float _lastTimeUseBlock;
     private float _sideStepTimer;
+    private float _jumpTimer;
     private Vector3 _freezeBody;
     private ImpactMarker _impactMarker;
     private Animator _animator;
@@ -132,7 +133,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private void OnCollisionEnter(Collision other)
     {
-        if (CharacterDataStore.CharacterMovementDataStore.JumpMask == (CharacterDataStore.CharacterMovementDataStore.JumpMask | (1 << other.gameObject.layer)) &&
+        if (CharacterDataStore.JumpMask == (CharacterDataStore.JumpMask | (1 << other.gameObject.layer)) &&
         _movementFSM.CurrentState.GetType().Equals(typeof(JumpState)))
         {
             _movementFSM.TransitionTo<IdleState>();
@@ -149,7 +150,7 @@ public class PlayerController : MonoBehaviour, IHittable
     public bool CanBlock(Vector3 forwardAngle)
     {
         if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
-            _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.CharacterBlockDataStore.BlockAngle))
+            _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle))
             return true;
         return false;
     }
@@ -163,7 +164,7 @@ public class PlayerController : MonoBehaviour, IHittable
         if (_blockable &&
             CanBlock(sender.transform.forward))
         {
-            sender.GetComponentInParent<IHittable>().OnImpact(-force * CharacterDataStore.CharacterBlockDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
+            sender.GetComponentInParent<IHittable>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
         }
         else // Player is hit cause he could not block
         {
@@ -182,7 +183,7 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         _rb.AddForce(force, forcemode);
         OnImpact(enforcer, impactType);
-        if (force.magnitude > CharacterDataStore.CharacterMovementDataStore.DropWeaponForceThreshold &&
+        if (force.magnitude > CharacterDataStore.DropWeaponForceThreshold &&
             _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
         {
             _actionFSM.TransitionTo<IdleActionState>();
@@ -270,11 +271,11 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         RaycastHit hit;
         float colliderRadius = GetComponent<CapsuleCollider>().radius;
-        Physics.Raycast(transform.position + transform.forward * (colliderRadius + CharacterDataStore.CharacterMovementDataStore.FrontIsCliff),
+        Physics.Raycast(transform.position + transform.forward * (colliderRadius + CharacterDataStore.FrontIsCliff),
                         Vector3.down,
                         out hit,
                         50f,
-                        CharacterDataStore.CharacterMovementDataStore.JumpMask);
+                        CharacterDataStore.JumpMask);
         if (hit.collider == null) return true;
         return false;
     }
@@ -302,7 +303,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private string _getGroundTag()
     {
         RaycastHit hit;
-        Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+        Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.JumpMask);
         if (hit.collider == null) return "";
         return hit.collider.tag;
     }
@@ -375,7 +376,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private bool _isGrounded()
     {
         RaycastHit hit;
-        return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.CharacterMovementDataStore.JumpMask);
+        return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.JumpMask);
     }
 
     #endregion
@@ -391,8 +392,6 @@ public class PlayerController : MonoBehaviour, IHittable
         protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
         protected bool _B { get { return Context._player.GetButton("Block"); } }
 
-        protected CharacterMovementData _charMovData { get { return Context.CharacterDataStore.CharacterMovementDataStore; } }
-        protected CharacterMeleeData _charMeleeData { get { return Context.CharacterDataStore.CharacterMeleeDataStore; } }
         public void OnEnterDeathZone()
         {
             Parent.TransitionTo<DeadState>();
@@ -430,12 +429,12 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<RunState>();
                 return;
             }
-            if (_jump && Context._isGrounded())
+            if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<JumpState>();
                 return;
             }
-            if (_B && Context.CharacterDataStore.CharacterBlockDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad)
+            if (_B && Context.CharacterDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<SideSteppingState>();
                 return;
@@ -447,7 +446,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.FixedUpdate();
             if (Context._frontIsCliff() && Context._isGrounded())
             {
-                Context._rb.AddForce(-Context.transform.forward * Context.CharacterDataStore.CharacterMovementDataStore.CliffPreventionForce, ForceMode.Acceleration);
+                Context._rb.AddForce(-Context.transform.forward * Context.CharacterDataStore.CliffPreventionForce, ForceMode.Acceleration);
             }
         }
 
@@ -463,29 +462,35 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._rb.AddForce(new Vector3(0, _charMovData.JumpForce, 0), ForceMode.Impulse);
+            Context._rb.AddForce(new Vector3(0, Context.CharacterDataStore.JumpForce, 0), ForceMode.Impulse);
             EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
         }
 
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-            Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed * Context._walkSpeed;
+            Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context._walkSpeed;
             Vector3 velocityChange = targetVelocity - Context._rb.velocity;
-            velocityChange.x = Mathf.Clamp(velocityChange.x, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
-            velocityChange.z = Mathf.Clamp(velocityChange.z, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
+            velocityChange.x = Mathf.Clamp(velocityChange.x, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
+            velocityChange.z = Mathf.Clamp(velocityChange.z, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
             velocityChange.y = 0f;
 
-            Context._rb.AddForce(velocityChange * _charMovData.InAirSpeedMultiplier, ForceMode.VelocityChange);
+            Context._rb.AddForce(velocityChange * Context.CharacterDataStore.InAirSpeedMultiplier, ForceMode.VelocityChange);
 
             if (_HLAxis != 0f && _VLAxis != 0f)
             {
                 Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
                 Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
+                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
                 Context.transform.rotation = tr;
             }
 
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._jumpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.JumpCD;
         }
     }
 
@@ -513,7 +518,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 return;
             }
 
-            if (_B && Context.CharacterDataStore.CharacterBlockDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad)
+            if (_B && Context.CharacterDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<SideSteppingState>();
                 return;
@@ -524,26 +529,26 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.FixedUpdate();
             bool isonground = Context._isGrounded();
-            Vector3 targetVelocity = Context.transform.forward * _charMovData.WalkSpeed * Context._walkSpeed;
+            Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context._walkSpeed;
             Vector3 velocityChange = targetVelocity - Context._rb.velocity;
-            velocityChange.x = Mathf.Clamp(velocityChange.x, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
-            velocityChange.z = Mathf.Clamp(velocityChange.z, -_charMovData.MaxVelocityChange, _charMovData.MaxVelocityChange);
+            velocityChange.x = Mathf.Clamp(velocityChange.x, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
+            velocityChange.z = Mathf.Clamp(velocityChange.z, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
             velocityChange.y = 0f;
 
             if (isonground)
                 Context._rb.AddForce(velocityChange, ForceMode.VelocityChange);
             else
-                Context._rb.AddForce(velocityChange * _charMovData.InAirSpeedMultiplier, ForceMode.VelocityChange);
+                Context._rb.AddForce(velocityChange * Context.CharacterDataStore.InAirSpeedMultiplier, ForceMode.VelocityChange);
 
             Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
             Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-            Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * _charMovData.MinRotationSpeed);
+            Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
             Context.transform.rotation = tr;
             if (Context._frontIsCliff() && isonground)
             {
                 _runTowardsCliffTime += Time.fixedDeltaTime;
-                if (_runTowardsCliffTime < Context.CharacterDataStore.CharacterMovementDataStore.CliffPreventionTimer)
-                    Context._rb.AddForce(-Context.transform.forward * Context.CharacterDataStore.CharacterMovementDataStore.CliffPreventionForce, ForceMode.Acceleration);
+                if (_runTowardsCliffTime < Context.CharacterDataStore.CliffPreventionTimer)
+                    Context._rb.AddForce(-Context.transform.forward * Context.CharacterDataStore.CliffPreventionForce, ForceMode.Acceleration);
             }
             else
                 _runTowardsCliffTime = 0f;
@@ -563,11 +568,11 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._sideStepTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.CharacterBlockDataStore.SideSteppingCD;
-            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.CharacterBlockDataStore.SideSteppingDuration;
+            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.SideSteppingDuration;
             _originalForward = Context.transform.forward;
-            Context._rb.AddForce(_originalForward * Context.CharacterDataStore.CharacterBlockDataStore.SideSteppingInitForce, ForceMode.VelocityChange);
+            Context._rb.AddForce(_originalForward * Context.CharacterDataStore.SideSteppingInitForce, ForceMode.VelocityChange);
             Context._animator.SetBool("SideStep", true);
+            Context._actionFSM.TransitionTo<SideSteppingActionState>();
         }
 
         public override void Update()
@@ -583,7 +588,9 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
+            Context._sideStepTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.SideSteppingCD;
             Context._animator.SetBool("SideStep", false);
+            Context._actionFSM.TransitionTo<IdleActionState>();
         }
     }
 
@@ -760,15 +767,12 @@ public class PlayerController : MonoBehaviour, IHittable
         protected bool _BDown { get { return Context._player.GetButtonDown("Block"); } }
         protected bool _BUp { get { return Context._player.GetButtonUp("Block"); } }
 
-        protected CharacterMeleeData _charMeleeData { get { return Context.CharacterDataStore.CharacterMeleeDataStore; } }
-        protected CharacterBlockData _charBlockData { get { return Context.CharacterDataStore.CharacterBlockDataStore; } }
-
         public override void Update()
         {
             /// Regen when past 3 seconds after block
-            if (Time.time > Context._lastTimeUseBlock + _charBlockData.BlockRegenInterval)
+            if (Time.time > Context._lastTimeUseBlock + Context.CharacterDataStore.BlockRegenInterval)
             {
-                if (Context._blockCharge > 0f) Context._blockCharge -= (Time.deltaTime * _charBlockData.BlockRegenRate);
+                if (Context._blockCharge > 0f) Context._blockCharge -= (Time.deltaTime * Context.CharacterDataStore.BlockRegenRate);
             }
         }
 
@@ -796,17 +800,17 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PickingState>();
                 return;
             }
-            if (_RightTrigger && !_charMeleeData.IsButtHitting)
+            if (_RightTrigger && !Context.CharacterDataStore.IsButtHitting)
             {
                 TransitionTo<PunchHoldingState>();
                 return;
             }
-            if (_RightTriggerDown && _charMeleeData.IsButtHitting)
+            if (_RightTriggerDown && Context.CharacterDataStore.IsButtHitting)
             {
                 TransitionTo<ButtAnticipationState>();
                 return;
             }
-            if (_B && Context._blockCharge <= _charBlockData.MaxBlockCD && !Context.CharacterDataStore.CharacterBlockDataStore.IsSideStepping)
+            if (_B && Context._blockCharge <= Context.CharacterDataStore.MaxBlockCD && !Context.CharacterDataStore.IsSideStepping)
             {
                 TransitionTo<BlockingState>();
                 return;
@@ -820,9 +824,13 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    private class SideSteppingActionState : ActionState
+    {
+
+    }
+
     private class PickingState : ActionState
     {
-        private CharacterPickUpData _characterPickUpData { get { return Context.CharacterDataStore.CharacterPickUpDataStore; } }
         public override void OnEnter()
         {
             base.OnEnter();
@@ -844,11 +852,11 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             RaycastHit hit;
             if (Physics.SphereCast(Context.Chest.transform.position,
-                _characterPickUpData.Radius,
+                Context.CharacterDataStore.Radius,
                 Vector3.down,
                 out hit,
                 Context._distToGround,
-                _characterPickUpData.PickUpLayer))
+                Context.CharacterDataStore.PickUpLayer))
             {
                 if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
                 {
@@ -967,7 +975,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._animator.SetFloat("ClockFistTime", 1f / _charMeleeData.ClockFistTime);
+            Context._animator.SetFloat("ClockFistTime", 1f / Context.CharacterDataStore.ClockFistTime);
             Context._animator.SetBool("PunchHolding", true);
             EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             _holding = false;
@@ -977,17 +985,17 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (!_holding && Time.time > _startHoldingTime + _charMeleeData.ClockFistTime)
+            if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
                 _holding = true;
                 Context._meleeCharge = 1f;
                 EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             }
-            else if (Time.time <= _startHoldingTime + _charMeleeData.ClockFistTime)
+            else if (Time.time <= _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
-                Context._meleeCharge = (Time.time - _startHoldingTime) / _charMeleeData.ClockFistTime;
+                Context._meleeCharge = (Time.time - _startHoldingTime) / Context.CharacterDataStore.ClockFistTime;
             }
-            if (_RightTriggerUp || Time.time > _startHoldingTime + _charMeleeData.MeleeHoldTime)
+            if (_RightTriggerUp || Time.time > _startHoldingTime + Context.CharacterDataStore.MeleeHoldTime)
             {
                 TransitionTo<PunchReleasingState>();
                 return;
@@ -1009,12 +1017,12 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._animator.SetFloat("FistReleaseTime", 1f / _charMeleeData.FistReleaseTime);
+            Context._animator.SetFloat("FistReleaseTime", 1f / Context.CharacterDataStore.FistReleaseTime);
             Context._animator.SetBool("PunchReleased", true);
-            _time = Time.time + _charMeleeData.FistReleaseTime;
+            _time = Time.time + Context.CharacterDataStore.FistReleaseTime;
             _hitOnce = false;
-            if (Context._meleeCharge < _charMeleeData.MeleeChargeThreshold) Context._meleeCharge = 0f;
-            Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * _charMeleeData.SelfPushForce, ForceMode.Impulse);
+            if (Context._meleeCharge < Context.CharacterDataStore.MeleeChargeThreshold) Context._meleeCharge = 0f;
+            Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.Impulse);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
         }
 
@@ -1026,9 +1034,9 @@ public class PlayerController : MonoBehaviour, IHittable
                 RaycastHit hit;
                 // This Layermask get all player's layer except this player's
                 int layermask = 0;
-                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CharacterMeleeDataStore.CanHitLayer;
-                else layermask = Context.CharacterDataStore.CharacterMeleeDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
-                if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
+                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
+                else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
+                if (!_hitOnce && Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
                 {
                     if (hit.transform.GetComponentInParent<IHittable>() == null) return;
                     _hitOnce = true;
@@ -1036,7 +1044,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     {
                         rb.velocity = Vector3.zero;
                     }
-                    Vector3 force = Context.transform.forward * _charMeleeData.PunchForce * Context._meleeCharge;
+                    Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce * Context._meleeCharge;
                     hit.transform.GetComponentInParent<IHittable>().OnImpact(force, Context._meleeCharge, Context.gameObject, true);
                 }
             }
@@ -1068,7 +1076,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            _timer = _charMeleeData.ButtAnticipationDuration + Time.timeSinceLevelLoad;
+            _timer = Context.CharacterDataStore.ButtAnticipationDuration + Time.timeSinceLevelLoad;
             Context._rb.velocity = Vector3.zero;
             Context._movementFSM.TransitionTo<ButtStrikeMovementState>();
             Context._animator.SetBool("ButtAnticipation", true);
@@ -1079,6 +1087,12 @@ public class PlayerController : MonoBehaviour, IHittable
             base.Update();
             if (_timer < Time.timeSinceLevelLoad)
             {
+                RaycastHit hit;
+                if (Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.ButtStrikeRaidus, Context.transform.forward, out hit, Context.CharacterDataStore.ButtStrikeStopDistance, Context.CharacterDataStore.ButtHitStopLayer))
+                {
+                    TransitionTo<ButtRecoveryState>();
+                    return;
+                }
                 TransitionTo<ButtStrikeState>();
                 return;
             }
@@ -1099,11 +1113,11 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            _timer = _charMeleeData.ButtStrikeDuration + Time.timeSinceLevelLoad;
+            _timer = Context.CharacterDataStore.ButtStrikeDuration + Time.timeSinceLevelLoad;
             _hitOnce = false;
-            _hitTween = Context.transform.DOMove(-Context.transform.forward * _charMeleeData.ButtStrikeForwardPush, _charMeleeData.ButtStrikeDuration)
+            _hitTween = Context.transform.DOMove(Context.transform.forward * Context.CharacterDataStore.ButtStrikeForwardPush, Context.CharacterDataStore.ButtStrikeDuration)
             .SetRelative(true)
-            .SetEase(_charMeleeData.ButtStrikePushEase);
+            .SetEase(Context.CharacterDataStore.ButtStrikePushEase);
             Context._animator.SetBool("ButtStrike", true);
 
         }
@@ -1122,9 +1136,9 @@ public class PlayerController : MonoBehaviour, IHittable
                 RaycastHit hit;
                 // This Layermask get all player's layer except this player's
                 int layermask = 0;
-                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CharacterMeleeDataStore.CanHitLayer;
-                else layermask = Context.CharacterDataStore.CharacterMeleeDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
-                if (!_hitOnce && Physics.SphereCast(Context.transform.position, _charMeleeData.PunchRadius, -Context.transform.forward, out hit, _charMeleeData.PunchDistance, layermask))
+                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
+                else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
+                if (!_hitOnce && Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.ButtStrikeRaidus, Context.transform.forward, out hit, Context.CharacterDataStore.ButtStrikeDistance, layermask))
                 {
                     if (hit.transform.GetComponentInParent<IHittable>() == null) return;
                     _hitOnce = true;
@@ -1132,8 +1146,14 @@ public class PlayerController : MonoBehaviour, IHittable
                     {
                         rb.velocity = Vector3.zero;
                     }
-                    Vector3 force = -Context.transform.forward * _charMeleeData.ButtStrikeStrength;
+                    Vector3 force = Context.transform.forward * Context.CharacterDataStore.ButtStrikeStrength;
                     hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    TransitionTo<ButtRecoveryState>();
+                    return;
+                }
+                if (Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.ButtStrikeRaidus, Context.transform.forward, out hit, Context.CharacterDataStore.ButtStrikeStopDistance, Context.CharacterDataStore.ButtHitStopLayer))
+                {
+                    print("On Hit Obstacles");
                     TransitionTo<ButtRecoveryState>();
                     return;
                 }
@@ -1154,7 +1174,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            _timer = _charMeleeData.ButtRecoveryDuration + Time.timeSinceLevelLoad;
+            _timer = Context.CharacterDataStore.ButtRecoveryDuration + Time.timeSinceLevelLoad;
         }
 
         public override void Update()
@@ -1200,10 +1220,10 @@ public class PlayerController : MonoBehaviour, IHittable
             if (Context.BlockUIVFXHolder != null)
             {
                 Vector2 _nextShieldUISize = _shieldUISize;
-                _nextShieldUISize.x *= (_charBlockData.MaxBlockCD - Context._blockCharge) / _charBlockData.MaxBlockCD;
+                _nextShieldUISize.x *= (Context.CharacterDataStore.MaxBlockCD - Context._blockCharge) / Context.CharacterDataStore.MaxBlockCD;
                 Context.BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextShieldUISize;
             }
-            if (Context._blockCharge > _charBlockData.MaxBlockCD)
+            if (Context._blockCharge > Context.CharacterDataStore.MaxBlockCD)
             {
                 TransitionTo<IdleActionState>();
                 return;

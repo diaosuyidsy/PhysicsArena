@@ -192,6 +192,10 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             _actionFSM.TransitionTo<IdleActionState>();
         }
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(ButtStrikeState)))
+        {
+            _actionFSM.TransitionTo<IdleActionState>();
+        }
     }
 
     public void OnImpact(GameObject enforcer, ImpactType impactType)

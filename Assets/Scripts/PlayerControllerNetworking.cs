@@ -320,7 +320,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     {
         if (_isGrounded())
         {
-            EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[1], _getGroundTag()));
+            // EventManager.Instance.TriggerEvent(new FootStep(OnDeathHidden[1], null, _getGroundTag()));
         }
     }
 

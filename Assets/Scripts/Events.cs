@@ -216,14 +216,20 @@ public class PunchDone : GameEvent
 
 public class FootStep : GameEvent
 {
-    public GameObject PlayerFeet { get; }
-    public string GroundTag { get; }
-
-    public FootStep(GameObject _playerfeet, string _groundTag)
+    public FootStep(GameObject playerFeet, GameObject playerActualFoot, string groundTag, GameObject player, int playerFootLeftRight)
     {
-        PlayerFeet = _playerfeet;
-        GroundTag = _groundTag;
+        PlayerFeet = playerFeet;
+        PlayerActualFoot = playerActualFoot;
+        GroundTag = groundTag;
+        Player = player;
+        PlayerFootLeftRight = playerFootLeftRight;
     }
+
+    public GameObject PlayerFeet { get; }
+    public GameObject PlayerActualFoot { get; }
+    public string GroundTag { get; }
+    public GameObject Player { get; }
+    public int PlayerFootLeftRight { get; }
 }
 
 public class PlayerJump : GameEvent

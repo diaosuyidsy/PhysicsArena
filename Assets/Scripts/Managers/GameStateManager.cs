@@ -55,6 +55,8 @@ public class GameStateManager
     private Transform _gameUI;
     private int _winner;
     private GameObject _gameManager;
+    private int _hitStopFrames;
+    private float _hitStopTimeScale;
 
     public GameStateManager(GameMapData _gmp, ConfigData _cfd, GameObject _gm)
     {
@@ -110,6 +112,7 @@ public class GameStateManager
         EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
+        EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
         _gameStateFSM.TransitionTo<FoodCartTutorialState>();
@@ -145,8 +148,19 @@ public class GameStateManager
         EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawn);
+        EventManager.Instance.RemoveHandler<HitStopEvent>(_onHitStop);
         if (_gameStateFSM.CurrentState != null)
             _gameStateFSM.CurrentState.CleanUp();
+    }
+
+    private void _onHitStop(HitStopEvent ev)
+    {
+        _hitStopFrames = ev.StopFrames;
+        _hitStopTimeScale = ev.TimeScale;
+        if (_gameStateFSM.CurrentState.GetType().Equals(typeof(GameLoop)))
+        {
+            _gameStateFSM.TransitionTo<HitStop>();
+        }
     }
 
     private void _onGameEnd(GameEnd ge)
@@ -518,6 +532,39 @@ public class GameStateManager
                 return;
             }
         }
+    }
+
+    private class HitStop : GameState
+    {
+        private float timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            timer = Time.unscaledTime + Context._hitStopFrames * Time.unscaledDeltaTime;
+            Time.timeScale = Context._hitStopTimeScale;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (timer < Time.unscaledTime)
+            {
+                TransitionTo<GameLoop>();
+                return;
+            }
+            if (_AnyPauseDown)
+            {
+                TransitionTo<PauseState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Time.timeScale = 1f;
+        }
+
     }
 
     private class PauseState : GameState

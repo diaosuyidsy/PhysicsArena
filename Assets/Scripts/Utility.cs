@@ -206,6 +206,16 @@ public class ViberationInformation
 }
 
 [Serializable]
+public class HitStopInformation
+{
+    public int Frames;
+    public float TimeScale = 0.1f;
+    public Vector3 Viberation = Vector3.one;
+    public int Vibrato = 50;
+    public float Randomness = 90f;
+}
+
+[Serializable]
 public class SushiRespawnInformation
 {
     public GameObject RespawnTriggerGameObject;

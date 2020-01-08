@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
+using DG.Tweening;
 
 /// <summary>
 /// Game Feel Manager Manages Controller vibration
@@ -26,6 +27,12 @@ public class GameFeelManager
         /// If the hiter number is below 0, means it's a block
         /// and blocked attack don't have a hitter
         _vibrateController(ph.HiterPlayerNumber, 1.0f * charge, 0.15f * charge);
+        // Also Shake the hitted
+        ph.Hitted.transform.DOShakePosition(GameFeelData.MeleeHitStopInformation.Frames * Time.unscaledDeltaTime,
+        GameFeelData.MeleeHitStopInformation.Viberation,
+        GameFeelData.MeleeHitStopInformation.Vibrato,
+        GameFeelData.MeleeHitStopInformation.Randomness).SetUpdate(true);
+        EventManager.Instance.TriggerEvent(new HitStopEvent(GameFeelData.MeleeHitStopInformation.Frames, GameFeelData.MeleeHitStopInformation.TimeScale));
     }
 
     private void _onPlayerDied(PlayerDied pd)

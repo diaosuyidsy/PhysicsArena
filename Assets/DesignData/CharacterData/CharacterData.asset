@@ -18,6 +18,7 @@ MonoBehaviour:
   FacingCliffMultiplier: 1
   PickupSpeed: 2
   JumpCD: 0
+  JumpStaminaDrain: 0
   JumpForce: 230
   JumpMask:
     serializedVersion: 2
@@ -28,17 +29,20 @@ MonoBehaviour:
   FrontIsCliff: 0.2
   CliffPreventionForce: 100
   CliffPreventionTimer: 0.4
-  MaxBlockCD: 1.5
-  BlockRegenInterval: 2
-  BlockRegenRate: 1
+  MaxStamina: 1.5
+  StaminaRegenInterval: 3
+  StaminaRegenRate: 1
+  BlockUILingerDuration: 0.4
   ArmTargetPosition: 100
   HandTargetPosition: 120
+  BlockStaminaDrain: 1
   BlockMultiplier: 2
   BlockAngle: 90
   IsSideStepping: 0
   SideSteppingInitForce: 70
   SideSteppingDuration: 0.3
   SideSteppingCD: 1
+  SideSteppingStaminaDrain: 0.3
   ClockFistTime: 0.3
   FistReleaseTime: 0.3
   SelfPushForce: 200

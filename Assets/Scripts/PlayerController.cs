@@ -19,6 +19,7 @@ public class PlayerController : MonoBehaviour, IHittable
     public GameObject LeftHand;
     public GameObject RightHand;
     public GameObject[] OnDeathHidden;
+    public GameObject BlockUIVFXHolder;
 
     public int PlayerNumber;
 
@@ -26,7 +27,6 @@ public class PlayerController : MonoBehaviour, IHittable
     [HideInInspector] public GameObject MeleeVFXHolder;
     [HideInInspector] public GameObject MeleeVFXHolder2;
     [HideInInspector] public GameObject BlockVFXHolder;
-    [HideInInspector] public GameObject BlockUIVFXHolder;
     [HideInInspector] public GameObject StunVFXHolder;
     [HideInInspector] public GameObject SlowVFXHolder;
     [HideInInspector] public GameObject FoodTraverseVFXHolder;
@@ -37,13 +37,15 @@ public class PlayerController : MonoBehaviour, IHittable
     private Rigidbody _rb;
     private float _distToGround;
     private float _meleeCharge;
-    private float _blockCharge;
-    private float _lastTimeUseBlock;
+    private float _currentStamina;
+    private float _lastTimeUseStamina;
+    private Vector2 _staminaUISize;
     private float _sideStepTimer;
     private float _jumpTimer;
     private Vector3 _freezeBody;
     private ImpactMarker _impactMarker;
     private Animator _animator;
+    // private IEnumerator StaminaUIDecrease;
 
     private FSM<PlayerController> _movementFSM;
     private FSM<PlayerController> _actionFSM;
@@ -86,6 +88,8 @@ public class PlayerController : MonoBehaviour, IHittable
         _impactMarker = new ImpactMarker(null, Time.time, ImpactType.Self);
         _animator = GetComponent<Animator>();
         _playerBodies = new List<Rigidbody>();
+        _currentStamina = CharacterDataStore.MaxStamina;
+        _staminaUISize = BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
         _playerBodiesLayer = gameObject.layer;
         foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
         {
@@ -379,6 +383,33 @@ public class PlayerController : MonoBehaviour, IHittable
         return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.JumpMask);
     }
 
+    private bool _canDrainStamina(float drain)
+    {
+        if (_currentStamina > drain)
+            return true;
+        else
+        {
+            _lastTimeUseStamina = Time.timeSinceLevelLoad;
+            BlockUIVFXHolder.SetActive(true);
+            BlockUIVFXHolder.GetComponent<DOTweenAnimation>().DORestart();
+            return false;
+        }
+    }
+
+    private void _drainStamina(float drain)
+    {
+        if (drain <= 0f) return;
+        if (_currentStamina - drain < 0f)
+            _currentStamina = 0f;
+        else
+            _currentStamina -= drain;
+        _lastTimeUseStamina = Time.timeSinceLevelLoad;
+
+        BlockUIVFXHolder.SetActive(true);
+        Vector2 _nextStaminaUISize = _staminaUISize;
+        _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
+        BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
+    }
     #endregion
 
     #region Movment States
@@ -429,12 +460,12 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<RunState>();
                 return;
             }
-            if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad)
+            if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad && Context._canDrainStamina(Context.CharacterDataStore.JumpStaminaDrain))
             {
                 TransitionTo<JumpState>();
                 return;
             }
-            if (_B && Context.CharacterDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad)
+            if (_B && Context.CharacterDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad && Context._canDrainStamina(Context.CharacterDataStore.SideSteppingStaminaDrain))
             {
                 TransitionTo<SideSteppingState>();
                 return;
@@ -464,6 +495,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             Context._rb.AddForce(new Vector3(0, Context.CharacterDataStore.JumpForce, 0), ForceMode.Impulse);
             EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
+            Context._drainStamina(Context.CharacterDataStore.JumpStaminaDrain);
         }
 
         public override void FixedUpdate()
@@ -512,13 +544,13 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleState>();
                 return;
             }
-            if (_jump && Context._isGrounded())
+            if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad && Context._canDrainStamina(Context.CharacterDataStore.JumpStaminaDrain))
             {
                 TransitionTo<JumpState>();
                 return;
             }
 
-            if (_B && Context.CharacterDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad)
+            if (_B && Context.CharacterDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad && Context._canDrainStamina(Context.CharacterDataStore.SideSteppingStaminaDrain))
             {
                 TransitionTo<SideSteppingState>();
                 return;
@@ -572,6 +604,7 @@ public class PlayerController : MonoBehaviour, IHittable
             _originalForward = Context.transform.forward;
             Context._rb.AddForce(_originalForward * Context.CharacterDataStore.SideSteppingInitForce, ForceMode.VelocityChange);
             Context._animator.SetBool("SideStep", true);
+            Context._drainStamina(Context.CharacterDataStore.SideSteppingStaminaDrain);
             Context._actionFSM.TransitionTo<SideSteppingActionState>();
         }
 
@@ -769,10 +802,16 @@ public class PlayerController : MonoBehaviour, IHittable
 
         public override void Update()
         {
+            base.Update();
             /// Regen when past 3 seconds after block
-            if (Time.time > Context._lastTimeUseBlock + Context.CharacterDataStore.BlockRegenInterval)
+            if (Time.timeSinceLevelLoad > Context._lastTimeUseStamina + Context.CharacterDataStore.StaminaRegenInterval)
             {
-                if (Context._blockCharge > 0f) Context._blockCharge -= (Time.deltaTime * Context.CharacterDataStore.BlockRegenRate);
+                if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._currentStamina += (Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
+            }
+            /// Stamina Regen UI Linger Time
+            if (Context.BlockUIVFXHolder != null && Context.BlockUIVFXHolder.activeSelf && Time.timeSinceLevelLoad > Context._lastTimeUseStamina + Context.CharacterDataStore.BlockUILingerDuration)
+            {
+                Context.BlockUIVFXHolder.SetActive(false);
             }
         }
 
@@ -810,7 +849,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<ButtAnticipationState>();
                 return;
             }
-            if (_B && Context._blockCharge <= Context.CharacterDataStore.MaxBlockCD && !Context.CharacterDataStore.IsSideStepping)
+            if (_B && Context._canDrainStamina(0.1f) && !Context.CharacterDataStore.IsSideStepping)
             {
                 TransitionTo<BlockingState>();
                 return;
@@ -1195,15 +1234,12 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
-
     private class BlockingState : ActionState
     {
-        private Vector2 _shieldUISize;
         public override void OnEnter()
         {
             base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
-            _shieldUISize = Services.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
             Context._animator.SetBool("Blocking", true);
         }
 
@@ -1215,15 +1251,9 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            Context._lastTimeUseBlock = Time.time;
-            Context._blockCharge += Time.deltaTime;
-            if (Context.BlockUIVFXHolder != null)
-            {
-                Vector2 _nextShieldUISize = _shieldUISize;
-                _nextShieldUISize.x *= (Context.CharacterDataStore.MaxBlockCD - Context._blockCharge) / Context.CharacterDataStore.MaxBlockCD;
-                Context.BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextShieldUISize;
-            }
-            if (Context._blockCharge > Context.CharacterDataStore.MaxBlockCD)
+            Context._drainStamina(Time.deltaTime * Context.CharacterDataStore.BlockStaminaDrain);
+
+            if (Context._currentStamina <= 0f)
             {
                 TransitionTo<IdleActionState>();
                 return;

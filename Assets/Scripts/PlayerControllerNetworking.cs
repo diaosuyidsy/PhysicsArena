@@ -674,9 +674,9 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         public override void Update()
         {
             /// Regen when past 3 seconds after block
-            if (Time.time > Context._lastTimeUseBlock + _charBlockData.BlockRegenInterval)
+            if (Time.time > Context._lastTimeUseBlock + _charBlockData.StaminaRegenInterval)
             {
-                if (Context._blockCharge > 0f) Context._blockCharge -= (Time.deltaTime * _charBlockData.BlockRegenRate);
+                if (Context._blockCharge > 0f) Context._blockCharge -= (Time.deltaTime * _charBlockData.StaminaRegenRate);
             }
         }
 
@@ -709,7 +709,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
                 TransitionTo<PunchHoldingState>();
                 return;
             }
-            if (_B && Context._blockCharge <= _charBlockData.MaxBlockCD)
+            if (_B && Context._blockCharge <= _charBlockData.MaxStamina)
             {
                 TransitionTo<BlockingState>();
                 return;
@@ -968,7 +968,7 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
         {
             base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
-            _shieldUISize = ServicesNetwork.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
+            // _shieldUISize = ServicesNetwork.VisualEffectManager.VFXDataStore.ChickenBlockUIVFX.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
             Context._animator.SetBool("Blocking", true);
             Context._photonview.RPC("OnBlock"
             , RpcTarget.All
@@ -988,10 +988,10 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
             if (Context.BlockUIVFXHolder != null)
             {
                 Vector2 _nextShieldUISize = _shieldUISize;
-                _nextShieldUISize.x *= (_charBlockData.MaxBlockCD - Context._blockCharge) / _charBlockData.MaxBlockCD;
+                _nextShieldUISize.x *= (_charBlockData.MaxStamina - Context._blockCharge) / _charBlockData.MaxStamina;
                 Context.BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextShieldUISize;
             }
-            if (Context._blockCharge > _charBlockData.MaxBlockCD)
+            if (Context._blockCharge > _charBlockData.MaxStamina)
             {
                 TransitionTo<IdleActionState>();
                 return;

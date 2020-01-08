@@ -13,6 +13,7 @@ public class CharacterData : ScriptableObject
     public float FacingCliffMultiplier = 0.3f;
     public float PickupSpeed = 2f;
     public float JumpCD = 0f;
+    public float JumpStaminaDrain = 0f;
     public float JumpForce = 230f;
     public LayerMask JumpMask;
     public float MinRotationSpeed = 4f;
@@ -23,19 +24,20 @@ public class CharacterData : ScriptableObject
     public float CliffPreventionTimer = 0.4f;
 
     [Header("Character Defend Related Settings")]
-    public float MaxBlockCD = 1.5f;
-    public float BlockRegenInterval = 3f;
-    public float BlockRegenRate = 1f;
-
+    public float MaxStamina = 1.5f;
+    public float StaminaRegenInterval = 3f;
+    public float StaminaRegenRate = 1f;
+    public float BlockUILingerDuration = 0.2f;
     public float ArmTargetPosition = 100f;
     public float HandTargetPosition = 120f;
-
+    public float BlockStaminaDrain = 1f;
     public float BlockMultiplier = 2f;
     public float BlockAngle = 90f;
     public bool IsSideStepping = false;
     public float SideSteppingInitForce = 300f;
     public float SideSteppingDuration = 0.2f;
     public float SideSteppingCD = 0.5f;
+    public float SideSteppingStaminaDrain = 0.3f;
 
     [Header("Character Attack Related Settings")]
 

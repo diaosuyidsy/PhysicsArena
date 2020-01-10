@@ -90,6 +90,8 @@ public class DeathModeObjectiveManager : ObjectiveManager
             }
         }
 
+        RefreshScore();
+
         if (TeamAScore >= ModeData.WinningScore || TeamBScore >= ModeData.WinningScore)
         {
             gameEnd = true;

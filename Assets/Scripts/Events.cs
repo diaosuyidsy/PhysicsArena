@@ -75,6 +75,20 @@ public class PlayerDied : GameEvent
     }
 }
 
+public class PlayerDiedInDeathMode : GameEvent
+{
+    public GameObject Player;
+    public int PlayerNumber;
+    public bool DeadInCircle;
+
+    public PlayerDiedInDeathMode(GameObject player,int playerNumber,bool inCircle)
+    {
+        Player = player;
+        PlayerNumber = playerNumber;
+        DeadInCircle = inCircle;
+    }
+}
+
 public class PlayerStunned : GameEvent
 {
     public PlayerStunned(GameObject player, int playerNumber, Transform playerHead, float stunnedTime)

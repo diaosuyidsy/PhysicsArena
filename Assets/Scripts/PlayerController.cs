@@ -135,7 +135,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
             EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker));
 
-            EventManager.Instance.TriggerEvent(new PlayerDiedInDeathMode(gameObject, PlayerNumber, true));
+            EventManager.Instance.TriggerEvent(new PlayerDiedInDeathMode(gameObject, PlayerNumber, other.gameObject));
         }
 
         if (other.CompareTag("DeathModeNormalDeadZone"))
@@ -143,7 +143,7 @@ public class PlayerController : MonoBehaviour, IHittable
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
             EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker));
-            EventManager.Instance.TriggerEvent(new PlayerDiedInDeathMode(gameObject, PlayerNumber, false));
+            EventManager.Instance.TriggerEvent(new PlayerDiedInDeathMode(gameObject, PlayerNumber, null));
         }
     }
 

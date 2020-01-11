@@ -67,7 +67,7 @@ public class DeathModeObjectiveManager : ObjectiveManager
             return;
         }
 
-        if (e.DeadInCircle)
+        if (e.TrapZone!=null)
         {
             if (e.Player.tag.Contains("1"))
             {

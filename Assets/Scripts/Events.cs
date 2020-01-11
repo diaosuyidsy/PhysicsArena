@@ -79,13 +79,13 @@ public class PlayerDiedInDeathMode : GameEvent
 {
     public GameObject Player;
     public int PlayerNumber;
-    public bool DeadInCircle;
+    public GameObject TrapZone;
 
-    public PlayerDiedInDeathMode(GameObject player,int playerNumber,bool inCircle)
+    public PlayerDiedInDeathMode(GameObject player,int playerNumber,GameObject trap)
     {
         Player = player;
         PlayerNumber = playerNumber;
-        DeadInCircle = inCircle;
+        TrapZone = trap;
     }
 }
 

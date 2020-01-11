@@ -16,7 +16,7 @@ public class WeaponGenerator : MonoBehaviour
     private float Timer;
 
     private bool gameStart;
-    
+
 
     // Start is called before the first frame update
     void Start()
@@ -41,6 +41,12 @@ public class WeaponGenerator : MonoBehaviour
                 GenerateWeapon();
             }
         }
+    }
+
+    public void EnableSelf()
+    {
+        gameStart = true;
+        EventManager.Instance.AddHandler<GameStart>(OnGameStart);
     }
 
     private void OnGameStart(GameStart e)

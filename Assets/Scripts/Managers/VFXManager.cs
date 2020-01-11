@@ -44,7 +44,7 @@ public class VFXManager
         GameObject VFX = ev.Player.CompareTag("Team1") ?
         (ev.PlayerFootLeftRight == 0 ? VFXDataStore.ChickenRightFootStepVFX : VFXDataStore.ChickenLeftFootStepVFX) :
         (ev.PlayerFootLeftRight == 0 ? VFXDataStore.DuckRightFootStepVFX : VFXDataStore.DuckLeftFootStepVFX);
-        _instantiateVFX(VFX, ev.PlayerActualFoot.transform.position, VFX.transform.rotation);
+        _instantiateVFX(VFX, ev.PlayerActualFoot.transform.position, Quaternion.Euler(VFX.transform.eulerAngles.x, ev.Player.transform.eulerAngles.y, ev.Player.transform.eulerAngles.z));
     }
 
     private void _onPlayerJump(PlayerJump pj)

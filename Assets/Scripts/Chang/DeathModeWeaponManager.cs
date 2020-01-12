@@ -18,12 +18,16 @@ public class DeathModeWeaponManager : MonoBehaviour
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<WeaponGeneratorActivated>(OnGeneratorActivaed);
+        EventManager.Instance.AddHandler<WeaponHitDeathTrigger>(OnWeaponFall);
+        EventManager.Instance.AddHandler<WeaponUsedUp>(OnWeaponUsedUp);
     }
 
     private void OnDestroy()
     {
         EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
         EventManager.Instance.RemoveHandler<WeaponGeneratorActivated>(OnGeneratorActivaed);
+        EventManager.Instance.RemoveHandler<WeaponHitDeathTrigger>(OnWeaponFall);
+        EventManager.Instance.RemoveHandler<WeaponUsedUp>(OnWeaponUsedUp);
     }
 
     // Update is called once per frame
@@ -56,6 +60,16 @@ public class DeathModeWeaponManager : MonoBehaviour
             }
 
         }
+    }
+
+    private void OnWeaponFall(WeaponHitDeathTrigger e)
+    {
+        CurrentWeaponCount--;
+    }
+
+    private void OnWeaponUsedUp(WeaponUsedUp e)
+    {
+        CurrentWeaponCount--;
     }
 
     private void OnGeneratorActivaed(WeaponGeneratorActivated e)

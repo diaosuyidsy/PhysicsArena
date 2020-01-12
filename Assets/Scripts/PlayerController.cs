@@ -127,6 +127,15 @@ public class PlayerController : MonoBehaviour, IHittable
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
             EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker));
+            EventManager.Instance.TriggerEvent(new PlayerDiedInDeathMode(gameObject, PlayerNumber, null));
+        }
+
+        if (other.CompareTag("DeathModeTrapZone"))
+        {
+            ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
+            ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
+            EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker));
+            EventManager.Instance.TriggerEvent(new PlayerDiedInDeathMode(gameObject,PlayerNumber,other.gameObject));
         }
     }
 

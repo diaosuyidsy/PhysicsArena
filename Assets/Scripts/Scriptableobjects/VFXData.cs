@@ -40,5 +40,9 @@ public class VFXData : ScriptableObject
     public GameObject ChickenBlockShieldStarVFX;
     public GameObject DuckBlockParryVFX;
     public GameObject DuckBlockShieldStarVFX;
-    
+    public GameObject ChickenLeftFootStepVFX;
+    public GameObject ChickenRightFootStepVFX;
+    public GameObject DuckLeftFootStepVFX;
+    public GameObject DuckRightFootStepVFX;
+
 }

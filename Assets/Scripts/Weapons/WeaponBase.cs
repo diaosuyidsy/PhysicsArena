@@ -52,6 +52,7 @@ public abstract class WeaponBase : MonoBehaviour
         if (_ammo <= 0)
         {
             CanBePickedUp = false;
+            EventManager.Instance.TriggerEvent(new WeaponUsedUp());
             if (Owner != null)
                 Owner.GetComponent<PlayerController>().ForceDropHandObject();
         }
@@ -103,6 +104,7 @@ public abstract class WeaponBase : MonoBehaviour
         if (other.CompareTag("DeathZone"))
         {
             _hitGroundOnce = false;
+            EventManager.Instance.TriggerEvent(new WeaponHitDeathTrigger());
             _onWeaponDespawn();
             return;
         }

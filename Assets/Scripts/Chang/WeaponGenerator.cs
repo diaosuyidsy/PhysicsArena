@@ -8,7 +8,11 @@ public class WeaponGenerator : MonoBehaviour
     public float GenerationIntervalMin;
     public float GenerationIntervalMax;
 
-    public int MaxWeaponNumber;
+    public Vector3 DetectOffset;
+    public float DetectRadius;
+
+    public LayerMask WeaponLayer;
+
 
     public List<GameObject> WeaponPrefabs;
     public List<float> ProbabilitySum;
@@ -18,43 +22,26 @@ public class WeaponGenerator : MonoBehaviour
     private bool gameStart;
 
 
+    private const float DetectDis = 1;
+
     // Start is called before the first frame update
     void Start()
     {
-        EventManager.Instance.AddHandler<GameStart>(OnGameStart);
+
     }
 
     private void OnDestroy()
     {
-        EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (gameStart)
-        {
-            Timer -= Time.deltaTime;
-            if (Timer <= 0)
-            {
-                Timer = Random.Range(GenerationIntervalMin, GenerationIntervalMax);
-                GenerateWeapon();
-            }
-        }
+
     }
 
-    public void EnableSelf()
-    {
-        gameStart = true;
-        EventManager.Instance.AddHandler<GameStart>(OnGameStart);
-    }
-
-    private void OnGameStart(GameStart e)
-    {
-        gameStart = true;
-    }
-
-    private void GenerateWeapon()
+    public void GenerateWeapon()
     {
         float Ran = Random.Range(0.0f, 1.0f);
 
@@ -79,4 +66,21 @@ public class WeaponGenerator : MonoBehaviour
         Weapon.GetComponent<WeaponBase>().OnSpawn();
 
     }
+
+
+    public bool WeaponOnPlatform()
+    {
+        RaycastHit[] AllHits = Physics.SphereCastAll(transform.position + DetectOffset, DetectRadius, Vector3.up, DetectDis, WeaponLayer);
+
+        for(int i = 0; i < AllHits.Length; i++)
+        {
+            if(AllHits[i].collider.gameObject.CompareTag("Weapon_OnChest")|| AllHits[i].collider.gameObject.CompareTag("Weapon_OnHead"))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }

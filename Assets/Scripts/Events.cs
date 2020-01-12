@@ -89,6 +89,26 @@ public class PlayerDiedInDeathMode : GameEvent
     }
 }
 
+public class WeaponDestroyed : GameEvent
+{
+
+}
+
+public class WeaponGenerated : GameEvent
+{
+
+}
+
+public class WeaponGeneratorActivated : GameEvent
+{
+    public GameObject Generator;
+    public WeaponGeneratorActivated(GameObject g)
+    {
+        Generator = g;
+    }
+}
+
+
 public class PlayerStunned : GameEvent
 {
     public PlayerStunned(GameObject player, int playerNumber, Transform playerHead, float stunnedTime)

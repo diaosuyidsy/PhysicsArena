@@ -95,6 +95,6 @@ public class DeathModeTrap : MonoBehaviour
         FenceColliders.SetActive(false);
 
         WeaponGenerator.GetComponent<WeaponGenerator>().enabled = true;
-        WeaponGenerator.GetComponent<WeaponGenerator>().EnableSelf();
+        EventManager.Instance.TriggerEvent(new WeaponGeneratorActivated(WeaponGenerator));
     }
 }

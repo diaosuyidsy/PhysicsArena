@@ -265,6 +265,14 @@ public class PlayerLand : GameEvent
 }
 #endregion
 
+public class WeaponHitDeathTrigger : GameEvent
+{
+}
+
+public class WeaponUsedUp : GameEvent
+{
+}
+
 public class ObjectDespawned : GameEvent
 {
     public GameObject Obj { get; }

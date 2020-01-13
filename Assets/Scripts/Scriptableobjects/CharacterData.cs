@@ -13,11 +13,9 @@ public class CharacterData : ScriptableObject
     public float FacingCliffMultiplier = 0.3f;
     public float PickupSpeed = 2f;
     public float JumpCD = 0f;
-    public float JumpStaminaDrain = 0f;
     public float JumpForce = 230f;
     public LayerMask JumpMask;
     public float MinRotationSpeed = 4f;
-    public float MaxRotationSpeed = 15f;
     public float DropWeaponForceThreshold = 500f;
     public float FrontIsCliff = 0.2f;
     public float CliffPreventionForce = 100f;
@@ -28,8 +26,6 @@ public class CharacterData : ScriptableObject
     public float StaminaRegenInterval = 3f;
     public float StaminaRegenRate = 1f;
     public float BlockUILingerDuration = 0.2f;
-    public float ArmTargetPosition = 100f;
-    public float HandTargetPosition = 120f;
     public float BlockStaminaDrain = 1f;
     public float BlockMultiplier = 2f;
     public float BlockAngle = 90f;
@@ -58,18 +54,6 @@ public class CharacterData : ScriptableObject
     [Tooltip("How much time player can hold the punch, default is infinity")]
     public float MeleeHoldTime = Mathf.Infinity;
     public LayerMask CanHitLayer;
-    public bool IsButtHitting;
-    public float ButtAnticipationDuration = 0.3f;
-    public float ButtAnticipationForwardPush = 50f;
-    public float ButtStrikeDuration = 0.2f;
-    public float ButtStrikeStrength = 500f;
-    public float ButtStrikeRaidus = 0.3f;
-    public float ButtStrikeDistance = 0.05f;
-    public float ButtStrikeStopDistance = 0.05f;
-    public float ButtStrikeForwardPush = 3f;
-    public Ease ButtStrikePushEase = Ease.OutQuad;
-    public float ButtRecoveryDuration = 0f;
-    public LayerMask ButtHitStopLayer;
 
     [Header("Character Other Settings")]
     public float Radius = 1f;

@@ -4,5 +4,7 @@ using UnityEngine;
 
 public class EquipmentDataBase : ScriptableObject
 {
-
+    public int Ammo = 5;
+    public EquipmentPositionType EquipmentPositionType;
+    public PickupablePositionAdjustment PositionAdjustment;
 }

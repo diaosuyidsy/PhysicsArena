@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 77f59a2ecbe94604094d30020f1b14bd, type: 3}
-  m_Name: CharacterData_Yellow
+  m_Name: CharacterData_Blue
   m_EditorClassIdentifier: 
   WalkSpeed: 3.5
   MaxVelocityChange: 2
@@ -18,13 +18,11 @@ MonoBehaviour:
   FacingCliffMultiplier: 1
   PickupSpeed: 2
   JumpCD: 0
-  JumpStaminaDrain: 0
   JumpForce: 230
   JumpMask:
     serializedVersion: 2
     m_Bits: 286720
   MinRotationSpeed: 8
-  MaxRotationSpeed: 15
   DropWeaponForceThreshold: 500
   FrontIsCliff: 0.2
   CliffPreventionForce: 100
@@ -33,8 +31,6 @@ MonoBehaviour:
   StaminaRegenInterval: 3
   StaminaRegenRate: 1
   BlockUILingerDuration: 0.4
-  ArmTargetPosition: 100
-  HandTargetPosition: 120
   BlockStaminaDrain: 1
   BlockMultiplier: 2
   BlockAngle: 90
@@ -54,20 +50,6 @@ MonoBehaviour:
   CanHitLayer:
     serializedVersion: 2
     m_Bits: 16883200
-  IsButtHitting: 0
-  ButtAnticipationDuration: 0.4
-  ButtAnticipationForwardPush: 3
-  ButtStrikeDuration: 0.3
-  ButtStrikeStrength: 900
-  ButtStrikeRaidus: 0.4
-  ButtStrikeDistance: 0.05
-  ButtStrikeStopDistance: 0.3
-  ButtStrikeForwardPush: 2
-  ButtStrikePushEase: 6
-  ButtRecoveryDuration: 0
-  ButtHitStopLayer:
-    serializedVersion: 2
-    m_Bits: 262144
   Radius: 0.25
   PickUpLayer:
     serializedVersion: 2

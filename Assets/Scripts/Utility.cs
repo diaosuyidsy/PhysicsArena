@@ -248,6 +248,23 @@ public enum GameWinType
     RaceWin,
 }
 
+public enum EquipmentPositionType
+{
+    OnBack,
+}
+
+[Serializable]
+public class PickupablePositionAdjustment
+{
+    public float XOffset;
+    public float YOffset;
+    public float ZOffset;
+    public float XRotation;
+    public float YRotation;
+    public float ZRotation;
+
+}
+
 public enum ImpactType
 {
     WaterGun,

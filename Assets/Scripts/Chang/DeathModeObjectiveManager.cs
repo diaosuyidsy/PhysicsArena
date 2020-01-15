@@ -30,7 +30,7 @@ public class DeathModeObjectiveManager : ObjectiveManager
         ModeData = Data;
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
-        EventManager.Instance.AddHandler<PlayerDiedInDeathMode>(OnPlayerDied);
+        EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
 
 
         TeamAScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
@@ -46,7 +46,7 @@ public class DeathModeObjectiveManager : ObjectiveManager
     public override void Destroy()
     {
         EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
-        EventManager.Instance.RemoveHandler<PlayerDiedInDeathMode>(OnPlayerDied);
+        EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
     }
 
     public override void Update()
@@ -60,14 +60,14 @@ public class DeathModeObjectiveManager : ObjectiveManager
         TeamBScoreText.text = TeamBScore.ToString();
     }
 
-    private void OnPlayerDied(PlayerDiedInDeathMode e)
+    private void OnPlayerDied(PlayerDied e)
     {
         if (gameEnd || !gameStart)
         {
             return;
         }
 
-        if (e.TrapZone!=null)
+        if (e.ImpactObject.CompareTag("DeathModeTrapZone"))
         {
             if (e.Player.tag.Contains("1"))
             {

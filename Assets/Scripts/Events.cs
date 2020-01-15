@@ -77,20 +77,6 @@ public class PlayerDied : GameEvent
     }
 }
 
-public class PlayerDiedInDeathMode : GameEvent
-{
-    public GameObject Player;
-    public int PlayerNumber;
-    public GameObject TrapZone;
-
-    public PlayerDiedInDeathMode(GameObject player,int playerNumber,GameObject trap)
-    {
-        Player = player;
-        PlayerNumber = playerNumber;
-        TrapZone = trap;
-    }
-}
-
 public class WeaponDestroyed : GameEvent
 {
 

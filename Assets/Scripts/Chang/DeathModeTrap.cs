@@ -29,12 +29,12 @@ public class DeathModeTrap : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        EventManager.Instance.AddHandler<PlayerDiedInDeathMode>(OnPlayerDied);
+        EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
     }
 
     private void OnDestroy()
     {
-        EventManager.Instance.RemoveHandler<PlayerDiedInDeathMode>(OnPlayerDied);
+        EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
     }
 
     // Update is called once per frame
@@ -43,9 +43,9 @@ public class DeathModeTrap : MonoBehaviour
         
     }
 
-    private void OnPlayerDied(PlayerDiedInDeathMode e)
+    private void OnPlayerDied(PlayerDied e)
     {
-        if (e.TrapZone == gameObject&&!Swtiched)
+        if (e.ImpactObject == gameObject&&!Swtiched)
         {
             StartCoroutine(Swtiching());
         }

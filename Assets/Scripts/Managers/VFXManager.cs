@@ -39,6 +39,14 @@ public class VFXManager
         _instantiateVFX(VFXDataStore.DeliverFoodVFX, fd.Food.transform.position, VFXDataStore.DeliverFoodVFX.transform.rotation);
     }
 
+    private void _onFootStep(FootStep ev)
+    {
+        GameObject VFX = ev.Player.CompareTag("Team1") ?
+        (ev.PlayerFootLeftRight == 0 ? VFXDataStore.ChickenRightFootStepVFX : VFXDataStore.ChickenLeftFootStepVFX) :
+        (ev.PlayerFootLeftRight == 0 ? VFXDataStore.DuckRightFootStepVFX : VFXDataStore.DuckLeftFootStepVFX);
+        _instantiateVFX(VFX, ev.PlayerActualFoot.transform.position, Quaternion.Euler(VFX.transform.eulerAngles.x, ev.Player.transform.eulerAngles.y, ev.Player.transform.eulerAngles.z));
+    }
+
     private void _onPlayerJump(PlayerJump pj)
     {
         var VFX = VFXDataStore.JumpGrassVFX;
@@ -304,6 +312,7 @@ public class VFXManager
         EventManager.Instance.AddHandler<BazookaFired>(_onBazookaLaunched);
         EventManager.Instance.AddHandler<Blocked>(_onBlocked);
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawned);
+        EventManager.Instance.AddHandler<FootStep>(_onFootStep);
         _blinkTime = Services.Config.GameMapData.InvincibleTime;
     }
 
@@ -335,7 +344,7 @@ public class VFXManager
         EventManager.Instance.RemoveHandler<BazookaFired>(_onBazookaLaunched);
         EventManager.Instance.RemoveHandler<Blocked>(_onBlocked);
         EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawned);
-
+        EventManager.Instance.RemoveHandler<FootStep>(_onFootStep);
     }
 
     public void Destory()

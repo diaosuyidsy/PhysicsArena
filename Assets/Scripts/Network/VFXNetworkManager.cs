@@ -70,18 +70,18 @@ public class VFXNetworkManager
     private void _onBlockStart(BlockStart bs)
     {
         GameObject VFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockVFX : VFXDataStore.DuckBlockVFX;
-        GameObject UIVFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockUIVFX : VFXDataStore.DuckBlockUIVFX;
+        // GameObject UIVFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockUIVFX : VFXDataStore.DuckBlockUIVFX;
         GameObject BlockVFXHolder = bs.Player.GetComponent<PlayerControllerNetworking>().BlockVFXHolder;
         if (BlockVFXHolder == null)
         {
             bs.Player.GetComponent<PlayerControllerNetworking>().BlockVFXHolder = GameObject.Instantiate(VFX, bs.Player.transform);
         }
-        if (bs.Player.GetComponent<PlayerControllerNetworking>().BlockUIVFXHolder == null)
-        {
-            bs.Player.GetComponent<PlayerControllerNetworking>().BlockUIVFXHolder = GameObject.Instantiate(UIVFX, bs.Player.transform);
-        }
+        // if (bs.Player.GetComponent<PlayerControllerNetworking>().BlockUIVFXHolder == null)
+        // {
+        //     bs.Player.GetComponent<PlayerControllerNetworking>().BlockUIVFXHolder = GameObject.Instantiate(UIVFX, bs.Player.transform);
+        // }
         bs.Player.GetComponent<PlayerControllerNetworking>().BlockVFXHolder.SetActive(true);
-        bs.Player.GetComponent<PlayerControllerNetworking>().BlockUIVFXHolder.SetActive(true);
+        // bs.Player.GetComponent<PlayerControllerNetworking>().BlockUIVFXHolder.SetActive(true);
     }
 
     private void _onBlockEnd(BlockEnd be)

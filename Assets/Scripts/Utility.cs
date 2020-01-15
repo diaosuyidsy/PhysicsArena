@@ -213,6 +213,7 @@ public class HitStopInformation
     public Vector3 Viberation = Vector3.one;
     public int Vibrato = 50;
     public float Randomness = 90f;
+    public Ease ViberationEase = Ease.OutQuad;
 }
 
 [Serializable]
@@ -246,6 +247,23 @@ public enum GameWinType
     FoodWin,
     ScoreWin,
     RaceWin,
+}
+
+public enum EquipmentPositionType
+{
+    OnBack,
+}
+
+[Serializable]
+public class PickupablePositionAdjustment
+{
+    public float XOffset;
+    public float YOffset;
+    public float ZOffset;
+    public float XRotation;
+    public float YRotation;
+    public float ZRotation;
+
 }
 
 public enum ImpactType

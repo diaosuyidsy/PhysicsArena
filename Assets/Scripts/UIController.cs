@@ -8,11 +8,13 @@ public class UIController : MonoBehaviour
 
     private float yDifference;
     private Vector3 _pos;
+    private Vector3 _initialScale;
     public float YOffset = 0.1f;
 
     private void Start()
     {
         yDifference = transform.parent.position.y - transform.position.y;
+        _initialScale = transform.localScale;
     }
 
     private void Update()
@@ -23,10 +25,11 @@ public class UIController : MonoBehaviour
         {
             _pos.y = hit.transform.position.y;
             _pos.y += hit.collider.bounds.extents.y + YOffset;
-            float yDiff = Mathf.Abs(_pos.y - transform.position.y);
+            float yDiff = Mathf.Abs(_pos.y - transform.parent.position.y);
             Color temp = GetComponent<SpriteRenderer>().color;
-            temp.a = (-180f * yDiff + 318.75f) / 255f;
+            temp.a = (3f - yDiff) / 3f;
             GetComponent<SpriteRenderer>().color = temp;
+            transform.localScale = _initialScale * ((3f - yDiff) / 3f);
         }
         else
         {

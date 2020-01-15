@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 [CreateAssetMenu(fileName = "CharacterMeleeData", menuName = "ScriptableObjects/Character/MeleeData", order = 1)]
 public class CharacterMeleeData : ScriptableObject
@@ -22,4 +23,12 @@ public class CharacterMeleeData : ScriptableObject
     [Tooltip("How much time player can hold the punch, default is infinity")]
     public float MeleeHoldTime = Mathf.Infinity;
     public LayerMask CanHitLayer;
+    public bool IsButtHitting;
+    public float ButtAnticipationDuration = 0.3f;
+    public float ButtAnticipationForwardPush = 50f;
+    public float ButtStrikeDuration = 0.2f;
+    public float ButtStrikeStrength = 500f;
+    public float ButtStrikeForwardPush = 3f;
+    public Ease ButtStrikePushEase = Ease.OutQuad;
+    public float ButtRecoveryDuration = 0f;
 }

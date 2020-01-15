@@ -230,6 +230,7 @@ public enum GameMapMode
     FoodCartMode,
     ObjectiveMode,
     BrawlMode,
+    DeathMode,
     RaceMode,
     SoccerMode,
 }

@@ -131,7 +131,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("DeathZone"))
+        if (other.CompareTag("DeathZone")||other.CompareTag("DeathModeTrapZone"))
         {
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();

@@ -65,13 +65,15 @@ public class PlayerDied : GameEvent
     public GameObject PlayerHitter { get; }
     public bool HitterIsValid { get; }
     public ImpactType ImpactType { get; }
-    public PlayerDied(GameObject player, int playerNumber, ImpactMarker impactMarker)
+    public GameObject ImpactObject { get; }
+    public PlayerDied(GameObject player, int playerNumber, ImpactMarker impactMarker, GameObject impactObject)
     {
         Player = player;
         PlayerNumber = playerNumber;
         PlayerHitter = impactMarker.EnemyWhoHitPlayer;
         HitterIsValid = Time.time < impactMarker.PlayerMarkedTime + 3f;
         ImpactType = impactMarker.ImpactType;
+        ImpactObject = impactObject;
     }
 }
 

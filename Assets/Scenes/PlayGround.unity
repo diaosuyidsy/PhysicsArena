@@ -1180,8 +1180,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7594fd5c5bd87ae49aed533df8abac38, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  mainLightingProfile: {fileID: 11400000, guid: 38e3ced4ccfc00645b3113b9b7f771c9,
-    type: 2}
 --- !u!4 &114530107
 Transform:
   m_ObjectHideFlags: 0
@@ -1903,8 +1901,8 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 10, y: 1.45, z: 10}
-  m_Center: {x: 0, y: -0.725, z: 0}
+  m_Size: {x: 10, y: 0.040192712, z: 10}
+  m_Center: {x: 0, y: -0.020096356, z: 0}
 --- !u!23 &143744832
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -9272,20 +9270,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SampleCount: 8
-  ScatteringCoef: 0.073
-  ExtinctionCoef: 0
-  SkyboxExtinctionCoef: 0.864
-  MieG: 0.675
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 1
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!108 &306114742
 Light:
   m_ObjectHideFlags: 0
@@ -12280,20 +12264,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SampleCount: 8
-  ScatteringCoef: 0.073
-  ExtinctionCoef: 0
-  SkyboxExtinctionCoef: 0.864
-  MieG: 0.675
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 1
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!108 &562319871
 Light:
   m_ObjectHideFlags: 0
@@ -19525,11 +19495,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sharedProfile: {fileID: 11400000, guid: 6da86197aa457484e9c71360f2a8832e, type: 2}
-  isGlobal: 1
-  blendDistance: 0
-  weight: 1
-  priority: 1
 --- !u!4 &667368565
 Transform:
   m_ObjectHideFlags: 0
@@ -32226,20 +32191,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SampleCount: 8
-  ScatteringCoef: 0.073
-  ExtinctionCoef: 0
-  SkyboxExtinctionCoef: 0.864
-  MieG: 0.675
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 1
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!1 &884806212
 GameObject:
   m_ObjectHideFlags: 0
@@ -58024,20 +57975,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SampleCount: 8
-  ScatteringCoef: 0.073
-  ExtinctionCoef: 0
-  SkyboxExtinctionCoef: 0.864
-  MieG: 0.675
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 1
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!108 &1363696338
 Light:
   m_ObjectHideFlags: 0
@@ -59948,20 +59885,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SampleCount: 8
-  ScatteringCoef: 0.073
-  ExtinctionCoef: 0
-  SkyboxExtinctionCoef: 0.864
-  MieG: 0.675
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 1
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!108 &1473643401
 Light:
   m_ObjectHideFlags: 0
@@ -61770,11 +61693,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sharedProfile: {fileID: 11400000, guid: e650a55ea6d8e084e9fe7f3b4806ea27, type: 2}
-  isGlobal: 1
-  blendDistance: 0
-  weight: 1
-  priority: 2
 --- !u!114 &1577605606
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -61906,50 +61824,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 948f4100a11a5c24981795d21301da5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  volumeTrigger: {fileID: 1577605609}
-  volumeLayer:
-    serializedVersion: 2
-    m_Bits: 4194305
-  stopNaNPropagation: 1
-  antialiasingMode: 2
-  temporalAntialiasing:
-    jitterSpread: 0.75
-    sharpness: 0.25
-    stationaryBlending: 0.95
-    motionBlending: 0.85
-  fastApproximateAntialiasing:
-    fastMode: 0
-    keepAlpha: 0
-  fog:
-    enabled: 1
-    excludeSkybox: 1
-  debugLayer:
-    lightMeter:
-      width: 512
-      height: 256
-      showCurves: 1
-    histogram:
-      width: 512
-      height: 256
-      channel: 3
-    waveform:
-      exposure: 0.12
-      height: 256
-    vectorscope:
-      size: 256
-      exposure: 0.12
-    overlaySettings:
-      motionColorIntensity: 4
-      motionGridSize: 64
-      colorBlindnessType: 0
-      colorBlindnessStrength: 1
-  m_Resources: {fileID: 11400000, guid: d82512f9c8e5d4a4d938b575d47f88d4, type: 2}
-  m_ShowToolkit: 0
-  m_ShowCustomSorter: 0
-  breakBeforeColorGrading: 0
-  m_BeforeTransparentBundles: []
-  m_BeforeStackBundles: []
-  m_AfterStackBundles: []
 --- !u!20 &1577605608
 Camera:
   m_ObjectHideFlags: 0
@@ -63452,20 +63326,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SampleCount: 8
-  ScatteringCoef: 0.073
-  ExtinctionCoef: 0
-  SkyboxExtinctionCoef: 0.864
-  MieG: 0.675
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 1
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!108 &1702173672
 Light:
   m_ObjectHideFlags: 0
@@ -72960,20 +72820,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SampleCount: 8
-  ScatteringCoef: 0.001
-  ExtinctionCoef: 0
-  SkyboxExtinctionCoef: 0.864
-  MieG: 0.675
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 0
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!1 &2010630316
 GameObject:
   m_ObjectHideFlags: 0
@@ -74697,14 +74543,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df10adf60de9f1947a8157dbbaf781dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distanceFog: 0
-  excludeFarPixels: 1
-  useRadialDistance: 1
-  heightFog: 1
-  height: 11.8
-  heightDensity: 0.607
-  startDistance: 35
-  fogShader: {fileID: 4800000, guid: 8deace52139596940b7802d4310e1d76, type: 3}
 --- !u!114 &2082989925
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -74717,8 +74555,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1eed1d9cbe64423499f1fefc0ce50417, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Resolution: 2
-  DefaultSpotCookie: {fileID: 2800000, guid: 5157bf6d690b6df458f6c0ce0c06d329, type: 3}
 --- !u!114 &2082989926
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -75180,20 +75016,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dafc90245bfe9e2408e358f71deace2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  SampleCount: 8
-  ScatteringCoef: 0.073
-  ExtinctionCoef: 0
-  SkyboxExtinctionCoef: 0.864
-  MieG: 0.675
-  HeightFog: 0
-  HeightScale: 0.1
-  GroundLevel: 0
-  Noise: 1
-  NoiseScale: 0.015
-  NoiseIntensity: 1
-  NoiseIntensityOffset: 0.3
-  NoiseVelocity: {x: 3, y: 3}
-  MaxRayLength: 400
 --- !u!1 &2131934318
 GameObject:
   m_ObjectHideFlags: 0

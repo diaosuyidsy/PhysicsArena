@@ -1,5 +1,89 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &703720054053072715
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1143188876460753025}
+  - component: {fileID: 8585499227858121135}
+  - component: {fileID: 7391740397001084274}
+  m_Layer: 12
+  m_Name: Character1_Spine1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1143188876460753025
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 703720054053072715}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 8703421837239533246}
+  m_Father: {fileID: 8703656480760987984}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &8585499227858121135
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 703720054053072715}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!59 &7391740397001084274
+HingeJoint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 703720054053072715}
+  m_ConnectedBody: {fileID: 744660066442607676}
+  m_Anchor: {x: 0, y: 0, z: 0}
+  m_Axis: {x: 0, y: 1, z: 0}
+  m_AutoConfigureConnectedAnchor: 1
+  m_ConnectedAnchor: {x: 0, y: 0, z: 0}
+  m_UseSpring: 1
+  m_Spring:
+    spring: 120
+    damper: 0
+    targetPosition: 0
+  m_UseMotor: 0
+  m_Motor:
+    targetVelocity: 0
+    force: 0
+    freeSpin: 0
+  m_UseLimits: 1
+  m_Limits:
+    min: -44
+    max: 44
+    bounciness: 0
+    bounceMinVelocity: 0.2
+    contactDistance: 0
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 0
+  m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!1 &7624063323780640517
 GameObject:
   m_ObjectHideFlags: 0
@@ -5126,7 +5210,7 @@ HingeJoint:
   m_Anchor: {x: 0.05, y: 0, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.23767528, y: 0.000033898505, z: 0}
+  m_ConnectedAnchor: {x: 0.23767528, y: 0.00003389478, z: 0}
   m_UseSpring: 1
   m_Spring:
     spring: 100
@@ -5271,8 +5355,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8701612684876536530}
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: 0.050490916, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0.05049092, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 8703558807981556796}
@@ -5280,7 +5364,7 @@ Transform:
   - {fileID: 8707532005473810460}
   - {fileID: 8707261541233664086}
   - {fileID: 8703630227133776878}
-  m_Father: {fileID: 8703656480760987984}
+  m_Father: {fileID: 1143188876460753025}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &8648765030975250966
@@ -5319,11 +5403,11 @@ HingeJoint:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8701612684876536530}
-  m_ConnectedBody: {fileID: 8649122673545853828}
+  m_ConnectedBody: {fileID: 8585499227858121135}
   m_Anchor: {x: 0, y: -0.01, z: 0}
   m_Axis: {x: 0, y: 0, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0, y: 0.07998894, z: 0}
+  m_ConnectedAnchor: {x: 0, y: 0.040490914, z: 0}
   m_UseSpring: 1
   m_Spring:
     spring: 200
@@ -5613,7 +5697,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.10817531, y: 0.03802368, z: 0}
+  m_ConnectedAnchor: {x: -0.10817531, y: 0.038023677, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 60
@@ -10708,7 +10792,7 @@ HingeJoint:
   m_Anchor: {x: -0.05, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.23767528, y: 0.00000833257, z: 0}
+  m_ConnectedAnchor: {x: -0.23767528, y: 0.000008343746, z: 0}
   m_UseSpring: 1
   m_Spring:
     spring: 100
@@ -10931,7 +11015,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.00000074505823, y: 0.0000000148916, z: 0}
+  m_ConnectedAnchor: {x: 0.0000007450584, y: 0.00000002606747, z: 0}
   m_UseSpring: 1
   m_Spring:
     spring: 60
@@ -11193,7 +11277,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.0000007450587, y: 0.000000014871014, z: 0}
+  m_ConnectedAnchor: {x: -0.00000074505914, y: 0.000000026046886, z: 0}
   m_UseSpring: 1
   m_Spring:
     spring: 60
@@ -11516,6 +11600,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8703656480760987984}
+  - component: {fileID: 744660066442607676}
+  - component: {fileID: 6080034876192499092}
   m_Layer: 12
   m_Name: Character1_Spine
   m_TagString: Untagged
@@ -11534,10 +11620,61 @@ Transform:
   m_LocalPosition: {x: -0, y: 0.039498027, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
-  - {fileID: 8703421837239533246}
+  - {fileID: 1143188876460753025}
   m_Father: {fileID: 8707315879492895536}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!54 &744660066442607676
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8701948000485547162}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!59 &6080034876192499092
+HingeJoint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8701948000485547162}
+  m_ConnectedBody: {fileID: 8649122673545853828}
+  m_Anchor: {x: 0, y: 0, z: 0}
+  m_Axis: {x: 0, y: 0, z: 1}
+  m_AutoConfigureConnectedAnchor: 1
+  m_ConnectedAnchor: {x: 0, y: 0.039498027, z: 0}
+  m_UseSpring: 1
+  m_Spring:
+    spring: 120
+    damper: 0
+    targetPosition: 0
+  m_UseMotor: 0
+  m_Motor:
+    targetVelocity: 0
+    force: 0
+    freeSpin: 0
+  m_UseLimits: 1
+  m_Limits:
+    min: -30
+    max: 30
+    bounciness: 0
+    bounceMinVelocity: 0.2
+    contactDistance: 0
+  m_BreakForce: Infinity
+  m_BreakTorque: Infinity
+  m_EnableCollision: 0
+  m_EnablePreprocessing: 1
+  m_MassScale: 1
+  m_ConnectedMassScale: 1
 --- !u!1 &8701949556714425590
 GameObject:
   m_ObjectHideFlags: 0
@@ -16631,7 +16768,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: -0.01, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.15125959, y: -0.010073415, z: 0}
+  m_ConnectedAnchor: {x: 0.15125959, y: -0.010073419, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -16862,7 +16999,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0.02, z: 0}
   m_Axis: {x: 0, y: -1, z: 0}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: -0.15131117, y: 0.019976696, z: 0}
+  m_ConnectedAnchor: {x: -0.15131117, y: 0.019976692, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 0
@@ -17076,7 +17213,7 @@ HingeJoint:
   m_Anchor: {x: 0, y: 0, z: 0}
   m_Axis: {x: 0, y: 0, z: 1}
   m_AutoConfigureConnectedAnchor: 1
-  m_ConnectedAnchor: {x: 0.10817531, y: 0.03802368, z: 0}
+  m_ConnectedAnchor: {x: 0.10817531, y: 0.038023677, z: 0}
   m_UseSpring: 0
   m_Spring:
     spring: 60

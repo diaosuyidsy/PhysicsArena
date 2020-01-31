@@ -17,7 +17,7 @@ public class DeathModeWeaponManager : MonoBehaviour
         CurrentMaxWeaponNumber = WeaponGeneratorList.Count;
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
-        EventManager.Instance.AddHandler<WeaponGeneratorActivated>(OnGeneratorActivaed);
+        EventManager.Instance.AddHandler<WeaponGeneratorSwtich>(OnGeneratorActivaed);
         EventManager.Instance.AddHandler<WeaponHitDeathTrigger>(OnWeaponFall);
         EventManager.Instance.AddHandler<WeaponUsedUp>(OnWeaponUsedUp);
     }
@@ -25,7 +25,7 @@ public class DeathModeWeaponManager : MonoBehaviour
     private void OnDestroy()
     {
         EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
-        EventManager.Instance.RemoveHandler<WeaponGeneratorActivated>(OnGeneratorActivaed);
+        EventManager.Instance.RemoveHandler<WeaponGeneratorSwtich>(OnGeneratorActivaed);
         EventManager.Instance.RemoveHandler<WeaponHitDeathTrigger>(OnWeaponFall);
         EventManager.Instance.RemoveHandler<WeaponUsedUp>(OnWeaponUsedUp);
     }
@@ -72,7 +72,7 @@ public class DeathModeWeaponManager : MonoBehaviour
         CurrentWeaponCount--;
     }
 
-    private void OnGeneratorActivaed(WeaponGeneratorActivated e)
+    private void OnGeneratorActivaed(WeaponGeneratorSwtich e)
     {
         CurrentMaxWeaponNumber++;
         WeaponGeneratorList.Add(e.Generator);

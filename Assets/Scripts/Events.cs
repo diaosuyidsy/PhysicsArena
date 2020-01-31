@@ -87,12 +87,15 @@ public class WeaponGenerated : GameEvent
 
 }
 
-public class WeaponGeneratorActivated : GameEvent
+public class WeaponGeneratorSwtich : GameEvent
 {
     public GameObject Generator;
-    public WeaponGeneratorActivated(GameObject g)
+    public bool Activated;
+
+    public WeaponGeneratorSwtich(GameObject g, bool activated)
     {
         Generator = g;
+        Activated = activated;
     }
 }
 

@@ -14,6 +14,9 @@ public class ApocalypseManager : MonoBehaviour
     public float ApocalypseTime;
     public GameObject Trigger;
 
+    public Material RedMat;
+    public Material BlueMat;
+
     private ApocalypseTeam TargetTeam;
     private float Timer;
 
@@ -40,16 +43,21 @@ public class ApocalypseManager : MonoBehaviour
     {
         if(e.ImpactObject == Trigger)
         {
+            Material[] mats = GetComponent<Renderer>().materials;
+            
+
             switch (TargetTeam)
             {
                 case ApocalypseTeam.Neutral:
                     if (e.Player.tag.Contains("1"))
                     {
                         TargetTeam = ApocalypseTeam.Red;
+                        mats[1] = RedMat;
                     }
                     else
                     {
                         TargetTeam = ApocalypseTeam.Blue;
+                        mats[1] = BlueMat;
                     }
 
                     break;
@@ -57,15 +65,19 @@ public class ApocalypseManager : MonoBehaviour
                     if (e.Player.tag.Contains("2"))
                     {
                         TargetTeam = ApocalypseTeam.Blue;
+                        mats[1] = BlueMat;
                     }
                     break;
                 case ApocalypseTeam.Blue:
                     if (e.Player.tag.Contains("1"))
                     {
                         TargetTeam = ApocalypseTeam.Red;
+                        mats[1] = RedMat;
                     }
                     break;
             }
+
+            GetComponent<Renderer>().materials = mats;
         }
     }
 }

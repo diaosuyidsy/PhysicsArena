@@ -9,8 +9,6 @@ public class NormalTrap : MonoBehaviour
     public GameObject Fence;
     public GameObject FenceColliders;
 
-    public GameObject WeaponGenerator;
-
     public GameObject ConnectedTrap;
 
     public float SwtichTime;
@@ -65,6 +63,8 @@ public class NormalTrap : MonoBehaviour
 
         if (fill)
         {
+            GetComponent<BoxCollider>().enabled = false;
+
             FillPlatform.GetComponent<MeshRenderer>().enabled = true;
             Fence.GetComponent<MeshRenderer>().enabled = false;
 
@@ -79,6 +79,8 @@ public class NormalTrap : MonoBehaviour
         }
         else
         {
+            GetComponent<BoxCollider>().enabled = true;
+
             FillPlatform.GetComponent<MeshRenderer>().enabled = false;
             Fence.GetComponent<MeshRenderer>().enabled = true;
 
@@ -94,8 +96,6 @@ public class NormalTrap : MonoBehaviour
 
     public IEnumerator Swtich(bool fill)
     {
-        GetComponent<MeshCollider>().enabled = false;
-
         Vector3 FillPlatformScale = FillPlatform.transform.localScale;
         Vector3 FillPlatformCollidersScale = FillPlatformColliders.transform.localScale;
         Vector3 FenceScale = Fence.transform.localScale;
@@ -103,6 +103,8 @@ public class NormalTrap : MonoBehaviour
 
         if (fill)
         {
+            GetComponent<BoxCollider>().enabled = false;
+
             FillPlatform.GetComponent<MeshRenderer>().enabled = true;
             FillPlatform.transform.localScale = new Vector3(FillPlatformScale.x, FillPlatformUnfilledScaleY, FillPlatformScale.z);
 
@@ -123,9 +125,6 @@ public class NormalTrap : MonoBehaviour
             Fence.transform.localScale = new Vector3(FenceScale.x, FenceFilledScaleY, FenceScale.z);
             FenceColliders.transform.localScale = new Vector3(FenceCollidersScale.x, FenceCollidersFilledScaleY, FenceCollidersScale.z);
             FenceColliders.SetActive(true);
-
-            WeaponGenerator.GetComponent<WeaponGenerator>().enabled = false;
-            EventManager.Instance.TriggerEvent(new WeaponGeneratorSwtich(WeaponGenerator, false));
 
         }
 
@@ -160,12 +159,12 @@ public class NormalTrap : MonoBehaviour
         {
             Fence.GetComponent<MeshRenderer>().enabled = false;
             FenceColliders.SetActive(false);
-
-            WeaponGenerator.GetComponent<WeaponGenerator>().enabled = true;
-            EventManager.Instance.TriggerEvent(new WeaponGeneratorSwtich(WeaponGenerator, true));
         }
         else
         {
+            GetComponent<BoxCollider>().enabled = true;
+
+            FillPlatform.GetComponent<MeshRenderer>().enabled = false;
             FillPlatformColliders.SetActive(false);
         }
 

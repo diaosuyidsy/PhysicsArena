@@ -11,6 +11,8 @@ public class NormalTrap : MonoBehaviour
 
     public GameObject ConnectedTrap;
 
+    public GameObject WeaponGenerator;
+
     public float SwtichTime;
 
     public float FenceFilledScaleY;
@@ -47,7 +49,10 @@ public class NormalTrap : MonoBehaviour
     {
         if (e.ImpactObject == gameObject)
         {
+            StopAllCoroutines();
             StartCoroutine(Swtich(true));
+
+            ConnectedTrap.GetComponent<NormalTrap>().StopAllCoroutines();
             ConnectedTrap.GetComponent<NormalTrap>().StartCoroutine(ConnectedTrap.GetComponent<NormalTrap>().Swtich(false));
         }
         
@@ -63,6 +68,8 @@ public class NormalTrap : MonoBehaviour
 
         if (fill)
         {
+            EventManager.Instance.TriggerEvent(new WeaponGeneratorSwtich(WeaponGenerator, true));
+
             GetComponent<BoxCollider>().enabled = false;
 
             FillPlatform.GetComponent<MeshRenderer>().enabled = true;
@@ -79,6 +86,8 @@ public class NormalTrap : MonoBehaviour
         }
         else
         {
+            EventManager.Instance.TriggerEvent(new WeaponGeneratorSwtich(WeaponGenerator, false));
+
             GetComponent<BoxCollider>().enabled = true;
 
             FillPlatform.GetComponent<MeshRenderer>().enabled = false;
@@ -117,6 +126,8 @@ public class NormalTrap : MonoBehaviour
         }
         else
         {
+            EventManager.Instance.TriggerEvent(new WeaponGeneratorSwtich(WeaponGenerator, false));
+
             Fence.GetComponent<MeshRenderer>().enabled = true;
 
             FillPlatform.transform.localScale = new Vector3(FillPlatformScale.x, FillPlatformFilledScaleY, FillPlatformScale.z);
@@ -157,6 +168,8 @@ public class NormalTrap : MonoBehaviour
 
         if (fill)
         {
+            EventManager.Instance.TriggerEvent(new WeaponGeneratorSwtich(WeaponGenerator, true));
+
             Fence.GetComponent<MeshRenderer>().enabled = false;
             FenceColliders.SetActive(false);
         }

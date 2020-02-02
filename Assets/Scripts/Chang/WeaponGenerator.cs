@@ -5,24 +5,13 @@ using UnityEngine;
 public class WeaponGenerator : MonoBehaviour
 {
     public float GenerationRadius;
-    public float GenerationIntervalMin;
-    public float GenerationIntervalMax;
 
     public Vector3 DetectOffset;
     public float DetectRadius;
 
     public LayerMask WeaponLayer;
 
-
-    public List<GameObject> WeaponPrefabs;
-    public List<float> ProbabilitySum;
-
-    private float Timer;
-
-    private bool gameStart;
-
-
-    private const float DetectDis = 1;
+    private const float DetectDis = 8;
 
     // Start is called before the first frame update
     void Start()
@@ -41,18 +30,10 @@ public class WeaponGenerator : MonoBehaviour
 
     }
 
-    public void GenerateWeapon()
+    public void GenerateWeapon(GameObject WeaponPrefab)
     {
-        float Ran = Random.Range(0.0f, 1.0f);
 
-        int index = 0;
-
-        while (Ran > ProbabilitySum[index]&&index<ProbabilitySum.Count)
-        {
-            index++;
-        }
-
-        GameObject Weapon = Instantiate(WeaponPrefabs[index]);
+        GameObject Weapon = Instantiate(WeaponPrefab);
         if (Weapon.name.Contains("Water"))
         {
             Camera.main.GetComponent<Obi.ObiBaseFluidRenderer>().particleRenderers.Add(Weapon.GetComponent<rtEmit>().ParticleRenderer);

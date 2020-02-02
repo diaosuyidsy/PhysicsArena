@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using TMPro;
 
-public class DeathModeObjectiveManager : ObjectiveManager
+public class ApocalypseArenaObjectiveManager : ObjectiveManager
 {
     private int TeamAScore;
     private int TeamBScore;
@@ -19,15 +20,20 @@ public class DeathModeObjectiveManager : ObjectiveManager
     private TextMeshProUGUI TeamAScoreText;
     private TextMeshProUGUI TeamBScoreText;
     private TextMeshProUGUI TimerText;
+    private Image Counter;
 
-    private DeathModeData ModeData;
+    private ApocalypseArenaData ModeData;
 
     private bool gameEnd;
     private bool gameStart;
 
-    public DeathModeObjectiveManager(DeathModeData Data) : base()
+    private float OneSecTimer;
+    private int Timer;
+
+    public ApocalypseArenaObjectiveManager(ApocalypseArenaData Data) : base()
     {
         ModeData = Data;
+        Timer = Data.TotalTime;
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
@@ -36,11 +42,13 @@ public class DeathModeObjectiveManager : ObjectiveManager
         TeamAScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
         TeamBScoreText = GameUI.Find("Team2Score").GetComponent<TextMeshProUGUI>();
         TimerText = GameUI.Find("TimerText").GetComponent<TextMeshProUGUI>();
+        Counter = GameUI.Find("Counter").GetComponent<Image>();
 
         TeamAScore = 0;
         TeamBScore = 0;
         RefreshScore();
         gameEnd = false;
+       
     }
 
     public override void Destroy()
@@ -51,7 +59,37 @@ public class DeathModeObjectiveManager : ObjectiveManager
 
     public override void Update()
     {
+        if (gameEnd || !gameStart) return;
 
+        UpdateTime();
+
+    }
+
+    private void UpdateTime()
+    {
+        OneSecTimer += Time.deltaTime;
+        if (OneSecTimer >= 1f)
+        {
+            OneSecTimer = 0f;
+            Timer--;
+        }
+        Counter.fillAmount = 1f * Timer / ModeData.TotalTime;
+        if (Timer <= 0)
+        {
+            TimerText.text = "0:00";
+            EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+            gameEnd = true;
+            return;
+        }
+        TimerText.text = TimerToMinute();
+    }
+
+    private string TimerToMinute()
+    {
+        int seconds = Timer % 10;
+        int tenseconds = (Timer % 60) / 10;
+        int minute = Timer / 60;
+        return minute.ToString("F0") + ":" + tenseconds.ToString("F0") + seconds.ToString("F0");
     }
 
     private void RefreshScore()
@@ -67,15 +105,15 @@ public class DeathModeObjectiveManager : ObjectiveManager
             return;
         }
 
-        if (e.ImpactObject.CompareTag("DeathModeTrapZone"))
+        if (e.ImpactObject.name == "TopTrapTrigger")
         {
             if (e.Player.tag.Contains("1"))
             {
-                TeamBScore += ModeData.CircleDeathScore;
+                TeamBScore += ModeData.ApoTrapDeathScore;
             }
             else
             {
-                TeamAScore += ModeData.CircleDeathScore;
+                TeamAScore += ModeData.ApoTrapDeathScore;
             }
         }
         else
@@ -91,12 +129,6 @@ public class DeathModeObjectiveManager : ObjectiveManager
         }
 
         RefreshScore();
-
-        if (TeamAScore >= ModeData.WinningScore || TeamBScore >= ModeData.WinningScore)
-        {
-            gameEnd = true;
-            EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
-        }
     }
 
     private void OnGameStart(GameStart e)

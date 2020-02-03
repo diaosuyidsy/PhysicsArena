@@ -10,6 +10,8 @@ public class ApocalypseArenaData : ModeSepcificData
     public float ApocalypseAlertTime;
 
     public float ApocalypseFollowSpeed;
+    public float ApocalypseRadius;
+    public float ApocalypsePower;
 
     public int ApoTrapDeathScore = 3;
     public int NormalDeathScore = 1;

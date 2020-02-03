@@ -16,7 +16,10 @@ public class ApocalypseManager : MonoBehaviour
     public GameObject Players;
 
     public LayerMask GroundLayer;
+    public LayerMask PlayerLayer;
     public ApocalypseArenaData Data;
+
+    public GameObject ExplosionVFX;
 
     public Color MarkDefaultColor;
     public Color MarkAlertColor;
@@ -93,9 +96,52 @@ public class ApocalypseManager : MonoBehaviour
 
     private void ApocalypseFall()
     {
+        Dictionary<GameObject, Vector3> PlayerToDir = new Dictionary<GameObject, Vector3>();
+
         foreach(GameObject mark in MarkToPlayer.Keys)
         {
+            RaycastHit[] AllHits = Physics.SphereCastAll(mark.transform.position, Data.ApocalypseRadius, Vector3.up, 0, PlayerLayer);
+
+            for(int i = 0; i < AllHits.Length; i++)
+            {
+                GameObject Player;
+
+                if (AllHits[i].collider.gameObject.GetComponent<PlayerController>())
+                {
+                    Player = AllHits[i].collider.gameObject;
+                }
+                else
+                {
+                    Player = AllHits[i].collider.gameObject.GetComponentInParent<PlayerController>().gameObject;
+                }
+
+                Vector3 Offset = Player.transform.position - mark.transform.position;
+                Offset.y = 0;
+
+                if(Mathf.Abs(Offset.x) < 0.01f && Mathf.Abs(Offset.z) < 0.01f)
+                {
+                    float angle = Random.Range(0, 2 * Mathf.PI);
+
+                    Offset.x = Mathf.Sin(angle);
+                    Offset.z = Mathf.Cos(angle);
+                }
+
+                if (PlayerToDir.ContainsKey(Player))
+                {
+                    PlayerToDir[Player] = (PlayerToDir[Player] + Offset.normalized).normalized;
+                }
+                else
+                {
+                    PlayerToDir.Add(Player, Offset.normalized);
+                }
+                GameObject.Instantiate(ExplosionVFX, mark.transform.position, ExplosionVFX.transform.rotation);
+            }
             Destroy(mark);
+        }
+
+        foreach(GameObject player in PlayerToDir.Keys)
+        {
+            player.GetComponent<IHittable>().OnImpact(Data.ApocalypsePower * PlayerToDir[player], ForceMode.Impulse, player, ImpactType.BazookaGun);
         }
 
         ResetApocalypse();
@@ -151,6 +197,12 @@ public class ApocalypseManager : MonoBehaviour
         InPreparation = true;
         PrepareTimer = 0;
         ActivatedTimer = 0;
+
+        foreach(GameObject mark in MarkToPlayer.Keys)
+        {
+            Destroy(mark);
+        }
+
         MarkToPlayer.Clear();
     }
 

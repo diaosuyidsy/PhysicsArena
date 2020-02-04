@@ -7,6 +7,7 @@ using System;
 
 public class OpenSaveFile : MonoBehaviour
 {
+#if UNITY_EDITOR
     [MenuItem("Tools/Birfia/Open Save File")]
     private static void Apply()
     {
@@ -19,5 +20,7 @@ public class OpenSaveFile : MonoBehaviour
             return;
         }
         System.Diagnostics.Process.Start(path);
-    }
+    }     
+#endif
+
 }

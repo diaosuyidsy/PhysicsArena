@@ -11,6 +11,7 @@ public enum ApocalypseTeam
 
 public class ApocalypseManager : MonoBehaviour
 {
+    public GameObject Indicator;
     public GameObject Trigger;
     public GameObject MarkPrefab;
     public GameObject Players;
@@ -49,11 +50,13 @@ public class ApocalypseManager : MonoBehaviour
 
 
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
+        EventManager.Instance.AddHandler<BazookaFired>(OnFire);
     }
 
     private void OnDestroy()
     {
         EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
+        EventManager.Instance.RemoveHandler<BazookaFired>(OnFire);
     }
 
     // Update is called once per frame
@@ -70,6 +73,11 @@ public class ApocalypseManager : MonoBehaviour
             if (InPreparation)
             {
                 PrepareTimer += Time.deltaTime;
+
+                Vector3 Scale = Indicator.transform.localScale;
+
+                Indicator.transform.localScale = new Vector3(Scale.x, Scale.y, Mathf.Lerp(0, 1, PrepareTimer / Data.ApocalypsePrepareTime));
+
                 if (PrepareTimer >= Data.ApocalypsePrepareTime)
                 {
                     InPreparation = false;
@@ -110,9 +118,13 @@ public class ApocalypseManager : MonoBehaviour
                 {
                     Player = AllHits[i].collider.gameObject;
                 }
-                else
+                else if(AllHits[i].collider.gameObject.GetComponentInParent<PlayerController>())
                 {
                     Player = AllHits[i].collider.gameObject.GetComponentInParent<PlayerController>().gameObject;
+                }
+                else
+                {
+                    Player = AllHits[i].collider.gameObject.GetComponent<WeaponBase>().Owner;
                 }
 
                 Vector3 Offset = Player.transform.position - mark.transform.position;
@@ -134,8 +146,8 @@ public class ApocalypseManager : MonoBehaviour
                 {
                     PlayerToDir.Add(Player, Offset.normalized);
                 }
-                GameObject.Instantiate(ExplosionVFX, mark.transform.position, ExplosionVFX.transform.rotation);
             }
+            GameObject.Instantiate(ExplosionVFX, mark.transform.position, ExplosionVFX.transform.rotation);
             Destroy(mark);
         }
 
@@ -149,6 +161,9 @@ public class ApocalypseManager : MonoBehaviour
 
     private void ActivateApocalypse()
     {
+        List<GameObject> AvailablePlayer = new List<GameObject>();
+        List<Vector3> AvailablePoint = new List<Vector3>();
+
         foreach(Transform child in Players.transform)
         {
             if(child.GetComponent<PlayerController>().enabled && ( child.tag.Contains("1") && TargetTeam == ApocalypseTeam.Red || child.tag.Contains("2") && TargetTeam == ApocalypseTeam.Blue))
@@ -158,15 +173,28 @@ public class ApocalypseManager : MonoBehaviour
                 {
                     if (hit.collider != null)
                     {
-                        GameObject Mark = GameObject.Instantiate(MarkPrefab);
-                        Mark.GetComponent<SpriteRenderer>().color = MarkDefaultColor;
-                        Mark.transform.position = hit.point + Vector3.up * MarkHeight;
+                        AvailablePlayer.Add(child.gameObject);
+                        AvailablePoint.Add(hit.point);
 
-                        MarkToPlayer.Add(Mark, child.gameObject);
                     }
                 }
             }
 
+        }
+
+        if (AvailablePlayer.Count > 0)
+        {
+            int index = Random.Range(0, AvailablePlayer.Count);
+
+            GameObject Mark = GameObject.Instantiate(MarkPrefab);
+            Mark.GetComponent<SpriteRenderer>().color = MarkDefaultColor;
+            Mark.transform.position = AvailablePoint[index] + Vector3.up * MarkHeight;
+
+            MarkToPlayer.Add(Mark, AvailablePlayer[index]);
+        }
+        else
+        {
+            ResetApocalypse();
         }
     }
 
@@ -206,6 +234,27 @@ public class ApocalypseManager : MonoBehaviour
         MarkToPlayer.Clear();
     }
 
+    private void OnFire(BazookaFired e)
+    {
+        if (MarkToPlayer.ContainsValue(e.BazookaUser))
+        {
+            foreach (KeyValuePair<GameObject, GameObject> Pair in MarkToPlayer)
+            {
+                if (Pair.Value == e.BazookaUser)
+                {
+                    MarkToPlayer.Remove(Pair.Key);
+                    Destroy(Pair.Key);
+                    break;
+                }
+            }
+
+            if (MarkToPlayer.Count == 0)
+            {
+                ResetApocalypse();
+            }
+        }
+    }
+
     private void OnPlayerDied(PlayerDied e)
     {
         if (MarkToPlayer.ContainsValue(e.Player))
@@ -229,6 +278,8 @@ public class ApocalypseManager : MonoBehaviour
         if(e.ImpactObject == Trigger)
         {
             Material[] mats = GetComponent<Renderer>().materials;
+
+           
             
             switch (TargetTeam)
             {
@@ -237,6 +288,7 @@ public class ApocalypseManager : MonoBehaviour
                     {
                         TargetTeam = ApocalypseTeam.Red;
                         mats[1] = RedMat;
+                        Indicator.GetComponent<Renderer>().material = RedMat;
 
                         ResetApocalypse();
                     }
@@ -244,6 +296,7 @@ public class ApocalypseManager : MonoBehaviour
                     {
                         TargetTeam = ApocalypseTeam.Blue;
                         mats[1] = BlueMat;
+                        Indicator.GetComponent<Renderer>().material = BlueMat;
 
                         ResetApocalypse();
                     }
@@ -254,6 +307,7 @@ public class ApocalypseManager : MonoBehaviour
                     {
                         TargetTeam = ApocalypseTeam.Blue;
                         mats[1] = BlueMat;
+                        Indicator.GetComponent<Renderer>().material = BlueMat;
 
                         ResetApocalypse();
                     }
@@ -263,6 +317,7 @@ public class ApocalypseManager : MonoBehaviour
                     {
                         TargetTeam = ApocalypseTeam.Red;
                         mats[1] = RedMat;
+                        Indicator.GetComponent<Renderer>().material = RedMat;
 
                         ResetApocalypse();
                     }

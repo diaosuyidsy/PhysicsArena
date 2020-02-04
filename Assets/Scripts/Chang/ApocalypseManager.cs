@@ -287,7 +287,7 @@ public class ApocalypseManager : MonoBehaviour
                     if (e.Player.tag.Contains("1"))
                     {
                         TargetTeam = ApocalypseTeam.Red;
-                        mats[1] = RedMat;
+                        mats[0] = RedMat;
                         Indicator.GetComponent<Renderer>().material = RedMat;
 
                         ResetApocalypse();
@@ -295,7 +295,7 @@ public class ApocalypseManager : MonoBehaviour
                     else
                     {
                         TargetTeam = ApocalypseTeam.Blue;
-                        mats[1] = BlueMat;
+                        mats[0] = BlueMat;
                         Indicator.GetComponent<Renderer>().material = BlueMat;
 
                         ResetApocalypse();
@@ -306,7 +306,7 @@ public class ApocalypseManager : MonoBehaviour
                     if (e.Player.tag.Contains("2"))
                     {
                         TargetTeam = ApocalypseTeam.Blue;
-                        mats[1] = BlueMat;
+                        mats[0] = BlueMat;
                         Indicator.GetComponent<Renderer>().material = BlueMat;
 
                         ResetApocalypse();
@@ -316,7 +316,7 @@ public class ApocalypseManager : MonoBehaviour
                     if (e.Player.tag.Contains("1"))
                     {
                         TargetTeam = ApocalypseTeam.Red;
-                        mats[1] = RedMat;
+                        mats[0] = RedMat;
                         Indicator.GetComponent<Renderer>().material = RedMat;
 
                         ResetApocalypse();

@@ -9,6 +9,7 @@ public class Game : MonoBehaviour
     public ConfigData ConfigData;
     public WeaponData WeaponData;
     public GameFeelData GameFeelData;
+	public SnapshotData SnapshotData;
     public ModeSepcificData ModeSepcificData;
     public GameMapData GameMapData;
 
@@ -21,6 +22,7 @@ public class Game : MonoBehaviour
         Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
         Services.StatisticsManager = new StatisticsManager();
         Services.TinylyticsManager = new TinylyticsHandler();
+		Services.CaptureManager = new CaptureManager(SnapshotData);
         Services.GameStateManager = new GameStateManager(GameMapData, ConfigData, gameObject);
         switch (GameMapData.GameMapMode)
         {
@@ -53,7 +55,12 @@ public class Game : MonoBehaviour
         Services.GameObjectiveManager.Update();
     }
 
-    private void OnDrawGizmos()
+	private void LateUpdate()
+	{
+		Services.CaptureManager.LateUpdate();
+	}
+
+	private void OnDrawGizmos()
     {
         Gizmos.color = new Color(1, 0, 0, 0.5f);
         Gizmos.DrawCube(new Vector3(0f, 6.5f, 0f), GameMapData.WeaponSpawnerSize);
@@ -97,6 +104,9 @@ public class Game : MonoBehaviour
 
         Services.GameStateManager.Destroy();
         Services.GameStateManager = null;
+
+		Services.CaptureManager.Destroy();
+		Services.CaptureManager = null;
 
         Services.GameObjectiveManager.Destroy();
         Services.GameObjectiveManager = null;

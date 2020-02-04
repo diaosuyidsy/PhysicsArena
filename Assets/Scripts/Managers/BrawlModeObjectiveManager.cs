@@ -21,7 +21,6 @@ public class BrawlModeObjectiveManager : ObjectiveManager
     private TextMeshProUGUI _team1ScoreText;
     private TextMeshProUGUI _team2ScoreText;
     private TextMeshProUGUI _timerText;
-    private Image _counter;
     private bool _winned;
     private bool _gamestart;
     private float _onesecTimer;
@@ -35,7 +34,6 @@ public class BrawlModeObjectiveManager : ObjectiveManager
         _team1ScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
         _team2ScoreText = GameUI.Find("Team2Score").GetComponent<TextMeshProUGUI>();
         _timerText = GameUI.Find("TimerText").GetComponent<TextMeshProUGUI>();
-        _counter = GameUI.Find("Counter").GetComponent<Image>();
         _team1Score = 0;
         _team2Score = 0;
         _refreshScore();
@@ -58,7 +56,6 @@ public class BrawlModeObjectiveManager : ObjectiveManager
             _onesecTimer = 0f;
             _timer--;
         }
-        _counter.fillAmount = 1f * _timer / _brawlModeData.TotalTime;
         if (_timer <= 0)
         {
             _timerText.text = "0:00";

@@ -129,4 +129,18 @@ public static class Services
 			_gameObjectiveManager = value;
 		}
 	}
+
+	private static CaptureManager _capturemanager;
+	public static CaptureManager CaptureManager
+	{
+		get
+		{
+			Debug.Assert(_capturemanager != null);
+			return _capturemanager;
+		}
+		set
+		{
+			_capturemanager = value;
+		}
+	}
 }

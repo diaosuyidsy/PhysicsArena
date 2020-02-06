@@ -13,15 +13,13 @@ public class SuckBallController : MonoBehaviour
     private rtSuck _rts;
     private string _opponentTeamTag = "";
     private int _tutorialTimes = 6;
-    private List<GameObject> _lineEnds;
-    private List<LineRenderer> _lineRenderers;
+    private List<GameObject> _lineEnds = new List<GameObject>();
+    private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
 
     private void Awake()
     {
         _rts = GetComponentInParent<rtSuck>();
         InRangePlayers = new List<GameObject>();
-        _lineEnds = new List<GameObject>();
-        _lineRenderers = new List<LineRenderer>();
     }
 
     private void OnEnable()

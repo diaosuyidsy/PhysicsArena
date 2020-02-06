@@ -6,7 +6,7 @@ using UnityEngine;
 public class VFXData : ScriptableObject
 {
     public GameObject DeliverFoodVFX;
-    public GameObject DeathVFX;
+    public GameObject[] DeathVFX;
     public GameObject VanishVFX;
     public GameObject HitVFX;
     public Vector3 HitOffset = Vector3.one;

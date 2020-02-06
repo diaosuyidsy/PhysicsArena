@@ -77,14 +77,14 @@ public class PlayerDied : GameEvent
     }
 }
 
-public class WeaponDestroyed : GameEvent
+public class BagelSent : GameEvent
 {
-
-}
-
-public class WeaponGenerated : GameEvent
-{
-
+    public GameObject Canon;
+    
+    public BagelSent(GameObject canon)
+    {
+        Canon = canon;
+    }
 }
 
 public class WeaponGeneratorSwtich : GameEvent

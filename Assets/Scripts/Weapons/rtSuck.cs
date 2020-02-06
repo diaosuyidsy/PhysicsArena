@@ -1,14 +1,22 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 
 public class rtSuck : WeaponBase
 {
+    public GameObject suckBallEffect;
+    public List<GameObject> suckBallExplodeEffects;
+    public ParticleSystem  DistortionSphere;
+    public DOTweenAnimation lineParticle; 
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
     private bool _charged = false;
     private Vector3 _suckBallInitialScale;
-
+    private float _matOpacity = 1;
+    private Quaternion _ballEffectQuaternion;
+    
+    
     private enum State
     {
         In,
@@ -28,6 +36,7 @@ public class rtSuck : WeaponBase
         _sbc = _suckBall.GetComponent<SuckBallController>();
         _suckBallInitialScale = new Vector3(_suckBall.transform.localScale.x, _suckBall.transform.localScale.y, _suckBall.transform.localScale.z);
         _ammo = WeaponDataStore.SuckGunDataStore.SuckGunMaxUseTimes;
+        _ballEffectQuaternion = suckBallEffect.transform.rotation;
 
     }
 
@@ -53,6 +62,14 @@ public class rtSuck : WeaponBase
                 // StartCoroutine(sucking(0.5f));
             }
         }
+
+        /*if (_ballState == State.Suck)
+        {
+            _suckBall.GetComponent<SuckBallController>().MakeLineSicker();
+        }
+*/
+
+
     }
 
     public override void Fire(bool buttondown)
@@ -65,6 +82,10 @@ public class rtSuck : WeaponBase
                 case State.In:
                     _ballState = State.Out;
                     _suckBall.SetActive(true);
+                    suckBallEffect.transform.rotation = _ballEffectQuaternion;
+                    suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Explode");
+                    suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Create");
+                    _matOpacity = 1;
                     _suckBall.transform.parent = null;
                     _charged = false;
                     EventManager.Instance.TriggerEvent(new SuckGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
@@ -72,6 +93,11 @@ public class rtSuck : WeaponBase
                 case State.Out:
                     if (_charged)
                     {
+                        suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Suck");
+                        lineParticle.DORestart();
+                        lineParticle.GetComponent<ParticleSystem>().Play();
+                        DistortionSphere.Play();
+                        
                         _charged = false;
                         _sbc.RTText.SetActive(false);
                         _ballState = State.Suck;
@@ -103,7 +129,14 @@ public class rtSuck : WeaponBase
             Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * WeaponDataStore.SuckGunDataStore.SuckStrength;
             go.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
         }
-        yield return new WaitForSeconds(0.3f);
+        yield return new WaitForSeconds(0.45f);
+        foreach (var suckBallExplodeEffect in suckBallExplodeEffects)
+        {
+            suckBallExplodeEffect.GetComponent<ParticleSystem>().Play();
+        }
+        suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Suck");
+        suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Explode");
+        yield return new WaitForSeconds(0.45f);
         ////Second prototype
         //yield return StartCoroutine(Congregate(time, gos));
         // After time, disable the suckball and return it to the original position,

@@ -24,7 +24,7 @@ public class VFXNetworkManager
 
     private void _onPlayerDied(PlayerDied pd)
     {
-        _instantiateVFX(VFXDataStore.DeathVFX, pd.Player.transform.position, VFXDataStore.DeathVFX.transform.rotation);
+
     }
 
     private void _onObjectDespawned(ObjectDespawned od)

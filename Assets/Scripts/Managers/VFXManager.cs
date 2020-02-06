@@ -26,10 +26,13 @@ public class VFXManager
 
     private void _onPlayerDied(PlayerDied pd)
     {
-        _instantiateVFX(VFXDataStore.DeathVFX, pd.Player.transform.position, VFXDataStore.DeathVFX.transform.rotation);
-    }
+		if (pd.Player.layer < 13)
+			_instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 9].transform.rotation);
+		else
+			_instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 11], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 11].transform.rotation);
+	}
 
-    private void _onObjectDespawned(ObjectDespawned od)
+	private void _onObjectDespawned(ObjectDespawned od)
     {
         _instantiateVFX(VFXDataStore.VanishVFX, od.Obj.transform.position, VFXDataStore.VanishVFX.transform.rotation);
     }

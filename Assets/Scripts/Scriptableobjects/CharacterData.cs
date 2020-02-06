@@ -53,7 +53,10 @@ public class CharacterData : ScriptableObject
     public float PunchForce = 800f;
     [Tooltip("How much time player can hold the punch, default is infinity")]
     public float MeleeHoldTime = Mathf.Infinity;
-    public float HitUncontrollableTime = 0.5f;
+    public float HitUncontrollableTimeSmall = 0.5f;
+    public float HitSmallThreshold = 500f;
+    public float HitUncontrollableTimeBig = 0.5f;
+     public float HitBigThreshold = 900f;
     public LayerMask CanHitLayer;
 
     [Header("Character Other Settings")]

@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour, IHittable
     #region Status Variables
     private float _stunTimer;
     private float _slowTimer;
+    private float _hitUncontrollableTimer;
     private float _walkSpeedMultiplier = 1f;
     private float _permaSlowWalkSpeedMultiplier = 1f;
     private int _permaSlow;
@@ -194,6 +195,16 @@ public class PlayerController : MonoBehaviour, IHittable
         if (_actionFSM.CurrentState.GetType().Equals(typeof(ButtStrikeState)))
         {
             _actionFSM.TransitionTo<IdleActionState>();
+        }
+        if(force.magnitude > CharacterDataStore.HitBigThreshold)
+        {
+            _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
+            _movementFSM.TransitionTo<HitUncontrollableState>();
+        }
+        else if(force.magnitude > CharacterDataStore.HitSmallThreshold)
+        {
+            _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
+            _movementFSM.TransitionTo<HitUncontrollableState>();
         }
     }
 
@@ -645,7 +656,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.HitUncontrollableTime;
+            _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
         }
 
         public override void Update()

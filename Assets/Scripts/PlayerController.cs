@@ -639,6 +639,26 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    private class HitUncontrollableState : ControllableMovementState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.HitUncontrollableTime;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if(_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<IdleState>();
+                return;
+            }
+        }
+    }
+
     private class JetPackState : ControllableMovementState
     {
         private JetData _jetData;
@@ -928,6 +948,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             Context._animator.SetBool("IdleUpper", true);
             Context._dropHandObject();
+            Context._permaSlow = 0;
         }
 
         public override void Update()
@@ -1051,6 +1072,8 @@ public class PlayerController : MonoBehaviour, IHittable
                     Context._animator.SetBool("IdleUpper", true);
                     break;
             }
+            Context._permaSlow++;
+            Context._permaSlowWalkSpeedMultiplier = Context.HandObject.GetComponent<WeaponBase>().WeaponDataBase.PickupSlowMultiplier;
         }
 
         public override void Update()

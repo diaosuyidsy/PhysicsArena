@@ -7,8 +7,9 @@ public class BrawlModeReforgedModeData : ModeSepcificData
 {
     public float CanonFireTime;
     public float CanonFireAlertTime;
-    public float CanonCoolDown;
+    public float CanonCooldown;
 
+    public float FollowSpeed;
     public float CanonRadius;
     public float CanonPower;
 

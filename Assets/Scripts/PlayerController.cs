@@ -132,7 +132,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("DeathZone")||other.CompareTag("DeathModeTrapZone"))
+        if (other.CompareTag("DeathZone") || other.CompareTag("DeathModeTrapZone"))
         {
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
@@ -196,12 +196,12 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             _actionFSM.TransitionTo<IdleActionState>();
         }
-        if(force.magnitude > CharacterDataStore.HitBigThreshold)
+        if (force.magnitude > CharacterDataStore.HitBigThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
             _movementFSM.TransitionTo<HitUncontrollableState>();
         }
-        else if(force.magnitude > CharacterDataStore.HitSmallThreshold)
+        else if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
             _movementFSM.TransitionTo<HitUncontrollableState>();
@@ -345,6 +345,12 @@ public class PlayerController : MonoBehaviour, IHittable
         if (HandObject == null) return;
         // Drop the thing
         HandObject.GetComponent<WeaponBase>().OnDrop();
+        HandObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        Vector3 forceToAdd = transform.right * CharacterDataStore.DropForce.x +
+            transform.forward * CharacterDataStore.DropForce.z +
+            transform.up * CharacterDataStore.DropForce.y;
+        HandObject.GetComponent<Rigidbody>().AddForce(forceToAdd, ForceMode.VelocityChange);
+
         EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
         // Return the body to normal position
         // _resetBodyAnimation();
@@ -460,7 +466,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            print(GetType().Name);
+            // print(GetType().Name);
         }
     }
 
@@ -649,7 +655,6 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("Running", false);
         }
     }
-
     private class HitUncontrollableState : ControllableMovementState
     {
         private float _timer;
@@ -662,7 +667,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if(_timer < Time.timeSinceLevelLoad)
+            if (_timer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleState>();
                 return;
@@ -1398,6 +1403,8 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             Context._animator.SetBool("Blocking", true);
+            Context._permaSlow++;
+            Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.BlockSpeedMultiplier;
         }
 
         public override void Update()
@@ -1421,6 +1428,7 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
+            Context._permaSlow--;
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
     }

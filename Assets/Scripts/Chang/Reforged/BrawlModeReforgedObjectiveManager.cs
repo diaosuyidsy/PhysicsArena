@@ -32,6 +32,9 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
     public BrawlModeReforgedObjectiveManager(BrawlModeReforgedModeData Data) : base()
     {
+        Services.GameStateManager.CameraTargets.Add(GameObject.Find("CanonTEAM1").transform);
+        Services.GameStateManager.CameraTargets.Add(GameObject.Find("CanonTEAM2").transform);
+
         ModeData = Data;
         Timer = Data.TotalTime;
 
@@ -105,28 +108,28 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             return;
         }
 
-        /*if (e.ImpactObject.name == "TopTrapTrigger")
+        if (e.ImpactObject.name.Contains("Canon"))
         {
             if (e.Player.tag.Contains("1"))
             {
-                TeamBScore += ModeData.ApoTrapDeathScore;
+                TeamBScore += ModeData.BagelKillPoint;
             }
             else
             {
-                TeamAScore += ModeData.ApoTrapDeathScore;
+                TeamAScore += ModeData.BagelKillPoint;
             }
         }
         else
         {
             if (e.Player.tag.Contains("1"))
             {
-                TeamBScore += ModeData.NormalDeathScore;
+                TeamBScore += ModeData.NormalKillPoint;
             }
             else
             {
-                TeamAScore += ModeData.NormalDeathScore;
+                TeamAScore += ModeData.NormalKillPoint;
             }
-        }*/
+        }
 
         RefreshScore();
     }

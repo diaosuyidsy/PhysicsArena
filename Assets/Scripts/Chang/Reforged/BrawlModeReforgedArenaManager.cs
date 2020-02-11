@@ -56,7 +56,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public BrawlModeReforgedModeData Data;
 
-    public GameObject Bagel;
     public GameObject Team1Canon;
     public GameObject Team2Canon;
     public GameObject Team1CanonCooldownMark;
@@ -69,10 +68,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public LayerMask GroundLayer;
     public GameObject Players;
 
+    public GameObject BagelPrefab;
     public GameObject MarkPrefab;
     public GameObject ExplosionVFX;
     public Color MarkDefaultColor;
     public Color MarkAlertColor;
+
+    public Vector3 BagelGenerationPos;
+
+    private GameObject Bagel;
 
     // Start is called before the first frame update
     void Start()
@@ -80,12 +84,18 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         Team1CanonInfo = new CanonInfo(Team1Canon, CanonState.Unactivated,Team1CanonCooldownMark);
         Team2CanonInfo = new CanonInfo(Team2Canon, CanonState.Unactivated,Team2CanonCooldownMark);
 
+        GenerateBagel();
+
+        EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
         EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
+        EventManager.Instance.AddHandler<BagelDespawn>(OnBagelDespawn);
     }
 
     private void OnDestroy()
     {
+        EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
         EventManager.Instance.RemoveHandler<BagelSent>(OnBagelSent);
+        EventManager.Instance.RemoveHandler<BagelDespawn>(OnBagelDespawn);
     }
 
     // Update is called once per frame
@@ -128,8 +138,14 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         if(Info.Timer >= Data.CanonCooldown)
         {
-            Info.TransitionTo(CanonState.Firing);
-            LockPlayer(Info);
+            if (LockPlayer(Info))
+            {
+                Info.TransitionTo(CanonState.Firing);
+            }
+            else
+            {
+                Destroy(Info.Mark);
+            }
         }
 
     }
@@ -169,7 +185,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         }
     }
 
-    private void LockPlayer(CanonInfo Info)
+    private bool LockPlayer(CanonInfo Info)
     {
         List<GameObject> AvailablePlayer = new List<GameObject>();
         List<Vector3> AvailablePoint = new List<Vector3>();
@@ -203,12 +219,19 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             Info.Mark = Mark;
             Info.LockedPlayer = AvailablePlayer[index];
 
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
 
     private void BagelFall(CanonInfo Info)
     {
         RaycastHit[] AllHits = Physics.SphereCastAll(Info.Mark.transform.position, Data.CanonRadius, Vector3.up, 0, PlayerLayer);
+
+        List<GameObject> HitPlayer = new List<GameObject>();
 
         for (int i = 0; i < AllHits.Length; i++)
         {
@@ -227,31 +250,50 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Player = AllHits[i].collider.gameObject.GetComponent<WeaponBase>().Owner;
             }
 
-            Vector3 Offset = Player.transform.position - Info.Mark.transform.position;
-            Offset.y = 0;
-
-            if (Mathf.Abs(Offset.x) < 0.01f && Mathf.Abs(Offset.z) < 0.01f)
+            if (!HitPlayer.Contains(Player))
             {
-                float angle = Random.Range(0, 2 * Mathf.PI);
+                HitPlayer.Add(Player);
+                Vector3 Offset = Player.transform.position - Info.Mark.transform.position;
+                Offset.y = 0;
 
-                Offset.x = Mathf.Sin(angle);
-                Offset.z = Mathf.Cos(angle);
+                if (Mathf.Abs(Offset.x) < 0.01f && Mathf.Abs(Offset.z) < 0.01f)
+                {
+                    float angle = Random.Range(0, 2 * Mathf.PI);
+
+                    Offset.x = Mathf.Sin(angle);
+                    Offset.z = Mathf.Cos(angle);
+                }
+
+                Player.GetComponent<IHittable>().OnImpact(Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
             }
-
-            Player.GetComponent<IHittable>().OnImpact(Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
         }
 
+        if (Bagel != null)
+        {
+            GenerateBagel();
+        }
         GameObject.Instantiate(ExplosionVFX, Info.Mark.transform.position, ExplosionVFX.transform.rotation);
         Destroy(Info.Mark);
     }
 
+    private void GenerateBagel()
+    {
+        Bagel = GameObject.Instantiate(BagelPrefab, BagelGenerationPos, new Quaternion(0, 0, 0, 0));
+    }
+
+    private void OnBagelDespawn(BagelDespawn e)
+    {
+        GenerateBagel();
+    }
+
     private void OnBagelSent(BagelSent e)
     {
+        Bagel = null;
         if(e.Canon == Team1Canon)
         {
             if(Team1CanonInfo.State == CanonState.Unactivated)
             {
-                Team1CanonInfo.State = CanonState.Firing;
+                Team1CanonInfo.TransitionTo(CanonState.Cooldown);
                 Team2CanonInfo.TransitionTo(CanonState.Unactivated);
             }
         }
@@ -259,9 +301,23 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             if (Team2CanonInfo.State == CanonState.Unactivated)
             {
-                Team2CanonInfo.State = CanonState.Firing;
+                Team2CanonInfo.TransitionTo(CanonState.Cooldown);
                 Team1CanonInfo.TransitionTo(CanonState.Unactivated);
             }
+        }
+    }
+
+    private void OnPlayerDied(PlayerDied e)
+    {
+        if(e.Player == Team1CanonInfo.LockedPlayer && Team1CanonInfo.State == CanonState.Firing)
+        {
+            Destroy(Team1CanonInfo.Mark);
+            Team1CanonInfo.TransitionTo(CanonState.Cooldown);
+        }
+        else if(e.Player == Team2CanonInfo.LockedPlayer && Team2CanonInfo.State == CanonState.Firing)
+        {
+            Destroy(Team2CanonInfo.Mark);
+            Team2CanonInfo.TransitionTo(CanonState.Cooldown);
         }
     }
 }

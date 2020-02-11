@@ -58,6 +58,7 @@ public class PlayerController : MonoBehaviour, IHittable
     #region Status Variables
     private float _stunTimer;
     private float _slowTimer;
+    private float _hitUncontrollableTimer;
     private float _walkSpeedMultiplier = 1f;
     private float _permaSlowWalkSpeedMultiplier = 1f;
     private int _permaSlow;
@@ -194,6 +195,16 @@ public class PlayerController : MonoBehaviour, IHittable
         if (_actionFSM.CurrentState.GetType().Equals(typeof(ButtStrikeState)))
         {
             _actionFSM.TransitionTo<IdleActionState>();
+        }
+        if(force.magnitude > CharacterDataStore.HitBigThreshold)
+        {
+            _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
+            _movementFSM.TransitionTo<HitUncontrollableState>();
+        }
+        else if(force.magnitude > CharacterDataStore.HitSmallThreshold)
+        {
+            _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
+            _movementFSM.TransitionTo<HitUncontrollableState>();
         }
     }
 
@@ -639,6 +650,26 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    private class HitUncontrollableState : ControllableMovementState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if(_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<IdleState>();
+                return;
+            }
+        }
+    }
+
     private class JetPackState : ControllableMovementState
     {
         private JetData _jetData;
@@ -928,6 +959,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             Context._animator.SetBool("IdleUpper", true);
             Context._dropHandObject();
+            Context._permaSlow = 0;
         }
 
         public override void Update()
@@ -1051,6 +1083,8 @@ public class PlayerController : MonoBehaviour, IHittable
                     Context._animator.SetBool("IdleUpper", true);
                     break;
             }
+            Context._permaSlow++;
+            Context._permaSlowWalkSpeedMultiplier = Context.HandObject.GetComponent<WeaponBase>().WeaponDataBase.PickupSlowMultiplier;
         }
 
         public override void Update()

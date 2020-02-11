@@ -40,6 +40,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
+        EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
 
 
         TeamAScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
@@ -58,6 +59,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     {
         EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
         EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
+        EventManager.Instance.RemoveHandler<BagelSent>(OnBagelSent);
     }
 
     public override void Update()
@@ -99,6 +101,25 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     {
         TeamAScoreText.text = TeamAScore.ToString();
         TeamBScoreText.text = TeamBScore.ToString();
+    }
+
+    private void OnBagelSent(BagelSent e)
+    {
+        if (gameEnd || !gameStart)
+        {
+            return;
+        }
+
+        if (e.Canon.name.Contains("1"))
+        {
+            TeamAScore += 2;
+        }
+        else
+        {
+            TeamBScore += 2;
+        }
+
+        RefreshScore();
     }
 
     private void OnPlayerDied(PlayerDied e)

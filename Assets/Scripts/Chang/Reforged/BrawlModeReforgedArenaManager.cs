@@ -268,7 +268,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             }
         }
 
-        if (Bagel != null)
+        if (Bagel == null)
         {
             GenerateBagel();
         }
@@ -294,7 +294,9 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             if(Team1CanonInfo.State == CanonState.Unactivated)
             {
                 Team1CanonInfo.TransitionTo(CanonState.Cooldown);
+                Team1CanonInfo.Timer = Data.CanonCooldown;
                 Team2CanonInfo.TransitionTo(CanonState.Unactivated);
+
             }
         }
         else
@@ -302,10 +304,13 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             if (Team2CanonInfo.State == CanonState.Unactivated)
             {
                 Team2CanonInfo.TransitionTo(CanonState.Cooldown);
+                Team2CanonInfo.Timer = Data.CanonCooldown;
                 Team1CanonInfo.TransitionTo(CanonState.Unactivated);
             }
         }
     }
+
+
 
     private void OnPlayerDied(PlayerDied e)
     {

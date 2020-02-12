@@ -1357,6 +1357,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class BlockingState : ActionState
     {
+        private float _timer;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1364,12 +1365,13 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("Blocking", true);
             Context._permaSlow++;
             Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.BlockSpeedMultiplier;
+            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
         }
 
         public override void Update()
         {
             base.Update();
-            if (_BUp)
+            if (!_B && _timer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleActionState>();
                 return;

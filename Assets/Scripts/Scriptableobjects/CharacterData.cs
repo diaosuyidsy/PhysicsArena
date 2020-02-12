@@ -31,11 +31,6 @@ public class CharacterData : ScriptableObject
     public float BlockMultiplier = 2f;
     public float BlockAngle = 90f;
     public float BlockSpeedMultiplier = 0.5f;
-    public bool IsSideStepping = false;
-    public float SideSteppingInitForce = 300f;
-    public float SideSteppingDuration = 0.2f;
-    public float SideSteppingCD = 0.5f;
-    public float SideSteppingStaminaDrain = 0.3f;
 
     [Header("Character Attack Related Settings")]
 

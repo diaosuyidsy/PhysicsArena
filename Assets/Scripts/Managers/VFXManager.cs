@@ -7,10 +7,12 @@ public class VFXManager
     public VFXData VFXDataStore;
     private float _blinkTime = 3f;
     private float _blinkDeltaTime = 10f;
+    private Transform _mainCameraTransform;
 
     public VFXManager(VFXData _vfxdata)
     {
         VFXDataStore = _vfxdata;
+        _mainCameraTransform = Camera.main.transform;
         OnEnable();
     }
 
@@ -36,12 +38,14 @@ public class VFXManager
                                                 0f));
             }
         }
-        _instantiateVFX(VFXDataStore.HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerFeet);
-        if (VFXDataStore.HittedBodyVFX != null)
+        GameObject[] HittedFeetVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedFeetVFX : VFXDataStore.DuckHittedFeetVFX;
+        _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerFeet);
+        GameObject[] HittedBodyVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
+        if (HittedBodyVFX != null)
         {
-            for (int i = 0; i < VFXDataStore.HittedBodyVFX.Length; i++)
+            for (int i = 0; i < HittedBodyVFX.Length; i++)
             {
-                GameObject VFX = VFXDataStore.HittedBodyVFX[i];
+                GameObject VFX = HittedBodyVFX[i];
                 Vector3 hittedPos = ph.Hitted.transform.position +
                                     ph.Hitted.transform.forward * VFX.transform.position.z +
                                     ph.Hitted.transform.right * VFX.transform.position.x +
@@ -54,6 +58,8 @@ public class VFXManager
                                                 0f));
             }
         }
+        GameObject[] CameraVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedCameraVFX : VFXDataStore.DuckHittedCameraVFX;
+        _instantiateVFX(CameraVFX, _mainCameraTransform);
     }
 
     private void _onPlayerDied(PlayerDied pd)
@@ -165,6 +171,20 @@ public class VFXManager
         {
             _instantiateVFX(VFXDataStore.DuckReleasePunchHandVFX, pr.Player.GetComponent<PlayerController>().RightHand.transform);
             _instantiateVFX(VFXDataStore.DuckReleasePunchFootVFX, pr.Player.GetComponent<PlayerController>().PlayerFeet);
+        }
+        GameObject[] ReleaseBodyVFX = pr.Player.CompareTag("Team1") ? VFXDataStore.ChickenReleaseBodyVFX : VFXDataStore.DuckReleaseBodyVFX;
+        for (int i = 0; i < ReleaseBodyVFX.Length; i++)
+        {
+            GameObject VFX = ReleaseBodyVFX[i];
+            Vector3 hittedPos = pr.Player.transform.position +
+                                   pr.Player.transform.forward * VFX.transform.position.z +
+                                   pr.Player.transform.right * VFX.transform.position.x +
+                                   pr.Player.transform.up * VFX.transform.position.y;
+            _instantiateVFX(VFX,
+                    hittedPos,
+                    Quaternion.Euler(0f,
+                                    VFX.transform.eulerAngles.y + pr.Player.transform.eulerAngles.y,
+                                    0f));
         }
     }
 

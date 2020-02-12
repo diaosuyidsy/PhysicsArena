@@ -1146,7 +1146,12 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 Context._meleeCharge = (Time.time - _startHoldingTime) / Context.CharacterDataStore.ClockFistTime;
             }
-            if (_RightTriggerUp || Time.time > _startHoldingTime + Context.CharacterDataStore.MeleeHoldTime)
+            if (_RightTriggerUp && _holding)
+            {
+                TransitionTo<PunchReleasingState>();
+                return;
+            }
+            if (_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime && !_RightTrigger)
             {
                 TransitionTo<PunchReleasingState>();
                 return;

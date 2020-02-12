@@ -60,7 +60,19 @@ public class PlayerController : MonoBehaviour, IHittable
     private float _slowTimer;
     private float _hitUncontrollableTimer;
     private float _walkSpeedMultiplier = 1f;
-    private float _permaSlowWalkSpeedMultiplier = 1f;
+    private float _permaSlowWalkSpeedMultiplierSub = 1f;
+    private float _permaSlowWalkSpeedMultiplier
+    {
+        get
+        {
+            return _permaSlowWalkSpeedMultiplierSub;
+        }
+        set
+        {
+            _permaSlowWalkSpeedMultiplierSub = value;
+            _animator.SetFloat("RunningSpeed", _walkSpeed);
+        }
+    }
     private int _permaSlow;
     private float _walkSpeed
     {
@@ -965,6 +977,7 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("IdleUpper", true);
             Context._dropHandObject();
             Context._permaSlow = 0;
+            Context._permaSlowWalkSpeedMultiplier = 1f;
         }
 
         public override void Update()
@@ -1429,6 +1442,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
             Context._permaSlow--;
+            Context._permaSlowWalkSpeedMultiplier = 1f;
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
     }

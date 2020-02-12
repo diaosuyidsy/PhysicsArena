@@ -948,7 +948,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<ButtAnticipationState>();
                 return;
             }
-            else if (_RightTriggerDown && (Context.EquipmentObject == null || Context.EquipmentObject.GetComponent<rtJet>() == null))
+            else if (_RightTrigger && (Context.EquipmentObject == null || Context.EquipmentObject.GetComponent<rtJet>() == null))
             {
                 TransitionTo<PunchHoldingState>();
                 return;
@@ -1205,12 +1205,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-
-            // if (_RightTriggerDown)
-            // {
-            //     TransitionTo<PunchHoldingState>();
-            //     return;
-            // }
         }
 
         public override void OnExit()

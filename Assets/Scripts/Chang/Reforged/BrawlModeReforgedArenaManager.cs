@@ -10,6 +10,13 @@ public enum CanonState
     Firing
 }
 
+public enum MiddleState
+{
+    Neutral,
+    Red,
+    Blue
+}
+
 public class BrawlModeReforgedArenaManager : MonoBehaviour
 {
     private class CanonInfo
@@ -17,6 +24,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public GameObject Entity;
         public CanonState State;
         public float Timer;
+        public int FireCount;
         public GameObject CooldownMark;
         public GameObject Mark;
         public GameObject LockedPlayer;
@@ -61,6 +69,9 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public GameObject Team1CanonCooldownMark;
     public GameObject Team2CanonCooldownMark;
 
+    public GameObject CanonObject;
+    public GameObject Lever;
+
     private CanonInfo Team1CanonInfo;
     private CanonInfo Team2CanonInfo;
 
@@ -75,12 +86,20 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public Color MarkAlertColor;
 
     public Vector3 BagelGenerationPos;
+    public float SwtichingTime;
+    public float LeverAngle;
 
     private GameObject Bagel;
+
+    private MiddleState CurrentMid;
+    private MiddleState PreviousMid;
 
     // Start is called before the first frame update
     void Start()
     {
+        CurrentMid = MiddleState.Neutral;
+        PreviousMid = MiddleState.Neutral;
+
         Team1CanonInfo = new CanonInfo(Team1Canon, CanonState.Unactivated,Team1CanonCooldownMark);
         Team2CanonInfo = new CanonInfo(Team2Canon, CanonState.Unactivated,Team2CanonCooldownMark);
 
@@ -101,7 +120,132 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        SetObject();
         CheckCanon();
+    }
+
+    private float To180(float eulerangle)
+    {
+        if (eulerangle > 180)
+        {
+            eulerangle -= 360;
+        }
+
+        return eulerangle;
+    }
+
+    private void SetObject()
+    {
+        float LeverRotateSpeed = 2 * LeverAngle / SwtichingTime;
+        float CanonRotateSpeed = 180 / SwtichingTime;
+
+        if(CurrentMid == MiddleState.Neutral)
+        {
+            if (PreviousMid == MiddleState.Neutral)
+            {
+                Lever.transform.localEulerAngles = Vector3.zero;
+                CanonObject.transform.localEulerAngles = new Vector3(0, 0, -45);
+            }
+            else if(PreviousMid == MiddleState.Red)
+            {
+                Lever.transform.Rotate(new Vector3(1, 0, 0), -LeverRotateSpeed * Time.deltaTime);
+
+                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), 0, 45), 0, 0);
+
+                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
+                CanonObject.transform.Rotate(new Vector3(0, 1, 0), CanonRotateSpeed * Time.deltaTime);
+                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), -90, 0),0);
+                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
+            }
+            else
+            {
+                Lever.transform.Rotate(new Vector3(1, 0, 0), LeverRotateSpeed * Time.deltaTime);
+
+                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), -45, 0), 0, 0);
+
+                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
+                CanonObject.transform.Rotate(new Vector3(0, 1, 0), -CanonRotateSpeed * Time.deltaTime);
+                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), 0, 90), 0);
+                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
+            }
+        }
+        else if(CurrentMid == MiddleState.Red)
+        {
+            if (PreviousMid == MiddleState.Neutral)
+            {
+                Lever.transform.Rotate(new Vector3(1, 0, 0), LeverRotateSpeed * Time.deltaTime);
+                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), 0, 45), 0, 0);
+
+                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
+                CanonObject.transform.Rotate(new Vector3(0, 1, 0), -CanonRotateSpeed * Time.deltaTime);
+
+                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), -90, 0), 0);
+                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
+            }
+            else if (PreviousMid == MiddleState.Red)
+            {
+                Lever.transform.localEulerAngles = new Vector3(0, 0, 45);
+
+                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
+
+                CanonObject.transform.localEulerAngles = new Vector3(0, 0, 0);
+                CanonObject.transform.Rotate(new Vector3(0, 1, 0), -90);
+                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
+            }
+            else
+            {
+
+                Lever.transform.Rotate(new Vector3(1, 0, 0), LeverRotateSpeed * Time.deltaTime);
+
+                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), 0, 45), 0, 0);
+
+                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
+                CanonObject.transform.Rotate(new Vector3(0, 1, 0), -CanonRotateSpeed * Time.deltaTime);
+
+                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), -90, 0), 0);
+                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
+            }
+        }
+        else
+        {
+
+            if (PreviousMid == MiddleState.Neutral)
+            {
+                Lever.transform.Rotate(new Vector3( 0, 0, -LeverRotateSpeed * Time.deltaTime), Space.World);
+
+                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), -45, 0), 0, 0);
+
+                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
+                CanonObject.transform.Rotate(new Vector3(0, 1, 0), CanonRotateSpeed * Time.deltaTime);
+                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), 0, 90), 0);
+
+                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
+            }
+            else if (PreviousMid == MiddleState.Red)
+            {
+                Lever.transform.Rotate(new Vector3(1, 0, 0), -LeverRotateSpeed * Time.deltaTime);
+
+                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), -45, 0), 0, 0);
+
+                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
+                CanonObject.transform.Rotate(new Vector3(0, 1, 0), CanonRotateSpeed * Time.deltaTime);
+                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), 0, 90), 0);
+
+                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
+            }
+            else
+            {
+                Lever.transform.localEulerAngles = new Vector3(-45, 0, 0);
+
+                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
+
+                CanonObject.transform.localEulerAngles = new Vector3(0, 0, 0);
+                CanonObject.transform.Rotate(new Vector3(0, 1, 0), 90);
+                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
+
+
+            }
+        }
     }
 
     private void CheckCanon()
@@ -291,21 +435,28 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         Bagel = null;
         if(e.Canon == Team1Canon)
         {
-            if(Team1CanonInfo.State == CanonState.Unactivated)
+            PreviousMid = CurrentMid;
+            CurrentMid = MiddleState.Red;
+
+            if (Team1CanonInfo.State == CanonState.Unactivated)
             {
                 Team1CanonInfo.TransitionTo(CanonState.Cooldown);
                 Team1CanonInfo.Timer = Data.CanonCooldown;
                 Team2CanonInfo.TransitionTo(CanonState.Unactivated);
-
+                Destroy(Team2CanonInfo.Mark);
             }
         }
         else
         {
+            PreviousMid = CurrentMid;
+            CurrentMid = MiddleState.Blue;
+
             if (Team2CanonInfo.State == CanonState.Unactivated)
             {
                 Team2CanonInfo.TransitionTo(CanonState.Cooldown);
                 Team2CanonInfo.Timer = Data.CanonCooldown;
                 Team1CanonInfo.TransitionTo(CanonState.Unactivated);
+                Destroy(Team1CanonInfo.Mark);
             }
         }
     }

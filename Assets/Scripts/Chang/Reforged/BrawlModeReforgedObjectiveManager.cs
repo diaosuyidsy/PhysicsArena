@@ -32,11 +32,15 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
     public BrawlModeReforgedObjectiveManager(BrawlModeReforgedModeData Data) : base()
     {
+        Services.GameStateManager.CameraTargets.Add(GameObject.Find("CanonTEAM1").transform);
+        Services.GameStateManager.CameraTargets.Add(GameObject.Find("CanonTEAM2").transform);
+
         ModeData = Data;
         Timer = Data.TotalTime;
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
+        EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
 
 
         TeamAScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
@@ -55,6 +59,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     {
         EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
         EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
+        EventManager.Instance.RemoveHandler<BagelSent>(OnBagelSent);
     }
 
     public override void Update()
@@ -98,6 +103,25 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         TeamBScoreText.text = TeamBScore.ToString();
     }
 
+    private void OnBagelSent(BagelSent e)
+    {
+        if (gameEnd || !gameStart)
+        {
+            return;
+        }
+
+        if (e.Canon.name.Contains("1"))
+        {
+            TeamAScore += 3;
+        }
+        else
+        {
+            TeamBScore += 3;
+        }
+
+        RefreshScore();
+    }
+
     private void OnPlayerDied(PlayerDied e)
     {
         if (gameEnd || !gameStart)
@@ -105,28 +129,28 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             return;
         }
 
-        /*if (e.ImpactObject.name == "TopTrapTrigger")
+        if (e.ImpactObject.name.Contains("Canon"))
         {
             if (e.Player.tag.Contains("1"))
             {
-                TeamBScore += ModeData.ApoTrapDeathScore;
+                TeamBScore += ModeData.BagelKillPoint;
             }
             else
             {
-                TeamAScore += ModeData.ApoTrapDeathScore;
+                TeamAScore += ModeData.BagelKillPoint;
             }
         }
         else
         {
             if (e.Player.tag.Contains("1"))
             {
-                TeamBScore += ModeData.NormalDeathScore;
+                TeamBScore += ModeData.NormalKillPoint;
             }
             else
             {
-                TeamAScore += ModeData.NormalDeathScore;
+                TeamAScore += ModeData.NormalKillPoint;
             }
-        }*/
+        }
 
         RefreshScore();
     }

@@ -72,6 +72,7 @@ public abstract class WeaponBase : MonoBehaviour
         {
             if (!_hitGroundOnce)
             {
+                gameObject.layer = LayerMask.NameToLayer("Pickup");
                 EventManager.Instance.TriggerEvent(new ObjectHitGround(gameObject));
                 _hitGroundOnce = true;
             }
@@ -82,6 +83,7 @@ public abstract class WeaponBase : MonoBehaviour
     {
         CanBePickedUp = true;
         _followHand = true;
+        gameObject.layer = LayerMask.NameToLayer("Pickup");
     }
 
     public virtual void OnDrop()
@@ -89,7 +91,6 @@ public abstract class WeaponBase : MonoBehaviour
         _hitGroundOnce = false;
         Owner = null;
         GetComponent<Rigidbody>().isKinematic = false;
-        gameObject.layer = LayerMask.NameToLayer("Pickup");
     }
 
     public virtual void OnPickUp(GameObject owner)

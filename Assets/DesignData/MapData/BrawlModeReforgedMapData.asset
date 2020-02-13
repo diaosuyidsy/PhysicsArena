@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1a1b76f45552cc46b47ae11c86de24d, type: 3}
   m_Name: BrawlModeReforgedMapData
   m_EditorClassIdentifier: 
-  GameMapMode: 4
+  GameMapMode: 5
   Team1RespawnPoints:
   - {x: 14, y: 0.573, z: -17}
   - {x: 13.5, y: 0.573, z: -17.5}
@@ -21,21 +21,21 @@ MonoBehaviour:
   - {x: 20.5, y: 0.573, z: -17}
   - {x: 21, y: 0.573, z: -17.5}
   - {x: 20.5, y: 0.573, z: -18}
-  RespawnTime: 5
-  InvincibleTime: 2
+  RespawnTime: 2
+  InvincibleTime: 1
   TutorialImageMoveInDuration: 0.5
   TutorialImageMoveInEase: 27
   HoldAMoveInDuration: 0.2
   HoldAMoveInDelay: 0.2
   FillASpeed: 2
   ChickenLandingPosition:
-  - {x: 15.8, y: 20, z: -18.1}
-  - {x: 14.8, y: 20, z: -18.5}
-  - {x: 16.12, y: 20, z: -18.86}
+  - {x: 14, y: 20, z: -17}
+  - {x: 13.5, y: 20, z: -17.5}
+  - {x: 16.12, y: 20, z: -18}
   DuckLandingPostion:
-  - {x: 17.9, y: 20, z: -18.1}
-  - {x: 18.9, y: 20, z: -18.5}
-  - {x: 17.7, y: 20, z: -18.9}
+  - {x: 20.5, y: 20, z: -17}
+  - {x: 21, y: 20, z: -17.5}
+  - {x: 20.5, y: 20, z: -18}
   BirdsFlyDownDuration: 1
   BirdsFlyDownDelay:
   - 0
@@ -69,7 +69,7 @@ MonoBehaviour:
   BackgroundMusicMixer: {fileID: 24100000, guid: 42e1f810734d8a447bb905f6bc63d0e5,
     type: 2}
   WeaponSpawnCD: 1
-  MaxAmountWeaponAtOnetime: 3
+  MaxAmountWeaponAtOnetime: 0
   WeaponsInformation:
   - WeaponName: SuckGun
     WeaponSetNumber: 0

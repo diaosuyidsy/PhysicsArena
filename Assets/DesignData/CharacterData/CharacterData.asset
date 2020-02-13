@@ -27,7 +27,7 @@ MonoBehaviour:
   FrontIsCliff: 0.2
   CliffPreventionForce: 100
   CliffPreventionTimer: 0.4
-  DropForce: {x: 0, y: 1, z: 1}
+  DropForce: {x: 0, y: 4, z: 3}
   MaxStamina: 1.5
   StaminaRegenInterval: 3
   StaminaRegenRate: 1
@@ -35,12 +35,8 @@ MonoBehaviour:
   BlockStaminaDrain: 1
   BlockMultiplier: 2
   BlockAngle: 90
-  BlockSpeedMultiplier: 0.5
-  IsSideStepping: 0
-  SideSteppingInitForce: 70
-  SideSteppingDuration: 0.3
-  SideSteppingCD: 1
-  SideSteppingStaminaDrain: 0.3
+  BlockSpeedMultiplier: 1
+  MinBlockUpTime: 0.3
   ClockFistTime: 0.3
   FistReleaseTime: 0.3
   SelfPushForce: 200

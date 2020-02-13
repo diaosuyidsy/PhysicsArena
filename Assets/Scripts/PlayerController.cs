@@ -60,7 +60,19 @@ public class PlayerController : MonoBehaviour, IHittable
     private float _slowTimer;
     private float _hitUncontrollableTimer;
     private float _walkSpeedMultiplier = 1f;
-    private float _permaSlowWalkSpeedMultiplier = 1f;
+    private float _permaSlowWalkSpeedMultiplierSub = 1f;
+    private float _permaSlowWalkSpeedMultiplier
+    {
+        get
+        {
+            return _permaSlowWalkSpeedMultiplierSub;
+        }
+        set
+        {
+            _permaSlowWalkSpeedMultiplierSub = value;
+            _animator.SetFloat("RunningSpeed", _walkSpeed);
+        }
+    }
     private int _permaSlow;
     private float _walkSpeed
     {
@@ -161,9 +173,6 @@ public class PlayerController : MonoBehaviour, IHittable
 
     public void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
     {
-        // Check if is side stepping
-        if (_movementFSM.CurrentState.GetType().Equals(typeof(SideSteppingState)))
-            return;
         // First check if the player could block the attack
         if (_blockable &&
             CanBlock(sender.transform.forward))
@@ -193,6 +202,10 @@ public class PlayerController : MonoBehaviour, IHittable
             _actionFSM.TransitionTo<IdleActionState>();
         }
         if (_actionFSM.CurrentState.GetType().Equals(typeof(ButtStrikeState)))
+        {
+            _actionFSM.TransitionTo<IdleActionState>();
+        }
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)))
         {
             _actionFSM.TransitionTo<IdleActionState>();
         }
@@ -512,11 +525,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<JumpState>();
                 return;
             }
-            if (_B && Context.CharacterDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad && Context._canDrainStamina(Context.CharacterDataStore.SideSteppingStaminaDrain))
-            {
-                TransitionTo<SideSteppingState>();
-                return;
-            }
         }
 
         public override void FixedUpdate()
@@ -610,12 +618,6 @@ public class PlayerController : MonoBehaviour, IHittable
             else if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<JumpState>();
-                return;
-            }
-
-            if (_B && Context.CharacterDataStore.IsSideStepping && Context._sideStepTimer < Time.timeSinceLevelLoad && Context._canDrainStamina(Context.CharacterDataStore.SideSteppingStaminaDrain))
-            {
-                TransitionTo<SideSteppingState>();
                 return;
             }
         }
@@ -725,40 +727,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
                 Context.transform.rotation = tr;
             }
-        }
-    }
-
-    private class SideSteppingState : ControllableMovementState
-    {
-        private float _timer;
-        private Vector3 _originalForward;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.SideSteppingDuration;
-            _originalForward = Context.transform.forward;
-            Context._rb.AddForce(_originalForward * Context.CharacterDataStore.SideSteppingInitForce, ForceMode.VelocityChange);
-            Context._animator.SetBool("SideStep", true);
-            Context._drainStamina(Context.CharacterDataStore.SideSteppingStaminaDrain);
-            Context._actionFSM.TransitionTo<SideSteppingActionState>();
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_timer < Time.timeSinceLevelLoad)
-            {
-                TransitionTo<IdleState>();
-                return;
-            }
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context._sideStepTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.SideSteppingCD;
-            Context._animator.SetBool("SideStep", false);
-            Context._actionFSM.TransitionTo<IdleActionState>();
         }
     }
 
@@ -965,6 +933,7 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("IdleUpper", true);
             Context._dropHandObject();
             Context._permaSlow = 0;
+            Context._permaSlowWalkSpeedMultiplier = 1f;
         }
 
         public override void Update()
@@ -983,12 +952,12 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<ButtAnticipationState>();
                 return;
             }
-            else if (_RightTriggerDown && (Context.EquipmentObject == null || Context.EquipmentObject.GetComponent<rtJet>() == null))
+            else if (_RightTrigger && (Context.EquipmentObject == null || Context.EquipmentObject.GetComponent<rtJet>() == null))
             {
                 TransitionTo<PunchHoldingState>();
                 return;
             }
-            if (_B && Context._canDrainStamina(0.1f) && !Context.CharacterDataStore.IsSideStepping)
+            if (_B && Context._canDrainStamina(0.1f))
             {
                 TransitionTo<BlockingState>();
                 return;
@@ -1000,11 +969,6 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("IdleUpper", false);
         }
-    }
-
-    private class SideSteppingActionState : ActionState
-    {
-
     }
 
     private class PickingState : ActionState
@@ -1186,7 +1150,12 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 Context._meleeCharge = (Time.time - _startHoldingTime) / Context.CharacterDataStore.ClockFistTime;
             }
-            if (_RightTriggerUp || Time.time > _startHoldingTime + Context.CharacterDataStore.MeleeHoldTime)
+            if (_RightTriggerUp && _holding)
+            {
+                TransitionTo<PunchReleasingState>();
+                return;
+            }
+            if (_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime && !_RightTrigger)
             {
                 TransitionTo<PunchReleasingState>();
                 return;
@@ -1245,12 +1214,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-
-            // if (_RightTriggerDown)
-            // {
-            //     TransitionTo<PunchHoldingState>();
-            //     return;
-            // }
         }
 
         public override void OnExit()
@@ -1398,6 +1361,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class BlockingState : ActionState
     {
+        private float _timer;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1405,12 +1369,13 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("Blocking", true);
             Context._permaSlow++;
             Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.BlockSpeedMultiplier;
+            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
         }
 
         public override void Update()
         {
             base.Update();
-            if (_BUp)
+            if (!_B && _timer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleActionState>();
                 return;
@@ -1429,6 +1394,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
             Context._permaSlow--;
+            Context._permaSlowWalkSpeedMultiplier = 1f;
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
     }

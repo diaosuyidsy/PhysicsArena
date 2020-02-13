@@ -37,6 +37,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             CooldownMark = cdmark;
             CooldownMark.SetActive(false);
 
+            FireCount = 0;
             Timer = 0;
             Mark = null;
             LockedPlayer = null;
@@ -51,6 +52,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             {
                 case CanonState.Unactivated:
                     CooldownMark.SetActive(false);
+                    FireCount = 0;
                     break;
                 case CanonState.Cooldown:
                     CooldownMark.SetActive(true);
@@ -86,6 +88,9 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public Color MarkAlertColor;
 
     public Vector3 BagelGenerationPos;
+    public Vector3 BagelGenerationPosLeft;
+    public Vector3 BagelGenerationPosRight;
+
     public float SwtichingTime;
     public float LeverAngle;
 
@@ -373,6 +378,14 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void BagelFall(CanonInfo Info)
     {
+        Info.FireCount++;
+        if(Info.FireCount >= Data.MaxCanonFireCount)
+        {
+            Info.TransitionTo(CanonState.Unactivated);
+            PreviousMid = CurrentMid;
+            CurrentMid = MiddleState.Neutral;
+        }
+
         RaycastHit[] AllHits = Physics.SphereCastAll(Info.Mark.transform.position, Data.CanonRadius, Vector3.up, 0, PlayerLayer);
 
         List<GameObject> HitPlayer = new List<GameObject>();
@@ -422,7 +435,22 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void GenerateBagel()
     {
-        Bagel = GameObject.Instantiate(BagelPrefab, BagelGenerationPos, new Quaternion(0, 0, 0, 0));
+        Vector3 Pos = BagelGenerationPos;
+
+        switch (CurrentMid)
+        {
+            case MiddleState.Neutral:
+                Pos = BagelGenerationPos;
+                break;
+            case MiddleState.Blue:
+                Pos = BagelGenerationPosLeft;
+                break;
+            case MiddleState.Red:
+                Pos = BagelGenerationPosRight;
+                break;
+        }
+
+        Bagel = GameObject.Instantiate(BagelPrefab, Pos, new Quaternion(0, 0, 0, 0));
     }
 
     private void OnBagelDespawn(BagelDespawn e)

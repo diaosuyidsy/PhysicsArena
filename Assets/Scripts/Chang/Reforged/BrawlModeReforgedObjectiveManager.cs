@@ -112,11 +112,11 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if (e.Canon.name.Contains("1"))
         {
-            TeamAScore += 2;
+            TeamAScore += 3;
         }
         else
         {
-            TeamBScore += 2;
+            TeamBScore += 3;
         }
 
         RefreshScore();

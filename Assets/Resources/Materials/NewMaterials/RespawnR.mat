@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: BrawlSideR_Unlit
+  m_Name: RespawnR
   m_Shader: {fileID: 4800000, guid: 03f07ed366daef04da6bce04d9f48994, type: 3}
   m_ShaderKeywords: _USE_SCREEN_SPACE_ON
   m_LightmapFlags: 4
@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 2800000, guid: 9860871da15d7fe4f9477035ed7ded1c, type: 3}
+        m_Texture: {fileID: 2800000, guid: 2726612a8c14c1c4fa45d2c050f3807f, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -52,7 +52,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: 6187dfb841570bf498a7d6e2fcb860fe, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -76,7 +76,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _ASEOutlineWidth: 0.0002
+    - _ASEOutlineWidth: 0.0001
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -85,20 +85,18 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HalftonePower: 1.66
-    - _HalftoneRangeMax: 0.06
-    - _HalftoneRangeMin: -2.01
+    - _HalftoneRangeMax: 2
+    - _HalftoneRangeMin: 0.3
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _RimOffset: 0.682
-    - _RimPower: 0.26
-    - _ShadeEdgeBlur: 0.45
+    - _RimOffset: 0.957
+    - _RimPower: 0.775
+    - _ShadeEdgeBlur: 0.61
     - _ShadeEdgeOffset: 0
     - _ShadeEdgeWidth: 0.03294117
-    - _ShadowOffset: 6.35
-    - _ShadowStrength: 0.941
+    - _ShadowOffset: 8
     - _SmoothnessTextureChannel: 0
     - _SpecIntensity: 0
     - _SpecTransition: 0.453
@@ -110,8 +108,7 @@ Material:
     - __dirty: 0
     m_Colors:
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0.8235294, g: 0.8117647, b: 0.8117647, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _RimColor: {r: 0.7490196, g: 0.9529411, b: 1, a: 0}
-    - _ShadowColor: {r: 0.7607843, g: 0.5921568, b: 0.8862745, a: 1}
     - _SpecTint: {r: 1, g: 1, b: 1, a: 0}

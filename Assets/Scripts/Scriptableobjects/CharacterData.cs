@@ -20,6 +20,7 @@ public class CharacterData : ScriptableObject
     public float FrontIsCliff = 0.2f;
     public float CliffPreventionForce = 100f;
     public float CliffPreventionTimer = 0.4f;
+    public Vector3 DropForce = new Vector3(0f, 10f, 20f);
 
     [Header("Character Defend Related Settings")]
     public float MaxStamina = 1.5f;
@@ -29,11 +30,8 @@ public class CharacterData : ScriptableObject
     public float BlockStaminaDrain = 1f;
     public float BlockMultiplier = 2f;
     public float BlockAngle = 90f;
-    public bool IsSideStepping = false;
-    public float SideSteppingInitForce = 300f;
-    public float SideSteppingDuration = 0.2f;
-    public float SideSteppingCD = 0.5f;
-    public float SideSteppingStaminaDrain = 0.3f;
+    public float BlockSpeedMultiplier = 0.5f;
+    public float MinBlockUpTime = 0.3f;
 
     [Header("Character Attack Related Settings")]
 
@@ -53,6 +51,10 @@ public class CharacterData : ScriptableObject
     public float PunchForce = 800f;
     [Tooltip("How much time player can hold the punch, default is infinity")]
     public float MeleeHoldTime = Mathf.Infinity;
+    public float HitUncontrollableTimeSmall = 0.5f;
+    public float HitSmallThreshold = 500f;
+    public float HitUncontrollableTimeBig = 0.5f;
+    public float HitBigThreshold = 900f;
     public LayerMask CanHitLayer;
 
     [Header("Character Other Settings")]

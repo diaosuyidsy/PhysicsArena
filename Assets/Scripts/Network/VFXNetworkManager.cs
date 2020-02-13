@@ -16,10 +16,10 @@ public class VFXNetworkManager
     #region Event Handlers
     private void _onPlayerHit(PlayerHit ph)
     {
-        Vector3 hittedPos = ph.Hitted.transform.position;
+        /*Vector3 hittedPos = ph.Hitted.transform.position;
         Vector3 force = ph.Force;
         if (ph.MeleeCharge > 0.1f)
-            _instantiateVFX(VFXDataStore.HitVFX, hittedPos, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
+            _instantiateVFX(VFXDataStore.HitVFX, hittedPos, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));*/
     }
 
     private void _onPlayerDied(PlayerDied pd)

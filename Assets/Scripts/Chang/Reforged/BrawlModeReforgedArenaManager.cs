@@ -305,7 +305,18 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         if(Info.Timer >= Data.CanonFireTime)
         {
             BagelFall(Info);
-            Info.TransitionTo(CanonState.Cooldown);
+            Info.FireCount++;
+            if (Info.FireCount >= Data.MaxCanonFireCount)
+            {
+                Info.TransitionTo(CanonState.Unactivated);
+                PreviousMid = CurrentMid;
+                CurrentMid = MiddleState.Neutral;
+            }
+            else
+            {
+                Info.TransitionTo(CanonState.Cooldown);
+            }
+
         }
         else if(Info.Timer >= Data.CanonFireTime - Data.CanonFireAlertTime)
         {
@@ -378,13 +389,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void BagelFall(CanonInfo Info)
     {
-        Info.FireCount++;
-        if(Info.FireCount >= Data.MaxCanonFireCount)
-        {
-            Info.TransitionTo(CanonState.Unactivated);
-            PreviousMid = CurrentMid;
-            CurrentMid = MiddleState.Neutral;
-        }
+
 
         RaycastHit[] AllHits = Physics.SphereCastAll(Info.Mark.transform.position, Data.CanonRadius, Vector3.up, 0, PlayerLayer);
 

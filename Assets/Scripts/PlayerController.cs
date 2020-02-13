@@ -205,6 +205,10 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             _actionFSM.TransitionTo<IdleActionState>();
         }
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)))
+        {
+            _actionFSM.TransitionTo<IdleActionState>();
+        }
         if (force.magnitude > CharacterDataStore.HitBigThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;

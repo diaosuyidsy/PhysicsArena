@@ -8,8 +8,19 @@ public class VFXData : ScriptableObject
     public GameObject DeliverFoodVFX;
     public GameObject[] DeathVFX;
     public GameObject VanishVFX;
-    public GameObject HitVFX;
-    public Vector3 HitOffset = Vector3.one;
+    [Tooltip("在击打位置的VFX")]
+    public GameObject[] HitVFX;
+
+    [Tooltip("被打的人脚下的VFX，是子物体")]
+    public GameObject[] ChickenHittedFeetVFX;
+    public GameObject[] DuckHittedFeetVFX;
+    [Tooltip("被打的人身上的VFX")]
+    public GameObject[] ChickenHittedBodyVFX;
+    public GameObject[] DuckHittedBodyVFX;
+    [Tooltip("被打的时候Camera VFX，子物体")]
+    public GameObject[] ChickenHittedCameraVFX;
+    [Tooltip("被打的时候Camera VFX，子物体")]
+    public GameObject[] DuckHittedCameraVFX;
     public GameObject JumpGrassVFX;
     public GameObject JumpConcreteVFX;
     public GameObject JumpYellowStoneVFX;
@@ -20,6 +31,12 @@ public class VFXData : ScriptableObject
     public GameObject ChickenUltimateVFX;
     public GameObject DuckMeleeChargingVFX;
     public GameObject DuckUltimateVFX;
+    public GameObject[] ChickenReleasePunchHandVFX;
+    public GameObject[] DuckReleasePunchHandVFX;
+    public GameObject[] ChickenReleasePunchFootVFX;
+    public GameObject[] DuckReleasePunchFootVFX;
+    public GameObject[] ChickenReleaseBodyVFX;
+    public GameObject[] DuckReleaseBodyVFX;
     public GameObject BazookaExplosionVFX;
     public GameObject BazookaTrailVFX;
     public GameObject ChickenBlockVFX;

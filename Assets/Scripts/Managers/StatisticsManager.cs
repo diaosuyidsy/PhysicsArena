@@ -123,7 +123,7 @@ public class StatisticsManager
     private void _onPlayerDied(PlayerDied pd)
     {
         /// Suicide Record
-        if (!pd.HitterIsValid || pd.PlayerHitter == null)
+        if (!pd.HitterIsValid || pd.PlayerHitter == null || pd.PlayerHitter.GetComponent<PlayerController>() == null)
         {
             AllRecords[0][pd.PlayerNumber]++;
             return;

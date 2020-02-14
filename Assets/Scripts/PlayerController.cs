@@ -1214,6 +1214,12 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
+            if (_LeftTrigger)
+            {
+                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                TransitionTo<PickingState>();
+                return;
+            }
         }
 
         public override void OnExit()

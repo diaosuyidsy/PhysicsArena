@@ -1487,6 +1487,25 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
+            if (_B || _RightTrigger || _LeftTrigger)
+            {
+                TransitionTo<IdleActionState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            if (Context._deadInvincible != null)
+            {
+                Context.StopCoroutine(Context._deadInvincible);
+
+                foreach (Rigidbody rb in Context._playerBodies)
+                {
+                    rb.gameObject.layer = Context._playerBodiesLayer;
+                }
+            }
         }
     }
     #endregion

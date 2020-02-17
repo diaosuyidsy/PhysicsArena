@@ -677,6 +677,11 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    private class PunchReleasingMovementState : ControllableMovementState
+    {
+
+    }
+
     private class JetPackState : ControllableMovementState
     {
         private JetData _jetData;
@@ -1182,8 +1187,9 @@ public class PlayerController : MonoBehaviour, IHittable
             _time = Time.time + Context.CharacterDataStore.FistReleaseTime;
             _hitOnce = false;
             if (Context._meleeCharge < Context.CharacterDataStore.MeleeChargeThreshold) Context._meleeCharge = 0f;
-            Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.Impulse);
+            Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.Acceleration);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
+            Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
         }
 
         public override void Update()
@@ -1227,6 +1233,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("PunchReleased", false);
             Context._meleeCharge = 0f;
+            Context._movementFSM.TransitionTo<IdleState>();
         }
     }
 
@@ -1506,6 +1513,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     rb.gameObject.layer = Context._playerBodiesLayer;
                 }
             }
+            Context._permaSlow = 0;
         }
     }
     #endregion

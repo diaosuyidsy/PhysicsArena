@@ -307,6 +307,14 @@ public class PlayerController : MonoBehaviour, IHittable
     }
 
     #region Helper Method
+    private void _setVelocity(Vector3 vel)
+    {
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
+        {
+            rb.velocity = vel;
+        }
+    }
+
     private bool _frontIsCliff()
     {
         RaycastHit hit;
@@ -1212,6 +1220,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     }
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce * Context._meleeCharge;
                     hit.transform.GetComponentInParent<IHittable>().OnImpact(force, Context._meleeCharge, Context.gameObject, true);
+                    Context._setVelocity(Vector3.zero);
                 }
             }
             else

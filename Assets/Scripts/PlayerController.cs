@@ -1187,7 +1187,7 @@ public class PlayerController : MonoBehaviour, IHittable
             _time = Time.time + Context.CharacterDataStore.FistReleaseTime;
             _hitOnce = false;
             if (Context._meleeCharge < Context.CharacterDataStore.MeleeChargeThreshold) Context._meleeCharge = 0f;
-            Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.Acceleration);
+            Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
         }

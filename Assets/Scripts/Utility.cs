@@ -86,6 +86,25 @@ public static class Utility
             arr[i] = temp;
         }
     }
+
+    public static bool PlayerWillDieOnHit(PlayerHit ev, CharacterData data)
+    {
+        float distance = 0f;
+        float mass = 0f;
+        foreach (Rigidbody rb in ev.Hitted.GetComponentsInChildren<Rigidbody>(true))
+        {
+            mass += rb.mass;
+        }
+        if (ev.Force.magnitude >= data.HitBigThreshold)
+        {
+            // distance = data.HitUncontrollableTimeBig *
+        }
+        else
+        {
+
+        }
+        return false;
+    }
 }
 
 public class PunchMessage

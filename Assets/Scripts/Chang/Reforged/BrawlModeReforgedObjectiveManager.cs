@@ -32,8 +32,6 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
     public BrawlModeReforgedObjectiveManager(BrawlModeReforgedModeData Data) : base()
     {
-        Services.GameStateManager.CameraTargets.Add(GameObject.Find("CanonTEAM1").transform);
-        Services.GameStateManager.CameraTargets.Add(GameObject.Find("CanonTEAM2").transform);
 
         ModeData = Data;
         Timer = Data.TotalTime;
@@ -110,7 +108,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             return;
         }
 
-        if (e.Canon.name.Contains("1"))
+        if (e.Basket.name.Contains("1"))
         {
             TeamAScore += 3;
         }

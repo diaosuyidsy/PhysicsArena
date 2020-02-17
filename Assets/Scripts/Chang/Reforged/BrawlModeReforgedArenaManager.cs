@@ -10,7 +10,7 @@ public enum CanonState
     Firing
 }
 
-public enum MiddleState
+public enum CanonSide
 {
     Neutral,
     Red,
@@ -21,26 +21,36 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 {
     private class CanonInfo
     {
-        public GameObject Entity;
+        public GameObject Pipe;
+        public GameObject Lever;
+
         public CanonState State;
+        public CanonSide CurrentSide;
+        public CanonSide LastSide;
         public float Timer;
         public int FireCount;
-        public GameObject CooldownMark;
+
         public GameObject Mark;
         public GameObject LockedPlayer;
 
+        private float PipeAngle;
+        private float LeverAngle;
 
-        public CanonInfo(GameObject canon, CanonState state, GameObject cdmark)
+
+        public CanonInfo(GameObject pipe, GameObject lever)
         {
-            Entity = canon;
-            State = state;
-            CooldownMark = cdmark;
-            CooldownMark.SetActive(false);
+            Pipe = pipe;
+            Lever = lever;
+            State = CanonState.Unactivated;
+            CurrentSide = LastSide = CanonSide.Neutral;
 
             FireCount = 0;
             Timer = 0;
             Mark = null;
             LockedPlayer = null;
+
+            PipeAngle = 0;
+            LeverAngle = 0;
         }
 
         public void TransitionTo(CanonState state)
@@ -51,14 +61,187 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             switch (State)
             {
                 case CanonState.Unactivated:
-                    CooldownMark.SetActive(false);
                     FireCount = 0;
                     break;
                 case CanonState.Cooldown:
-                    CooldownMark.SetActive(true);
                     break;
                 case CanonState.Firing:
-                    CooldownMark.SetActive(true);
+                    break;
+            }
+        }
+
+        public void SetCanon(float MaxPipeAngle, float MaxLeverAngle, float PipeRotateSpeed, float LeverRotateSpeed)
+        {
+            switch (CurrentSide)
+            {
+                case CanonSide.Neutral:
+                    switch (LastSide)
+                    {
+                        case CanonSide.Neutral:
+                            Lever.transform.Rotate(new Vector3(-LeverAngle, 0, 0));
+                            Pipe.transform.Rotate(new Vector3(0, -PipeAngle, 0));
+
+                            LeverAngle = 0;
+                            PipeAngle = 0;
+                            break;
+                        case CanonSide.Blue:
+                            if (LeverAngle < 0)
+                            {
+                                LeverAngle += LeverRotateSpeed * Time.deltaTime;
+                                Lever.transform.Rotate(new Vector3(LeverRotateSpeed * Time.deltaTime, 0, 0));
+                            }
+                            else
+                            {
+                                Lever.transform.Rotate(new Vector3(-LeverAngle, 0, 0));
+                                LeverAngle = 0;
+                            }
+                            if (PipeAngle > 0)
+                            {
+                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
+                            }
+                            else
+                            {
+                                Pipe.transform.Rotate(new Vector3(0, -PipeAngle, 0));
+                                PipeAngle = 0;
+                            }
+                            break;
+                        case CanonSide.Red:
+                            if (LeverAngle > -MaxLeverAngle)
+                            {
+                                LeverAngle += -LeverRotateSpeed * Time.deltaTime;
+                                Lever.transform.Rotate(new Vector3(-LeverRotateSpeed * Time.deltaTime, 0, 0));
+                            }
+                            else
+                            {
+                                Lever.transform.Rotate(new Vector3(-LeverAngle, 0, 0));
+                                LeverAngle = 0;
+                            }
+                            if (PipeAngle < MaxPipeAngle)
+                            {
+                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
+                            }
+                            else
+                            {
+                                Pipe.transform.Rotate(new Vector3(0, -PipeAngle, 0));
+                                PipeAngle = 0;
+                            }
+                            break;
+                    }
+                    break;
+                case CanonSide.Blue:
+                    switch (LastSide)
+                    {
+                        case CanonSide.Neutral:
+                            if(LeverAngle > -MaxLeverAngle)
+                            {
+                                LeverAngle += -LeverRotateSpeed * Time.deltaTime;
+                                Lever.transform.Rotate(new Vector3(-LeverRotateSpeed * Time.deltaTime, 0, 0));
+                            }
+                            else
+                            {
+                                Lever.transform.Rotate(new Vector3(-MaxLeverAngle - LeverAngle, 0, 0));
+                                LeverAngle = -MaxLeverAngle;
+                            }
+                            if(PipeAngle < MaxPipeAngle)
+                            {
+                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
+                            }
+                            else
+                            {
+                                Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
+                                PipeAngle = MaxPipeAngle;
+                            }
+                            break;
+                        case CanonSide.Blue:
+                            Lever.transform.Rotate(new Vector3(-MaxLeverAngle - LeverAngle, 0, 0));
+                            Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
+
+                            LeverAngle = -MaxLeverAngle;
+                            PipeAngle = MaxPipeAngle;
+                            break;
+                        case CanonSide.Red:
+                            if (LeverAngle > -MaxLeverAngle)
+                            {
+                                LeverAngle += -LeverRotateSpeed * Time.deltaTime;
+                                Lever.transform.Rotate(new Vector3(-LeverRotateSpeed * Time.deltaTime, 0, 0));
+                            }
+                            else
+                            {
+                                Lever.transform.Rotate(new Vector3(-MaxLeverAngle - LeverAngle, 0, 0));
+                                LeverAngle = -MaxLeverAngle;
+
+                            }
+                            if (PipeAngle < MaxPipeAngle)
+                            {
+                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
+                            }
+                            else
+                            {
+                                Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
+                                PipeAngle = MaxPipeAngle;
+                            }
+                            break;
+                    }
+                    break;
+                case CanonSide.Red:
+                    switch (LastSide)
+                    {
+                        case CanonSide.Neutral:
+                            if (LeverAngle < MaxLeverAngle)
+                            {
+                                LeverAngle += LeverRotateSpeed * Time.deltaTime;
+                                Lever.transform.Rotate(new Vector3(LeverRotateSpeed * Time.deltaTime, 0, 0));
+                            }
+                            else
+                            {
+                                Lever.transform.Rotate(new Vector3(MaxLeverAngle - LeverAngle, 0, 0));
+                                LeverAngle = MaxLeverAngle;
+                            }
+                            if (PipeAngle > -MaxPipeAngle)
+                            {
+                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
+                            }
+                            else
+                            {
+                                Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
+                                PipeAngle = -MaxPipeAngle;
+                            }
+                            break;
+                        case CanonSide.Blue:
+                            if (LeverAngle < MaxLeverAngle)
+                            {
+                                LeverAngle += LeverRotateSpeed * Time.deltaTime;
+                                Lever.transform.Rotate(new Vector3(LeverRotateSpeed * Time.deltaTime, 0, 0));
+                            }
+                            else
+                            {
+                                Lever.transform.Rotate(new Vector3(MaxLeverAngle - LeverAngle, 0, 0));
+                                LeverAngle = MaxLeverAngle;
+                            }
+                            if (PipeAngle > -MaxPipeAngle)
+                            {
+                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
+                            }
+                            else
+                            {
+                                Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
+                                PipeAngle = -MaxPipeAngle;
+                            }
+                            break;
+                        case CanonSide.Red:
+                            Lever.transform.Rotate(new Vector3(MaxLeverAngle - LeverAngle, 0, 0));
+                            Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
+
+                            LeverAngle = MaxLeverAngle;
+                            PipeAngle = -MaxPipeAngle;
+                            break;
+                    }
                     break;
             }
         }
@@ -66,16 +249,11 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public BrawlModeReforgedModeData Data;
 
-    public GameObject Team1Canon;
-    public GameObject Team2Canon;
-    public GameObject Team1CanonCooldownMark;
-    public GameObject Team2CanonCooldownMark;
+    public GameObject PipeObject;
+    public GameObject LeverObject;
 
-    public GameObject CanonObject;
-    public GameObject Lever;
-
-    private CanonInfo Team1CanonInfo;
-    private CanonInfo Team2CanonInfo;
+    public GameObject Team1Basket;
+    public GameObject Team2Basket;
 
     public LayerMask PlayerLayer;
     public LayerMask GroundLayer;
@@ -91,22 +269,18 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public Vector3 BagelGenerationPosLeft;
     public Vector3 BagelGenerationPosRight;
 
-    public float SwtichingTime;
-    public float LeverAngle;
+    public float MaxLeverAngle;
+    public float MaxPipeAngle;
+    public float LeverRotateSpeed;
+    public float PipeRotateSpeed;
 
+    private CanonInfo Info;
     private GameObject Bagel;
-
-    private MiddleState CurrentMid;
-    private MiddleState PreviousMid;
 
     // Start is called before the first frame update
     void Start()
     {
-        CurrentMid = MiddleState.Neutral;
-        PreviousMid = MiddleState.Neutral;
-
-        Team1CanonInfo = new CanonInfo(Team1Canon, CanonState.Unactivated,Team1CanonCooldownMark);
-        Team2CanonInfo = new CanonInfo(Team2Canon, CanonState.Unactivated,Team2CanonCooldownMark);
+        Info = new CanonInfo(PipeObject, LeverObject);
 
         GenerateBagel();
 
@@ -125,165 +299,26 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        SetObject();
+        Info.SetCanon(MaxPipeAngle, MaxLeverAngle, PipeRotateSpeed, LeverRotateSpeed);
         CheckCanon();
     }
 
-    private float To180(float eulerangle)
-    {
-        if (eulerangle > 180)
-        {
-            eulerangle -= 360;
-        }
-
-        return eulerangle;
-    }
-
-    private void SetObject()
-    {
-        float LeverRotateSpeed = 2 * LeverAngle / SwtichingTime;
-        float CanonRotateSpeed = 180 / SwtichingTime;
-
-        if(CurrentMid == MiddleState.Neutral)
-        {
-            if (PreviousMid == MiddleState.Neutral)
-            {
-                Lever.transform.localEulerAngles = Vector3.zero;
-                CanonObject.transform.localEulerAngles = new Vector3(0, 0, -45);
-            }
-            else if(PreviousMid == MiddleState.Red)
-            {
-                Lever.transform.Rotate(new Vector3(1, 0, 0), -LeverRotateSpeed * Time.deltaTime);
-
-                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), 0, 45), 0, 0);
-
-                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
-                CanonObject.transform.Rotate(new Vector3(0, 1, 0), CanonRotateSpeed * Time.deltaTime);
-                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), -90, 0),0);
-                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
-            }
-            else
-            {
-                Lever.transform.Rotate(new Vector3(1, 0, 0), LeverRotateSpeed * Time.deltaTime);
-
-                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), -45, 0), 0, 0);
-
-                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
-                CanonObject.transform.Rotate(new Vector3(0, 1, 0), -CanonRotateSpeed * Time.deltaTime);
-                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), 0, 90), 0);
-                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
-            }
-        }
-        else if(CurrentMid == MiddleState.Red)
-        {
-            if (PreviousMid == MiddleState.Neutral)
-            {
-                Lever.transform.Rotate(new Vector3(1, 0, 0), LeverRotateSpeed * Time.deltaTime);
-                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), 0, 45), 0, 0);
-
-                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
-                CanonObject.transform.Rotate(new Vector3(0, 1, 0), -CanonRotateSpeed * Time.deltaTime);
-
-                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), -90, 0), 0);
-                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
-            }
-            else if (PreviousMid == MiddleState.Red)
-            {
-                Lever.transform.localEulerAngles = new Vector3(0, 0, 45);
-
-                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
-
-                CanonObject.transform.localEulerAngles = new Vector3(0, 0, 0);
-                CanonObject.transform.Rotate(new Vector3(0, 1, 0), -90);
-                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
-            }
-            else
-            {
-
-                Lever.transform.Rotate(new Vector3(1, 0, 0), LeverRotateSpeed * Time.deltaTime);
-
-                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), 0, 45), 0, 0);
-
-                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
-                CanonObject.transform.Rotate(new Vector3(0, 1, 0), -CanonRotateSpeed * Time.deltaTime);
-
-                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), -90, 0), 0);
-                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
-            }
-        }
-        else
-        {
-
-            if (PreviousMid == MiddleState.Neutral)
-            {
-                Lever.transform.Rotate(new Vector3( 0, 0, -LeverRotateSpeed * Time.deltaTime), Space.World);
-
-                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), -45, 0), 0, 0);
-
-                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
-                CanonObject.transform.Rotate(new Vector3(0, 1, 0), CanonRotateSpeed * Time.deltaTime);
-                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), 0, 90), 0);
-
-                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
-            }
-            else if (PreviousMid == MiddleState.Red)
-            {
-                Lever.transform.Rotate(new Vector3(1, 0, 0), -LeverRotateSpeed * Time.deltaTime);
-
-                Lever.transform.localEulerAngles = new Vector3(Mathf.Clamp(To180(Lever.transform.localEulerAngles.x), -45, 0), 0, 0);
-
-                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
-                CanonObject.transform.Rotate(new Vector3(0, 1, 0), CanonRotateSpeed * Time.deltaTime);
-                CanonObject.transform.localEulerAngles = new Vector3(0, Mathf.Clamp(To180(CanonObject.transform.localEulerAngles.y), 0, 90), 0);
-
-                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
-            }
-            else
-            {
-                Lever.transform.localEulerAngles = new Vector3(-45, 0, 0);
-
-                CanonObject.transform.Rotate(new Vector3(-45, 0, 0), Space.World);
-
-                CanonObject.transform.localEulerAngles = new Vector3(0, 0, 0);
-                CanonObject.transform.Rotate(new Vector3(0, 1, 0), 90);
-                CanonObject.transform.Rotate(new Vector3(45, 0, 0), Space.World);
-
-
-            }
-        }
-    }
 
     private void CheckCanon()
     {
-        if(Team1CanonInfo.State != CanonState.Unactivated)
+        if(Info.State == CanonState.Cooldown)
         {
-            if(Team1CanonInfo.State == CanonState.Cooldown)
-            {
-                CanonCooldown(Team1CanonInfo);
-            }
-            else
-            {
-                CanonFiring(Team1CanonInfo);
-            }
+            CanonCooldown(Info);
         }
-        else if(Team2CanonInfo.State != CanonState.Unactivated)
+        else if(Info.State == CanonState.Firing)
         {
-            if (Team2CanonInfo.State == CanonState.Cooldown)
-            {
-                CanonCooldown(Team2CanonInfo);
-            }
-            else
-            {
-                CanonFiring(Team2CanonInfo);
-            }
+            CanonFiring(Info);
         }
     }
 
     private void CanonCooldown(CanonInfo Info)
     {
         Info.Timer += Time.deltaTime;
-
-        Info.CooldownMark.GetComponent<Image>().fillAmount = Info.Timer / Data.CanonCooldown;
 
         if(Info.Timer >= Data.CanonCooldown)
         {
@@ -309,8 +344,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             if (Info.FireCount >= Data.MaxCanonFireCount)
             {
                 Info.TransitionTo(CanonState.Unactivated);
-                PreviousMid = CurrentMid;
-                CurrentMid = MiddleState.Neutral;
+                Info.LastSide = Info.CurrentSide;
+                Info.CurrentSide = CanonSide.Neutral;
             }
             else
             {
@@ -328,6 +363,11 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void MarkFollow(CanonInfo Info)
     {
+        if(Info.LockedPlayer == null)
+        {
+            return;
+        }
+
         Vector3 Offset = Info.LockedPlayer.transform.position - Info.Mark.transform.position;
         Offset.y = 0;
         float Dis = Offset.magnitude;
@@ -352,7 +392,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         foreach (Transform child in Players.transform)
         {
-            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Info.Entity == Team2Canon || child.tag.Contains("2") && Info.Entity == Team1Canon))
+            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Info.CurrentSide == CanonSide.Red))
             {
                 RaycastHit hit;
                 if (Physics.Raycast(child.position, Vector3.down, out hit, 5, GroundLayer))
@@ -389,7 +429,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void BagelFall(CanonInfo Info)
     {
-
 
         RaycastHit[] AllHits = Physics.SphereCastAll(Info.Mark.transform.position, Data.CanonRadius, Vector3.up, 0, PlayerLayer);
 
@@ -442,15 +481,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     {
         Vector3 Pos = BagelGenerationPos;
 
-        switch (CurrentMid)
+        switch (Info.CurrentSide)
         {
-            case MiddleState.Neutral:
+            case CanonSide.Neutral:
                 Pos = BagelGenerationPos;
                 break;
-            case MiddleState.Blue:
+            case CanonSide.Blue:
                 Pos = BagelGenerationPosLeft;
                 break;
-            case MiddleState.Red:
+            case CanonSide.Red:
                 Pos = BagelGenerationPosRight;
                 break;
         }
@@ -466,30 +505,29 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     private void OnBagelSent(BagelSent e)
     {
         Bagel = null;
-        if(e.Canon == Team1Canon)
-        {
-            PreviousMid = CurrentMid;
-            CurrentMid = MiddleState.Red;
 
-            if (Team1CanonInfo.State == CanonState.Unactivated)
+        if(e.Basket == Team1Basket)
+        {
+            if (Info.CurrentSide != CanonSide.Red)
             {
-                Team1CanonInfo.TransitionTo(CanonState.Cooldown);
-                Team1CanonInfo.Timer = Data.CanonCooldown;
-                Team2CanonInfo.TransitionTo(CanonState.Unactivated);
-                Destroy(Team2CanonInfo.Mark);
+                Info.LastSide = Info.CurrentSide;
+                Info.CurrentSide = CanonSide.Red;
+
+                Destroy(Info.Mark);
+                LockPlayer(Info);
+                Info.TransitionTo(CanonState.Firing);
             }
         }
         else
         {
-            PreviousMid = CurrentMid;
-            CurrentMid = MiddleState.Blue;
-
-            if (Team2CanonInfo.State == CanonState.Unactivated)
+            if (Info.CurrentSide != CanonSide.Blue)
             {
-                Team2CanonInfo.TransitionTo(CanonState.Cooldown);
-                Team2CanonInfo.Timer = Data.CanonCooldown;
-                Team1CanonInfo.TransitionTo(CanonState.Unactivated);
-                Destroy(Team1CanonInfo.Mark);
+                Info.LastSide = Info.CurrentSide;
+                Info.CurrentSide = CanonSide.Blue;
+
+                Destroy(Info.Mark);
+                LockPlayer(Info);
+                Info.TransitionTo(CanonState.Firing);
             }
         }
     }
@@ -498,15 +536,9 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void OnPlayerDied(PlayerDied e)
     {
-        if(e.Player == Team1CanonInfo.LockedPlayer && Team1CanonInfo.State == CanonState.Firing)
+        if(e.Player == Info.LockedPlayer && Info.State == CanonState.Firing)
         {
-            Destroy(Team1CanonInfo.Mark);
-            Team1CanonInfo.TransitionTo(CanonState.Cooldown);
-        }
-        else if(e.Player == Team2CanonInfo.LockedPlayer && Team2CanonInfo.State == CanonState.Firing)
-        {
-            Destroy(Team2CanonInfo.Mark);
-            Team2CanonInfo.TransitionTo(CanonState.Cooldown);
+            Info.LockedPlayer = null;
         }
     }
 }

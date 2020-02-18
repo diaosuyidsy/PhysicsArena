@@ -83,7 +83,7 @@ public class CameraController : MonoBehaviour
             _desiredPosition.y = _targetOnGround.y + Mathf.Sin(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
             _desiredPosition.z = _targetOnGround.z - Mathf.Cos(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
             _desiredPosition.x = Mathf.Clamp(_desiredPosition.x, Context._minPosition.x, Context._maxPosition.x);
-            _desiredPosition.y = Mathf.Clamp(_desiredPosition.y, Context._minPosition.y, Context._maxPosition.y);
+            // _desiredPosition.y = Mathf.Clamp(_desiredPosition.y, Context._minPosition.y, Context._maxPosition.y);
             _desiredPosition.z = Mathf.Clamp(_desiredPosition.z, Context._minPosition.z, Context._maxPosition.z);
             Context.transform.position = Vector3.Lerp(Context.transform.position, _desiredPosition, _CameraData.SmoothSpeed);
 

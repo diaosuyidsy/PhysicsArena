@@ -31,7 +31,7 @@ public class Game : MonoBehaviour
                 Services.GameObjectiveManager = new BrawlModeObjectiveManager((BrawlModeData)ModeSepcificData);
                 break;
             case GameMapMode.DeathMode:
-                Services.GameObjectiveManager = new ApocalypseArenaObjectiveManager((ApocalypseArenaData)ModeSepcificData);
+                Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSepcificData);
                 break;
             case GameMapMode.RaceMode:
                 Services.GameObjectiveManager = new SushiModeObjectiveManager((SushiModeData)ModeSepcificData);

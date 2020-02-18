@@ -107,7 +107,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             }
                             break;
                         case CanonSide.Red:
-                            if (LeverAngle > -MaxLeverAngle)
+                            if (LeverAngle > 0)
                             {
                                 LeverAngle += -LeverRotateSpeed * Time.deltaTime;
                                 Lever.transform.Rotate(new Vector3(-LeverRotateSpeed * Time.deltaTime, 0, 0));
@@ -117,7 +117,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                                 Lever.transform.Rotate(new Vector3(-LeverAngle, 0, 0));
                                 LeverAngle = 0;
                             }
-                            if (PipeAngle < MaxPipeAngle)
+                            if (PipeAngle < 0)
                             {
                                 PipeAngle += PipeRotateSpeed * Time.deltaTime;
                                 Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
@@ -481,7 +481,17 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     {
         Vector3 Pos = BagelGenerationPos;
 
-        switch (Info.CurrentSide)
+        BrawlModeReforgedObjectiveManager Manager = (BrawlModeReforgedObjectiveManager)Services.GameObjectiveManager;
+
+        if (Manager.TeamAScore > Manager.TeamBScore)
+        {
+            Pos = BagelGenerationPosRight;
+        }
+        else if(Manager.TeamBScore > Manager.TeamAScore)
+        {
+            Pos = BagelGenerationPosLeft;
+        }
+        /*switch (Info.CurrentSide)
         {
             case CanonSide.Neutral:
                 Pos = BagelGenerationPos;
@@ -492,7 +502,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             case CanonSide.Red:
                 Pos = BagelGenerationPosRight;
                 break;
-        }
+        }*/
 
         Bagel = GameObject.Instantiate(BagelPrefab, Pos, new Quaternion(0, 0, 0, 0));
     }

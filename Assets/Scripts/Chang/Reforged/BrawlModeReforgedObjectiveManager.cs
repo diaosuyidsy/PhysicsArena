@@ -6,8 +6,8 @@ using TMPro;
 
 public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 {
-    private int TeamAScore;
-    private int TeamBScore;
+    public int TeamAScore;
+    public int TeamBScore;
     private int winner
     {
         get
@@ -80,11 +80,18 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         if (Timer <= 0)
         {
             TimerText.text = "0:00";
-            EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
-            gameEnd = true;
-            return;
+            if (TeamAScore != TeamBScore)
+            {
+                EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+                gameEnd = true;
+                return;
+            }
         }
-        TimerText.text = TimerToMinute();
+        else
+        {
+            TimerText.text = TimerToMinute();
+        }
+
     }
 
     private string TimerToMinute()

@@ -16,7 +16,7 @@ public class GameStateManager
     public PlayerInformation PlayersInformation;
     public List<Transform> CameraTargets;
 
-    private GameMapData _gameMapdata;
+    public GameMapData _gameMapdata;
     private ConfigData _configData;
     private FSM<GameStateManager> _gameStateFSM;
     private TextMeshProUGUI _holdAText;

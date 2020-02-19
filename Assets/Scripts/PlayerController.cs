@@ -1138,6 +1138,26 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    private class DroppedRecoveryState : ActionState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.DropRecoveryTime;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (Time.timeSinceLevelLoad > _timer)
+            {
+                TransitionTo<IdleActionState>();
+                return;
+            }
+        }
+    }
+
     private class PunchHoldingState : ActionState
     {
         private float _startHoldingTime;

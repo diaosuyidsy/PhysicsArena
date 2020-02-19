@@ -60,4 +60,5 @@ public class CharacterData : ScriptableObject
     [Header("Character Other Settings")]
     public float Radius = 1f;
     public LayerMask PickUpLayer;
+    public float DropRecoveryTime = 0.2f;
 }

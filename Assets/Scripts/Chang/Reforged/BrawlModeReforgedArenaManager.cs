@@ -249,6 +249,9 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public BrawlModeReforgedModeData Data;
 
+    public BrawlModeReforgedModeData Data_2Player;
+    public BrawlModeReforgedModeData Data_MorePlayer;
+
     public GameObject PipeObject;
     public GameObject LeverObject;
 
@@ -280,6 +283,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        if (Utility.GetPlayerNumber() <= 2)
+        {
+            Data = Data_2Player;
+        }
+        else
+        {
+            Data = Data_MorePlayer;
+        }
+
         Info = new CanonInfo(PipeObject, LeverObject);
 
         GenerateBagel();
@@ -303,6 +315,21 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         CheckCanon();
     }
 
+
+    private int GetPlayerNumber()
+    {
+        int Count = 0;
+        for(int i=0;i < Services.GameStateManager.CameraTargets.Count; i++)
+        {
+            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
+            {
+                Count++;
+            }
+        }
+
+        return Count;
+
+    }
 
     private void CheckCanon()
     {
@@ -479,17 +506,17 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void GenerateBagel()
     {
-        Vector3 Pos = BagelGenerationPos;
+        Vector3 Pos = Data.BagelGenerationPos;
 
         BrawlModeReforgedObjectiveManager Manager = (BrawlModeReforgedObjectiveManager)Services.GameObjectiveManager;
 
         if (Manager.TeamAScore > Manager.TeamBScore)
         {
-            Pos = BagelGenerationPosRight;
+            Pos = Data.BagelGenerationPosRight;
         }
         else if(Manager.TeamBScore > Manager.TeamAScore)
         {
-            Pos = BagelGenerationPosLeft;
+            Pos = Data.BagelGenerationPosLeft;
         }
         /*switch (Info.CurrentSide)
         {

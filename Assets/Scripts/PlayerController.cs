@@ -205,19 +205,22 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             _actionFSM.TransitionTo<IdleActionState>();
         }
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)))
-        {
-            _actionFSM.TransitionTo<IdleActionState>();
-        }
-        if (force.magnitude > CharacterDataStore.HitBigThreshold)
-        {
-            _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
-            _movementFSM.TransitionTo<HitUncontrollableState>();
-        }
-        else if (force.magnitude > CharacterDataStore.HitSmallThreshold)
+
+        if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
+            if (force.magnitude > CharacterDataStore.HitBigThreshold)
+            {
+                _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
+            }
             _movementFSM.TransitionTo<HitUncontrollableState>();
+            if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
+                _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
+                _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)) ||
+                _actionFSM.CurrentState.GetType().Equals(typeof(PickingState)))
+            {
+                _actionFSM.TransitionTo<HitUnControllableActionState>();
+            }
         }
     }
 
@@ -1197,7 +1200,7 @@ public class PlayerController : MonoBehaviour, IHittable
             if (Context._meleeCharge < Context.CharacterDataStore.MeleeChargeThreshold) Context._meleeCharge = 0f;
             Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
-            Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
+            // Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
         }
 
         public override void Update()
@@ -1242,7 +1245,27 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("PunchReleased", false);
             Context._meleeCharge = 0f;
-            Context._movementFSM.TransitionTo<IdleState>();
+            // Context._movementFSM.TransitionTo<IdleState>();
+        }
+    }
+
+    private class HitUnControllableActionState : ActionState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<IdleActionState>();
+                return;
+            }
         }
     }
 

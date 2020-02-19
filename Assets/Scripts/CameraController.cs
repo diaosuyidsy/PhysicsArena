@@ -17,11 +17,11 @@ public class CameraController : MonoBehaviour
 
     private void Awake()
     {
+        _minPosition = transform.position - Services.GameStateManager._gameMapdata.CameraClampRelativePosition;
+        _maxPosition = transform.position + Services.GameStateManager._gameMapdata.CameraClampRelativePosition;
         _cam = GetComponent<Camera>();
         _camFSM = new FSM<CameraController>(this);
         _camFSM.TransitionTo<EntryState>();
-        _minPosition = transform.position - Services.GameStateManager._gameMapdata.CameraClampRelativePosition;
-        _maxPosition = transform.position + Services.GameStateManager._gameMapdata.CameraClampRelativePosition;
     }
 
     // Update is called once per frame
@@ -82,38 +82,14 @@ public class CameraController : MonoBehaviour
             _desiredPosition.x = _targetOnGround.x;
             _desiredPosition.y = _targetOnGround.y + Mathf.Sin(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
             _desiredPosition.z = _targetOnGround.z - Mathf.Cos(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
-            _desiredPosition.x = Mathf.Clamp(_desiredPosition.x, Context._minPosition.x, Context._maxPosition.x);
+            // _desiredPosition.x = Mathf.Clamp(_desiredPosition.x, Context._minPosition.x, Context._maxPosition.x);
             // _desiredPosition.y = Mathf.Clamp(_desiredPosition.y, Context._minPosition.y, Context._maxPosition.y);
-            _desiredPosition.z = Mathf.Clamp(_desiredPosition.z, Context._minPosition.z, Context._maxPosition.z);
+            // _desiredPosition.z = Mathf.Clamp(_desiredPosition.z, Context._minPosition.z, Context._maxPosition.z);
             Context.transform.position = Vector3.Lerp(Context.transform.position, _desiredPosition, _CameraData.SmoothSpeed);
 
             float _desiredFOV = 2f * _getMaxDistance() + 5f;
             Context._cam.fieldOfView = Mathf.Lerp(Context._cam.fieldOfView, _desiredFOV, _CameraData.SmoothSpeed);
             Context._cam.fieldOfView = Mathf.Clamp(Context._cam.fieldOfView, _CameraData.FOVSizeMin, _CameraData.FOVSizeMax);
-        }
-
-        private void _setCameraPosition()
-        {
-            Vector3 total = Vector3.zero;
-            int length = 0;
-
-            foreach (PlayerController go in Services.GameStateManager.PlayerControllers)
-            {
-                if (go != null && go.OnDeathHidden[0].activeSelf)
-                {
-                    total += go.transform.position;
-                    length++;
-                }
-            }
-            total /= (length == 0 ? 1 : length);
-            _targetOnGround = total;
-            float maxDistBetweenPlayers = 2f * _getMaxDistance() + 4f;
-            maxDistBetweenPlayers = Mathf.Clamp(maxDistBetweenPlayers, _CameraData.MinDistance, _CameraData.MaxDistance);
-            _desiredPosition.x = _targetOnGround.x;
-            _desiredPosition.y = _targetOnGround.y + Mathf.Sin(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * maxDistBetweenPlayers;
-            _desiredPosition.z = _targetOnGround.z - Mathf.Cos(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * maxDistBetweenPlayers;
-
-            Context.transform.position = Vector3.Lerp(Context.transform.position, _desiredPosition, _CameraData.SmoothSpeed);
         }
 
         // Should get the max distance between any two players

@@ -39,7 +39,7 @@ public class VFXManager
             }
         }
         GameObject[] HittedFeetVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedFeetVFX : VFXDataStore.DuckHittedFeetVFX;
-        _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerFeet);
+        _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerUITransform);
         GameObject[] HittedBodyVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
         if (HittedBodyVFX != null)
         {

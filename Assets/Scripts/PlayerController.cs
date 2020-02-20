@@ -34,6 +34,7 @@ public class PlayerController : MonoBehaviour, IHittable
     [HideInInspector] public GameObject SlowVFXHolder;
     [HideInInspector] public GameObject FoodTraverseVFXHolder;
     public Transform PlayerFeet { get { return OnDeathHidden[1].transform; } }
+    public Transform PlayerUITransform;
 
     #region Private Variables
     private Player _player;

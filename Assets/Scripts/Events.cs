@@ -79,11 +79,11 @@ public class PlayerDied : GameEvent
 
 public class BagelSent : GameEvent
 {
-    public GameObject Canon;
+    public GameObject Basket;
     
-    public BagelSent(GameObject canon)
+    public BagelSent(GameObject obj)
     {
-        Canon = canon;
+        Basket = obj;
     }
 }
 

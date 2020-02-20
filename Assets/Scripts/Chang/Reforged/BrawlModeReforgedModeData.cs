@@ -18,4 +18,8 @@ public class BrawlModeReforgedModeData : ModeSepcificData
     public int BagelKillPoint;
     public int NormalKillPoint;
     public int TotalTime;
+
+    public Vector3 BagelGenerationPos;
+    public Vector3 BagelGenerationPosLeft;
+    public Vector3 BagelGenerationPosRight;
 }

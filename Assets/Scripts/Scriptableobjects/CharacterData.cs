@@ -39,8 +39,11 @@ public class CharacterData : ScriptableObject
     public float ClockFistTime = 1f;
     [Tooltip("How much time it takes to release the punch (before it resets to normal state)")]
     public float FistReleaseTime = 0.2f;
+    [Tooltip("Actual Fist Punchable Time")]
+    public float PunchActivateTime = 0.2f;
     [Tooltip("Self Push Force adjust how much yourself will be launched forward when punching")]
     public float SelfPushForce = 200f;
+    public float IdleSelfPushForce = 65f;
     [Tooltip("MeleeCharge Threshold must be over this to take effect")]
     public float MeleeChargeThreshold = 0.75f;
     [Tooltip("The Radius of punching")]
@@ -55,9 +58,11 @@ public class CharacterData : ScriptableObject
     public float HitSmallThreshold = 500f;
     public float HitUncontrollableTimeBig = 0.5f;
     public float HitBigThreshold = 900f;
+    public float PunchReleaseRotationMultiplier = 0.2f;
     public LayerMask CanHitLayer;
 
     [Header("Character Other Settings")]
     public float Radius = 1f;
     public LayerMask PickUpLayer;
+    public float DropRecoveryTime = 0.2f;
 }

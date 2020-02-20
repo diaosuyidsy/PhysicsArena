@@ -6,8 +6,8 @@ using TMPro;
 
 public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 {
-    private int TeamAScore;
-    private int TeamBScore;
+    public int TeamAScore;
+    public int TeamBScore;
     private int winner
     {
         get
@@ -32,8 +32,6 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
     public BrawlModeReforgedObjectiveManager(BrawlModeReforgedModeData Data) : base()
     {
-        Services.GameStateManager.CameraTargets.Add(GameObject.Find("CanonTEAM1").transform);
-        Services.GameStateManager.CameraTargets.Add(GameObject.Find("CanonTEAM2").transform);
 
         ModeData = Data;
         Timer = Data.TotalTime;
@@ -82,11 +80,18 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         if (Timer <= 0)
         {
             TimerText.text = "0:00";
-            EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
-            gameEnd = true;
-            return;
+            if (TeamAScore != TeamBScore)
+            {
+                EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+                gameEnd = true;
+                return;
+            }
         }
-        TimerText.text = TimerToMinute();
+        else
+        {
+            TimerText.text = TimerToMinute();
+        }
+
     }
 
     private string TimerToMinute()
@@ -110,7 +115,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             return;
         }
 
-        if (e.Canon.name.Contains("1"))
+        if (e.Basket.name.Contains("1"))
         {
             TeamAScore += 3;
         }

@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class BrawlModeReforgedWeaponManager : MonoBehaviour
 {
+    public GameObject WeaponGenerators_2Player;
+    public GameObject WeaponGenerators_MorePlayer;
+
     public List<GameObject> WeaponGeneratorList;
 
     public List<GameObject> AvailableWeaponList;
@@ -26,7 +29,21 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-
+        WeaponGeneratorList = new List<GameObject>();
+        if (Utility.GetPlayerNumber() <= 2)
+        {
+            foreach(Transform child in WeaponGenerators_2Player.transform)
+            {
+                WeaponGeneratorList.Add(child.gameObject);
+            }
+        }
+        else
+        {
+            foreach (Transform child in WeaponGenerators_MorePlayer.transform)
+            {
+                WeaponGeneratorList.Add(child.gameObject);
+            }
+        }
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<WeaponGeneratorSwtich>(OnGeneratorSwtich);

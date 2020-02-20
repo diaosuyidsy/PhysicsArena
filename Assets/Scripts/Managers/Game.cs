@@ -4,17 +4,20 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+    public CharacterData CharacterData;
     public AudioData AudioData;
     public VFXData VFXData;
     public ConfigData ConfigData;
     public WeaponData WeaponData;
     public GameFeelData GameFeelData;
-    public ModeSepcificData ModeSepcificData;
+    public ModeSepcificData ModeSpecificData;
     public GameMapData GameMapData;
+
+    public ModeSepcificData ModeSpecificData_2Player;
 
     private void Awake()
     {
-        Services.Config = new Config(ConfigData, GameMapData);
+        Services.Config = new Config(ConfigData, GameMapData, CharacterData);
         Services.AudioManager = new AudioManager(AudioData);
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
@@ -28,16 +31,24 @@ public class Game : MonoBehaviour
                 Services.GameObjectiveManager = new FoodModeObjectiveManager();
                 break;
             case GameMapMode.BrawlMode:
-                Services.GameObjectiveManager = new BrawlModeObjectiveManager((BrawlModeData)ModeSepcificData);
+                Services.GameObjectiveManager = new BrawlModeObjectiveManager((BrawlModeData)ModeSpecificData);
                 break;
             case GameMapMode.DeathMode:
-                Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSepcificData);
+                if (Utility.GetPlayerNumber() <= 2)
+                {
+                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData_2Player);
+                }
+                else
+                {
+                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData);
+                }
+                Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData);
                 break;
             case GameMapMode.RaceMode:
-                Services.GameObjectiveManager = new SushiModeObjectiveManager((SushiModeData)ModeSepcificData);
+                Services.GameObjectiveManager = new SushiModeObjectiveManager((SushiModeData)ModeSpecificData);
                 break;
             case GameMapMode.SoccerMode:
-                Services.GameObjectiveManager = new SoccerModeObjectiveManager((SoccerMapData)ModeSepcificData);
+                Services.GameObjectiveManager = new SoccerModeObjectiveManager((SoccerMapData)ModeSpecificData);
                 break;
             default:
                 Services.GameObjectiveManager = new EmptyObjectiveManager();

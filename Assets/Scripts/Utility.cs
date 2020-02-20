@@ -7,6 +7,21 @@ using DG.Tweening;
 
 public static class Utility
 {
+    public static int GetPlayerNumber()
+    {
+        int Count = 0;
+        for (int i = 0; i < Services.GameStateManager.CameraTargets.Count; i++)
+        {
+            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
+            {
+                Count++;
+            }
+        }
+
+        return Count;
+    }
+
+
     // This function takes the center position on sreen
     // and calculates the maximum length of its position to the four corners
     public static float GetMaxLengthToCorner(Vector2 centerposition)
@@ -85,6 +100,42 @@ public static class Utility
             arr[min_idx] = arr[i];
             arr[i] = temp;
         }
+    }
+
+    public static bool PlayerWillDieOnHit(PlayerHit ev, CharacterData data, LayerMask HitBlockedLayer)
+    {
+        float time = 0f;
+        float mass = 0f;
+        float frictionCoeffcient = ev.Hitted.GetComponent<CapsuleCollider>().material.dynamicFriction;
+        foreach (Rigidbody rb in ev.Hitted.GetComponentsInChildren<Rigidbody>(true))
+        {
+            mass += rb.mass;
+        }
+        float velocityF = ev.Force.magnitude / mass;
+        if (ev.Force.magnitude >= data.HitBigThreshold)
+        {
+            time = data.HitUncontrollableTimeBig;
+        }
+        else
+        {
+            time = data.HitUncontrollableTimeSmall;
+        }
+        // Travel Distance S = Vot - 1/2 a t^2
+        float distance = velocityF * time - 0.5f * frictionCoeffcient * Mathf.Abs(Physics.gravity.y) * time * time;
+        // 1. See if there is something behind, blocking
+        RaycastHit hit;
+        if (Physics.SphereCast(ev.Hitted.transform.position, 0.2f, ev.Force.normalized, out hit, distance, HitBlockedLayer ^ (1 << ev.Hitted.layer)))
+        {
+            return false;
+        }
+        // 2. See if the destination is beyond cliff
+        if (Physics.SphereCast(ev.Hitted.transform.position + ev.Force.normalized * distance, 0.2f, Vector3.down, out hit, 100f))
+        {
+            Debug.Log(hit.transform);
+            if (!hit.transform.CompareTag("DeathZone"))
+                return false;
+        }
+        return true;
     }
 }
 

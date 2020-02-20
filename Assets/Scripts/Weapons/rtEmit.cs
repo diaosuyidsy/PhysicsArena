@@ -79,8 +79,18 @@ public class rtEmit : WeaponBase
         RaycastHit hit;
         if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
         {
-            if (hit.transform.GetComponentInParent<IHittable>() != null)
+            // if (hit.transform.GetComponentInParent<IHittable>() != null)
+            //     hit.transform.GetComponentInParent<IHittable>().OnImpact(Owner, ImpactType.WaterGun);
+            if (hit.transform.GetComponentInParent<IHittable>() != null &&
+                !hit.transform.GetComponentInParent<IHittable>().CanBlock(Owner.transform.forward))
+                hit.transform.GetComponentInParent<IHittable>().OnImpact(WeaponDataStore.WaterGunDataStore.WaterForce * Owner.transform.forward,
+                ForceMode.Acceleration,
+                Owner,
+                ImpactType.WaterGun);
+            else if (hit.transform.GetComponentInParent<IHittable>() != null)
+            {
                 hit.transform.GetComponentInParent<IHittable>().OnImpact(Owner, ImpactType.WaterGun);
+            }
         }
     }
 

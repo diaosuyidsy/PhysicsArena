@@ -10,7 +10,8 @@ public class VFXData : ScriptableObject
     public GameObject[] HugeDeathVFX;
     public GameObject VanishVFX;
     [Tooltip("在击打位置的VFX")]
-    public GameObject[] HitVFX;
+    public GameObject[] ChickenHitVFX;
+    public GameObject[] DuckHitVFX;
 
     [Tooltip("被打的人脚下的VFX，是子物体")]
     public GameObject[] ChickenHittedFeetVFX;

@@ -560,6 +560,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
+            Context.OnDeathHidden[2].SetActive(false);
             Context._rb.AddForce(new Vector3(0, Context.CharacterDataStore.JumpForce, 0), ForceMode.Impulse);
             EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
         }
@@ -595,6 +596,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
+            Context.OnDeathHidden[2].SetActive(true);
             Context._jumpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.JumpCD;
         }
     }

@@ -16,7 +16,7 @@ public class GameNetwork : MonoBehaviour
     private void Awake()
     {
         ServicesNetwork.NetworkEventManager = new NetworkEventManager();
-        ServicesNetwork.Config = new Config(ConfigData, GameMapData);
+        ServicesNetwork.Config = null;
         ServicesNetwork.AudioManager = new AudioManager(AudioData);
         ServicesNetwork.GameFeelManager = new GameFeelNetworkManager(GameFeelData);
         ServicesNetwork.VisualEffectManager = new VFXNetworkManager(VFXData);

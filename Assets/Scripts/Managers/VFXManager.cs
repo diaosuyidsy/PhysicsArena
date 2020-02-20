@@ -70,6 +70,12 @@ public class VFXManager
             _instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 9].transform.rotation);
         else
             _instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 11], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 11].transform.rotation);
+
+        if (pd.Player.layer < 13)
+            _instantiateVFX(VFXDataStore.HugeDeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.HugeDeathVFX[pd.Player.layer - 9].transform.rotation);
+        else
+            _instantiateVFX(VFXDataStore.HugeDeathVFX[pd.Player.layer - 11], pd.Player.transform.position, VFXDataStore.HugeDeathVFX[pd.Player.layer - 11].transform.rotation);
+
     }
 
     private void _onObjectDespawned(ObjectDespawned od)

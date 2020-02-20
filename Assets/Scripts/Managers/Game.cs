@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Game : MonoBehaviour
 {
+    public CharacterData CharacterData;
     public AudioData AudioData;
     public VFXData VFXData;
     public ConfigData ConfigData;
@@ -16,7 +17,7 @@ public class Game : MonoBehaviour
 
     private void Awake()
     {
-        Services.Config = new Config(ConfigData, GameMapData);
+        Services.Config = new Config(ConfigData, GameMapData, CharacterData);
         Services.AudioManager = new AudioManager(AudioData);
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);

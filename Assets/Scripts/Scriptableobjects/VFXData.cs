@@ -7,6 +7,7 @@ public class VFXData : ScriptableObject
 {
     public GameObject DeliverFoodVFX;
     public GameObject[] DeathVFX;
+    public GameObject[] HugeDeathVFX;
     public GameObject VanishVFX;
     [Tooltip("在击打位置的VFX")]
     public GameObject[] HitVFX;
@@ -61,5 +62,6 @@ public class VFXData : ScriptableObject
     public GameObject ChickenRightFootStepVFX;
     public GameObject DuckLeftFootStepVFX;
     public GameObject DuckRightFootStepVFX;
+    public LayerMask HitBlockedLayer;
 
 }

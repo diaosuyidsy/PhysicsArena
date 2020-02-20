@@ -6,11 +6,13 @@ public class Config
 {
     public ConfigData ConfigData;
     public GameMapData GameMapData;
+    public CharacterData CharacterData;
     public Vector3[] Team1RespawnPoints;
     public Vector3[] Team2RespawnPoints;
 
-    public Config(ConfigData _cd, GameMapData _gmp)
+    public Config(ConfigData _cd, GameMapData _gmp, CharacterData _charData)
     {
+        CharacterData = _charData;
         ConfigData = _cd;
         GameMapData = _gmp;
         Team1RespawnPoints = new Vector3[GameMapData.Team1RespawnPoints.Length];

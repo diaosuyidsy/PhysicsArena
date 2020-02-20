@@ -19,8 +19,11 @@ public class VFXManager
     #region Event Handlers
     private void _onPlayerHit(PlayerHit ph)
     {
-        if (ph.MeleeCharge <= 0.1f) return;
-
+        if (Utility.PlayerWillDieOnHit(ph, Services.Config.CharacterData, VFXDataStore.HitBlockedLayer))
+        {
+            GameObject[] CameraVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedCameraVFX : VFXDataStore.DuckHittedCameraVFX;
+            _instantiateVFX(CameraVFX, _mainCameraTransform);
+        }
         if (VFXDataStore.HitVFX != null)
         {
             for (int i = 0; i < VFXDataStore.HitVFX.Length; i++)
@@ -58,8 +61,7 @@ public class VFXManager
                                                 0f));
             }
         }
-        GameObject[] CameraVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedCameraVFX : VFXDataStore.DuckHittedCameraVFX;
-        _instantiateVFX(CameraVFX, _mainCameraTransform);
+
     }
 
     private void _onPlayerDied(PlayerDied pd)

@@ -61,5 +61,6 @@ public class VFXData : ScriptableObject
     public GameObject ChickenRightFootStepVFX;
     public GameObject DuckLeftFootStepVFX;
     public GameObject DuckRightFootStepVFX;
+    public LayerMask HitBlockedLayer;
 
 }

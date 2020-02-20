@@ -191,7 +191,9 @@ public class VFXManager
     private void _onPunchDone(PunchDone pd)
     {
         GameObject MeleeVFXHolder = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder;
+        GameObject MeleeVFXHolder2 = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
         if (MeleeVFXHolder != null) GameObject.Destroy(MeleeVFXHolder);
+        if (MeleeVFXHolder2 != null) GameObject.Destroy(MeleeVFXHolder2);
     }
 
     private void _onBazookaBombed(BazookaBombed bb)

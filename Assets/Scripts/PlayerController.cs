@@ -946,8 +946,8 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._animator.SetBool("IdleUpper", true);
             Context._dropHandObject();
+            Context._animator.SetBool("IdleUpper", true);
             Context._permaSlow = 0;
             Context._permaSlowWalkSpeedMultiplier = 1f;
         }
@@ -1124,6 +1124,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
+            Context._dropHandObject();
             Context._animator.SetBool("Dropping", false);
         }
 
@@ -1132,7 +1133,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.Update();
             if (_LeftTriggerUp)
             {
-                TransitionTo<IdleActionState>();
+                TransitionTo<DroppedRecoveryState>();
                 return;
             }
         }
@@ -1144,6 +1145,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._animator.SetBool("IdleUpper", true);
             _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.DropRecoveryTime;
         }
 
@@ -1194,6 +1196,12 @@ public class PlayerController : MonoBehaviour, IHittable
             if (_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime && !_RightTrigger)
             {
                 TransitionTo<PunchReleasingState>();
+                return;
+            }
+            if (_holding && _BDown)
+            {
+                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                TransitionTo<BlockingState>();
                 return;
             }
         }
@@ -1450,6 +1458,11 @@ public class PlayerController : MonoBehaviour, IHittable
             if (Context._currentStamina <= 0f)
             {
                 TransitionTo<IdleActionState>();
+                return;
+            }
+            if (_RightTriggerDown)
+            {
+                TransitionTo<PunchHoldingState>();
                 return;
             }
         }

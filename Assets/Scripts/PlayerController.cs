@@ -87,6 +87,7 @@ public class PlayerController : MonoBehaviour, IHittable
             else return _walkSpeedMultiplier;
         }
     }
+    private float _rotationSpeedMultiplier = 1f;
     private List<Rigidbody> _playerBodies;
     private IEnumerator _deadInvincible;
     private int _playerBodiesLayer;
@@ -586,7 +587,7 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
                 Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
+                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed * Context._rotationSpeedMultiplier);
                 Context.transform.rotation = tr;
             }
         }
@@ -650,7 +651,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
             Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
             Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-            Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
+            Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed * Context._rotationSpeedMultiplier);
             Context.transform.rotation = tr;
             if (Context._frontIsCliff() && isonground)
             {
@@ -1223,18 +1224,22 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             Context._animator.SetFloat("FistReleaseTime", 1f / Context.CharacterDataStore.FistReleaseTime);
             Context._animator.SetBool("PunchReleased", true);
-            _time = Time.time + Context.CharacterDataStore.FistReleaseTime;
+            _time = Time.time;
             _hitOnce = false;
             if (Context._meleeCharge < Context.CharacterDataStore.MeleeChargeThreshold) Context._meleeCharge = 0f;
-            Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
+            if (Context._movementFSM.CurrentState.GetType().Equals(typeof(IdleState)))
+                Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
+            else
+                Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
+            Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
             // Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
         }
 
         public override void Update()
         {
             base.Update();
-            if (Time.time < _time)
+            if (Time.time < _time + Context.CharacterDataStore.PunchActivateTime)
             {
                 RaycastHit hit;
                 // This Layermask get all player's layer except this player's
@@ -1254,7 +1259,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     Context._setVelocity(Vector3.zero);
                 }
             }
-            else
+            if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<IdleActionState>();
@@ -1273,6 +1278,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("PunchReleased", false);
             Context._meleeCharge = 0f;
+            Context._rotationSpeedMultiplier = 1f;
             // Context._movementFSM.TransitionTo<IdleState>();
         }
     }

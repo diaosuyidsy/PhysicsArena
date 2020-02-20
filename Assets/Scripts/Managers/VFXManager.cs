@@ -19,8 +19,11 @@ public class VFXManager
     #region Event Handlers
     private void _onPlayerHit(PlayerHit ph)
     {
-        if (ph.MeleeCharge <= 0.1f) return;
-
+        if (Utility.PlayerWillDieOnHit(ph, Services.Config.CharacterData, VFXDataStore.HitBlockedLayer))
+        {
+            GameObject[] CameraVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedCameraVFX : VFXDataStore.DuckHittedCameraVFX;
+            _instantiateVFX(CameraVFX, _mainCameraTransform);
+        }
         if (VFXDataStore.HitVFX != null)
         {
             for (int i = 0; i < VFXDataStore.HitVFX.Length; i++)
@@ -58,8 +61,7 @@ public class VFXManager
                                                 0f));
             }
         }
-        GameObject[] CameraVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedCameraVFX : VFXDataStore.DuckHittedCameraVFX;
-        _instantiateVFX(CameraVFX, _mainCameraTransform);
+
     }
 
     private void _onPlayerDied(PlayerDied pd)
@@ -68,6 +70,12 @@ public class VFXManager
             _instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 9].transform.rotation);
         else
             _instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 11], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 11].transform.rotation);
+
+        if (pd.Player.layer < 13)
+            _instantiateVFX(VFXDataStore.HugeDeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.HugeDeathVFX[pd.Player.layer - 9].transform.rotation);
+        else
+            _instantiateVFX(VFXDataStore.HugeDeathVFX[pd.Player.layer - 11], pd.Player.transform.position, VFXDataStore.HugeDeathVFX[pd.Player.layer - 11].transform.rotation);
+
     }
 
     private void _onObjectDespawned(ObjectDespawned od)

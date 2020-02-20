@@ -41,9 +41,9 @@ public class VFXManager
                                                 0f));
             }
         }
-        GameObject[] HittedFeetVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedFeetVFX : VFXDataStore.DuckHittedFeetVFX;
+        GameObject[] HittedFeetVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedFeetVFX : VFXDataStore.DuckHittedFeetVFX;
         _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerFeet);
-        GameObject[] HittedBodyVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
+        GameObject[] HittedBodyVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
         if (HittedBodyVFX != null)
         {
             for (int i = 0; i < HittedBodyVFX.Length; i++)

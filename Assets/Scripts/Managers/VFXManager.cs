@@ -7,32 +7,70 @@ public class VFXManager
     public VFXData VFXDataStore;
     private float _blinkTime = 3f;
     private float _blinkDeltaTime = 10f;
+    private Transform _mainCameraTransform;
 
     public VFXManager(VFXData _vfxdata)
     {
         VFXDataStore = _vfxdata;
+        _mainCameraTransform = Camera.main.transform;
         OnEnable();
     }
 
     #region Event Handlers
     private void _onPlayerHit(PlayerHit ph)
     {
-        //		Vector3 hittedPos = ph.Hitted.transform.position;
-        Vector3 hittedPos = ph.Hiter.transform.position + ph.Hiter.transform.forward * VFXDataStore.HitOffset.z + ph.Hiter.transform.right * VFXDataStore.HitOffset.x + ph.Hiter.transform.up * VFXDataStore.HitOffset.y;
-        Vector3 force = ph.Force;
-        if (ph.MeleeCharge > 0.1f)
-            _instantiateVFX(VFXDataStore.HitVFX, hittedPos, Quaternion.Euler(0f, 180f + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up), 0f));
+        if (ph.MeleeCharge <= 0.1f) return;
+
+        if (VFXDataStore.HitVFX != null)
+        {
+            for (int i = 0; i < VFXDataStore.HitVFX.Length; i++)
+            {
+                GameObject VFX = VFXDataStore.HitVFX[i];
+                Vector3 hittedPos = ph.Hiter.transform.position +
+                                    ph.Hiter.transform.forward * VFX.transform.position.z +
+                                    ph.Hiter.transform.right * VFX.transform.position.x +
+                                    ph.Hiter.transform.up * VFX.transform.position.y;
+                Vector3 force = ph.Force;
+                _instantiateVFX(VFXDataStore.HitVFX[i],
+                                hittedPos,
+                                Quaternion.Euler(0f,
+                                                VFXDataStore.HitVFX[i].transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
+                                                0f));
+            }
+        }
+        GameObject[] HittedFeetVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedFeetVFX : VFXDataStore.DuckHittedFeetVFX;
+        _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerFeet);
+        GameObject[] HittedBodyVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
+        if (HittedBodyVFX != null)
+        {
+            for (int i = 0; i < HittedBodyVFX.Length; i++)
+            {
+                GameObject VFX = HittedBodyVFX[i];
+                Vector3 hittedPos = ph.Hitted.transform.position +
+                                    ph.Hitted.transform.forward * VFX.transform.position.z +
+                                    ph.Hitted.transform.right * VFX.transform.position.x +
+                                    ph.Hitted.transform.up * VFX.transform.position.y;
+                Vector3 force = ph.Force;
+                _instantiateVFX(VFX,
+                                hittedPos,
+                                Quaternion.Euler(0f,
+                                                VFX.transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
+                                                0f));
+            }
+        }
+        GameObject[] CameraVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHittedCameraVFX : VFXDataStore.DuckHittedCameraVFX;
+        _instantiateVFX(CameraVFX, _mainCameraTransform);
     }
 
     private void _onPlayerDied(PlayerDied pd)
     {
-		if (pd.Player.layer < 13)
-			_instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 9].transform.rotation);
-		else
-			_instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 11], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 11].transform.rotation);
-	}
+        if (pd.Player.layer < 13)
+            _instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 9].transform.rotation);
+        else
+            _instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 11], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 11].transform.rotation);
+    }
 
-	private void _onObjectDespawned(ObjectDespawned od)
+    private void _onObjectDespawned(ObjectDespawned od)
     {
         _instantiateVFX(VFXDataStore.VanishVFX, od.Obj.transform.position, VFXDataStore.VanishVFX.transform.rotation);
     }
@@ -124,12 +162,38 @@ public class VFXManager
     {
         GameObject MeleeVFXHolder2 = pr.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
         if (MeleeVFXHolder2 != null) GameObject.Destroy(MeleeVFXHolder2);
+        if (pr.Player.CompareTag("Team1"))
+        {
+            _instantiateVFX(VFXDataStore.ChickenReleasePunchHandVFX, pr.Player.GetComponent<PlayerController>().RightHand.transform);
+            _instantiateVFX(VFXDataStore.ChickenReleasePunchFootVFX, pr.Player.GetComponent<PlayerController>().PlayerFeet);
+        }
+        else
+        {
+            _instantiateVFX(VFXDataStore.DuckReleasePunchHandVFX, pr.Player.GetComponent<PlayerController>().RightHand.transform);
+            _instantiateVFX(VFXDataStore.DuckReleasePunchFootVFX, pr.Player.GetComponent<PlayerController>().PlayerFeet);
+        }
+        GameObject[] ReleaseBodyVFX = pr.Player.CompareTag("Team1") ? VFXDataStore.ChickenReleaseBodyVFX : VFXDataStore.DuckReleaseBodyVFX;
+        for (int i = 0; i < ReleaseBodyVFX.Length; i++)
+        {
+            GameObject VFX = ReleaseBodyVFX[i];
+            Vector3 hittedPos = pr.Player.transform.position +
+                                   pr.Player.transform.forward * VFX.transform.position.z +
+                                   pr.Player.transform.right * VFX.transform.position.x +
+                                   pr.Player.transform.up * VFX.transform.position.y;
+            _instantiateVFX(VFX,
+                    hittedPos,
+                    Quaternion.Euler(0f,
+                                    VFX.transform.eulerAngles.y + pr.Player.transform.eulerAngles.y,
+                                    0f));
+        }
     }
 
     private void _onPunchDone(PunchDone pd)
     {
         GameObject MeleeVFXHolder = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder;
+        GameObject MeleeVFXHolder2 = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
         if (MeleeVFXHolder != null) GameObject.Destroy(MeleeVFXHolder);
+        if (MeleeVFXHolder2 != null) GameObject.Destroy(MeleeVFXHolder2);
     }
 
     private void _onBazookaBombed(BazookaBombed bb)
@@ -287,6 +351,27 @@ public class VFXManager
     {
         if (_vfx == null) return null;
         return GameObject.Instantiate(_vfx, _pos, _rot);
+    }
+    private GameObject[] _instantiateVFX(GameObject[] _vfx, Vector3 _pos, Quaternion _rot)
+    {
+        if (_vfx.Length == 0) return null;
+        GameObject[] result = new GameObject[_vfx.Length];
+        for (int i = 0; i < _vfx.Length; i++)
+        {
+            result[i] = GameObject.Instantiate(_vfx[i], _pos, _rot);
+        }
+        return result;
+    }
+
+    private GameObject[] _instantiateVFX(GameObject[] _vfx, Transform parent)
+    {
+        if (_vfx.Length == 0) return null;
+        GameObject[] result = new GameObject[_vfx.Length];
+        for (int i = 0; i < _vfx.Length; i++)
+        {
+            result[i] = GameObject.Instantiate(_vfx[i], parent);
+        }
+        return result;
     }
     private void OnEnable()
     {

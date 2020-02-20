@@ -64,6 +64,9 @@ public class GameMapData : ScriptableObject
     [Header("Pause Menu Setting")]
     public AudioMixer BackgroundMusicMixer;
 
+    [Header("Camera Setting")]
+    public Vector3 CameraClampRelativePosition = new Vector3(6f, 0f, 5f);
+
     [Header("Weapon Generation Setting")]
     public float WeaponSpawnCD = 1f;
     public int MaxAmountWeaponAtOnetime = 3;

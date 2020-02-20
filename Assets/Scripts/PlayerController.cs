@@ -87,6 +87,7 @@ public class PlayerController : MonoBehaviour, IHittable
             else return _walkSpeedMultiplier;
         }
     }
+    private float _rotationSpeedMultiplier = 1f;
     private List<Rigidbody> _playerBodies;
     private IEnumerator _deadInvincible;
     private int _playerBodiesLayer;
@@ -205,19 +206,22 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             _actionFSM.TransitionTo<IdleActionState>();
         }
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)))
-        {
-            _actionFSM.TransitionTo<IdleActionState>();
-        }
-        if (force.magnitude > CharacterDataStore.HitBigThreshold)
-        {
-            _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
-            _movementFSM.TransitionTo<HitUncontrollableState>();
-        }
-        else if (force.magnitude > CharacterDataStore.HitSmallThreshold)
+
+        if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
+            if (force.magnitude > CharacterDataStore.HitBigThreshold)
+            {
+                _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
+            }
             _movementFSM.TransitionTo<HitUncontrollableState>();
+            if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
+                _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
+                _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)) ||
+                _actionFSM.CurrentState.GetType().Equals(typeof(PickingState)))
+            {
+                _actionFSM.TransitionTo<HitUnControllableActionState>();
+            }
         }
     }
 
@@ -307,6 +311,14 @@ public class PlayerController : MonoBehaviour, IHittable
     }
 
     #region Helper Method
+    private void _setVelocity(Vector3 vel)
+    {
+        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
+        {
+            rb.velocity = vel;
+        }
+    }
+
     private bool _frontIsCliff()
     {
         RaycastHit hit;
@@ -575,7 +587,7 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
                 Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
+                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed * Context._rotationSpeedMultiplier);
                 Context.transform.rotation = tr;
             }
         }
@@ -639,7 +651,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
             Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
             Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-            Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
+            Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed * Context._rotationSpeedMultiplier);
             Context.transform.rotation = tr;
             if (Context._frontIsCliff() && isonground)
             {
@@ -675,6 +687,11 @@ public class PlayerController : MonoBehaviour, IHittable
                 return;
             }
         }
+    }
+
+    private class PunchReleasingMovementState : ControllableMovementState
+    {
+
     }
 
     private class JetPackState : ControllableMovementState
@@ -930,8 +947,8 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._animator.SetBool("IdleUpper", true);
             Context._dropHandObject();
+            Context._animator.SetBool("IdleUpper", true);
             Context._permaSlow = 0;
             Context._permaSlowWalkSpeedMultiplier = 1f;
         }
@@ -1108,6 +1125,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
+            Context._dropHandObject();
             Context._animator.SetBool("Dropping", false);
         }
 
@@ -1115,6 +1133,27 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.Update();
             if (_LeftTriggerUp)
+            {
+                TransitionTo<DroppedRecoveryState>();
+                return;
+            }
+        }
+    }
+
+    private class DroppedRecoveryState : ActionState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._animator.SetBool("IdleUpper", true);
+            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.DropRecoveryTime;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (Time.timeSinceLevelLoad > _timer)
             {
                 TransitionTo<IdleActionState>();
                 return;
@@ -1160,6 +1199,12 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PunchReleasingState>();
                 return;
             }
+            if (_holding && _BDown)
+            {
+                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                TransitionTo<BlockingState>();
+                return;
+            }
         }
 
         public override void OnExit()
@@ -1179,17 +1224,22 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             Context._animator.SetFloat("FistReleaseTime", 1f / Context.CharacterDataStore.FistReleaseTime);
             Context._animator.SetBool("PunchReleased", true);
-            _time = Time.time + Context.CharacterDataStore.FistReleaseTime;
+            _time = Time.time;
             _hitOnce = false;
             if (Context._meleeCharge < Context.CharacterDataStore.MeleeChargeThreshold) Context._meleeCharge = 0f;
-            Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.Impulse);
+            if (Context._movementFSM.CurrentState.GetType().Equals(typeof(IdleState)))
+                Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
+            else
+                Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
+            Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
+            // Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
         }
 
         public override void Update()
         {
             base.Update();
-            if (Time.time < _time)
+            if (Time.time < _time + Context.CharacterDataStore.PunchActivateTime)
             {
                 RaycastHit hit;
                 // This Layermask get all player's layer except this player's
@@ -1206,12 +1256,19 @@ public class PlayerController : MonoBehaviour, IHittable
                     }
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce * Context._meleeCharge;
                     hit.transform.GetComponentInParent<IHittable>().OnImpact(force, Context._meleeCharge, Context.gameObject, true);
+                    Context._setVelocity(Vector3.zero);
                 }
             }
-            else
+            if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<IdleActionState>();
+                return;
+            }
+            if (_LeftTrigger)
+            {
+                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                TransitionTo<PickingState>();
                 return;
             }
         }
@@ -1221,6 +1278,28 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("PunchReleased", false);
             Context._meleeCharge = 0f;
+            Context._rotationSpeedMultiplier = 1f;
+            // Context._movementFSM.TransitionTo<IdleState>();
+        }
+    }
+
+    private class HitUnControllableActionState : ActionState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<IdleActionState>();
+                return;
+            }
         }
     }
 
@@ -1387,6 +1466,11 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
+            if (_RightTriggerDown)
+            {
+                TransitionTo<PunchHoldingState>();
+                return;
+            }
         }
 
         public override void OnExit()
@@ -1481,6 +1565,26 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
+            if (_B || _RightTrigger || _LeftTrigger)
+            {
+                TransitionTo<IdleActionState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            if (Context._deadInvincible != null)
+            {
+                Context.StopCoroutine(Context._deadInvincible);
+
+                foreach (Rigidbody rb in Context._playerBodies)
+                {
+                    rb.gameObject.layer = Context._playerBodiesLayer;
+                }
+            }
+            Context._permaSlow = 0;
         }
     }
     #endregion

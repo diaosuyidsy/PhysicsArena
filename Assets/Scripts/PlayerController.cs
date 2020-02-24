@@ -159,6 +159,13 @@ public class PlayerController : MonoBehaviour, IHittable
         ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
     }
 
+    public bool CanBeBlockPushed()
+    {
+        return _actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
+        _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)) ||
+        _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
+        _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState));
+    }
     /// <summary>
     /// Can Block The attack or not
     /// Used by hook and hit
@@ -1482,6 +1489,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private class BlockingState : ActionState
     {
         private float _timer;
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1511,6 +1519,29 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 TransitionTo<PunchHoldingState>();
                 return;
+            }
+            _blockPush();
+        }
+
+        private void _blockPush()
+        {
+            RaycastHit hit;
+            // This Layermask get all player's layer except this player's
+            int layermask = 0;
+            if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
+            else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
+            if (Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
+            {
+                IHittable ihit = hit.transform.GetComponentInParent<IHittable>();
+                if (ihit == null) return;
+                if (!ihit.CanBeBlockPushed()) return;
+
+                foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+                {
+                    rb.velocity = Vector3.zero;
+                }
+                Vector3 force = Context.transform.forward * Context.CharacterDataStore.BlockPushForce;
+                ihit.OnImpact(force, ForceMode.VelocityChange, Context.gameObject, ImpactType.Block);
             }
         }
 

@@ -32,6 +32,7 @@ public class CharacterData : ScriptableObject
     public float BlockAngle = 90f;
     public float BlockSpeedMultiplier = 0.5f;
     public float MinBlockUpTime = 0.3f;
+    public float BlockPushForce = 30f;
 
     [Header("Character Attack Related Settings")]
 

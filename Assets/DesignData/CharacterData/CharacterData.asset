@@ -37,9 +37,12 @@ MonoBehaviour:
   BlockAngle: 90
   BlockSpeedMultiplier: 1
   MinBlockUpTime: 0.3
+  BlockPushForce: 50
   ClockFistTime: 0.3
   FistReleaseTime: 0.3
+  PunchActivateTime: 0.2
   SelfPushForce: 50
+  IdleSelfPushForce: 65
   MeleeChargeThreshold: 0.75
   PunchRadius: 0.3
   PunchDistance: 0.05
@@ -49,10 +52,12 @@ MonoBehaviour:
   HitSmallThreshold: 500
   HitUncontrollableTimeBig: 0.4
   HitBigThreshold: 900
+  PunchReleaseRotationMultiplier: 0.2
   CanHitLayer:
     serializedVersion: 2
     m_Bits: 16883200
   Radius: 0.25
+  PickUpCD: 0.8
   PickUpLayer:
     serializedVersion: 2
     m_Bits: 1048576

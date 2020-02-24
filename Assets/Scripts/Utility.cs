@@ -346,6 +346,7 @@ public interface IAimable
 
 public interface IHittable
 {
+    bool CanBeBlockPushed();
     /// <summary>
     /// Can Block The attack or not
     /// </summary>

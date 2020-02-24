@@ -946,6 +946,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class IdleActionState : ActionState
     {
+        private float _pickUpTimer;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -953,6 +954,7 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("IdleUpper", true);
             Context._permaSlow = 0;
             Context._permaSlowWalkSpeedMultiplier = 1f;
+            _pickUpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.PickUpCD;
         }
 
         public override void Update()
@@ -981,7 +983,8 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<BlockingState>();
                 return;
             }
-            _pickupcheck();
+            if (_pickUpTimer < Time.timeSinceLevelLoad)
+                _pickupcheck();
         }
 
         private void _pickupcheck()

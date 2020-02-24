@@ -75,16 +75,10 @@ public abstract class WeaponBase : MonoBehaviour
             {
                 gameObject.layer = LayerMask.NameToLayer("Pickup");
                 EventManager.Instance.TriggerEvent(new ObjectHitGround(gameObject));
-                StartCoroutine(_pickUpCD());
+                CanBePickedUp = true;
                 _hitGroundOnce = true;
             }
         }
-    }
-
-    IEnumerator _pickUpCD()
-    {
-        yield return new WaitForSeconds(WeaponDataBase.PickupCD);
-        CanBePickedUp = true;
     }
 
     public virtual void OnSpawn()

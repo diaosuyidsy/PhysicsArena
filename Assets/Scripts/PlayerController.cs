@@ -218,8 +218,7 @@ public class PlayerController : MonoBehaviour, IHittable
             _movementFSM.TransitionTo<HitUncontrollableState>();
             if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
                 _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
-                _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)) ||
-                _actionFSM.CurrentState.GetType().Equals(typeof(PickingState)))
+                _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)))
             {
                 _actionFSM.TransitionTo<HitUnControllableActionState>();
             }
@@ -959,11 +958,11 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_LeftTrigger)
-            {
-                TransitionTo<PickingState>();
-                return;
-            }
+            // if (_LeftTrigger)
+            // {
+            //     TransitionTo<PickingState>();
+            //     return;
+            // }
             if (_RightTriggerDown && Context.EquipmentObject != null &&
             Context.EquipmentObject.GetComponent<rtJet>() != null &&
             Context._canDrainStamina(Context.EquipmentObject.GetComponent<rtJet>().m_JetData.ButtStaminaDrain))
@@ -977,34 +976,9 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PunchHoldingState>();
                 return;
             }
-            if (_B && Context._canDrainStamina(0.1f))
+            if ((_B || _LeftTrigger) && Context._canDrainStamina(0.1f))
             {
                 TransitionTo<BlockingState>();
-                return;
-            }
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context._animator.SetBool("IdleUpper", false);
-        }
-    }
-
-    private class PickingState : ActionState
-    {
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Context._animator.SetBool("Picking", true);
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_LeftTriggerUp)
-            {
-                TransitionTo<IdleActionState>();
                 return;
             }
             _pickupcheck();
@@ -1048,9 +1022,70 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
-            Context._animator.SetBool("Picking", false);
+            Context._animator.SetBool("IdleUpper", false);
         }
     }
+
+    // private class PickingState : ActionState
+    // {
+    //     public override void OnEnter()
+    //     {
+    //         base.OnEnter();
+    //         Context._animator.SetBool("Picking", true);
+    //     }
+
+    //     public override void Update()
+    //     {
+    //         base.Update();
+    //         if (_LeftTriggerUp)
+    //         {
+    //             TransitionTo<IdleActionState>();
+    //             return;
+    //         }
+    //         _pickupcheck();
+    //     }
+
+    //     private void _pickupcheck()
+    //     {
+    //         RaycastHit hit;
+    //         if (Physics.SphereCast(Context.Chest.transform.position,
+    //             Context.CharacterDataStore.Radius,
+    //             Vector3.down,
+    //             out hit,
+    //             Context._distToGround,
+    //             Context.CharacterDataStore.PickUpLayer))
+    //         {
+
+    //             if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>() != null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
+    //             {
+    //                 EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
+    //                 // Tell other necessary components that it has taken something
+    //                 Context.HandObject = hit.collider.gameObject;
+
+    //                 // Tell the collected weapon who picked it up
+    //                 hit.collider.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
+    //                 TransitionTo<HoldingState>();
+    //                 return;
+    //             }
+    //             else if (Context.EquipmentObject == null &&
+    //                     hit.collider.GetComponent<EquipmentBase>() != null &&
+    //                     hit.collider.GetComponent<EquipmentBase>().CanBePickedUp)
+    //             {
+    //                 EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
+    //                 Context.EquipmentObject = hit.collider.gameObject;
+    //                 hit.collider.GetComponent<EquipmentBase>().OnPickUp(Context.gameObject);
+    //                 TransitionTo<IdleActionState>();
+    //                 return;
+    //             }
+    //         }
+    //     }
+
+    //     public override void OnExit()
+    //     {
+    //         base.OnExit();
+    //         Context._animator.SetBool("Picking", false);
+    //     }
+    // }
 
     private class HoldingState : ActionState
     {
@@ -1268,12 +1303,12 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            if (_LeftTrigger)
-            {
-                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
-                TransitionTo<PickingState>();
-                return;
-            }
+            // if (_LeftTrigger)
+            // {
+            //     EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            //     TransitionTo<PickingState>();
+            //     return;
+            // }
         }
 
         public override void OnExit()
@@ -1457,7 +1492,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (!_B && _timer < Time.timeSinceLevelLoad)
+            if (!(_B || _LeftTrigger) && _timer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleActionState>();
                 return;

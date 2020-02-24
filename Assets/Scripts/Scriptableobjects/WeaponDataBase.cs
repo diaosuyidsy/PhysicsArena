@@ -11,4 +11,5 @@ public abstract class WeaponDataBase : ScriptableObject
     public float ZOffset;
     public float XOffset;
     public float PickupSlowMultiplier = 1f;
+    public float PickupCD = 0.8f;
 }

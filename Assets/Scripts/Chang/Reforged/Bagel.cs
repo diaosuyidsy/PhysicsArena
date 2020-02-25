@@ -70,7 +70,8 @@ public class Bagel : WeaponBase
     {
         if (buttondown)
         {
-            Owner.GetComponent<PlayerController>().ForceDropHandObject();
+            Owner.GetComponent<PlayerController>().FireBirdFood();
+            GetComponent<Rigidbody>().AddForce(Owner.transform.forward * 2 + Owner.transform.up * 2,ForceMode.VelocityChange);
         }
     }
 

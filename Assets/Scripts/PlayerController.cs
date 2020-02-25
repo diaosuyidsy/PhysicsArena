@@ -283,7 +283,11 @@ public class PlayerController : MonoBehaviour, IHittable
         if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
             _actionFSM.TransitionTo<IdleActionState>();
     }
-
+    public void FireBirdFood()
+    {
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+            _actionFSM.TransitionTo<DroppedRecoveryState>();
+    }
     public void ForceDropEquipment(EquipmentPositionType posType)
     {
         if (posType == EquipmentPositionType.OnBack && _movementFSM.CurrentState.GetType().Equals(typeof(JetPackState)))

@@ -27,7 +27,7 @@ MonoBehaviour:
   FrontIsCliff: 0.2
   CliffPreventionForce: 100
   CliffPreventionTimer: 0.4
-  DropForce: {x: 0, y: 2, z: 2}
+  DropForce: {x: 0, y: 2, z: -2}
   MaxStamina: 1.5
   StaminaRegenInterval: 3
   StaminaRegenRate: 1
@@ -37,7 +37,7 @@ MonoBehaviour:
   BlockAngle: 90
   BlockSpeedMultiplier: 1
   MinBlockUpTime: 0.3
-  BlockPushForce: 50
+  BlockPushForce: 30
   ClockFistTime: 0.3
   FistReleaseTime: 0.3
   PunchActivateTime: 0.2
@@ -53,11 +53,12 @@ MonoBehaviour:
   HitUncontrollableTimeBig: 0.4
   HitBigThreshold: 900
   PunchReleaseRotationMultiplier: 0.2
+  PunchResetVelocityBeforeHitDuration: 0.5
   CanHitLayer:
     serializedVersion: 2
     m_Bits: 16883200
   Radius: 0.25
-  PickUpCD: 0.2
+  PickUpCD: 0
   PickUpLayer:
     serializedVersion: 2
     m_Bits: 1048576

@@ -1124,7 +1124,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_LeftTriggerDown)
+            if (_LeftTriggerDown || _BDown)
             {
                 TransitionTo<DroppingState>();
                 return;
@@ -1180,7 +1180,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_LeftTriggerUp)
+            if (_LeftTriggerUp || _BUp)
             {
                 TransitionTo<DroppedRecoveryState>();
                 return;
@@ -1247,7 +1247,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PunchReleasingState>();
                 return;
             }
-            if (_holding && _BDown)
+            if (_holding && (_BDown || _LeftTriggerDown))
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<BlockingState>();

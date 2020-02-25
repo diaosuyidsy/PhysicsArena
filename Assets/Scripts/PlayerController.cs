@@ -40,7 +40,6 @@ public class PlayerController : MonoBehaviour, IHittable
     private Player _player;
     private Rigidbody _rb;
     private float _distToGround;
-    private float _meleeCharge;
     private float _currentStamina;
     private float _lastTimeUseStamina;
     private float _lastTimeUSeStaminaUnimportant;
@@ -1230,13 +1229,9 @@ public class PlayerController : MonoBehaviour, IHittable
             if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
                 _holding = true;
-                Context._meleeCharge = 1f;
                 EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             }
-            else if (Time.time <= _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
-            {
-                Context._meleeCharge = (Time.time - _startHoldingTime) / Context.CharacterDataStore.ClockFistTime;
-            }
+
             if (_RightTriggerUp && _holding)
             {
                 TransitionTo<PunchReleasingState>();
@@ -1274,11 +1269,10 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("PunchReleased", true);
             _time = Time.time;
             _hitOnce = false;
-            if (Context._meleeCharge < Context.CharacterDataStore.MeleeChargeThreshold) Context._meleeCharge = 0f;
             if (Context._movementFSM.CurrentState.GetType().Equals(typeof(IdleState)))
-                Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
+                Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else
-                Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
+                Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
             // Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
@@ -1302,9 +1296,10 @@ public class PlayerController : MonoBehaviour, IHittable
                     {
                         rb.velocity = Vector3.zero;
                     }
-                    Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce * Context._meleeCharge;
-                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, Context._meleeCharge, Context.gameObject, true);
-                    Context._setVelocity(Vector3.zero);
+                    Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
+                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
+                        Context._setVelocity(Vector3.zero);
                 }
             }
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
@@ -1325,7 +1320,6 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.OnExit();
             Context._animator.SetBool("PunchReleased", false);
-            Context._meleeCharge = 0f;
             Context._rotationSpeedMultiplier = 1f;
             // Context._movementFSM.TransitionTo<IdleState>();
         }

@@ -73,6 +73,7 @@ Transform:
   - {fileID: 1420999341689698712}
   - {fileID: 1420999340467004420}
   - {fileID: 8778697181860929233}
+  - {fileID: 2649372268444091410}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
@@ -160,6 +161,7 @@ MonoBehaviour:
   StunVFXHolder: {fileID: 0}
   SlowVFXHolder: {fileID: 0}
   FoodTraverseVFXHolder: {fileID: 0}
+  PlayerUITransform: {fileID: 2649372268444091410}
 --- !u!95 &689603609705083799
 Animator:
   serializedVersion: 3
@@ -16589,6 +16591,36 @@ HingeJoint:
   m_EnablePreprocessing: 0
   m_MassScale: 1
   m_ConnectedMassScale: 1
+--- !u!1 &6883910729782875733
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2649372268444091410}
+  m_Layer: 12
+  m_Name: FeetPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2649372268444091410
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6883910729782875733}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -1.48, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2040752910071275732}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6890809572118097066
 GameObject:
   m_ObjectHideFlags: 0

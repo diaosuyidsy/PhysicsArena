@@ -34,12 +34,12 @@ public class PlayerController : MonoBehaviour, IHittable
     [HideInInspector] public GameObject SlowVFXHolder;
     [HideInInspector] public GameObject FoodTraverseVFXHolder;
     public Transform PlayerFeet { get { return OnDeathHidden[1].transform; } }
+    public Transform PlayerUITransform;
 
     #region Private Variables
     private Player _player;
     private Rigidbody _rb;
     private float _distToGround;
-    private float _meleeCharge;
     private float _currentStamina;
     private float _lastTimeUseStamina;
     private float _lastTimeUSeStaminaUnimportant;
@@ -158,6 +158,13 @@ public class PlayerController : MonoBehaviour, IHittable
         ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
     }
 
+    public bool CanBeBlockPushed()
+    {
+        return _actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
+        _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)) ||
+        _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
+        _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState));
+    }
     /// <summary>
     /// Can Block The attack or not
     /// Used by hook and hit
@@ -217,8 +224,7 @@ public class PlayerController : MonoBehaviour, IHittable
             _movementFSM.TransitionTo<HitUncontrollableState>();
             if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
                 _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
-                _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)) ||
-                _actionFSM.CurrentState.GetType().Equals(typeof(PickingState)))
+                _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)))
             {
                 _actionFSM.TransitionTo<HitUnControllableActionState>();
             }
@@ -560,6 +566,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
+            Context.OnDeathHidden[2].SetActive(false);
             Context._rb.AddForce(new Vector3(0, Context.CharacterDataStore.JumpForce, 0), ForceMode.Impulse);
             EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
         }
@@ -595,6 +602,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
+            Context.OnDeathHidden[2].SetActive(true);
             Context._jumpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.JumpCD;
         }
     }
@@ -944,6 +952,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class IdleActionState : ActionState
     {
+        private float _pickUpTimer;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -951,16 +960,17 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("IdleUpper", true);
             Context._permaSlow = 0;
             Context._permaSlowWalkSpeedMultiplier = 1f;
+            _pickUpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.PickUpCD;
         }
 
         public override void Update()
         {
             base.Update();
-            if (_LeftTrigger)
-            {
-                TransitionTo<PickingState>();
-                return;
-            }
+            // if (_LeftTrigger)
+            // {
+            //     TransitionTo<PickingState>();
+            //     return;
+            // }
             if (_RightTriggerDown && Context.EquipmentObject != null &&
             Context.EquipmentObject.GetComponent<rtJet>() != null &&
             Context._canDrainStamina(Context.EquipmentObject.GetComponent<rtJet>().m_JetData.ButtStaminaDrain))
@@ -974,37 +984,13 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PunchHoldingState>();
                 return;
             }
-            if (_B && Context._canDrainStamina(0.1f))
+            if ((_B || _LeftTrigger) && Context._canDrainStamina(0.1f))
             {
                 TransitionTo<BlockingState>();
                 return;
             }
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context._animator.SetBool("IdleUpper", false);
-        }
-    }
-
-    private class PickingState : ActionState
-    {
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Context._animator.SetBool("Picking", true);
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_LeftTriggerUp)
-            {
-                TransitionTo<IdleActionState>();
-                return;
-            }
-            _pickupcheck();
+            if (_pickUpTimer < Time.timeSinceLevelLoad)
+                _pickupcheck();
         }
 
         private void _pickupcheck()
@@ -1045,9 +1031,70 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
-            Context._animator.SetBool("Picking", false);
+            Context._animator.SetBool("IdleUpper", false);
         }
     }
+
+    // private class PickingState : ActionState
+    // {
+    //     public override void OnEnter()
+    //     {
+    //         base.OnEnter();
+    //         Context._animator.SetBool("Picking", true);
+    //     }
+
+    //     public override void Update()
+    //     {
+    //         base.Update();
+    //         if (_LeftTriggerUp)
+    //         {
+    //             TransitionTo<IdleActionState>();
+    //             return;
+    //         }
+    //         _pickupcheck();
+    //     }
+
+    //     private void _pickupcheck()
+    //     {
+    //         RaycastHit hit;
+    //         if (Physics.SphereCast(Context.Chest.transform.position,
+    //             Context.CharacterDataStore.Radius,
+    //             Vector3.down,
+    //             out hit,
+    //             Context._distToGround,
+    //             Context.CharacterDataStore.PickUpLayer))
+    //         {
+
+    //             if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>() != null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
+    //             {
+    //                 EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
+    //                 // Tell other necessary components that it has taken something
+    //                 Context.HandObject = hit.collider.gameObject;
+
+    //                 // Tell the collected weapon who picked it up
+    //                 hit.collider.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
+    //                 TransitionTo<HoldingState>();
+    //                 return;
+    //             }
+    //             else if (Context.EquipmentObject == null &&
+    //                     hit.collider.GetComponent<EquipmentBase>() != null &&
+    //                     hit.collider.GetComponent<EquipmentBase>().CanBePickedUp)
+    //             {
+    //                 EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
+    //                 Context.EquipmentObject = hit.collider.gameObject;
+    //                 hit.collider.GetComponent<EquipmentBase>().OnPickUp(Context.gameObject);
+    //                 TransitionTo<IdleActionState>();
+    //                 return;
+    //             }
+    //         }
+    //     }
+
+    //     public override void OnExit()
+    //     {
+    //         base.OnExit();
+    //         Context._animator.SetBool("Picking", false);
+    //     }
+    // }
 
     private class HoldingState : ActionState
     {
@@ -1076,7 +1123,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_LeftTriggerDown)
+            if (_LeftTriggerDown || _BDown)
             {
                 TransitionTo<DroppingState>();
                 return;
@@ -1132,7 +1179,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_LeftTriggerUp)
+            if (_LeftTriggerUp || _BUp)
             {
                 TransitionTo<DroppedRecoveryState>();
                 return;
@@ -1182,13 +1229,9 @@ public class PlayerController : MonoBehaviour, IHittable
             if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
                 _holding = true;
-                Context._meleeCharge = 1f;
                 EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             }
-            else if (Time.time <= _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
-            {
-                Context._meleeCharge = (Time.time - _startHoldingTime) / Context.CharacterDataStore.ClockFistTime;
-            }
+
             if (_RightTriggerUp && _holding)
             {
                 TransitionTo<PunchReleasingState>();
@@ -1199,7 +1242,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PunchReleasingState>();
                 return;
             }
-            if (_holding && _BDown)
+            if (_holding && (_BDown || _LeftTriggerDown))
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<BlockingState>();
@@ -1226,11 +1269,10 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("PunchReleased", true);
             _time = Time.time;
             _hitOnce = false;
-            if (Context._meleeCharge < Context.CharacterDataStore.MeleeChargeThreshold) Context._meleeCharge = 0f;
             if (Context._movementFSM.CurrentState.GetType().Equals(typeof(IdleState)))
-                Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
+                Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else
-                Context._rb.AddForce(Context.transform.forward * Context._meleeCharge * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
+                Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
             // Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
@@ -1254,9 +1296,10 @@ public class PlayerController : MonoBehaviour, IHittable
                     {
                         rb.velocity = Vector3.zero;
                     }
-                    Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce * Context._meleeCharge;
-                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, Context._meleeCharge, Context.gameObject, true);
-                    Context._setVelocity(Vector3.zero);
+                    Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
+                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
+                        Context._setVelocity(Vector3.zero);
                 }
             }
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
@@ -1265,19 +1308,18 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            if (_LeftTrigger)
-            {
-                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
-                TransitionTo<PickingState>();
-                return;
-            }
+            // if (_LeftTrigger)
+            // {
+            //     EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            //     TransitionTo<PickingState>();
+            //     return;
+            // }
         }
 
         public override void OnExit()
         {
             base.OnExit();
             Context._animator.SetBool("PunchReleased", false);
-            Context._meleeCharge = 0f;
             Context._rotationSpeedMultiplier = 1f;
             // Context._movementFSM.TransitionTo<IdleState>();
         }
@@ -1290,6 +1332,7 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.OnEnter();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
+            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
 
         public override void Update()
@@ -1441,6 +1484,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private class BlockingState : ActionState
     {
         private float _timer;
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1454,7 +1498,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (!_B && _timer < Time.timeSinceLevelLoad)
+            if (!(_B || _LeftTrigger) && _timer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleActionState>();
                 return;
@@ -1470,6 +1514,29 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 TransitionTo<PunchHoldingState>();
                 return;
+            }
+            _blockPush();
+        }
+
+        private void _blockPush()
+        {
+            RaycastHit hit;
+            // This Layermask get all player's layer except this player's
+            int layermask = 0;
+            if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
+            else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
+            if (Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
+            {
+                IHittable ihit = hit.transform.GetComponentInParent<IHittable>();
+                if (ihit == null) return;
+                if (!ihit.CanBeBlockPushed()) return;
+
+                foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+                {
+                    rb.velocity = Vector3.zero;
+                }
+                Vector3 force = Context.transform.forward * Context.CharacterDataStore.BlockPushForce;
+                ihit.OnImpact(force, ForceMode.VelocityChange, Context.gameObject, ImpactType.Block);
             }
         }
 

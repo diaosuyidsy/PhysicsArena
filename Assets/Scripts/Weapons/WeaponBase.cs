@@ -14,6 +14,7 @@ public abstract class WeaponBase : MonoBehaviour
     protected bool _hitGroundOnce;
     public bool CanBePickedUp;
     protected bool _followHand;
+    protected float _pickUpTimer;
 
     protected virtual void Awake()
     {
@@ -74,6 +75,7 @@ public abstract class WeaponBase : MonoBehaviour
             {
                 gameObject.layer = LayerMask.NameToLayer("Pickup");
                 EventManager.Instance.TriggerEvent(new ObjectHitGround(gameObject));
+                CanBePickedUp = true;
                 _hitGroundOnce = true;
             }
         }
@@ -89,6 +91,7 @@ public abstract class WeaponBase : MonoBehaviour
     public virtual void OnDrop()
     {
         _hitGroundOnce = false;
+        CanBePickedUp = false;
         Owner = null;
         GetComponent<Rigidbody>().isKinematic = false;
     }

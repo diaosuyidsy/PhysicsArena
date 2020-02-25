@@ -32,6 +32,7 @@ public class CharacterData : ScriptableObject
     public float BlockAngle = 90f;
     public float BlockSpeedMultiplier = 0.5f;
     public float MinBlockUpTime = 0.3f;
+    public float BlockPushForce = 30f;
 
     [Header("Character Attack Related Settings")]
 
@@ -59,10 +60,12 @@ public class CharacterData : ScriptableObject
     public float HitUncontrollableTimeBig = 0.5f;
     public float HitBigThreshold = 900f;
     public float PunchReleaseRotationMultiplier = 0.2f;
+    public float PunchResetVelocityBeforeHitDuration = 0.5f;
     public LayerMask CanHitLayer;
 
     [Header("Character Other Settings")]
     public float Radius = 1f;
+    public float PickUpCD = 0f;
     public LayerMask PickUpLayer;
     public float DropRecoveryTime = 0.2f;
 }

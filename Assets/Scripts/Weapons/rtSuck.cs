@@ -7,16 +7,15 @@ public class rtSuck : WeaponBase
 {
     public GameObject suckBallEffect;
     public List<GameObject> suckBallExplodeEffects;
-    public ParticleSystem  DistortionSphere;
-    public DOTweenAnimation lineParticle; 
+    public ParticleSystem DistortionSphere;
+    public DOTweenAnimation lineParticle;
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
-    private bool _charged = false;
     private Vector3 _suckBallInitialScale;
     private float _matOpacity = 1;
     private Quaternion _ballEffectQuaternion;
-    
-    
+
+
     private enum State
     {
         In,
@@ -87,22 +86,7 @@ public class rtSuck : WeaponBase
                     suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Create");
                     _matOpacity = 1;
                     _suckBall.transform.parent = null;
-                    _charged = false;
                     EventManager.Instance.TriggerEvent(new SuckGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
-                    break;
-                case State.Out:
-                    if (_charged)
-                    {
-                        suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Suck");
-                        lineParticle.DORestart();
-                        lineParticle.GetComponent<ParticleSystem>().Play();
-                        DistortionSphere.Play();
-                        
-                        _charged = false;
-                        _sbc.RTText.SetActive(false);
-                        _ballState = State.Suck;
-                        StartCoroutine(sucking(0.1f));
-                    }
                     break;
             }
         }
@@ -111,7 +95,16 @@ public class rtSuck : WeaponBase
             // If player released RT
             if (_ballState == State.Out)
             {
-                _charged = true;
+
+                suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Suck");
+                lineParticle.DORestart();
+                lineParticle.GetComponent<ParticleSystem>().Play();
+                DistortionSphere.Play();
+
+                _sbc.RTText.SetActive(false);
+                _ballState = State.Suck;
+                StartCoroutine(sucking(0.1f));
+
             }
         }
     }

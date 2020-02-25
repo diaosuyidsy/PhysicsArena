@@ -68,7 +68,10 @@ public class Bagel : WeaponBase
 
     public override void Fire(bool buttondown)
     {
-        
+        if (buttondown)
+        {
+            Owner.GetComponent<PlayerController>().ForceDropHandObject();
+        }
     }
 
     public void OnSucked()

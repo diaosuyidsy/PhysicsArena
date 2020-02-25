@@ -169,6 +169,13 @@ public class VFXManager
         ph.Player.GetComponent<PlayerController>().MeleeVFXHolder = GameObject.Instantiate(VFX, ph.PlayerRightHand, false);
     }
 
+    private void _onPunchInterrupted(PunchInterruptted ev)
+    {
+        PlayerController pc = ev.Player.GetComponent<PlayerController>();
+        if (pc.MeleeVFXHolder != null) GameObject.Destroy(pc.MeleeVFXHolder);
+        if (pc.MeleeVFXHolder2 != null) GameObject.Destroy(pc.MeleeVFXHolder2);
+    }
+
     private void _onPunchReleased(PunchReleased pr)
     {
         GameObject MeleeVFXHolder2 = pr.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
@@ -412,6 +419,7 @@ public class VFXManager
         EventManager.Instance.AddHandler<Blocked>(_onBlocked);
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawned);
         EventManager.Instance.AddHandler<FootStep>(_onFootStep);
+        EventManager.Instance.AddHandler<PunchInterruptted>(_onPunchInterrupted);
         _blinkTime = Services.Config.GameMapData.InvincibleTime;
     }
 
@@ -444,6 +452,7 @@ public class VFXManager
         EventManager.Instance.RemoveHandler<Blocked>(_onBlocked);
         EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawned);
         EventManager.Instance.RemoveHandler<FootStep>(_onFootStep);
+        EventManager.Instance.RemoveHandler<PunchInterruptted>(_onPunchInterrupted);
     }
 
     public void Destory()

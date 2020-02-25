@@ -1338,6 +1338,7 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.OnEnter();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
+            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
 
         public override void Update()

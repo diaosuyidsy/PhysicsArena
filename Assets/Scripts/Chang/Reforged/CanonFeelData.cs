@@ -4,10 +4,15 @@ using UnityEngine;
 
 public class CanonFeelData : MonoBehaviour
 {
-    public float MaxLeverAngle;
     public float MaxPipeAngle;
-    public float LeverRotateSpeed;
     public float PipeRotateSpeed;
+
+    public float CabelStartEmission;
+    public float CabelEndEmission;
+    public float CabelShineTime;
+
+    public Color RedCabelColor;
+    public Color BlueCabelColor;
 
     public Vector3 PipeEndStartLocalPos;
     public float PipeEndFireTime;

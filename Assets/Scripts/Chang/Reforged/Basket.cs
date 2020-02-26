@@ -17,6 +17,7 @@ public class Basket : MonoBehaviour
     public GameObject Canvas;
     public GameObject ScoreText;
 
+    public float DetectRadius;
     public float SuckRadius;
     public float SuckSpeed;
 
@@ -29,11 +30,15 @@ public class Basket : MonoBehaviour
     public float ScoreTextShowTime;
     public float ScoreTextDisappearTime;
 
+    public float InCameraTime;
 
+    private bool InCamera;
 
     private GameObject Bagel;
     private float ScoreTextTimer;
     private ScoreTextState TextState;
+
+    private float InCameraTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +50,7 @@ public class Basket : MonoBehaviour
     void Update()
     {
         //Canvas.transform.LookAt(Camera.main.transform,Vector3.down);
+        CheckCharacter();
         CheckBagel();
         CheckScoreText();
     }
@@ -85,6 +91,37 @@ public class Basket : MonoBehaviour
         }
     }
 
+    private void CheckCharacter()
+    {
+
+        Collider[] AllHits = Physics.OverlapSphere(transform.position, DetectRadius);
+        for (int i = 0; i < AllHits.Length; i++)
+        {
+            if (AllHits[i].gameObject.CompareTag("Team2Resource") && AllHits[i].gameObject.GetComponent<Bagel>().Hold)
+            {
+                InCameraTimer = 0;
+
+                if (!InCamera)
+                {
+                    InCamera = true;
+                    Services.GameStateManager.CameraTargets.Add(transform);
+                }
+                return;
+            }
+        }
+
+        if (Bagel==null)
+        {
+            InCameraTimer += Time.deltaTime;
+
+            if (InCameraTimer >= InCameraTime)
+            {
+                InCamera = false;
+                Services.GameStateManager.CameraTargets.Remove(transform);
+            }
+        }
+
+    }
 
     private void CheckBagel()
     {

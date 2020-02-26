@@ -6,8 +6,8 @@ public class Bagel : WeaponBase
 {
     public VFXData Data;
 
-    public GameObject Team1Basket;
-    public GameObject Team2Basket;
+    private GameObject Team1Basket;
+    private GameObject Team2Basket;
 
     public bool Hold;
 
@@ -18,8 +18,8 @@ public class Bagel : WeaponBase
         base.Awake();
         _hitGroundOnce = true;
 
-        Team1Basket = GameObject.Find("BasketTEAM1");
-        Team2Basket = GameObject.Find("BasketTEAM2");
+        Team1Basket = BrawlModeReforgedArenaManager.Team1Basket;
+        Team2Basket = BrawlModeReforgedArenaManager.Team2Basket;
     }
 
     protected override void Update()

@@ -11,4 +11,7 @@ public abstract class WeaponDataBase : ScriptableObject
     public float ZOffset;
     public float XOffset;
     public float PickupSlowMultiplier = 1f;
+    public LayerMask Ground;
+    public LayerMask OnNoAmmoDropDisappear;
+    public LayerMask OnHitDisappear;
 }

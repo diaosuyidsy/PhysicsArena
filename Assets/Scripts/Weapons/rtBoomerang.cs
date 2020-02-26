@@ -17,17 +17,19 @@ public class rtBoomerang : WeaponBase
 
     private FSM<rtBoomerang> _boomerangFSM;
     private bool _UIShow;
+    private BoomerangData _boomerangData;
 
     protected override void Awake()
     {
         base.Awake();
-        _ammo = WeaponDataStore.BoomerangDataStore.MaxAmmo;
+        _boomerangData = WeaponDataBase as BoomerangData;
+        _ammo = _boomerangData.MaxAmmo;
         _hitSet = new HashSet<IHittable>();
         _meshRotate = GetComponentInChildren<DOTweenAnimation>();
         _rb = GetComponent<Rigidbody>();
         _lr = GetComponent<LineRenderer>();
         _axuilaryLinePoints = new List<Vector3>();
-        for (int i = 0; i < WeaponDataStore.BoomerangDataStore.Time / WeaponDataStore.BoomerangDataStore.Step; i++)
+        for (int i = 0; i < _boomerangData.Time / _boomerangData.Step; i++)
         {
             _axuilaryLinePoints.Add(Vector3.zero);
         }
@@ -53,11 +55,11 @@ public class rtBoomerang : WeaponBase
     {
         base.OnTriggerEnter(other);
         if (_boomerangFSM.CurrentState.GetType().Equals(typeof(BoomerangInState))) return;
-        if (WeaponDataStore.BoomerangDataStore.ObstacleLayer == (WeaponDataStore.BoomerangDataStore.ObstacleLayer | (1 << other.gameObject.layer)))
+        if (_boomerangData.ObstacleLayer == (_boomerangData.ObstacleLayer | (1 << other.gameObject.layer)))
         {
             print("Hit Obstacles");
             _rb.velocity = Vector3.zero;
-            _rb.AddForce(WeaponDataStore.BoomerangDataStore.BoomerangReflectionForce * Vector3.up, ForceMode.VelocityChange);
+            _rb.AddForce(_boomerangData.BoomerangReflectionForce * Vector3.up, ForceMode.VelocityChange);
             _boomerangFSM.TransitionTo<BoomerangInState>();
         }
     }
@@ -65,9 +67,9 @@ public class rtBoomerang : WeaponBase
     private void _updateUI()
     {
         RaycastHit hit;
-        BoomerangData bd = WeaponDataStore.BoomerangDataStore;
+        BoomerangData bd = _boomerangData;
         float yy = transform.position.y;
-        if (Physics.Raycast(transform.position, Vector3.down, out hit, 50f, WeaponDataStore.BoomerangDataStore.GroundLayer))
+        if (Physics.Raycast(transform.position, Vector3.down, out hit, 50f, _boomerangData.GroundLayer))
         {
             yy = hit.point.y;
         }
@@ -109,7 +111,7 @@ public class rtBoomerang : WeaponBase
         _meshRotate.DOPause();
         _boomerangFSM.TransitionTo<BoomerangInState>();
         _meshRotate.transform.localEulerAngles = Vector3.zero;
-        _ammo = WeaponDataStore.BoomerangDataStore.MaxAmmo;
+        _ammo = _boomerangData.MaxAmmo;
         _hitSet.Clear();
         _canHit = false;
         _rb.useGravity = true;
@@ -120,7 +122,7 @@ public class rtBoomerang : WeaponBase
     private void OnDrawGizmos()
     {
         Gizmos.color = Color.red;
-        Vector3 centerPoint = WeaponDataStore.BoomerangDataStore.CircleCenter;
+        Vector3 centerPoint = _boomerangData.CircleCenter;
         Gizmos.DrawSphere(transform.position + transform.forward * centerPoint.z + transform.right * centerPoint.x, 0.2f);
 
     }
@@ -131,7 +133,7 @@ public class rtBoomerang : WeaponBase
         public override void Init()
         {
             base.Init();
-            BoomerangData = Context.WeaponDataStore.BoomerangDataStore;
+            BoomerangData = Context._boomerangData;
         }
     }
 

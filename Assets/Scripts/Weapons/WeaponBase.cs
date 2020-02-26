@@ -18,13 +18,13 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void Awake()
     {
-        // WeaponBaseFSM = new FSM<WeaponBase>(this);
-        // WeaponBaseFSM.TransitionTo<InAirState>();
+        WeaponBaseFSM = new FSM<WeaponBase>(this);
         OnSpawn();
     }
 
     protected virtual void Update()
     {
+        WeaponBaseFSM.Update();
         if (Owner != null && _followHand)
         {
             Vector3 targetposition = (Owner.GetComponent<PlayerController>().LeftHand.transform.position
@@ -63,7 +63,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void OnCollisionEnter(Collision other)
     {
-        // ((WeaponState)WeaponBaseFSM.CurrentState).OnCollisionEnter(other);
+        ((WeaponState)WeaponBaseFSM.CurrentState).OnCollisionEnter(other);
         if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer))
         {
             _onWeaponDespawn();
@@ -86,6 +86,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     public virtual void OnSpawn()
     {
+        WeaponBaseFSM.TransitionTo<InAirState>();
         CanBePickedUp = true;
         _followHand = true;
         gameObject.layer = LayerMask.NameToLayer("Pickup");
@@ -108,7 +109,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        // ((WeaponState)WeaponBaseFSM.CurrentState).OnTriggerEnter(other);
+        ((WeaponState)WeaponBaseFSM.CurrentState).OnTriggerEnter(other);
         if (other.CompareTag("DeathZone"))
         {
             _hitGroundOnce = false;
@@ -149,7 +150,11 @@ public abstract class WeaponBase : MonoBehaviour
         public override void OnCollisionEnter(Collision other)
         {
             base.OnCollisionEnter(other);
-
+            // if ((WeaponBaseData.OnNoAmmoDropDisappear == (WeaponBaseData.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
+            // {
+            //     Context.gameObject.layer = LayerMask.NameToLayer("Pickup");
+            //     EventManager.Instance.TriggerEvent(new ObjectHitGround(Context.gameObject));
+            // }
         }
     }
 

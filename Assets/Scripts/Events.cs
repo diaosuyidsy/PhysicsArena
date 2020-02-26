@@ -80,7 +80,7 @@ public class PlayerDied : GameEvent
 public class BagelSent : GameEvent
 {
     public GameObject Basket;
-    
+
     public BagelSent(GameObject obj)
     {
         Basket = obj;
@@ -239,6 +239,18 @@ public class PunchDone : GameEvent
     }
 }
 
+public class PunchInterruptted : GameEvent
+{
+    public GameObject Player;
+    public int PlayerNumber;
+
+    public PunchInterruptted(GameObject player, int playerNumber)
+    {
+        Player = player;
+        PlayerNumber = playerNumber;
+    }
+}
+
 public class FootStep : GameEvent
 {
     public FootStep(GameObject playerFeet, GameObject playerActualFoot, string groundTag, GameObject player, int playerFootLeftRight)
@@ -322,7 +334,7 @@ public class WeaponSpawned : GameEvent
     }
 }
 
-public class BagelDespawn: GameEvent
+public class BagelDespawn : GameEvent
 {
 
 }

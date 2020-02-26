@@ -7,6 +7,7 @@ public enum CanonState
 {
     Unactivated,
     Cooldown,
+    Swtiching,
     Firing
 }
 
@@ -30,11 +31,14 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public float Timer;
         public int FireCount;
 
+        public GameObject Rocket;
         public GameObject Mark;
         public GameObject LockedPlayer;
 
         private float PipeAngle;
         private float LeverAngle;
+
+        public bool ReadyToFire;
 
 
         public CanonInfo(GameObject pipe, GameObject lever)
@@ -46,11 +50,14 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
             FireCount = 0;
             Timer = 0;
+
             Mark = null;
             LockedPlayer = null;
 
             PipeAngle = 0;
             LeverAngle = 0;
+
+            ReadyToFire = false;
         }
 
         public void TransitionTo(CanonState state)
@@ -65,16 +72,23 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                     break;
                 case CanonState.Cooldown:
                     break;
+                case CanonState.Swtiching:
+                    break;
                 case CanonState.Firing:
                     break;
             }
         }
 
+
+
         public void SetCanon(float MaxPipeAngle, float MaxLeverAngle, float PipeRotateSpeed, float LeverRotateSpeed)
         {
+            ReadyToFire = false;
+
             switch (CurrentSide)
             {
                 case CanonSide.Neutral:
+
                     switch (LastSide)
                     {
                         case CanonSide.Neutral:
@@ -143,6 +157,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             {
                                 Lever.transform.Rotate(new Vector3(-MaxLeverAngle - LeverAngle, 0, 0));
                                 LeverAngle = -MaxLeverAngle;
+
+                                ReadyToFire = true;
                             }
                             if(PipeAngle < MaxPipeAngle)
                             {
@@ -153,6 +169,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             {
                                 Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
                                 PipeAngle = MaxPipeAngle;
+
+                                ReadyToFire = true;
                             }
                             break;
                         case CanonSide.Blue:
@@ -161,6 +179,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
                             LeverAngle = -MaxLeverAngle;
                             PipeAngle = MaxPipeAngle;
+
+                            ReadyToFire = true;
                             break;
                         case CanonSide.Red:
                             if (LeverAngle > -MaxLeverAngle)
@@ -173,6 +193,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                                 Lever.transform.Rotate(new Vector3(-MaxLeverAngle - LeverAngle, 0, 0));
                                 LeverAngle = -MaxLeverAngle;
 
+                                ReadyToFire = true;
+
                             }
                             if (PipeAngle < MaxPipeAngle)
                             {
@@ -183,6 +205,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             {
                                 Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
                                 PipeAngle = MaxPipeAngle;
+
+                                ReadyToFire = true;
                             }
                             break;
                     }
@@ -200,6 +224,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             {
                                 Lever.transform.Rotate(new Vector3(MaxLeverAngle - LeverAngle, 0, 0));
                                 LeverAngle = MaxLeverAngle;
+
+                                ReadyToFire = true;
                             }
                             if (PipeAngle > -MaxPipeAngle)
                             {
@@ -210,6 +236,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             {
                                 Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
                                 PipeAngle = -MaxPipeAngle;
+
+                                ReadyToFire = true;
                             }
                             break;
                         case CanonSide.Blue:
@@ -222,6 +250,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             {
                                 Lever.transform.Rotate(new Vector3(MaxLeverAngle - LeverAngle, 0, 0));
                                 LeverAngle = MaxLeverAngle;
+
+                                ReadyToFire = true;
                             }
                             if (PipeAngle > -MaxPipeAngle)
                             {
@@ -232,6 +262,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             {
                                 Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
                                 PipeAngle = -MaxPipeAngle;
+
+                                ReadyToFire = true;
                             }
                             break;
                         case CanonSide.Red:
@@ -240,6 +272,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
                             LeverAngle = MaxLeverAngle;
                             PipeAngle = -MaxPipeAngle;
+
+                            ReadyToFire = true;
                             break;
                     }
                     break;
@@ -247,12 +281,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         }
     }
 
-    public BrawlModeReforgedModeData Data;
+
 
     public BrawlModeReforgedModeData Data_2Player;
     public BrawlModeReforgedModeData Data_MorePlayer;
 
+    public CanonFeelData FeelData;
+
     public GameObject PipeObject;
+    public GameObject PipeEndObject;
     public GameObject LeverObject;
 
     public GameObject Team1Basket;
@@ -265,17 +302,12 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public GameObject BagelPrefab;
     public GameObject MarkPrefab;
     public GameObject ExplosionVFX;
-    public Color MarkDefaultColor;
-    public Color MarkAlertColor;
 
     public Vector3 BagelGenerationPos;
     public Vector3 BagelGenerationPosLeft;
     public Vector3 BagelGenerationPosRight;
 
-    public float MaxLeverAngle;
-    public float MaxPipeAngle;
-    public float LeverRotateSpeed;
-    public float PipeRotateSpeed;
+    private BrawlModeReforgedModeData Data;
 
     private CanonInfo Info;
     private GameObject Bagel;
@@ -311,7 +343,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Info.SetCanon(MaxPipeAngle, MaxLeverAngle, PipeRotateSpeed, LeverRotateSpeed);
         CheckCanon();
     }
 
@@ -333,13 +364,25 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void CheckCanon()
     {
-        if(Info.State == CanonState.Cooldown)
+        Info.SetCanon(FeelData.MaxPipeAngle, FeelData.MaxLeverAngle, FeelData.PipeRotateSpeed, FeelData.LeverRotateSpeed);
+        switch (Info.State)
         {
-            CanonCooldown(Info);
-        }
-        else if(Info.State == CanonState.Firing)
-        {
-            CanonFiring(Info);
+            case CanonState.Swtiching:
+                if (Info.ReadyToFire && LockPlayer(Info))
+                {
+                    StopAllCoroutines();
+                    Destroy(Info.Rocket);
+                    StartCoroutine(CanonFire());
+
+                    Info.TransitionTo(CanonState.Firing);
+                }
+                break;
+            case CanonState.Firing:
+                CanonFiring(Info);
+                break;
+            case CanonState.Cooldown:
+                CanonCooldown(Info);
+                break;
         }
     }
 
@@ -351,6 +394,10 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             if (LockPlayer(Info))
             {
+                StopAllCoroutines();
+                Destroy(Info.Rocket);
+                StartCoroutine(CanonFire());
+
                 Info.TransitionTo(CanonState.Firing);
             }
             else
@@ -361,12 +408,58 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     }
 
+    private IEnumerator CanonFire()
+    {
+        float Timer = 0;
+
+        PipeEndObject.transform.localPosition = FeelData.PipeEndStartLocalPos;
+
+        StartCoroutine(RocketFire());
+
+        while(Timer < FeelData.PipeEndFireTime)
+        {
+            Timer += Time.deltaTime;
+            PipeEndObject.transform.localPosition = Vector3.Lerp(FeelData.PipeEndStartLocalPos, FeelData.PipeEndStartLocalPos + Vector3.down * FeelData.PipeEndShakeDis, Timer / FeelData.PipeEndFireTime);
+            yield return null;
+        }
+
+        Timer = 0;
+
+        while (Timer < FeelData.PipeEndRecoverTime)
+        {
+            Timer += Time.deltaTime;
+            PipeEndObject.transform.localPosition = Vector3.Lerp(FeelData.PipeEndStartLocalPos + Vector3.down * FeelData.PipeEndShakeDis, FeelData.PipeEndStartLocalPos, Timer / FeelData.PipeEndRecoverTime);
+            yield return null;
+        }
+    }
+
+    private IEnumerator RocketFire()
+    {
+        Info.Rocket = GameObject.Instantiate(FeelData.BombPrefab);
+        Info.Rocket.transform.position = PipeEndObject.transform.position;
+
+        float Timer = 0;
+
+        Vector3 Start = Info.Rocket.transform.position;
+
+        Vector3 Target = Info.Rocket.transform.position + (FeelData.BombInvisibleHeight - Info.Rocket.transform.position.y) / Info.Rocket.transform.up.y * Info.Rocket.transform.up;
+
+        while (Timer < FeelData.BombRiseTime)
+        {
+            Timer += Time.deltaTime;
+
+            Info.Rocket.transform.position = Vector3.Lerp(Start, Target, Timer / FeelData.BombRiseTime);
+
+            yield return null;
+        }
+    }
+
     private void CanonFiring(CanonInfo Info)
     {
         Info.Timer += Time.deltaTime;
         if(Info.Timer >= Data.CanonFireTime)
         {
-            BagelFall(Info);
+            BombFall(Info);
             Info.FireCount++;
             if (Info.FireCount >= Data.MaxCanonFireCount)
             {
@@ -379,10 +472,20 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Info.TransitionTo(CanonState.Cooldown);
             }
 
+            return;
+        }
+        else if(Info.Timer >= Data.CanonFireTime - FeelData.BombFallTime)
+        {
+            Info.Rocket.transform.up = Vector3.down;
+            Info.Rocket.transform.position += Vector3.down * (FeelData.BombInvisibleHeight - Info.Mark.transform.position.y)/FeelData.BombFallTime*Time.deltaTime;
         }
         else if(Info.Timer >= Data.CanonFireTime - Data.CanonFireAlertTime)
         {
-            Info.Mark.GetComponent<SpriteRenderer>().color = MarkAlertColor;
+            Info.Mark.GetComponent<SpriteRenderer>().color = FeelData.MarkAlertColor;
+        }
+        else
+        {
+            Info.Mark.GetComponent<SpriteRenderer>().color = new Color(FeelData.MarkDefaultColor.r, FeelData.MarkDefaultColor.g, FeelData.MarkDefaultColor.b, Info.Timer / FeelData.MarkAppearTime);
         }
 
         MarkFollow(Info);
@@ -410,6 +513,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Info.Mark.transform.position += Dis * Offset.normalized;
             }
         }
+
+        Info.Rocket.transform.position = new Vector3(Info.Mark.transform.position.x, Info.Rocket.transform.position.y, Info.Mark.transform.position.z);
     }
 
     private bool LockPlayer(CanonInfo Info)
@@ -440,7 +545,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             int index = Random.Range(0, AvailablePlayer.Count);
 
             GameObject Mark = GameObject.Instantiate(MarkPrefab);
-            Mark.GetComponent<SpriteRenderer>().color = MarkDefaultColor;
+            Mark.GetComponent<SpriteRenderer>().color = FeelData.MarkDefaultColor;
             Mark.transform.position = AvailablePoint[index] + Vector3.up * 0.01f;
 
             Info.Mark = Mark;
@@ -454,7 +559,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         }
     }
 
-    private void BagelFall(CanonInfo Info)
+    private void BombFall(CanonInfo Info)
     {
 
         RaycastHit[] AllHits = Physics.SphereCastAll(Info.Mark.transform.position, Data.CanonRadius, Vector3.up, 0, PlayerLayer);
@@ -501,6 +606,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             GenerateBagel();
         }
         GameObject.Instantiate(ExplosionVFX, Info.Mark.transform.position, ExplosionVFX.transform.rotation);
+        Destroy(Info.Rocket);
         Destroy(Info.Mark);
     }
 
@@ -550,9 +656,11 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Info.LastSide = Info.CurrentSide;
                 Info.CurrentSide = CanonSide.Red;
 
+                Info.LockedPlayer = null;
                 Destroy(Info.Mark);
-                LockPlayer(Info);
-                Info.TransitionTo(CanonState.Firing);
+
+                Info.TransitionTo(CanonState.Swtiching);
+
             }
         }
         else
@@ -562,9 +670,11 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Info.LastSide = Info.CurrentSide;
                 Info.CurrentSide = CanonSide.Blue;
 
+                Info.LockedPlayer = null;
                 Destroy(Info.Mark);
-                LockPlayer(Info);
-                Info.TransitionTo(CanonState.Firing);
+
+                Info.TransitionTo(CanonState.Swtiching);
+
             }
         }
     }

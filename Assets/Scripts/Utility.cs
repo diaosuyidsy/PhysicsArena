@@ -131,7 +131,6 @@ public static class Utility
         // 2. See if the destination is beyond cliff
         if (Physics.SphereCast(ev.Hitted.transform.position + ev.Force.normalized * distance, 0.2f, Vector3.down, out hit, 100f))
         {
-            Debug.Log(hit.transform);
             if (!hit.transform.CompareTag("DeathZone"))
                 return false;
         }
@@ -346,6 +345,7 @@ public interface IAimable
 
 public interface IHittable
 {
+    bool CanBeBlockPushed();
     /// <summary>
     /// Can Block The attack or not
     /// </summary>

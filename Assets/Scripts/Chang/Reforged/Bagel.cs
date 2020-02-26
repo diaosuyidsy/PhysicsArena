@@ -4,17 +4,57 @@ using UnityEngine;
 
 public class Bagel : WeaponBase
 {
+    public VFXData Data;
+
+    public GameObject Team1Basket;
+    public GameObject Team2Basket;
+
     public bool Hold;
+
+    private GameObject Guide;
 
     protected override void Awake()
     {
         base.Awake();
         _hitGroundOnce = true;
+
+        Team1Basket = GameObject.Find("BasketTEAM1");
+        Team2Basket = GameObject.Find("BasketTEAM2");
+    }
+
+    protected override void Update()
+    {
+        base.Update();
+        if (Hold)
+        {
+            if (Guide== null)
+            {
+                GameObject FoodGuideVFX = Owner.tag.Contains("1") ? Data.ChickenFoodGuideVFX : Data.DuckFoodGuideVFX;
+
+                PlayerController pc = Owner.GetComponent<PlayerController>();
+                Guide = GameObject.Instantiate(FoodGuideVFX, pc.PlayerFeet, false);
+                pc.FoodTraverseVFXHolder = Guide;
+                pc.FoodTraverseVFXHolder.transform.rotation = FoodGuideVFX.transform.rotation;
+                pc.FoodTraverseVFXHolder.SetActive(true);
+            }
+            else
+            {
+                Vector3 Team1BasketOffset = Team1Basket.transform.position - Guide.transform.position;
+                Vector3 Team2BasketOffset = Team2Basket.transform.position - Guide.transform.position;
+                Team1BasketOffset.y = 0;
+                Team2BasketOffset.y = 0;
+
+                Guide.transform.forward = Owner.tag.Contains("1") ? Team1BasketOffset : Team2BasketOffset;
+            }
+
+
+        }
     }
 
     public override void OnPickUp(GameObject owner)
     {
         base.OnPickUp(owner);
+
         Hold = true;
     }
 
@@ -22,11 +62,17 @@ public class Bagel : WeaponBase
     {
         base.OnDrop();
         Hold = false;
+        Destroy(Guide);
+        
     }
 
     public override void Fire(bool buttondown)
     {
-        
+        if (buttondown)
+        {
+            Owner.GetComponent<PlayerController>().FireBirdFood();
+            GetComponent<Rigidbody>().AddForce(Owner.transform.forward * 2 + Owner.transform.up * 2,ForceMode.VelocityChange);
+        }
     }
 
     public void OnSucked()

@@ -634,11 +634,11 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         BrawlModeReforgedObjectiveManager Manager = (BrawlModeReforgedObjectiveManager)Services.GameObjectiveManager;
 
-        if (Manager.TeamAScore > Manager.TeamBScore)
+        if (Manager.TeamAScore - Manager.TeamBScore >= Data.DeliveryPoint)
         {
             Pos = Data.BagelGenerationPosRight;
         }
-        else if(Manager.TeamBScore > Manager.TeamAScore)
+        else if(Manager.TeamBScore - Manager.TeamAScore >= Data.DeliveryPoint)
         {
             Pos = Data.BagelGenerationPosLeft;
         }

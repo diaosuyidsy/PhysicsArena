@@ -36,6 +36,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         ModeData = Data;
         Timer = Data.TotalTime;
 
+        Debug.Log(Data.name);
+
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
         EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
@@ -131,6 +133,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     {
         if (gameEnd || !gameStart)
         {
+            Debug.Log("rua");
             return;
         }
 
@@ -158,6 +161,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         }
 
         RefreshScore();
+
+        Debug.Log("Fuck");
     }
 
     private void OnGameStart(GameStart e)

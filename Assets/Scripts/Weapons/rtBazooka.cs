@@ -9,6 +9,7 @@ public class rtBazooka : WeaponBase
     [HideInInspector]
     public GameObject BazookaTrailVFXHolder;
     public Vector3 BazookaShadowTransformPosition { get { return _shadowThrowMark.transform.position; } }
+    private BazookaData _bazookaData;
     private enum BazookaStates
     {
         Idle,
@@ -21,7 +22,7 @@ public class rtBazooka : WeaponBase
     {
         get
         {
-            return Physics.gravity * WeaponDataStore.BazookaDataStore.MarkGravityScale;
+            return Physics.gravity * _bazookaData.MarkGravityScale;
         }
     }
     private Vector3 _startVelocity
@@ -33,7 +34,7 @@ public class rtBazooka : WeaponBase
             Vector3 result = new Vector3(diffx, 0f, diffz);
             float mag = Mathf.Tan(_throwAngle * Mathf.Deg2Rad) * result.magnitude;
             result.y = mag;
-            return result.normalized * WeaponDataStore.BazookaDataStore.MarkThrowThurst;
+            return result.normalized * _bazookaData.MarkThrowThurst;
         }
     }
     [Range(10f, 89f)]
@@ -45,7 +46,7 @@ public class rtBazooka : WeaponBase
     {
         get
         {
-            return Mathf.Pow(WeaponDataStore.BazookaDataStore.MarkThrowThurst, 2) / -_throwMarkGravity.y - 1f;
+            return Mathf.Pow(_bazookaData.MarkThrowThurst, 2) / -_throwMarkGravity.y - 1f;
         }
     }
     private float _HLAxis { get { return _player.GetAxis("Move Horizontal"); } }
@@ -54,17 +55,18 @@ public class rtBazooka : WeaponBase
     protected override void Awake()
     {
         base.Awake();
+        _bazookaData = WeaponDataBase as BazookaData;
         _lineRenderer = GetComponent<LineRenderer>();
         _throwMark = transform.Find("ThrowMark");
         Debug.Assert(_throwMark != null);
         Vector3 throwmarkscaleAdjust = Vector3.one;
-        throwmarkscaleAdjust.x = WeaponDataStore.BazookaDataStore.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
-        throwmarkscaleAdjust.y = WeaponDataStore.BazookaDataStore.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
-        throwmarkscaleAdjust.z = WeaponDataStore.BazookaDataStore.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.z;
+        throwmarkscaleAdjust.x = _bazookaData.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+        throwmarkscaleAdjust.y = _bazookaData.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.y;
+        throwmarkscaleAdjust.z = _bazookaData.MaxAffectionRange / _throwMark.GetComponent<SpriteRenderer>().sprite.bounds.size.z;
         _throwMark.transform.localScale = throwmarkscaleAdjust * 2f;
         _shadowThrowMark = transform.Find("ShadowThrowMark");
         Debug.Assert(_shadowThrowMark != null);
-        _ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
+        _ammo = _bazookaData.MaxAmmo;
     }
 
     protected override void Update()
@@ -77,12 +79,12 @@ public class rtBazooka : WeaponBase
         else if (_bazookaState == BazookaStates.Out)
         {
             if (Owner == null) return;
-            Vector3 movement = new Vector3(_HLAxis, 0f, -_VLAxis) * WeaponDataStore.BazookaDataStore.MarkAirMoveSpeed * Time.deltaTime;
+            Vector3 movement = new Vector3(_HLAxis, 0f, -_VLAxis) * _bazookaData.MarkAirMoveSpeed * Time.deltaTime;
             transform.position += movement;
             Vector3 _throwMarkNewPos = _throwMark.position + movement;
             // _throwMark.position += movement;
             RaycastHit hit1;
-            if (Physics.Raycast(_throwMarkNewPos + new Vector3(0, 20f), Vector3.down, out hit1, 30f, WeaponDataStore.BazookaDataStore.LineCastLayer))
+            if (Physics.Raycast(_throwMarkNewPos + new Vector3(0, 20f), Vector3.down, out hit1, 30f, _bazookaData.LineCastLayer))
             {
                 _throwMarkNewPos.y = hit1.point.y;
                 _throwMark.gameObject.SetActive(true);
@@ -91,26 +93,26 @@ public class rtBazooka : WeaponBase
             _throwMark.position = _throwMarkNewPos;
             transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
             RaycastHit hit;
-            if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, WeaponDataStore.BazookaDataStore.HitExplodeLayer ^ (1 << Owner.layer)))
+            if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, _bazookaData.HitExplodeLayer ^ (1 << Owner.layer)))
             {
                 if (hit.collider.gameObject == Owner) return;
                 _bazookaState = BazookaStates.Idle;
                 List<GameObject> affectedPlayers = new List<GameObject>();
                 Collider[] hitColliders = Physics.OverlapSphere(transform.position,
-                                                                    WeaponDataStore.BazookaDataStore.MaxAffectionRange,
-                                                                    WeaponDataStore.BazookaDataStore.CanHitLayer);
+                                                                    _bazookaData.MaxAffectionRange,
+                                                                    _bazookaData.CanHitLayer);
                 foreach (Collider _c in hitColliders)
                 {
                     IHittable ih = _c.GetComponent<IHittable>();
                     if (ih == null || Owner == _c.gameObject ||
-                    Physics.Linecast(_c.transform.position, transform.position, WeaponDataStore.BazookaDataStore.CanHideLayer)) continue;
+                    Physics.Linecast(_c.transform.position, transform.position, _bazookaData.CanHideLayer)) continue;
                     affectedPlayers.Add(_c.gameObject);
                     Vector3 dir = _c.transform.position - transform.position;
                     dir.y = 0f;
-                    ih.OnImpact(WeaponDataStore.BazookaDataStore.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
+                    ih.OnImpact(_bazookaData.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
                 }
                 EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));
-                Owner.GetComponent<IHittable>().OnImpact(new StunEffect(WeaponDataStore.BazookaDataStore.SelfStunTime, 0f));
+                Owner.GetComponent<IHittable>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
                 _resetThrowMark();
                 _onWeaponUsedOnce();
             }
@@ -121,13 +123,13 @@ public class rtBazooka : WeaponBase
     private void FixedUpdate()
     {
         if (_bazookaState == BazookaStates.Out)
-            GetComponent<Rigidbody>().AddForce(Vector3.down * Physics.gravity.y * (1f - WeaponDataStore.BazookaDataStore.MarkGravityScale));
+            GetComponent<Rigidbody>().AddForce(Vector3.down * Physics.gravity.y * (1f - _bazookaData.MarkGravityScale));
     }
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, WeaponDataStore.BazookaDataStore.MaxAffectionRange);
+        Gizmos.DrawWireSphere(transform.position, _bazookaData.MaxAffectionRange);
     }
 
     public override void Fire(bool buttondown)
@@ -168,7 +170,7 @@ public class rtBazooka : WeaponBase
         _lineRenderer.enabled = false;
         _player = null;
         _resetThrowMark();
-        _ammo = WeaponDataStore.BazookaDataStore.MaxAmmo;
+        _ammo = _bazookaData.MaxAmmo;
         transform.GetComponent<Rigidbody>().isKinematic = false;
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         _hitGroundOnce = false;
@@ -190,9 +192,9 @@ public class rtBazooka : WeaponBase
 
     private void _aim()
     {
-        Vector3 newPosition = _shadowThrowMark.position + new Vector3(_HLAxis, 0f, -_VLAxis) * Time.deltaTime * WeaponDataStore.BazookaDataStore.MarkMoveSpeed;
+        Vector3 newPosition = _shadowThrowMark.position + new Vector3(_HLAxis, 0f, -_VLAxis) * Time.deltaTime * _bazookaData.MarkMoveSpeed;
         RaycastHit hit;
-        if (Physics.Raycast(newPosition + new Vector3(0, 20f), Vector3.down, out hit, 30f, WeaponDataStore.BazookaDataStore.LineCastLayer))
+        if (Physics.Raycast(newPosition + new Vector3(0, 20f), Vector3.down, out hit, 30f, _bazookaData.LineCastLayer))
         {
             newPosition.y = hit.point.y;
             _throwMark.gameObject.SetActive(true);
@@ -209,7 +211,7 @@ public class rtBazooka : WeaponBase
         }
         else
             _shadowThrowMark.position = newPosition;
-        _throwAngle = 90f - Mathf.Asin(-_throwMarkGravity.y * distance / Mathf.Pow(WeaponDataStore.BazookaDataStore.MarkThrowThurst, 2)) * Mathf.Rad2Deg / 2f;
+        _throwAngle = 90f - Mathf.Asin(-_throwMarkGravity.y * distance / Mathf.Pow(_bazookaData.MarkThrowThurst, 2)) * Mathf.Rad2Deg / 2f;
 
         _drawTrajectory();
 
@@ -217,7 +219,7 @@ public class rtBazooka : WeaponBase
 
     private void _drawTrajectory()
     {
-        var points = _getTrajectoryPoints(transform.position, _startVelocity, WeaponDataStore.BazookaDataStore.TrajectoryLineStep, WeaponDataStore.BazookaDataStore.TrajectoryLineTime);
+        var points = _getTrajectoryPoints(transform.position, _startVelocity, _bazookaData.TrajectoryLineStep, _bazookaData.TrajectoryLineTime);
         if (_lineRenderer)
         {
             if (!_lineRenderer.enabled) _lineRenderer.enabled = true;
@@ -243,7 +245,7 @@ public class rtBazooka : WeaponBase
             if (t > maxTime) break;
             Vector3 pos = PlotTrajectoryAtTime(start, startVelocity, t);
             RaycastHit hit;
-            if (Physics.Linecast(prev, pos, out hit, WeaponDataStore.BazookaDataStore.LineCastLayer))
+            if (Physics.Linecast(prev, pos, out hit, _bazookaData.LineCastLayer))
             {
                 points.Add(hit.point);
                 break;

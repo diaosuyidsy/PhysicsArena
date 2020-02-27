@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class WeaponGenerationManager
 {
-    private WeaponData WeaponDataStore;
     private Vector3 _weaponSpawnerCenter = new Vector3(0f, 6.5f, 0f);
     private CameraController _cc;
     private bool _gamestart;
@@ -30,9 +29,8 @@ public class WeaponGenerationManager
         }
     }
 
-    public WeaponGenerationManager(GameMapData gmp, WeaponData _wd)
+    public WeaponGenerationManager(GameMapData gmp)
     {
-        WeaponDataStore = _wd;
         GameMapData = gmp;
         EventManager.Instance.AddHandler<GameStart>(_onGameStart);
         _cc = Camera.main.GetComponent<CameraController>();
@@ -119,7 +117,7 @@ public class WeaponGenerationManager
             UnityEngine.Random.Range(-weaponSpawnerSize.x / 2, weaponSpawnerSize.x / 2),
             UnityEngine.Random.Range(-weaponSpawnerSize.y / 2, weaponSpawnerSize.y / 2),
             UnityEngine.Random.Range(-weaponSpawnerSize.z / 2, weaponSpawnerSize.z / 2));
-        while (!Physics.Raycast(targetPos, -Vector3.up, 100f, WeaponDataStore.Ground))
+        while (!Physics.Raycast(targetPos, -Vector3.up, 100f, LayerMask.NameToLayer("Ground")))
         {
             targetPos = _weaponSpawnerCenter + new Vector3(
             UnityEngine.Random.Range(-weaponSpawnerSize.x / 2, weaponSpawnerSize.x / 2),

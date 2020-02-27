@@ -380,11 +380,6 @@ public class PlayerController : MonoBehaviour, IHittable
         if (HandObject == null) return;
         // Drop the thing
         HandObject.GetComponent<WeaponBase>().OnDrop();
-        HandObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        Vector3 forceToAdd = transform.right * CharacterDataStore.DropForce.x +
-            transform.forward * CharacterDataStore.DropForce.z +
-            transform.up * CharacterDataStore.DropForce.y;
-        HandObject.GetComponent<Rigidbody>().AddForce(forceToAdd, ForceMode.VelocityChange);
 
         EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
         // Return the body to normal position

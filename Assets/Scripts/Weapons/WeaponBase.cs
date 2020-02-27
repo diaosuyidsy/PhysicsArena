@@ -4,7 +4,6 @@ using UnityEngine;
 
 public abstract class WeaponBase : MonoBehaviour
 {
-    public WeaponData WeaponDataStore;
     public WeaponDataBase WeaponDataBase;
     public virtual float HelpAimAngle { get; }
     public virtual float HelpAimDistance { get; }
@@ -15,14 +14,17 @@ public abstract class WeaponBase : MonoBehaviour
     public bool CanBePickedUp;
     protected bool _followHand;
     protected float _pickUpTimer;
+    // protected FSM<WeaponBase> WeaponBaseFSM;
 
     protected virtual void Awake()
     {
+        // WeaponBaseFSM = new FSM<WeaponBase>(this);
         OnSpawn();
     }
 
     protected virtual void Update()
     {
+        // WeaponBaseFSM.Update();
         if (Owner != null && _followHand)
         {
             Vector3 targetposition = (Owner.GetComponent<PlayerController>().LeftHand.transform.position
@@ -61,15 +63,16 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void OnCollisionEnter(Collision other)
     {
-        if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | 1 << other.gameObject.layer))
+        // ((WeaponState)WeaponBaseFSM.CurrentState).OnCollisionEnter(other);
+        if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer))
         {
             _onWeaponDespawn();
         }
-        if ((WeaponDataStore.OnNoAmmoDropDisappear == (WeaponDataStore.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))) && _ammo <= 0)
+        if ((WeaponDataBase.OnNoAmmoDropDisappear == (WeaponDataBase.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))) && _ammo <= 0)
         {
             _onWeaponDespawn();
         }
-        if ((WeaponDataStore.OnNoAmmoDropDisappear == (WeaponDataStore.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
+        if ((WeaponDataBase.OnNoAmmoDropDisappear == (WeaponDataBase.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
         {
             if (!_hitGroundOnce)
             {
@@ -83,6 +86,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     public virtual void OnSpawn()
     {
+        // WeaponBaseFSM.TransitionTo<InAirState>();
         CanBePickedUp = true;
         _followHand = true;
         gameObject.layer = LayerMask.NameToLayer("Pickup");
@@ -92,8 +96,12 @@ public abstract class WeaponBase : MonoBehaviour
     {
         _hitGroundOnce = false;
         CanBePickedUp = false;
-        Owner = null;
         GetComponent<Rigidbody>().isKinematic = false;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
+        Owner.transform.up * WeaponDataBase.DropForce.y +
+        Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
+        Owner = null;
     }
 
     public virtual void OnPickUp(GameObject owner)
@@ -105,6 +113,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
+        // ((WeaponState)WeaponBaseFSM.CurrentState).OnTriggerEnter(other);
         if (other.CompareTag("DeathZone"))
         {
             _hitGroundOnce = false;
@@ -112,10 +121,59 @@ public abstract class WeaponBase : MonoBehaviour
             _onWeaponDespawn();
             return;
         }
-        if (WeaponDataStore.OnHitDisappear == (WeaponDataStore.OnHitDisappear | 1 << other.gameObject.layer)
+        if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer)
         && Owner == null)
         {
             _onWeaponDespawn();
         }
+    }
+
+    protected abstract class WeaponState : FSM<WeaponBase>.State
+    {
+        protected WeaponDataBase WeaponBaseData;
+
+        public override void Init()
+        {
+            base.Init();
+            WeaponBaseData = Context.WeaponDataBase;
+        }
+
+        public virtual void OnCollisionEnter(Collision other)
+        {
+
+        }
+
+        public virtual void OnTriggerEnter(Collider other)
+        {
+
+        }
+    }
+
+    protected class InAirState : WeaponState
+    {
+        public override void OnCollisionEnter(Collision other)
+        {
+            base.OnCollisionEnter(other);
+            // if ((WeaponBaseData.OnNoAmmoDropDisappear == (WeaponBaseData.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
+            // {
+            //     Context.gameObject.layer = LayerMask.NameToLayer("Pickup");
+            //     EventManager.Instance.TriggerEvent(new ObjectHitGround(Context.gameObject));
+            // }
+        }
+    }
+
+    protected class OnGroundState : WeaponState
+    {
+
+    }
+
+    protected class PickedUpState : WeaponState
+    {
+
+    }
+
+    protected class DeadState : WeaponState
+    {
+
     }
 }

@@ -8,7 +8,6 @@ public class GameNetwork : MonoBehaviour
     public AudioData AudioData;
     public VFXData VFXData;
     public ConfigData ConfigData;
-    public WeaponData WeaponData;
     public GameFeelData GameFeelData;
     public BrawlModeData BrawlModeData;
     public GameMapData GameMapData;

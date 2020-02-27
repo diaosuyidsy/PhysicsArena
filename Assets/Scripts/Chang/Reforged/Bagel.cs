@@ -32,7 +32,7 @@ public class Bagel : WeaponBase
         base.Update();
         if (Hold)
         {
-            if (Guide== null)
+            if (Guide == null)
             {
                 GameObject FoodGuideVFX = Owner.tag.Contains("1") ? Data.ChickenFoodGuideVFX : Data.DuckFoodGuideVFX;
 
@@ -62,7 +62,7 @@ public class Bagel : WeaponBase
 
         Material mat = Entity.GetComponent<Renderer>().material;
         mat.EnableKeyword("_EMISSION");
-        
+
 
         if (owner.tag.Contains("1"))
         {
@@ -90,15 +90,14 @@ public class Bagel : WeaponBase
 
         Hold = false;
         Destroy(Guide);
-        
+
     }
 
     public override void Fire(bool buttondown)
     {
         if (buttondown)
         {
-            Owner.GetComponent<PlayerController>().FireBirdFood();
-            GetComponent<Rigidbody>().AddForce(Owner.transform.forward * 2 + Owner.transform.up * 2,ForceMode.VelocityChange);
+            Owner.GetComponent<PlayerController>().ForceDropHandObject();
         }
     }
 

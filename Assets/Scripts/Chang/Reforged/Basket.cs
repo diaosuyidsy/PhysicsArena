@@ -112,7 +112,7 @@ public class Basket : MonoBehaviour
             }
         }
 
-        if (Bagel==null)
+        if (Bagel == null)
         {
             InCameraTimer += Time.deltaTime;
 
@@ -145,7 +145,7 @@ public class Basket : MonoBehaviour
         {
             Vector3 Offset = transform.position - Bagel.transform.position;
             Bagel.transform.position += SuckSpeed * Offset.normalized * Time.deltaTime;
-            if(Vector3.Dot(Offset, transform.position - Bagel.transform.position)<0)
+            if (Vector3.Dot(Offset, transform.position - Bagel.transform.position) < 0)
             {
                 ScoreTextTimer = 0;
                 ScoreText.GetComponent<TextMeshProUGUI>().enabled = true;
@@ -164,15 +164,15 @@ public class Basket : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.GetComponentInParent<PlayerController>()|| other.GetComponent<PlayerController>())
+        if (other.GetComponentInParent<PlayerController>() || other.GetComponent<PlayerController>())
         {
             if (other.GetComponentInParent<PlayerController>() && SameTeam(other.GetComponentInParent<PlayerController>().gameObject))
             {
-                other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().FireBirdFood();
+                other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().ForceDropHandObject();
             }
-            else if(other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
+            else if (other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
             {
-                other.GetComponent<PlayerController>().FireBirdFood();
+                other.GetComponent<PlayerController>().ForceDropHandObject();
             }
         }
 

@@ -14,17 +14,17 @@ public abstract class WeaponBase : MonoBehaviour
     public bool CanBePickedUp;
     protected bool _followHand;
     protected float _pickUpTimer;
-    protected FSM<WeaponBase> WeaponBaseFSM;
+    // protected FSM<WeaponBase> WeaponBaseFSM;
 
     protected virtual void Awake()
     {
-        WeaponBaseFSM = new FSM<WeaponBase>(this);
+        // WeaponBaseFSM = new FSM<WeaponBase>(this);
         OnSpawn();
     }
 
     protected virtual void Update()
     {
-        WeaponBaseFSM.Update();
+        // WeaponBaseFSM.Update();
         if (Owner != null && _followHand)
         {
             Vector3 targetposition = (Owner.GetComponent<PlayerController>().LeftHand.transform.position
@@ -63,7 +63,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void OnCollisionEnter(Collision other)
     {
-        ((WeaponState)WeaponBaseFSM.CurrentState).OnCollisionEnter(other);
+        // ((WeaponState)WeaponBaseFSM.CurrentState).OnCollisionEnter(other);
         if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer))
         {
             _onWeaponDespawn();
@@ -86,7 +86,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     public virtual void OnSpawn()
     {
-        WeaponBaseFSM.TransitionTo<InAirState>();
+        // WeaponBaseFSM.TransitionTo<InAirState>();
         CanBePickedUp = true;
         _followHand = true;
         gameObject.layer = LayerMask.NameToLayer("Pickup");
@@ -96,8 +96,12 @@ public abstract class WeaponBase : MonoBehaviour
     {
         _hitGroundOnce = false;
         CanBePickedUp = false;
-        Owner = null;
         GetComponent<Rigidbody>().isKinematic = false;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
+        Owner.transform.up * WeaponDataBase.DropForce.y +
+        Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
+        Owner = null;
     }
 
     public virtual void OnPickUp(GameObject owner)
@@ -109,7 +113,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        ((WeaponState)WeaponBaseFSM.CurrentState).OnTriggerEnter(other);
+        // ((WeaponState)WeaponBaseFSM.CurrentState).OnTriggerEnter(other);
         if (other.CompareTag("DeathZone"))
         {
             _hitGroundOnce = false;

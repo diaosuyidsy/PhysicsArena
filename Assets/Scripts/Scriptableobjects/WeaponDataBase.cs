@@ -14,4 +14,5 @@ public abstract class WeaponDataBase : ScriptableObject
     public LayerMask Ground;
     public LayerMask OnNoAmmoDropDisappear;
     public LayerMask OnHitDisappear;
+    public Vector3 DropForce = new Vector3(0f, 2f, -2f);
 }

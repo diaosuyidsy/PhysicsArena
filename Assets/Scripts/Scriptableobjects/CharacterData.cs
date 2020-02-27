@@ -20,7 +20,6 @@ public class CharacterData : ScriptableObject
     public float FrontIsCliff = 0.2f;
     public float CliffPreventionForce = 100f;
     public float CliffPreventionTimer = 0.4f;
-    public Vector3 DropForce = new Vector3(0f, 10f, 20f);
 
     [Header("Character Defend Related Settings")]
     public float MaxStamina = 1.5f;

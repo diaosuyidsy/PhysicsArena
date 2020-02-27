@@ -217,6 +217,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public GameObject CanonObject;
     public GameObject PipeObject;
     public GameObject PipeEndObject;
+    public GameObject CameraPoint;
 
     public GameObject Team1Cabel;
     public GameObject Team2Cabel;
@@ -246,7 +247,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             Data = Data_MorePlayer;
         }
 
-        Services.GameStateManager.CameraTargets.Add(PipeEndObject.transform);
+
 
         Team1Basket = CanonObject.transform.Find("LForceField").gameObject;
         Team2Basket = CanonObject.transform.Find("RForceField").gameObject;
@@ -333,12 +334,21 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Destroy(Info.Mark);
             }
         }
+        else if(Info.Timer >= Data.CanonCooldown - 2)
+        {
+            if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
+            {
+                Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
+            }
+        }
 
     }
 
     private IEnumerator CanonFire()
     {
         float Timer = 0;
+
+        Services.GameStateManager.CameraTargets.Remove(CameraPoint.transform);
 
         PipeEndObject.transform.localPosition = FeelData.PipeEndStartLocalPos;
 
@@ -363,7 +373,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         }
     }
 
-    private IEnumerator CabelShine(GameObject Cabel,Color color)
+    private IEnumerator CabelChange(GameObject Cabel,Color color,bool Shine)
     {
         foreach (Transform child in Cabel.transform)
         {
@@ -375,7 +385,32 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         float Timer = 0;
 
-        while(Timer < FeelData.CabelShineTime / 2)
+        while (Timer < FeelData.CabelShineTime)
+        {
+            Timer += Time.deltaTime;
+            foreach (Transform child in Cabel.transform)
+            {
+                Material mat = child.GetComponent<Renderer>().material;
+                mat.EnableKeyword("_EMISSION");
+
+                float Emission;
+
+                if (Shine)
+                {
+                    Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / FeelData.CabelShineTime);
+                }
+                else
+                {
+                    Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, Timer / FeelData.CabelShineTime);
+                }
+
+
+                mat.SetColor("_EmissionColor", color * Emission);
+            }
+            yield return null;
+        }
+
+        /*while(Timer < FeelData.CabelShineTime / 2)
         {
             Timer += Time.deltaTime;
             foreach (Transform child in Cabel.transform)
@@ -403,7 +438,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 mat.SetColor("_EmissionColor", color * Emission);
             }
             yield return null;
-        }
+        }*/
     }
 
     private IEnumerator RocketFire()
@@ -437,6 +472,16 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             if (Info.FireCount >= Data.MaxCanonFireCount)
             {
                 Info.TransitionTo(CanonState.Unactivated);
+                StopAllCoroutines();
+                if(Info.CurrentSide == CanonSide.Red)
+                {
+                    StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor, false));
+                }
+                else
+                {
+                    StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, false));
+                }
+
                 Info.LastSide = Info.CurrentSide;
                 Info.CurrentSide = CanonSide.Neutral;
             }
@@ -632,7 +677,17 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Info.LockedPlayer = null;
                 Destroy(Info.Mark);
 
-                StartCoroutine(CabelShine(Team1Cabel, FeelData.RedCabelColor));
+                StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor,true));
+
+                if (Info.LastSide != CanonSide.Neutral)
+                {
+                    StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, false));
+                }
+                if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
+                {
+                    Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
+                }
+
 
                 Info.TransitionTo(CanonState.Swtiching);
 
@@ -648,7 +703,17 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Info.LockedPlayer = null;
                 Destroy(Info.Mark);
 
-                StartCoroutine(CabelShine(Team2Cabel, FeelData.BlueCabelColor));
+                if(Info.LastSide != CanonSide.Neutral)
+                {
+                    StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor, false));
+                }
+
+                StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, true));
+
+                if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
+                {
+                    Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
+                }
 
                 Info.TransitionTo(CanonState.Swtiching);
 

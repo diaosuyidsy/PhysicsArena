@@ -80,8 +80,10 @@ MonoBehaviour:
   WeaponDataBase: {fileID: 11400000, guid: e68950b442d2ba04aa46774f7a020950, type: 2}
   CanBePickedUp: 1
   Data: {fileID: 11400000, guid: 02308cdd234d4104a9b5ba42b61b1914, type: 2}
-  Team1Basket: {fileID: 0}
-  Team2Basket: {fileID: 0}
+  Entity: {fileID: 8885476002484785804}
+  Default: {r: 0.7169812, g: 0.7169812, b: 0.7169812, a: 1}
+  Blue: {r: 0.11681202, g: 0.50922894, b: 0.7075472, a: 1}
+  Red: {r: 0.6320754, g: 0.11627804, b: 0.11627804, a: 1}
   Hold: 0
 --- !u!1001 &5332164940370193278
 PrefabInstance:
@@ -225,11 +227,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1196548920874240831, guid: b8c8d64adeb12ee41a9dfd5fca3ae3f7,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: b4bd0a275c81b97448384eb7281bfd33, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b8c8d64adeb12ee41a9dfd5fca3ae3f7, type: 3}
 --- !u!4 &2652552068719049017 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: b8c8d64adeb12ee41a9dfd5fca3ae3f7,
+    type: 3}
+  m_PrefabInstance: {fileID: 7040664176609481251}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &8885476002484785804 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1944142833006756015, guid: b8c8d64adeb12ee41a9dfd5fca3ae3f7,
     type: 3}
   m_PrefabInstance: {fileID: 7040664176609481251}
   m_PrefabAsset: {fileID: 0}

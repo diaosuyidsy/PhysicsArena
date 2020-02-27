@@ -14,6 +14,8 @@ public class Basket : MonoBehaviour
         Disappear
     }
 
+    public int TeamNumber;
+
     public GameObject Canvas;
     public GameObject ScoreText;
 
@@ -133,6 +135,7 @@ public class Basket : MonoBehaviour
                 if (AllHits[i].gameObject.CompareTag("Team2Resource") && !AllHits[i].gameObject.GetComponent<Bagel>().Hold)
                 {
                     Bagel = AllHits[i].gameObject;
+                    Bagel.GetComponent<BoxCollider>().enabled = false;
                     AllHits[i].gameObject.GetComponent<Bagel>().OnSucked();
                     break;
                 }
@@ -152,5 +155,27 @@ public class Basket : MonoBehaviour
                 Destroy(Bagel);
             }
         }
+    }
+
+    private bool SameTeam(GameObject Player)
+    {
+        return Player.tag.Contains("1") && TeamNumber == 1 || Player.tag.Contains("2") && TeamNumber == 2;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.GetComponentInParent<PlayerController>()|| other.GetComponent<PlayerController>())
+        {
+            if (other.GetComponentInParent<PlayerController>() && SameTeam(other.GetComponentInParent<PlayerController>().gameObject))
+            {
+                other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().FireBirdFood();
+            }
+            else if(other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
+            {
+                other.GetComponent<PlayerController>().FireBirdFood();
+            }
+        }
+
+
     }
 }

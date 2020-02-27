@@ -14,9 +14,12 @@ public class Basket : MonoBehaviour
         Disappear
     }
 
+    public int TeamNumber;
+
     public GameObject Canvas;
     public GameObject ScoreText;
 
+    public float DetectRadius;
     public float SuckRadius;
     public float SuckSpeed;
 
@@ -29,11 +32,15 @@ public class Basket : MonoBehaviour
     public float ScoreTextShowTime;
     public float ScoreTextDisappearTime;
 
+    public float InCameraTime;
 
+    private bool InCamera;
 
     private GameObject Bagel;
     private float ScoreTextTimer;
     private ScoreTextState TextState;
+
+    private float InCameraTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -45,6 +52,7 @@ public class Basket : MonoBehaviour
     void Update()
     {
         //Canvas.transform.LookAt(Camera.main.transform,Vector3.down);
+        CheckCharacter();
         CheckBagel();
         CheckScoreText();
     }
@@ -85,6 +93,37 @@ public class Basket : MonoBehaviour
         }
     }
 
+    private void CheckCharacter()
+    {
+
+        Collider[] AllHits = Physics.OverlapSphere(transform.position, DetectRadius);
+        for (int i = 0; i < AllHits.Length; i++)
+        {
+            if (AllHits[i].gameObject.CompareTag("Team2Resource") && AllHits[i].gameObject.GetComponent<Bagel>().Hold)
+            {
+                InCameraTimer = 0;
+
+                if (!InCamera)
+                {
+                    InCamera = true;
+                    Services.GameStateManager.CameraTargets.Add(transform);
+                }
+                return;
+            }
+        }
+
+        if (Bagel==null)
+        {
+            InCameraTimer += Time.deltaTime;
+
+            if (InCameraTimer >= InCameraTime)
+            {
+                InCamera = false;
+                Services.GameStateManager.CameraTargets.Remove(transform);
+            }
+        }
+
+    }
 
     private void CheckBagel()
     {
@@ -96,6 +135,7 @@ public class Basket : MonoBehaviour
                 if (AllHits[i].gameObject.CompareTag("Team2Resource") && !AllHits[i].gameObject.GetComponent<Bagel>().Hold)
                 {
                     Bagel = AllHits[i].gameObject;
+                    Bagel.GetComponent<BoxCollider>().enabled = false;
                     AllHits[i].gameObject.GetComponent<Bagel>().OnSucked();
                     break;
                 }
@@ -115,5 +155,27 @@ public class Basket : MonoBehaviour
                 Destroy(Bagel);
             }
         }
+    }
+
+    private bool SameTeam(GameObject Player)
+    {
+        return Player.tag.Contains("1") && TeamNumber == 1 || Player.tag.Contains("2") && TeamNumber == 2;
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if(other.GetComponentInParent<PlayerController>()|| other.GetComponent<PlayerController>())
+        {
+            if (other.GetComponentInParent<PlayerController>() && SameTeam(other.GetComponentInParent<PlayerController>().gameObject))
+            {
+                other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().FireBirdFood();
+            }
+            else if(other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
+            {
+                other.GetComponent<PlayerController>().FireBirdFood();
+            }
+        }
+
+
     }
 }

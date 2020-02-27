@@ -6,8 +6,10 @@ public class rtHook : WeaponBase
 {
     [HideInInspector]
     public GameObject Hooked = null;
-    public override float HelpAimAngle { get { return WeaponDataStore.HookGunDataStore.HelpAimAngle; } }
-    public override float HelpAimDistance { get { return WeaponDataStore.HookGunDataStore.HelpAimDistance; } }
+    public override float HelpAimAngle { get { return _hookGunData.HelpAimAngle; } }
+    public override float HelpAimDistance { get { return _hookGunData.HelpAimDistance; } }
+    [HideInInspector]
+    public HookGunData _hookGunData;
     private GameObject _hook;
     private Vector3 _hookinitlocalPos;
     private Vector3 _hookinitlocalScale;
@@ -39,6 +41,7 @@ public class rtHook : WeaponBase
     protected override void Awake()
     {
         base.Awake();
+        _hookGunData = WeaponDataBase as HookGunData;
         _hook = transform.GetChild(0).gameObject;
         _hookstartpoint = _hook.transform.GetChild(0);
         _hookendpoint = transform.GetChild(2);
@@ -48,7 +51,7 @@ public class rtHook : WeaponBase
         _hookinitialLocalRotation = new Vector3(_hook.transform.localEulerAngles.x, _hook.transform.localEulerAngles.y, _hook.transform.localEulerAngles.z);
         _hookmax = transform.GetChild(1).gameObject;
         _hookState = State.Empty;
-        _ammo = WeaponDataStore.HookGunDataStore.MaxHookTimes;
+        _ammo = _hookGunData.MaxHookTimes;
         _lr = GetComponent<LineRenderer>();
         _hookFSM = new FSM<rtHook>(this);
         _hookFSM.TransitionTo<IdleState>();
@@ -63,7 +66,7 @@ public class rtHook : WeaponBase
         if (_hookState == State.FlyingOut)
         {
             Vector3 nextpos = (_hookmaxPos - _hook.transform.position).normalized;
-            _hook.transform.Translate(nextpos * Time.deltaTime * WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
+            _hook.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
             if (Vector3.Distance(_hook.transform.position, _hookmaxPos) <= 0.1f)
             {
                 _hookState = State.FlyingIn;
@@ -83,7 +86,7 @@ public class rtHook : WeaponBase
                 Vector3 finalVec = force - vec2;
                 force = (force + finalVec * 10f).normalized;
 
-                Hooked.GetComponent<IHittable>().OnImpact(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
+                Hooked.GetComponent<IHittable>().OnImpact(force * _hookGunData.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
                 Hooked = null;
             }
             Vector3 nextpos = (transform.position - _hook.transform.position).normalized;
@@ -93,10 +96,10 @@ public class rtHook : WeaponBase
                 Vector3 finalVec = nextpos - vec2;
                 nextpos = (nextpos + finalVec * 10f).normalized;
             }
-            _hook.transform.Translate(nextpos * Time.deltaTime * WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
+            _hook.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
             if (Hooked != null && CanCarryBack)
             {
-                Hooked.transform.Translate(nextpos * Time.deltaTime * WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
+                Hooked.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
             }
             if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.6f)
             {
@@ -134,7 +137,7 @@ public class rtHook : WeaponBase
         }
         if (_hookState == State.Broken)
         {
-            if (Time.time > _brokenTimer + WeaponDataStore.HookGunDataStore.HookBlockReloadTime)
+            if (Time.time > _brokenTimer + _hookGunData.HookBlockReloadTime)
             {
                 _hook.SetActive(true);
                 _hookState = State.Empty;
@@ -144,7 +147,7 @@ public class rtHook : WeaponBase
         if (_hookState == State.StaticFlyingIn)
         {
             Vector3 nextpos = (_hook.transform.position - transform.position).normalized;
-            transform.Translate(nextpos * Time.deltaTime * WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
+            transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
             if (Vector3.Distance(transform.position, _hook.transform.position) <= 0.5f)
             {
                 Owner.GetComponent<PlayerController>().HookedStatic(false);
@@ -196,7 +199,7 @@ public class rtHook : WeaponBase
                 Vector3 finalVec = force - vec2;
                 force = (force + finalVec * 10f).normalized;
 
-                Hooked.GetComponent<IHittable>().OnImpact(force * WeaponDataStore.HookGunDataStore.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
+                Hooked.GetComponent<IHittable>().OnImpact(force * _hookGunData.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
                 Hooked = null;
             }
             if (_hookState == State.FlyingOut)
@@ -237,7 +240,7 @@ public class rtHook : WeaponBase
         {
             GameObject hookDup = Instantiate(_hook, _hook.transform.position, _hook.transform.rotation);
             EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, hookDup));
-            Destroy(hookDup, WeaponDataStore.HookGunDataStore.HookBlockReloadTime);
+            Destroy(hookDup, _hookGunData.HookBlockReloadTime);
             _hook.transform.parent = transform;
             _hook.transform.localPosition = _hookinitlocalPos;
             _hook.SetActive(false);
@@ -249,8 +252,8 @@ public class rtHook : WeaponBase
             var coll = hookDup.AddComponent<MeshCollider>();
             coll.convex = true;
             Vector3 _dir = -hookDup.transform.right;
-            _dir.y = WeaponDataStore.HookGunDataStore.HookBlockYDirection;
-            hookDup.GetComponent<Rigidbody>().AddForce(WeaponDataStore.HookGunDataStore.HookBlockReflectionForce * _dir, ForceMode.Impulse);
+            _dir.y = _hookGunData.HookBlockYDirection;
+            hookDup.GetComponent<Rigidbody>().AddForce(_hookGunData.HookBlockReflectionForce * _dir, ForceMode.Impulse);
             _brokenTimer = Time.time;
             _hookState = State.Broken;
             return;
@@ -262,7 +265,7 @@ public class rtHook : WeaponBase
         {
             rb.isKinematic = true;
         }
-        StartCoroutine(hookhelper(WeaponDataStore.HookGunDataStore.HookedTime));
+        StartCoroutine(hookhelper(_hookGunData.HookedTime));
         EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _hook, hit,
         hit.GetComponent<PlayerController>() == null ? 6 : hit.GetComponent<PlayerController>().PlayerNumber));
     }
@@ -282,7 +285,7 @@ public class rtHook : WeaponBase
         _hook.transform.localEulerAngles = Vector3.zero;
         _hook.transform.localPosition = _hookinitlocalPos;
         _hook.gameObject.SetActive(true);
-        _ammo = WeaponDataStore.HookGunDataStore.MaxHookTimes;
+        _ammo = _hookGunData.MaxHookTimes;
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         // Need to set hooked's rigidbody back
         if (Hooked != null)
@@ -322,7 +325,7 @@ public class rtHook : WeaponBase
         {
             base.Update();
             Vector3 nextpos = (Context._hookmaxPos - Context._hook.transform.position).normalized;
-            Context._hook.transform.Translate(nextpos * Time.deltaTime * Context.WeaponDataStore.HookGunDataStore.HookSpeed, Space.World);
+            Context._hook.transform.Translate(nextpos * Time.deltaTime * Context._hookGunData.HookSpeed, Space.World);
             if (Vector3.Distance(Context._hook.transform.position, Context._hookmaxPos) <= 0.1f)
             {
                 TransitionTo<FlyingInState>();

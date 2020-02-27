@@ -23,7 +23,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     private class CanonInfo
     {
         public GameObject Pipe;
-        public GameObject Lever;
 
         public CanonState State;
         public CanonSide CurrentSide;
@@ -36,15 +35,13 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public GameObject LockedPlayer;
 
         private float PipeAngle;
-        private float LeverAngle;
 
         public bool ReadyToFire;
 
 
-        public CanonInfo(GameObject pipe, GameObject lever)
+        public CanonInfo(GameObject pipe)
         {
             Pipe = pipe;
-            Lever = lever;
             State = CanonState.Unactivated;
             CurrentSide = LastSide = CanonSide.Neutral;
 
@@ -55,7 +52,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             LockedPlayer = null;
 
             PipeAngle = 0;
-            LeverAngle = 0;
 
             ReadyToFire = false;
         }
@@ -81,7 +77,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
 
 
-        public void SetCanon(float MaxPipeAngle, float MaxLeverAngle, float PipeRotateSpeed, float LeverRotateSpeed)
+        public void SetCanon(float MaxPipeAngle, float PipeRotateSpeed)
         {
             ReadyToFire = false;
 
@@ -92,27 +88,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                     switch (LastSide)
                     {
                         case CanonSide.Neutral:
-                            Lever.transform.Rotate(new Vector3(-LeverAngle, 0, 0));
                             Pipe.transform.Rotate(new Vector3(0, -PipeAngle, 0));
 
-                            LeverAngle = 0;
                             PipeAngle = 0;
                             break;
                         case CanonSide.Blue:
-                            if (LeverAngle < 0)
+                            if (PipeAngle < 0)
                             {
-                                LeverAngle += LeverRotateSpeed * Time.deltaTime;
-                                Lever.transform.Rotate(new Vector3(LeverRotateSpeed * Time.deltaTime, 0, 0));
-                            }
-                            else
-                            {
-                                Lever.transform.Rotate(new Vector3(-LeverAngle, 0, 0));
-                                LeverAngle = 0;
-                            }
-                            if (PipeAngle > 0)
-                            {
-                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
+                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
                             }
                             else
                             {
@@ -121,20 +105,11 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                             }
                             break;
                         case CanonSide.Red:
-                            if (LeverAngle > 0)
+
+                            if (PipeAngle > 0)
                             {
-                                LeverAngle += -LeverRotateSpeed * Time.deltaTime;
-                                Lever.transform.Rotate(new Vector3(-LeverRotateSpeed * Time.deltaTime, 0, 0));
-                            }
-                            else
-                            {
-                                Lever.transform.Rotate(new Vector3(-LeverAngle, 0, 0));
-                                LeverAngle = 0;
-                            }
-                            if (PipeAngle < 0)
-                            {
-                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
+                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
                             }
                             else
                             {
@@ -148,54 +123,48 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                     switch (LastSide)
                     {
                         case CanonSide.Neutral:
-                            if(LeverAngle > -MaxLeverAngle)
-                            {
-                                LeverAngle += -LeverRotateSpeed * Time.deltaTime;
-                                Lever.transform.Rotate(new Vector3(-LeverRotateSpeed * Time.deltaTime, 0, 0));
-                            }
-                            else
-                            {
-                                Lever.transform.Rotate(new Vector3(-MaxLeverAngle - LeverAngle, 0, 0));
-                                LeverAngle = -MaxLeverAngle;
 
-                                ReadyToFire = true;
-                            }
-                            if(PipeAngle < MaxPipeAngle)
+                            if(PipeAngle > -MaxPipeAngle)
                             {
-                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
+                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
                             }
                             else
                             {
-                                Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
-                                PipeAngle = MaxPipeAngle;
+                                Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
+                                PipeAngle = -MaxPipeAngle;
 
                                 ReadyToFire = true;
                             }
                             break;
                         case CanonSide.Blue:
-                            Lever.transform.Rotate(new Vector3(-MaxLeverAngle - LeverAngle, 0, 0));
-                            Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
+                            Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
 
-                            LeverAngle = -MaxLeverAngle;
-                            PipeAngle = MaxPipeAngle;
+                            PipeAngle = -MaxPipeAngle;
 
                             ReadyToFire = true;
                             break;
                         case CanonSide.Red:
-                            if (LeverAngle > -MaxLeverAngle)
+                            if (PipeAngle > -MaxPipeAngle)
                             {
-                                LeverAngle += -LeverRotateSpeed * Time.deltaTime;
-                                Lever.transform.Rotate(new Vector3(-LeverRotateSpeed * Time.deltaTime, 0, 0));
+                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
                             }
                             else
                             {
-                                Lever.transform.Rotate(new Vector3(-MaxLeverAngle - LeverAngle, 0, 0));
-                                LeverAngle = -MaxLeverAngle;
+                                Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
+                                PipeAngle = -MaxPipeAngle;
 
                                 ReadyToFire = true;
-
                             }
+                            break;
+                    }
+                    break;
+                case CanonSide.Red:
+                    switch (LastSide)
+                    {
+                        case CanonSide.Neutral:
+
                             if (PipeAngle < MaxPipeAngle)
                             {
                                 PipeAngle += PipeRotateSpeed * Time.deltaTime;
@@ -209,69 +178,25 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                                 ReadyToFire = true;
                             }
                             break;
-                    }
-                    break;
-                case CanonSide.Red:
-                    switch (LastSide)
-                    {
-                        case CanonSide.Neutral:
-                            if (LeverAngle < MaxLeverAngle)
-                            {
-                                LeverAngle += LeverRotateSpeed * Time.deltaTime;
-                                Lever.transform.Rotate(new Vector3(LeverRotateSpeed * Time.deltaTime, 0, 0));
-                            }
-                            else
-                            {
-                                Lever.transform.Rotate(new Vector3(MaxLeverAngle - LeverAngle, 0, 0));
-                                LeverAngle = MaxLeverAngle;
-
-                                ReadyToFire = true;
-                            }
-                            if (PipeAngle > -MaxPipeAngle)
-                            {
-                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
-                            }
-                            else
-                            {
-                                Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
-                                PipeAngle = -MaxPipeAngle;
-
-                                ReadyToFire = true;
-                            }
-                            break;
                         case CanonSide.Blue:
-                            if (LeverAngle < MaxLeverAngle)
-                            {
-                                LeverAngle += LeverRotateSpeed * Time.deltaTime;
-                                Lever.transform.Rotate(new Vector3(LeverRotateSpeed * Time.deltaTime, 0, 0));
-                            }
-                            else
-                            {
-                                Lever.transform.Rotate(new Vector3(MaxLeverAngle - LeverAngle, 0, 0));
-                                LeverAngle = MaxLeverAngle;
 
-                                ReadyToFire = true;
-                            }
-                            if (PipeAngle > -MaxPipeAngle)
+                            if (PipeAngle < MaxPipeAngle)
                             {
-                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
+                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
+                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
                             }
                             else
                             {
-                                Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
-                                PipeAngle = -MaxPipeAngle;
+                                Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
+                                PipeAngle = MaxPipeAngle;
 
                                 ReadyToFire = true;
                             }
                             break;
                         case CanonSide.Red:
-                            Lever.transform.Rotate(new Vector3(MaxLeverAngle - LeverAngle, 0, 0));
-                            Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
+                            Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
 
-                            LeverAngle = MaxLeverAngle;
-                            PipeAngle = -MaxPipeAngle;
+                            PipeAngle = MaxPipeAngle;
 
                             ReadyToFire = true;
                             break;
@@ -281,19 +206,21 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         }
     }
 
-
+    public static GameObject Team1Basket;
+    public static GameObject Team2Basket;
 
     public BrawlModeReforgedModeData Data_2Player;
     public BrawlModeReforgedModeData Data_MorePlayer;
 
     public CanonFeelData FeelData;
 
+    public GameObject CanonObject;
     public GameObject PipeObject;
     public GameObject PipeEndObject;
-    public GameObject LeverObject;
+    public GameObject CameraPoint;
 
-    public GameObject Team1Basket;
-    public GameObject Team2Basket;
+    public GameObject Team1Cabel;
+    public GameObject Team2Cabel;
 
     public LayerMask PlayerLayer;
     public LayerMask GroundLayer;
@@ -302,10 +229,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public GameObject BagelPrefab;
     public GameObject MarkPrefab;
     public GameObject ExplosionVFX;
-
-    public Vector3 BagelGenerationPos;
-    public Vector3 BagelGenerationPosLeft;
-    public Vector3 BagelGenerationPosRight;
 
     private BrawlModeReforgedModeData Data;
 
@@ -324,7 +247,13 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             Data = Data_MorePlayer;
         }
 
-        Info = new CanonInfo(PipeObject, LeverObject);
+
+
+        Team1Basket = CanonObject.transform.Find("LForceField").gameObject;
+        Team2Basket = CanonObject.transform.Find("RForceField").gameObject;
+
+
+        Info = new CanonInfo(PipeObject);
 
         GenerateBagel();
 
@@ -364,7 +293,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void CheckCanon()
     {
-        Info.SetCanon(FeelData.MaxPipeAngle, FeelData.MaxLeverAngle, FeelData.PipeRotateSpeed, FeelData.LeverRotateSpeed);
+        Info.SetCanon(FeelData.MaxPipeAngle, FeelData.PipeRotateSpeed);
         switch (Info.State)
         {
             case CanonState.Swtiching:
@@ -405,6 +334,13 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Destroy(Info.Mark);
             }
         }
+        else if(Info.Timer >= Data.CanonCooldown - 2)
+        {
+            if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
+            {
+                Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
+            }
+        }
 
     }
 
@@ -412,9 +348,13 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     {
         float Timer = 0;
 
+        Services.GameStateManager.CameraTargets.Remove(CameraPoint.transform);
+
         PipeEndObject.transform.localPosition = FeelData.PipeEndStartLocalPos;
 
         StartCoroutine(RocketFire());
+
+
 
         while(Timer < FeelData.PipeEndFireTime)
         {
@@ -431,6 +371,74 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             PipeEndObject.transform.localPosition = Vector3.Lerp(FeelData.PipeEndStartLocalPos + Vector3.down * FeelData.PipeEndShakeDis, FeelData.PipeEndStartLocalPos, Timer / FeelData.PipeEndRecoverTime);
             yield return null;
         }
+    }
+
+    private IEnumerator CabelChange(GameObject Cabel,Color color,bool Shine)
+    {
+        foreach (Transform child in Cabel.transform)
+        {
+            Material mat = child.GetComponent<Renderer>().material;
+            mat.EnableKeyword("_EMISSION");
+            mat.SetColor("_EmissionColor", color * FeelData.CabelStartEmission);
+        }
+
+
+        float Timer = 0;
+
+        while (Timer < FeelData.CabelShineTime)
+        {
+            Timer += Time.deltaTime;
+            foreach (Transform child in Cabel.transform)
+            {
+                Material mat = child.GetComponent<Renderer>().material;
+                mat.EnableKeyword("_EMISSION");
+
+                float Emission;
+
+                if (Shine)
+                {
+                    Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / FeelData.CabelShineTime);
+                }
+                else
+                {
+                    Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, Timer / FeelData.CabelShineTime);
+                }
+
+
+                mat.SetColor("_EmissionColor", color * Emission);
+            }
+            yield return null;
+        }
+
+        /*while(Timer < FeelData.CabelShineTime / 2)
+        {
+            Timer += Time.deltaTime;
+            foreach (Transform child in Cabel.transform)
+            {
+                Material mat = child.GetComponent<Renderer>().material;
+                mat.EnableKeyword("_EMISSION");
+
+                float Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / (FeelData.CabelShineTime / 2));
+
+                mat.SetColor("_EmissionColor", color * Emission);
+            }
+            yield return null;
+        }
+
+        while (Timer < FeelData.CabelShineTime)
+        {
+            Timer += Time.deltaTime;
+            foreach (Transform child in Cabel.transform)
+            {
+                Material mat = child.GetComponent<Renderer>().material;
+                mat.EnableKeyword("_EMISSION");
+
+                float Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, (Timer - FeelData.CabelShineTime / 2) / (FeelData.CabelShineTime / 2));
+
+                mat.SetColor("_EmissionColor", color * Emission);
+            }
+            yield return null;
+        }*/
     }
 
     private IEnumerator RocketFire()
@@ -464,6 +472,16 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             if (Info.FireCount >= Data.MaxCanonFireCount)
             {
                 Info.TransitionTo(CanonState.Unactivated);
+                StopAllCoroutines();
+                if(Info.CurrentSide == CanonSide.Red)
+                {
+                    StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor, false));
+                }
+                else
+                {
+                    StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, false));
+                }
+
                 Info.LastSide = Info.CurrentSide;
                 Info.CurrentSide = CanonSide.Neutral;
             }
@@ -659,6 +677,18 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Info.LockedPlayer = null;
                 Destroy(Info.Mark);
 
+                StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor,true));
+
+                if (Info.LastSide != CanonSide.Neutral)
+                {
+                    StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, false));
+                }
+                if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
+                {
+                    Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
+                }
+
+
                 Info.TransitionTo(CanonState.Swtiching);
 
             }
@@ -672,6 +702,18 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
                 Info.LockedPlayer = null;
                 Destroy(Info.Mark);
+
+                if(Info.LastSide != CanonSide.Neutral)
+                {
+                    StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor, false));
+                }
+
+                StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, true));
+
+                if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
+                {
+                    Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
+                }
 
                 Info.TransitionTo(CanonState.Swtiching);
 

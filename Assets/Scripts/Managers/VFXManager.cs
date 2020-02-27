@@ -97,6 +97,8 @@ public class VFXManager
         (ev.PlayerFootLeftRight == 0 ? VFXDataStore.ChickenRightFootStepVFX : VFXDataStore.ChickenLeftFootStepVFX) :
         (ev.PlayerFootLeftRight == 0 ? VFXDataStore.DuckRightFootStepVFX : VFXDataStore.DuckLeftFootStepVFX);
         _instantiateVFX(VFX, ev.PlayerActualFoot.transform.position, Quaternion.Euler(VFX.transform.eulerAngles.x, ev.Player.transform.eulerAngles.y, ev.Player.transform.eulerAngles.z));
+        GameObject[] VFX2 = ev.Player.CompareTag("Team1") ? VFXDataStore.ChickenFootVFX : VFXDataStore.DuckFootVFX;
+        _instantiateVFX(VFX2, ev.PlayerActualFoot.transform.position);
     }
 
     private void _onPlayerJump(PlayerJump pj)
@@ -377,6 +379,17 @@ public class VFXManager
         for (int i = 0; i < _vfx.Length; i++)
         {
             result[i] = GameObject.Instantiate(_vfx[i], _pos, _rot);
+        }
+        return result;
+    }
+
+    private GameObject[] _instantiateVFX(GameObject[] _vfx, Vector3 _pos)
+    {
+        if (_vfx.Length == 0) return null;
+        GameObject[] result = new GameObject[_vfx.Length];
+        for (int i = 0; i < _vfx.Length; i++)
+        {
+            result[i] = GameObject.Instantiate(_vfx[i], _pos, _vfx[i].transform.rotation);
         }
         return result;
     }

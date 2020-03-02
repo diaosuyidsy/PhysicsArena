@@ -8,7 +8,12 @@ using TMPro;
 public class ComicMenu : MonoBehaviour
 {
     public ComicMenuData ComicMenuData;
+    public GameObject CoverPage;
     public GameObject CoverPage2D;
+    public GameObject MapSelectionLeft;
+    public GameObject MapSelectionRight;
+    public GameObject Maps;
+    public string SelectedMapName = "BrawlModeReforged";
     private FSM<ComicMenu> ComicMenuFSM;
 
     private void Awake()
@@ -77,10 +82,11 @@ public class ComicMenu : MonoBehaviour
         protected bool _vAxisInUse = true;
         protected bool _hAxisInUse = true;
         protected ComicMenuData _MenuData { get { return Context.ComicMenuData; } }
-
+        protected Camera _MainCamera;
         public override void OnEnter()
         {
             base.OnEnter();
+            _MainCamera = Camera.main;
             _vAxisInUse = true;
             _hAxisInUse = true;
         }
@@ -189,11 +195,83 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
-            print("Hello");
             _playMenuItem = Context.CoverPage2D.transform.GetChild(0);
             Sequence sequence = DOTween.Sequence();
             sequence.Append(_playMenuItem.GetChild(1).GetComponent<TextMeshPro>().DOColor(_MenuData.PlayTextBlinkColor, _MenuData.PlayTextBlinkDuration)
             .SetEase(Ease.Flash, _MenuData.PlayTextBlinkTime, _MenuData.PlayTextBlinkPeriod));
+            sequence.Append(Context.CoverPage.transform.DOLocalMove(_MenuData.CoverPageLocalMovement, _MenuData.CoverPageMovementDuration)
+            .SetEase(_MenuData.CoverPageMovementEase).SetRelative(true));
+            sequence.Join(Context.CoverPage.transform.DOLocalRotate(_MenuData.CoverPageLocalRotation, _MenuData.CoverPageRotateDuration)
+            .SetEase(_MenuData.CoverPageRotateEase).SetRelative(true));
+            sequence.AppendCallback(() =>
+            {
+                foreach (SpriteRenderer sr in Context.CoverPage.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    sr.sortingLayerID = 0;
+                }
+
+                foreach (TextMeshPro tmp in Context.CoverPage.GetComponentsInChildren<TextMeshPro>())
+                {
+                    tmp.sortingLayerID = 0;
+                }
+            });
+            sequence.Append(Context.CoverPage.transform.DOLocalMove(_MenuData.CoverPageReturnLocalMovement, _MenuData.CoverpageReturnDuration)
+            .SetEase(_MenuData.CoverPageReturnEase).SetRelative(true));
+            sequence.Join(Context.CoverPage.transform.DOLocalRotate(_MenuData.CoverPageReturnLocalRotation, _MenuData.CoverPageReturnRotateDuration)
+            .SetEase(_MenuData.CoverPageReturnRotateEase).SetRelative(true));
+            sequence.AppendInterval(_MenuData.AfterCoverPageWaitDuration);
+            sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraMapSelectionWorldLocation, _MenuData.CameraToMapSelectionDuration)
+            .SetEase(_MenuData.CameraToMapSelectionEase));
+            sequence.Join(_MainCamera.DOFieldOfView(_MenuData.CameraMapSelectionFOV, _MenuData.CameraToMapSelectionDuration)
+            .SetEase(_MenuData.CameraToMapSelectionEase));
+            sequence.AppendCallback(() =>
+            {
+                TransitionTo<MapSelectionState>();
+            });
+        }
+    }
+
+    private class MapSelectionState : MenuState
+    {
+        private int _mapIndex = 0;
+        private int _maxMapCount;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context.SelectedMapName = "BrawlModeReforged";
+            _maxMapCount = Context.Maps.transform.childCount;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_HLAxisRaw > 0.2f && !_hAxisInUse)
+            {
+                BlinkLeftRight(false);
+                return;
+            }
+            if (_HLAxisRaw < -0.2f && !_hAxisInUse)
+            {
+                BlinkLeftRight(true);
+                return;
+            }
+
+        }
+
+        private void BlinkLeftRight(bool left)
+        {
+            _hAxisInUse = true;
+            Context.Maps.transform.GetChild(_mapIndex).gameObject.SetActive(false);
+            _mapIndex = Mathf.Abs((_mapIndex + (left ? -1 : 1)) % _maxMapCount);
+            Context.Maps.transform.GetChild(_mapIndex).gameObject.SetActive(true);
+            Context.SelectedMapName = Context.Maps.transform.GetChild(_mapIndex).name;
+            if (left)
+                Context.MapSelectionLeft.GetComponent<SpriteRenderer>().DOColor(_MenuData.LeftRightClickColor, _MenuData.LeftRightClickDuration)
+                .SetEase(Ease.Flash, 2, 0);
+            else
+                Context.MapSelectionRight.GetComponent<SpriteRenderer>().DOColor(_MenuData.LeftRightClickColor, _MenuData.LeftRightClickDuration)
+                    .SetEase(Ease.Flash, 2, 0);
         }
     }
 }

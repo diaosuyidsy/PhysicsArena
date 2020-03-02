@@ -14,7 +14,7 @@ public class ComicMenu : MonoBehaviour
     private void Awake()
     {
         ComicMenuFSM = new FSM<ComicMenu>(this);
-
+        ComicMenuFSM.TransitionTo<FirstMenuState>();
     }
 
 
@@ -114,15 +114,58 @@ public class ComicMenu : MonoBehaviour
             ActivateMenuItem(_menuItem);
         }
 
+        public override void OnExit()
+        {
+            base.OnExit();
+        }
+
         public override void Update()
         {
             base.Update();
             if (_VLAxisRaw > 0.2f && !_vAxisInUse && _finishedEnter && _index < _maxIndex)
             {
+                DeactivateMenuItem(_menuItem);
                 _index++;
+                _vAxisInUse = true;
+                _finishedEnter = false;
                 _menuItem = Context.CoverPage2D.transform.GetChild(_index);
                 ActivateMenuItem(_menuItem);
+                return;
             }
+
+            if (_VLAxisRaw < -0.2f && !_vAxisInUse && _finishedEnter && _index > 0)
+            {
+                DeactivateMenuItem(_menuItem);
+                _index--;
+                _vAxisInUse = true;
+                _finishedEnter = false;
+                _menuItem = Context.CoverPage2D.transform.GetChild(_index);
+                ActivateMenuItem(_menuItem);
+                return;
+            }
+            if (_ADown && !_vAxisInUse && _finishedEnter)
+            {
+                switch (_index)
+                {
+                    case 0:
+                        TransitionTo<FirstMenuToSecondMenuTransition>();
+                        break;
+                    case 1:
+                        break;
+                    case 2:
+                        Application.Quit();
+                        break;
+                }
+                return;
+            }
+
+        }
+
+        private void DeactivateMenuItem(Transform menuItem)
+        {
+            menuItem.GetChild(0).GetComponent<SpriteRenderer>().color = _MenuData.UnselectedFillColor;
+            menuItem.GetChild(1).GetComponent<TextMeshPro>().color = _MenuData.UnselectedTextColor;
+            menuItem.DOScale(_MenuData.UnselectedMenuItemScale, _MenuData.UnselectedMenuItemDuartion).SetEase(_MenuData.UnSelectedMenuItemEase);
         }
 
         private void ActivateMenuItem(Transform menuItem)
@@ -137,6 +180,20 @@ public class ComicMenu : MonoBehaviour
             {
                 _finishedEnter = true;
             });
+        }
+    }
+
+    private class FirstMenuToSecondMenuTransition : MenuState
+    {
+        private Transform _playMenuItem;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            print("Hello");
+            _playMenuItem = Context.CoverPage2D.transform.GetChild(0);
+            Sequence sequence = DOTween.Sequence();
+            sequence.Append(_playMenuItem.GetChild(1).GetComponent<TextMeshPro>().DOColor(_MenuData.PlayTextBlinkColor, _MenuData.PlayTextBlinkDuration)
+            .SetEase(Ease.Flash, _MenuData.PlayTextBlinkTime, _MenuData.PlayTextBlinkPeriod));
         }
     }
 }

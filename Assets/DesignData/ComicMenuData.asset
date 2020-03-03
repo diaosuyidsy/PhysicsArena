@@ -43,5 +43,154 @@ MonoBehaviour:
   CameraMapSelectionFOV: 10.5
   CameraToMapSelectionDuration: 0.5
   CameraToMapSelectionEase: 6
+  MapToFirstCameraPositionEase:
+    EndValue: {x: 0.158, y: 2.551, z: -0.04659413}
+    Duration: 0.4
+    Relative: 0
+    Ease: 6
+  MapToFirstCameraFOVEase:
+    EndValue: 30
+    Duration: 0.4
+    Relative: 0
+    Ease: 6
+  MapToFirstFirstMenuMove1:
+    EndValue: {x: -0.55, y: 0, z: 0}
+    Duration: 0.2
+    Relative: 1
+    Ease: 6
+  MapToFirstFirstMenuMove2:
+    EndValue: {x: 0.6, y: 0, z: 0}
+    Duration: 0.2
+    Relative: 1
+    Ease: 5
+  MaptoFirstFirstMenuRotate1:
+    EndValue: {x: 0, y: 5, z: 0}
+    Duration: 0.2
+    Relative: 1
+    Ease: 6
   LeftRightClickColor: {r: 1, g: 0.44479144, b: 0, a: 1}
   LeftRightClickDuration: 0.1
+  CameraStopLocation1: {x: 0.421, y: 2.551, z: -0.02}
+  CameraToCharacterMoveDuration1: 0.5
+  CameraMoveEase1: 6
+  CameraStopDuration1: 0.5
+  CameraStopLocation2: {x: 0.421, y: 2.551, z: -0.22}
+  CameraToCharacterMoveDuration2: 0.5
+  CameraMoveEase2: 6
+  EggNormalOutlineColor: {r: 0, g: 0, b: 0, a: 1}
+  EggCursorOverOutlineColor: {r: 1, g: 1, b: 1, a: 1}
+  HoleNormalColor: {r: 1, g: 1, b: 1, a: 1}
+  HoverImageColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  HoleCursorveHoverColor:
+  - {r: 0.25490198, g: 0.4039216, b: 1, a: 0.7058824}
+  - {r: 0.25490198, g: 0.4039216, b: 1, a: 0.7058824}
+  - {r: 0.25490198, g: 0.4039216, b: 1, a: 0.7058824}
+  - {r: 1, g: 0.31764707, b: 0.5803922, a: 0.7058824}
+  - {r: 1, g: 0.31764707, b: 0.5803922, a: 0.7058824}
+  - {r: 1, g: 0.31764707, b: 0.5803922, a: 0.7058824}
+  HoleSelectedColor:
+  - {r: 0.25490198, g: 0.4039216, b: 1, a: 1}
+  - {r: 0.25490198, g: 0.4039216, b: 1, a: 1}
+  - {r: 0.25490198, g: 0.4039216, b: 1, a: 1}
+  - {r: 1, g: 0.31764707, b: 0.5803922, a: 1}
+  - {r: 1, g: 0.31764707, b: 0.5803922, a: 1}
+  - {r: 1, g: 0.31764707, b: 0.5803922, a: 1}
+  EggActivatedScale: {x: 0, y: 0, z: 0}
+  CursorMoveSpeed: 1
+  EggLayer:
+    serializedVersion: 2
+    m_Bits: 2097152
+  ETC_EggShakeDuration: 0.2
+  ETC_EggShakeStrength: 90
+  ETC_EggShakeVibrato: 10
+  ETC_EggScaleAmount: {x: 1.2, y: 1.2, z: 1.2}
+  ETC_EggScaleDuration: 0.2
+  ETC_EggScaleAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.08553788
+      value: 0.99632144
+      inSlope: 0.003639984
+      outSlope: 0.003639984
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.9809265
+      value: 0.002380371
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  ETC_EggMoveYAmount: 10
+  ETC_EggMoveYDuration: 0.5
+  ETC_EggMoveYAnimationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.35718283
+      value: 1.0038035
+      inSlope: -0.013702008
+      outSlope: -0.013702008
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.6693493
+    - serializedVersion: 3
+      time: 0.4947575
+      value: 1.0040417
+      inSlope: -0.01975302
+      outSlope: -0.01975302
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.25076315
+    - serializedVersion: 3
+      time: 0.69615215
+      value: 1.0014133
+      inSlope: 0.004270105
+      outSlope: 0.004270105
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.42793888
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.9944458
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  ETC_ChickenMoveYDuration: 0.3
+  ETC_ChickenMoveYEase: 6
+  ETC_ChickenMoveYDelay: 0.3

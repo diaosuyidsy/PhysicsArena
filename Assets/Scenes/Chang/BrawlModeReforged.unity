@@ -12056,7 +12056,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d4f1cc3fe4a57f439f50230ed246e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GenerationRadius: 1
+  GenerationRadius: 0.2
   DetectOffset: {x: 0, y: 0, z: 0}
   DetectRadius: 1
   WeaponLayer:
@@ -13466,6 +13466,7 @@ MonoBehaviour:
     type: 3}
   ExplosionVFX: {fileID: 1924789974987344, guid: ff88062c6299ba24694ece87ffe4bf5a,
     type: 3}
+  Data: {fileID: 0}
 --- !u!114 &548079446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13490,7 +13491,7 @@ MonoBehaviour:
   PipeEndRecoverTime: 1
   PipeEndShakeDis: 1
   MarkAppearTime: 0.5
-  MarkDefaultColor: {r: 1, g: 1, b: 1, a: 1}
+  MarkDefaultColor: {r: 1, g: 1, b: 1, a: 0}
   MarkAlertColor: {r: 0.8352941, g: 0.1764706, b: 0.8666667, a: 1}
   BombPrefab: {fileID: 5766329749968335211, guid: eaf25f58b8bc9d5438b493ef86c5899e,
     type: 3}
@@ -14000,7 +14001,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d4f1cc3fe4a57f439f50230ed246e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GenerationRadius: 1
+  GenerationRadius: 0.2
   DetectOffset: {x: 0, y: 0, z: 0}
   DetectRadius: 1
   WeaponLayer:
@@ -32917,7 +32918,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d4f1cc3fe4a57f439f50230ed246e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GenerationRadius: 1
+  GenerationRadius: 0.2
   DetectOffset: {x: 0, y: 0, z: 0}
   DetectRadius: 1
   WeaponLayer:
@@ -33360,21 +33361,6 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 224014487168222038, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -868.00006
-      objectReference: {fileID: 0}
-    - target: {fileID: 224230160525881856, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -652
-      objectReference: {fileID: 0}
-    - target: {fileID: 224230160525881856, guid: 1d54c92011a4fa44abc8bcea479467c2,
-        type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: -868.00006
-      objectReference: {fileID: 0}
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 16.8
@@ -33406,6 +33392,21 @@ PrefabInstance:
     - target: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2, type: 3}
       propertyPath: m_RootOrder
       value: 17
+      objectReference: {fileID: 0}
+    - target: {fileID: 224014487168222038, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -868.00006
+      objectReference: {fileID: 0}
+    - target: {fileID: 224230160525881856, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -652
+      objectReference: {fileID: 0}
+    - target: {fileID: 224230160525881856, guid: 1d54c92011a4fa44abc8bcea479467c2,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -868.00006
       objectReference: {fileID: 0}
     - target: {fileID: 114862773439473196, guid: 1d54c92011a4fa44abc8bcea479467c2,
         type: 3}
@@ -53111,80 +53112,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1183775275}
   m_CullTransparentMesh: 0
---- !u!1 &1194620670
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1194620671}
-  - component: {fileID: 1194620672}
-  m_Layer: 0
-  m_Name: JiffycrewUtilCam
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1194620671
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1194620670}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 2082989922}
-  m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &1194620672
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1194620670}
-  m_Enabled: 0
-  serializedVersion: 2
-  m_ClearFlags: 2
-  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 100000
-  field of view: 30
-  orthographic: 0
-  orthographic size: 10
-  m_Depth: -1
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: 1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 0
-  m_AllowDynamicResolution: 1
-  m_ForceIntoRT: 1
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
 --- !u!1 &1200908927
 GameObject:
   m_ObjectHideFlags: 0
@@ -59710,7 +59637,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d4f1cc3fe4a57f439f50230ed246e1e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GenerationRadius: 1
+  GenerationRadius: 0.2
   DetectOffset: {x: 0, y: 0, z: 0}
   DetectRadius: 1
   WeaponLayer:
@@ -67378,6 +67305,80 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1723360801}
   m_Mesh: {fileID: 4300000, guid: cfae94002c272d14fb7dbfb38dbd454c, type: 3}
+--- !u!1 &1726184351
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1726184352}
+  - component: {fileID: 1726184353}
+  m_Layer: 0
+  m_Name: JiffycrewUtilCam
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1726184352
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1726184351}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 2082989922}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &1726184353
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1726184351}
+  m_Enabled: 0
+  serializedVersion: 2
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_FocalLength: 50
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 100000
+  field of view: 30
+  orthographic: 0
+  orthographic size: 10
+  m_Depth: -1
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: 1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 0
+  m_AllowDynamicResolution: 1
+  m_ForceIntoRT: 1
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
 --- !u!1 &1732926433
 GameObject:
   m_ObjectHideFlags: 0

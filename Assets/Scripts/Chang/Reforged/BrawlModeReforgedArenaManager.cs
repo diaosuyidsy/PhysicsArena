@@ -18,9 +18,294 @@ public enum CanonSide
     Blue
 }
 
+public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
+{
+
+}
+
+public class CanonIdle: CanonAction
+{
+    public override void Update()
+    {
+        base.Update();
+        CheckDelivery();
+    }
+
+    private void CheckDelivery()
+    {
+        if (Context.DeliveryEvent != null)
+        {
+            Context.Info.LastSide = Context.Info.CurrentSide;
+
+            if(Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team1Basket)
+            {
+                Context.Info.CurrentSide = CanonSide.Red;
+            }
+            else
+            {
+                Context.Info.CurrentSide = CanonSide.Blue;
+            }
+
+            TransitionTo<CanonSwtich>();
+
+            Context.DeliveryEvent = null;
+
+            return;
+        }
+    }
+}
+
+public class CanonSwtich : CanonAction
+{
+    private float Timer;
+
+    private Material RedCabelMat;
+    private Material BlueCabelMat;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+
+
+    }
+
+
+    public override void Update()
+    {
+        base.Update();
+
+        SetCanonPipe(Context.FeelData.MaxPipeAngle, Context.FeelData.PipeRotateSpeed);
+    }
+
+
+    /*private void CabelChange(GameObject Cabel,bool Shine)
+    {
+        foreach (Transform child in Cabel.transform)
+        {
+            Material mat = child.GetComponent<Renderer>().material;
+            mat.EnableKeyword("_EMISSION");
+
+            float Emission;
+
+            if (Shine)
+            {
+                Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / FeelData.CabelShineTime);
+            }
+            else
+            {
+                Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, Timer / FeelData.CabelShineTime);
+            }
+
+
+            mat.SetColor("_EmissionColor", color * Emission);
+        }
+    }*/
+
+    private void SetCabel(GameObject RedCabel, GameObject BlueCabel)
+    {
+
+
+        Timer += Time.deltaTime;
+
+        switch (Context.Info.CurrentSide)
+        {
+            case CanonSide.Neutral:
+                switch (Context.Info.LastSide)
+                {
+                    case CanonSide.Red:
+
+
+                        break;
+                    case CanonSide.Blue:
+                        break;
+                }
+                break;
+            case CanonSide.Red:
+                break;
+            case CanonSide.Blue:
+                break;
+        }
+    }
+
+    private void SetCanonPipe(float MaxPipeAngle, float PipeRotateSpeed)
+    {
+        switch (Context.Info.CurrentSide)
+        {
+            case CanonSide.Neutral:
+
+                switch (Context.Info.LastSide)
+                {
+                    case CanonSide.Blue:
+                        if (Context.Info.PipeAngle < 0)
+                        {
+                            Context.Info.PipeAngle += PipeRotateSpeed * Time.deltaTime;
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
+                        }
+                        else
+                        {
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -Context.Info.PipeAngle, 0));
+                            Context.Info.PipeAngle = 0;
+
+                            TransitionTo<CanonIdle>();
+                        }
+                        break;
+                    case CanonSide.Red:
+
+                        if (Context.Info.PipeAngle > 0)
+                        {
+                            Context.Info.PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
+                        }
+                        else
+                        {
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -Context.Info.PipeAngle, 0));
+                            Context.Info.PipeAngle = 0;
+
+                            TransitionTo<CanonIdle>();
+                        }
+                        break;
+                }
+                break;
+            case CanonSide.Blue:
+                switch (Context.Info.LastSide)
+                {
+                    case CanonSide.Neutral:
+
+                        if (Context.Info.PipeAngle > -MaxPipeAngle)
+                        {
+                            Context.Info.PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
+                        }
+                        else
+                        {
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - Context.Info.PipeAngle, 0));
+                            Context.Info.PipeAngle = -MaxPipeAngle;
+
+                            TransitionTo<CanonFiring_Normal>();
+                        }
+                        break;
+                    case CanonSide.Red:
+                        if (Context.Info.PipeAngle > -MaxPipeAngle)
+                        {
+                            Context.Info.PipeAngle += -PipeRotateSpeed * Time.deltaTime;
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
+                        }
+                        else
+                        {
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - Context.Info.PipeAngle, 0));
+                            Context.Info.PipeAngle = -MaxPipeAngle;
+
+                            TransitionTo<CanonFiring_Normal>();
+                        }
+                        break;
+                }
+                break;
+            case CanonSide.Red:
+                switch (Context.Info.LastSide)
+                {
+                    case CanonSide.Neutral:
+
+                        if (Context.Info.PipeAngle < MaxPipeAngle)
+                        {
+                            Context.Info.PipeAngle += PipeRotateSpeed * Time.deltaTime;
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
+                        }
+                        else
+                        {
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - Context.Info.PipeAngle, 0));
+                            Context.Info.PipeAngle = MaxPipeAngle;
+
+                            TransitionTo<CanonFiring_Normal>();
+                        }
+                        break;
+                    case CanonSide.Blue:
+
+                        if (Context.Info.PipeAngle < MaxPipeAngle)
+                        {
+                            Context.Info.PipeAngle += PipeRotateSpeed * Time.deltaTime;
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
+                        }
+                        else
+                        {
+                            Context.Info.Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - Context.Info.PipeAngle, 0));
+                            Context.Info.PipeAngle = MaxPipeAngle;
+
+                            TransitionTo<CanonFiring_Normal>();
+                        }
+                        break;
+                }
+                break;
+        }
+    }
+}
+
+public class CanonCooldown : CanonAction
+{
+    private float Timer;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Timer = 0;
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        CheckDelivery();
+        CheckTimer();
+
+    }
+
+    private void CheckDelivery()
+    {
+        if (Context.DeliveryEvent != null)
+        {
+            if (Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team1Basket && Context.Info.CurrentSide != CanonSide.Red)
+            {
+                Context.Info.LastSide = Context.Info.CurrentSide;
+                Context.Info.CurrentSide = CanonSide.Red;
+
+                TransitionTo<CanonSwtich>();
+                return;
+            }
+            else if (Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team2Basket && Context.Info.CurrentSide != CanonSide.Blue)
+            {
+                Context.Info.LastSide = Context.Info.CurrentSide;
+                Context.Info.CurrentSide = CanonSide.Blue;
+
+                TransitionTo<CanonSwtich>();
+                return;
+            }
+
+            Context.DeliveryEvent = null;
+        }
+    }
+
+    private void CheckTimer()
+    {
+        Timer += Time.deltaTime;
+        if (Timer >= Context.Data.CanonCooldown)
+        {
+            TransitionTo<CanonFiring_Normal>();
+        }
+    }
+}
+
+public class CanonFiring_Normal : CanonAction
+{
+
+}
+
+public class CanonFiring_Alert : CanonAction
+{
+
+}
+
 public class BrawlModeReforgedArenaManager : MonoBehaviour
 {
-    private class CanonInfo
+    public class CanonInfo
     {
         public GameObject Pipe;
 
@@ -34,7 +319,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public GameObject Mark;
         public GameObject LockedPlayer;
 
-        private float PipeAngle;
+        public float PipeAngle;
 
         public bool ReadyToFire;
 
@@ -230,9 +515,11 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public GameObject MarkPrefab;
     public GameObject ExplosionVFX;
 
-    private BrawlModeReforgedModeData Data;
+    public BrawlModeReforgedModeData Data;
 
-    private CanonInfo Info;
+    public CanonInfo Info;
+
+    public BagelSent DeliveryEvent;
     private GameObject Bagel;
 
     // Start is called before the first frame update
@@ -246,8 +533,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             Data = Data_MorePlayer;
         }
-
-
 
         Team1Basket = CanonObject.transform.Find("LForceField").gameObject;
         Team2Basket = CanonObject.transform.Find("RForceField").gameObject;
@@ -496,20 +781,23 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             Info.Rocket.transform.up = Vector3.down;
             Info.Rocket.transform.position += Vector3.down * (FeelData.BombInvisibleHeight - Info.Mark.transform.position.y)/FeelData.BombFallTime*Time.deltaTime;
+            MarkFollow(Info,false);
         }
         else if(Info.Timer >= Data.CanonFireTime - Data.CanonFireAlertTime)
         {
             Info.Mark.GetComponent<SpriteRenderer>().color = FeelData.MarkAlertColor;
+            MarkFollow(Info,false);
         }
         else
         {
             Info.Mark.GetComponent<SpriteRenderer>().color = new Color(FeelData.MarkDefaultColor.r, FeelData.MarkDefaultColor.g, FeelData.MarkDefaultColor.b, Info.Timer / FeelData.MarkAppearTime);
+            MarkFollow(Info,true);
         }
 
-        MarkFollow(Info);
+
     }
 
-    private void MarkFollow(CanonInfo Info)
+    private void MarkFollow(CanonInfo Info, bool Normal)
     {
         if(Info.LockedPlayer == null)
         {
@@ -518,13 +806,24 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         Vector3 Offset = Info.LockedPlayer.transform.position - Info.Mark.transform.position;
         Offset.y = 0;
+
+        float FollowSpeed;
+        if (Normal)
+        {
+            FollowSpeed = Data.NormalFollowSpeed;
+        }
+        else
+        {
+            FollowSpeed = Data.AlertFollowSpeed;
+        }
+
         float Dis = Offset.magnitude;
 
         if (Dis >= 0.01f)
         {
-            if (Dis >= Data.FollowSpeed * Time.deltaTime)
+            if (Dis >= FollowSpeed* Time.deltaTime)
             {
-                Info.Mark.transform.position += Data.FollowSpeed * Time.deltaTime * Offset.normalized;
+                Info.Mark.transform.position += FollowSpeed * Time.deltaTime * Offset.normalized;
             }
             else
             {
@@ -619,10 +918,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             }
         }
 
-        if (Bagel == null)
-        {
-            GenerateBagel();
-        }
         GameObject.Instantiate(ExplosionVFX, Info.Mark.transform.position, ExplosionVFX.transform.rotation);
         Destroy(Info.Rocket);
         Destroy(Info.Mark);
@@ -728,6 +1023,11 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         if(e.Player == Info.LockedPlayer && Info.State == CanonState.Firing)
         {
             Info.LockedPlayer = null;
+        }
+
+        if (Bagel == null)
+        {
+            GenerateBagel();
         }
     }
 }

@@ -9,6 +9,8 @@ public class ComicMenu : MonoBehaviour
 {
     public ComicMenuData ComicMenuData;
     public GameObject CoverPage;
+    public GameObject SelectionPage;
+    public GameObject LoadingPage;
     public GameObject CoverPage2D;
     public GameObject MapSelectionLeft;
     public GameObject MapSelectionRight;
@@ -1068,6 +1070,43 @@ public class ComicMenu : MonoBehaviour
     }
 
     private class CharacterSelectionToLoadingTransition : MenuState
+    {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Sequence sequence = DOTween.Sequence();
+            sequence.AppendInterval(_MenuData.CharacterSelectionToLoadingPauseDuration);
+            sequence.Append(_MainCamera.transform.DOMove(_MenuData.CharacterSelectionToLoadingCameraLocationEase.EndValue,
+            _MenuData.CharacterSelectionToLoadingCameraLocationEase.Duration).SetEase(_MenuData.CharacterSelectionToLoadingCameraFOVEase.Ease));
+            sequence.Join(_MainCamera.DOFieldOfView(_MenuData.CharacterSelectionToLoadingCameraFOVEase.EndValue, _MenuData.CharacterSelectionToLoadingCameraFOVEase.Duration)
+            .SetEase(_MenuData.CharacterSelectionToLoadingCameraFOVEase.Ease));
+            sequence.AppendInterval(_MenuData.CharacterSelectionToLoadingPauseDuration2);
+            sequence.Append(Context.SelectionPage.transform.DOMove(_MenuData.CharacterSelectionToLoadingPageMovementEase1.EndValue,
+            _MenuData.CharacterSelectionToLoadingPageMovementEase1.Duration).SetEase(_MenuData.CharacterSelectionToLoadingPageMovementEase1.Ease)
+            .SetRelative(_MenuData.CharacterSelectionToLoadingPageMovementEase1.Relative));
+            sequence.AppendCallback(() =>
+            {
+                foreach (SpriteRenderer sr in Context.SelectionPage.GetComponentsInChildren<SpriteRenderer>())
+                {
+                    sr.sortingLayerID = 0;
+                }
+
+                foreach (TextMeshPro tmp in Context.SelectionPage.GetComponentsInChildren<TextMeshPro>())
+                {
+                    tmp.sortingLayerID = 0;
+                }
+            });
+            sequence.Append(Context.SelectionPage.transform.DOMove(_MenuData.CharacterSelectionToLoadingPageMovementEase2.EndValue,
+            _MenuData.CharacterSelectionToLoadingPageMovementEase2.Duration).SetEase(_MenuData.CharacterSelectionToLoadingPageMovementEase2.Ease)
+            .SetRelative(_MenuData.CharacterSelectionToLoadingPageMovementEase2.Relative));
+            sequence.AppendCallback(() =>
+            {
+                TransitionTo<LoadingState>();
+            });
+        }
+    }
+
+    private class LoadingState : MenuState
     {
 
     }

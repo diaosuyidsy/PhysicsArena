@@ -93,6 +93,14 @@ public class ComicMenuData : ScriptableObject
     public float ETC_ChickenMoveYDelay = 0.3f;
 
     public Color[] BirdColor;
+    [Header("CharacterSelectionToLoadingSetting")]
+    public float CharacterSelectionToLoadingPauseDuration = 0.5f;
+    public float CharacterSelectionToLoadingPauseDuration2 = 0.5f;
+    public Vector3Ease CharacterSelectionToLoadingCameraLocationEase;
+    public FloatEase CharacterSelectionToLoadingCameraFOVEase;
+    public Vector3Ease CharacterSelectionToLoadingPageMovementEase1;
+    public Vector3Ease CharacterSelectionToLoadingPageMovementEase2;
+
 }
 
 [Serializable]

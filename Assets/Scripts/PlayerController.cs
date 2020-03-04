@@ -475,6 +475,11 @@ public class PlayerController : MonoBehaviour, IHittable
         _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
         BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
     }
+
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
     #endregion
 
     #region Movment States
@@ -1296,7 +1301,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 {
                     if (hit.transform.GetComponentInParent<IHittable>() == null) return;
                     _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+                    foreach (var rb in hit.transform.GetComponentInParent<IHittable>().GetGameObject().GetComponentsInChildren<Rigidbody>())
                     {
                         rb.velocity = Vector3.zero;
                     }

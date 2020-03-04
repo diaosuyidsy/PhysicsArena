@@ -23,6 +23,7 @@ public class ComicMenuData : ScriptableObject
     public float PlayTextBlinkDuration = 0.4f;
     public float PlayTextBlinkTime = 0.2f;
     public float PlayTextBlinkPeriod = 0.2f;
+    public float PlayTextAfterDelay = 0.5f;
     public Vector3 CoverPageLocalMovement = new Vector3(-0.8f, 0f, 0f);
     public float CoverPageMovementDuration = 0.35f;
     public Ease CoverPageMovementEase = Ease.OutQuad;
@@ -52,6 +53,7 @@ public class ComicMenuData : ScriptableObject
     public float LeftRightClickDuration = 0.1f;
 
     [Header("Map To Character Transition Settings")]
+    public float InitialStopDuration = 0.2f;
     public Vector3 CameraStopLocation1 = new Vector3(0.421f, 2.551f, -0.02f);
     public float CameraToCharacterMoveDuration1 = 0.5f;
     public Ease CameraMoveEase1 = Ease.OutQuad;
@@ -59,7 +61,13 @@ public class ComicMenuData : ScriptableObject
     public Vector3 CameraStopLocation2 = new Vector3(0.421f, 2.551f, -0.22f);
     public float CameraToCharacterMoveDuration2 = 0.5f;
     public Ease CameraMoveEase2 = Ease.OutQuad;
+    [Header("Character To Map Transition Settings")]
+    public float CharacterToMapInitialStopDuration = 0.2f;
+
+    public Vector3Ease CharacterToMapCameraLocationEase;
     [Header("Character Selection Settings")]
+    public Vector2 MouseClampMaxValue = new Vector2(0.218f, -0.074f);
+    public Vector2 MouseClampMinValue = new Vector2(-0.22f, -0.306f);
     public Color EggNormalOutlineColor = Color.black;
     public Color EggCursorOverOutlineColor = Color.white;
     public Color HoleNormalColor = Color.white;
@@ -67,7 +75,7 @@ public class ComicMenuData : ScriptableObject
     public Color[] HoleCursorveHoverColor;
     public Color[] HoleSelectedColor;
     public Vector3 EggActivatedScale;
-
+    public Vector3 EggNormalScale = 0.8f * Vector3.one;
     public Vector2 CursorMoveSpeed = new Vector2(50f, 30f);
     public LayerMask EggLayer;
     public float ETC_EggShakeDuration = 0.2f;
@@ -79,9 +87,12 @@ public class ComicMenuData : ScriptableObject
     public float ETC_EggMoveYAmount = 10f;
     public float ETC_EggMoveYDuration = 0.5f;
     public AnimationCurve ETC_EggMoveYAnimationCurve;
+    public float ETC_ChickenMoveYAmount = 10f;
     public float ETC_ChickenMoveYDuration = 0.3f;
     public Ease ETC_ChickenMoveYEase = Ease.OutQuad;
     public float ETC_ChickenMoveYDelay = 0.3f;
+
+    public Color[] BirdColor;
 }
 
 [Serializable]

@@ -16,6 +16,8 @@ public class ComicMenu : MonoBehaviour
     public GameObject EggHolder;
     public GameObject PlayerHolder;
     public GameObject CharacterImageHolder;
+    public Camera SceneCamera;
+    public GameObject HitBar;
     [HideInInspector]
     public string SelectedMapName = "BrawlModeReforged";
     private PlayerInformation _finalPlayerInformation;
@@ -27,6 +29,7 @@ public class ComicMenu : MonoBehaviour
     public Transform[] _3rdMenuHoleImages;
     public Transform[] _3rdMenuIndicators;
     public Transform[] _3rdMenuPrompts;
+    public TextMeshPro _hintText;
     private Vector3[] _3rdMenuCursorsOriginalLocalPosition;
     private Vector3[] _chickenOriginalLocalPosition;
     private Vector3[] _eggsOriginalLocalPosition;
@@ -62,6 +65,11 @@ public class ComicMenu : MonoBehaviour
     void Update()
     {
         ComicMenuFSM.Update();
+    }
+
+    public void OnPlayerRechoose(int rewiredId)
+    {
+        ((CharacterSelectionState)ComicMenuFSM.CurrentState).OnPlayerRechoose(rewiredId);
     }
 
     private abstract class MenuState : FSM<ComicMenu>.State
@@ -229,6 +237,7 @@ public class ComicMenu : MonoBehaviour
             Sequence sequence = DOTween.Sequence();
             sequence.Append(_playMenuItem.GetChild(1).GetComponent<TextMeshPro>().DOColor(_MenuData.PlayTextBlinkColor, _MenuData.PlayTextBlinkDuration)
             .SetEase(Ease.Flash, _MenuData.PlayTextBlinkTime, _MenuData.PlayTextBlinkPeriod));
+            sequence.AppendInterval(_MenuData.PlayTextAfterDelay);
             sequence.Append(Context.CoverPage.transform.DOLocalMove(_MenuData.CoverPageLocalMovement, _MenuData.CoverPageMovementDuration)
             .SetEase(_MenuData.CoverPageMovementEase).SetRelative(true));
             sequence.Join(Context.CoverPage.transform.DOLocalRotate(_MenuData.CoverPageLocalRotation, _MenuData.CoverPageRotateDuration)
@@ -304,6 +313,8 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context.MapSelectionLeft.SetActive(true);
+            Context.MapSelectionRight.SetActive(true);
             Context.SelectedMapName = "BrawlModeReforged";
             _maxMapCount = Context.Maps.transform.childCount;
         }
@@ -355,7 +366,10 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context.MapSelectionLeft.SetActive(false);
+            Context.MapSelectionRight.SetActive(false);
             Sequence sequence = DOTween.Sequence();
+            sequence.AppendInterval(_MenuData.InitialStopDuration);
             sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation1, _MenuData.CameraToCharacterMoveDuration1).SetEase(_MenuData.CameraMoveEase1));
             sequence.AppendInterval(_MenuData.CameraStopDuration1);
             sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation2, _MenuData.CameraToCharacterMoveDuration2).SetEase(_MenuData.CameraMoveEase2));
@@ -368,7 +382,17 @@ public class ComicMenu : MonoBehaviour
 
     private class CharacterSelectionToMapTransition : MenuState
     {
-
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Sequence sequence = DOTween.Sequence();
+            sequence.AppendInterval(_MenuData.CharacterToMapInitialStopDuration);
+            sequence.Append(_MainCamera.transform.DOMove(_MenuData.CharacterToMapCameraLocationEase.EndValue, _MenuData.CharacterToMapCameraLocationEase.Duration).SetEase(_MenuData.CharacterToMapCameraLocationEase.Ease));
+            sequence.AppendCallback(() =>
+            {
+                TransitionTo<MapSelectionState>();
+            });
+        }
     }
 
 
@@ -376,6 +400,7 @@ public class ComicMenu : MonoBehaviour
     {
         private List<PlayerMap> _playerMap;
         private Camera _mainCamera;
+        private Camera _sceneCamera { get { return Context.SceneCamera; } }
 
         /// <summary>
         /// How many cursors are on a egg
@@ -527,23 +552,28 @@ public class ComicMenu : MonoBehaviour
             DataSaver.saveData(saveData, "PlayersInformation");
         }
 
+        public void OnPlayerRechoose(int rewiredID)
+        {
+            ((SelectedState)_playersFSM[_getGamePlayerIDFromRewiredId(rewiredID)].CurrentState).OnPlayerRechoose();
+        }
+
         private void _onPlayerEggStateChange()
         {
-            // Context._hintText.DOKill();
-            // if (_playerMap.Count == 1 && _eggsSelectedAmount == 1)
-            // {
-            //     Context._hintText.DOText("Need More Players", 1f).SetDelay(2f);
-            // }
-            // else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count && (_blueEggsSelectedAmount == 0 || _redEggsSelectedAmount == 0))
-            // {
-            //     Context._hintText.DOText("Need Players On Both Teams", 1f).SetDelay(2f);
-            // }
-            // else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count)
-            // {
-            //     Context._hintText.DOText("Press A to Confirm", 1f);
-            // }
-            // else
-            //     Context._hintText.DOText("", 0f);
+            Context._hintText.DOKill();
+            if (_playerMap.Count == 1 && _eggsSelectedAmount == 1)
+            {
+                Context._hintText.DOText("Need More Players", 1f).SetDelay(2f);
+            }
+            else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count && (_blueEggsSelectedAmount == 0 || _redEggsSelectedAmount == 0))
+            {
+                Context._hintText.DOText("Need Players On Both Teams", 1f).SetDelay(2f);
+            }
+            else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count)
+            {
+                Context._hintText.DOText("Hit the Box", 1f);
+            }
+            else
+                Context._hintText.DOText("", 0f);
         }
 
         private bool _isRewiredPlayerInGame(int rewiredID)
@@ -595,6 +625,16 @@ public class ComicMenu : MonoBehaviour
             {
                 if (pm.RewiredPlayerID == rewiredID)
                     return pm.GamePlayerID;
+            }
+            return -1;
+        }
+
+        private int _getRewiredIDFromGameplayerId(int gamePlayerID)
+        {
+            foreach (PlayerMap pm in _playerMap)
+            {
+                if (pm.GamePlayerID == gamePlayerID)
+                    return pm.RewiredPlayerID;
             }
             return -1;
         }
@@ -719,13 +759,13 @@ public class ComicMenu : MonoBehaviour
             public override void Update()
             {
                 base.Update();
-                float HLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxis("Move Horizontal");
-                float VLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxis("Move Vertical");
+                float HLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxisRaw("Move Horizontal");
+                float VLAxis = ReInput.players.GetPlayer(_rewiredPlayerIndex).GetAxisRaw("Move Vertical");
                 Transform cursor = Context.Context._selectionCursors[_gamePlayerIndex];
-                Vector3 finalPosition = cursor.localPosition + new Vector3(HLAxis * Context._MenuData.CursorMoveSpeed.x, -VLAxis * Context._MenuData.CursorMoveSpeed.y) * Time.deltaTime;
-                finalPosition.x = Mathf.Clamp(finalPosition.x, -12.9f, 59.5f);
-                finalPosition.y = Mathf.Clamp(finalPosition.y, -9f, 0f);
-                cursor.localPosition = finalPosition;
+                Vector3 finalPosition = cursor.position + new Vector3(HLAxis * Context._MenuData.CursorMoveSpeed.x, 0f, -VLAxis * Context._MenuData.CursorMoveSpeed.y) * Time.deltaTime;
+                finalPosition.x = Mathf.Clamp(finalPosition.x, Context._MenuData.MouseClampMinValue.x, Context._MenuData.MouseClampMaxValue.x);
+                finalPosition.z = Mathf.Clamp(finalPosition.z, Context._MenuData.MouseClampMinValue.y, Context._MenuData.MouseClampMaxValue.y);
+                cursor.position = finalPosition;
             }
         }
 
@@ -747,8 +787,13 @@ public class ComicMenu : MonoBehaviour
             public override void Update()
             {
                 base.Update();
+                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
+                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+
+                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
                 RaycastHit hit;
-                Ray ray = Context._mainCamera.ScreenPointToRay(_CursorPos);
+                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 /// If cursor Casted to a egg
                 if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
@@ -768,8 +813,14 @@ public class ComicMenu : MonoBehaviour
                 base.OnEnter();
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuEggJiggleAudioClip);
                 Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+
+                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
+                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
+
                 RaycastHit hit;
-                Ray ray = Context._mainCamera.ScreenPointToRay(_CursorPos);
+                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 /// If cursor Casted to a egg
                 if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
@@ -789,8 +840,12 @@ public class ComicMenu : MonoBehaviour
             public override void Update()
             {
                 base.Update();
+                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
+                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
                 RaycastHit hit;
-                Ray ray = Context._mainCamera.ScreenPointToRay(_CursorPos);
+                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 /// If cursor Casted to another egg
                 if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
@@ -847,22 +902,34 @@ public class ComicMenu : MonoBehaviour
                 Context.Context._selectionCursors[_gamePlayerIndex].gameObject.SetActive(false);
                 Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(castedEggIndex).GetComponent<SpriteRenderer>().color = Color.white;
                 Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleSelectedColor[castedEggIndex];
+                Context.Context.HitBar.transform.GetChild(castedEggIndex).gameObject.SetActive(true);
             }
         }
 
         private class SelectedState : PlayerState
         {
-            public override void Update()
+            // public override void Update()
+            // {
+            //     base.Update();
+            //     if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Block"))
+            //     {
+            //         Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<EggNormalState>();
+            //         Context._eggSelected[Context._cursorSelectedEggIndex[_gamePlayerIndex]] = false;
+            //         Context._onPlayerEggStateChange();
+            //         TransitionTo<UnselectingState>();
+            //         return;
+            //     }
+            // }
+            public void OnPlayerRechoose()
             {
-                base.Update();
-                if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Block"))
-                {
-                    Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<EggNormalState>();
-                    Context._eggSelected[Context._cursorSelectedEggIndex[_gamePlayerIndex]] = false;
-                    Context._onPlayerEggStateChange();
-                    TransitionTo<UnselectingState>();
-                    return;
-                }
+                int castedEggIndex = Context._cursorSelectedEggIndex[_gamePlayerIndex];
+                Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<EggNormalState>();
+                Context._eggSelected[Context._cursorSelectedEggIndex[_gamePlayerIndex]] = false;
+                Context._onPlayerEggStateChange();
+                Context.Context.HitBar.transform.GetChild(castedEggIndex).gameObject.SetActive(false);
+                Context.Context.HitBar.transform.GetChild(castedEggIndex).GetComponent<SpriteRenderer>().color = Color.black;
+                TransitionTo<UnselectingState>();
+                return;
             }
         }
 
@@ -899,8 +966,8 @@ public class ComicMenu : MonoBehaviour
             {
                 base.OnEnter();
                 Context.Context._eggs[_eggIndex].GetComponent<Collider>().enabled = true;
-                _eggChild.localScale = Vector3.one;
-                _eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggNormalOutlineColor);
+                _eggChild.localScale = Context._MenuData.EggNormalScale;
+                // _eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggNormalOutlineColor);
                 Context.Context._hoverEggCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
             }
         }
@@ -911,7 +978,7 @@ public class ComicMenu : MonoBehaviour
             {
                 base.OnEnter();
                 _eggChild.localScale = Context._MenuData.EggActivatedScale;
-                _eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggCursorOverOutlineColor);
+                // _eggChild.GetComponent<Renderer>().material.SetColor("_OutlineColor", Context._MenuData.EggCursorOverOutlineColor);
                 _eggChild.GetComponent<DOTweenAnimation>().DORestart();
                 Context.Context._hoverEggCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayForward();
             }
@@ -924,7 +991,6 @@ public class ComicMenu : MonoBehaviour
             public override void OnEnter()
             {
                 base.OnEnter();
-                Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Enter");
                 Context.Context._eggs[_eggIndex].GetComponent<Collider>().enabled = false;
                 Context.Context._hoverEggCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
                 _sequence = DOTween.Sequence();
@@ -933,14 +999,13 @@ public class ComicMenu : MonoBehaviour
                 _sequence.Append(Context.Context._eggs[_eggIndex].DOShakeRotation(Context._MenuData.ETC_EggShakeDuration, Context._MenuData.ETC_EggShakeStrength, Context._MenuData.ETC_EggShakeVibrato));
                 _sequence.Append(Context.Context._eggs[_eggIndex].DOScale(Context._MenuData.ETC_EggScaleAmount, Context._MenuData.ETC_EggScaleDuration).SetEase(Context._MenuData.ETC_EggScaleAnimationCurve));
                 _sequence.Join(Context.Context._eggs[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_EggMoveYAmount, Context._MenuData.ETC_EggMoveYDuration).SetEase(Context._MenuData.ETC_EggMoveYAnimationCurve));
-                _sequence.Append(Context.Context._chickens[_eggIndex].DOLocalMoveY(-2.5f, Context._MenuData.ETC_ChickenMoveYDuration).
+                _sequence.Append(Context.Context._chickens[_eggIndex].DOLocalMoveY(Context._MenuData.ETC_ChickenMoveYAmount, Context._MenuData.ETC_ChickenMoveYDuration).
                             SetEase(Context._MenuData.ETC_ChickenMoveYEase).
                             SetDelay(Context._MenuData.ETC_ChickenMoveYDelay));
                 _sequence.AppendCallback(() =>
                 {
                     // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuChickenLandAudioClip);
                     // Context.Context._camera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
-                    Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Pose");
                     // Instantiate(Context._MenuData.ETC_ChickenLandVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenLandVFXOffset, Context._MenuData.ETC_ChickenLandVFX.transform.rotation);
                     TransitionTo<ChickenState>();
                     return;
@@ -953,7 +1018,6 @@ public class ComicMenu : MonoBehaviour
                 if (_eggIndex != Context._cursorSelectedEggIndex[args.controllerId]) return;
                 _sequence.Kill();
                 // Instantiate(Context._MenuData.ETC_ChickenDisappearVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenDisapperavFXOffset, Context._MenuData.ETC_ChickenDisappearVFX.transform.rotation);
-                Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Reset");
                 Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
                 Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
                 Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
@@ -972,6 +1036,9 @@ public class ComicMenu : MonoBehaviour
                 int playerindex = Context._eggSelectedCursorIndex[_eggIndex];
                 Context._eggSelected[_eggIndex] = true;
                 Context._onPlayerEggStateChange();
+                Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().enabled = true;
+                Context.Context._chickens[_eggIndex].GetComponent<Rigidbody>().isKinematic = false;
+                Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().Init(Context._getRewiredIDFromGameplayerId(playerindex));
                 Context._playersFSM[playerindex].TransitionTo<SelectedState>();
             }
 
@@ -991,7 +1058,6 @@ public class ComicMenu : MonoBehaviour
                 /// Reset Egg Children Scale, Shader Color
                 /// Reset _eggCursors
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuChickenToEggAudioClip);
-                Context.Context._chickens[_eggIndex].GetComponent<Animator>().SetTrigger("Reset");
                 Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
                 Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
                 Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];

@@ -1,16 +1,20 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
-public class BallController : MonoBehaviour, IHittable
+public class ComicMenuTargetController : MonoBehaviour, IHittable
 {
     public Vector3 InitialPosition;
     public float SoccerForceDamper = 0.1f;
+    public GameObject HitBar;
+
+    public ComicMenuData MenuData;
+    private int _hitCount = 10;
     private Rigidbody _rb;
     private void Awake()
     {
         InitialPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-        Services.GameStateManager.CameraTargets.Add(transform);
         _rb = GetComponent<Rigidbody>();
         Debug.Assert(_rb != null, "Rigidbody missing on soccer ball");
     }
@@ -70,6 +74,10 @@ public class BallController : MonoBehaviour, IHittable
     {
         _rb.AddForce(force * SoccerForceDamper, forcemode);
         OnImpact(enforcer, impactType);
+        if (enforcer.GetComponent<PlayerController>() != null)
+        {
+            HitBar.transform.GetChild(enforcer.transform.GetSiblingIndex()).GetComponent<SpriteRenderer>().color = MenuData.BirdColor[enforcer.transform.GetSiblingIndex()];
+        }
     }
 
     public void OnImpact(GameObject enforcer, ImpactType impactType)

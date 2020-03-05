@@ -323,6 +323,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         public bool ReadyToFire;
 
+        public Vector3 MarkDirection;
+
 
         public CanonInfo(GameObject pipe)
         {
@@ -781,18 +783,27 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             Info.Rocket.transform.up = Vector3.down;
             Info.Rocket.transform.position += Vector3.down * (FeelData.BombInvisibleHeight - Info.Mark.transform.position.y)/FeelData.BombFallTime*Time.deltaTime;
-            MarkFollow(Info,false);
+            //MarkFollow(Info,false);
+            MarkDash(Info);
         }
         else if(Info.Timer >= Data.CanonFireTime - Data.CanonFireAlertTime)
         {
             Info.Mark.GetComponent<SpriteRenderer>().color = FeelData.MarkAlertColor;
-            MarkFollow(Info,false);
+            //MarkFollow(Info,false);
+            MarkDash(Info);
         }
         else
         {
             Info.Mark.GetComponent<SpriteRenderer>().color = new Color(FeelData.MarkDefaultColor.r, FeelData.MarkDefaultColor.g, FeelData.MarkDefaultColor.b, Info.Timer / FeelData.MarkAppearTime);
             MarkFollow(Info,true);
         }
+
+
+    }
+
+    private void MarkDash(CanonInfo Info)
+    {
+        Info.Mark.transform.position += Data.AlertFollowSpeed * Time.deltaTime * Info.MarkDirection;
 
 
     }
@@ -830,6 +841,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                 Info.Mark.transform.position += Dis * Offset.normalized;
             }
         }
+
+        Info.MarkDirection = Offset.normalized;
 
         Info.Rocket.transform.position = new Vector3(Info.Mark.transform.position.x, Info.Rocket.transform.position.y, Info.Mark.transform.position.z);
     }

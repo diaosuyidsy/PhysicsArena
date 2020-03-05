@@ -19,7 +19,8 @@ public class ComicMenu : MonoBehaviour
     public GameObject PlayerHolder;
     public GameObject CharacterImageHolder;
     public Camera SceneCamera;
-    public GameObject HitBar;
+    public GameObject IndicationBars;
+    public IndicationBarController IndicationBarController;
     [HideInInspector]
     public string SelectedMapName = "BrawlModeReforged";
     private PlayerInformation _finalPlayerInformation;
@@ -72,6 +73,21 @@ public class ComicMenu : MonoBehaviour
     public void OnPlayerRechoose(int rewiredId)
     {
         ((CharacterSelectionState)ComicMenuFSM.CurrentState).OnPlayerRechoose(rewiredId);
+    }
+
+    public void ChargedUp()
+    {
+        ComicMenuFSM.TransitionTo<CharacterSelectionToLoadingTransition>();
+    }
+
+    /// <summary>
+    /// Whenever a player enters/exits the circle, notify the Text
+    /// </summary>
+    /// <param name="chickenInCircle"></param>
+    /// <param name="duckInCircle"></param>
+    public void PlayerInCircleChange(int chickenInCircle, int duckInCircle)
+    {
+        ((CharacterSelectionState)ComicMenuFSM.CurrentState).OnPlayerEggStateChange(chickenInCircle, duckInCircle);
     }
 
     private abstract class MenuState : FSM<ComicMenu>.State
@@ -248,12 +264,12 @@ public class ComicMenu : MonoBehaviour
             {
                 foreach (SpriteRenderer sr in Context.CoverPage.GetComponentsInChildren<SpriteRenderer>())
                 {
-                    sr.sortingLayerID = 0;
+                    sr.sortingLayerID = SortingLayer.NameToID("Front");
                 }
 
                 foreach (TextMeshPro tmp in Context.CoverPage.GetComponentsInChildren<TextMeshPro>())
                 {
-                    tmp.sortingLayerID = 0;
+                    tmp.sortingLayerID = SortingLayer.NameToID("Front");
                 }
             });
             sequence.Append(Context.CoverPage.transform.DOLocalMove(_MenuData.CoverPageReturnLocalMovement, _MenuData.CoverpageReturnDuration)
@@ -559,23 +575,23 @@ public class ComicMenu : MonoBehaviour
             ((SelectedState)_playersFSM[_getGamePlayerIDFromRewiredId(rewiredID)].CurrentState).OnPlayerRechoose();
         }
 
-        private void _onPlayerEggStateChange()
+        public void OnPlayerEggStateChange(int chickenInCircle, int duckInCircle)
         {
             Context._hintText.DOKill();
-            if (_playerMap.Count == 1 && _eggsSelectedAmount == 1)
+            if ((chickenInCircle + duckInCircle) == 1)
             {
                 Context._hintText.DOText("Need More Players", 1f).SetDelay(2f);
             }
-            else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count && (_blueEggsSelectedAmount == 0 || _redEggsSelectedAmount == 0))
+            else if (_playerMap.Count > 1 && (chickenInCircle == 0 || duckInCircle == 0))
             {
                 Context._hintText.DOText("Need Players On Both Teams", 1f).SetDelay(2f);
             }
-            else if (_playerMap.Count > 1 && _eggsSelectedAmount == _playerMap.Count)
+            else if (_playerMap.Count > 1 && _playerMap.Count > (chickenInCircle + duckInCircle))
             {
-                Context._hintText.DOText("Hit the Box", 1f);
+                Context._hintText.DOText("Everybody in Circle", 1f);
             }
             else
-                Context._hintText.DOText("", 0f);
+                Context._hintText.DOText("Enter The Circle", 0f);
         }
 
         private bool _isRewiredPlayerInGame(int rewiredID)
@@ -653,7 +669,8 @@ public class ComicMenu : MonoBehaviour
             Player rewiredPlayer = ReInput.players.GetPlayer(rewiredPlayerId);
             // Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuJoinGameAudioClip);
             rewiredPlayer.controllers.maps.SetMapsEnabled(false, "Assignment");
-            _onPlayerEggStateChange();
+            Context.IndicationBarController.MaxPlayers = _playerMap.Count;
+            // _onPlayerEggStateChange();
         }
 
         private void _unassignPlayer(int rewiredPlayerId)
@@ -676,7 +693,8 @@ public class ComicMenu : MonoBehaviour
             _playerMap.RemoveAt(playerMapIndex);
             _playersFSM[gamePlayerId].CurrentState.CleanUp();
             _playersFSM[gamePlayerId] = null;
-            _onPlayerEggStateChange();
+            Context.IndicationBarController.MaxPlayers = _playerMap.Count;
+            // _onPlayerEggStateChange();
         }
 
         private int _getNextGamePlayerId()
@@ -904,7 +922,7 @@ public class ComicMenu : MonoBehaviour
                 Context.Context._selectionCursors[_gamePlayerIndex].gameObject.SetActive(false);
                 Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(castedEggIndex).GetComponent<SpriteRenderer>().color = Color.white;
                 Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleSelectedColor[castedEggIndex];
-                Context.Context.HitBar.transform.GetChild(castedEggIndex).gameObject.SetActive(true);
+                Context.Context.IndicationBars.transform.GetChild(castedEggIndex).gameObject.SetActive(true);
             }
         }
 
@@ -927,9 +945,8 @@ public class ComicMenu : MonoBehaviour
                 int castedEggIndex = Context._cursorSelectedEggIndex[_gamePlayerIndex];
                 Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<EggNormalState>();
                 Context._eggSelected[Context._cursorSelectedEggIndex[_gamePlayerIndex]] = false;
-                Context._onPlayerEggStateChange();
-                Context.Context.HitBar.transform.GetChild(castedEggIndex).gameObject.SetActive(false);
-                Context.Context.HitBar.transform.GetChild(castedEggIndex).GetComponent<SpriteRenderer>().color = Color.black;
+                // Context._onPlayerEggStateChange();
+                Context.Context.IndicationBars.transform.GetChild(castedEggIndex).gameObject.SetActive(false);
                 TransitionTo<UnselectingState>();
                 return;
             }
@@ -1037,7 +1054,7 @@ public class ComicMenu : MonoBehaviour
                 /// Switch Cursor to Selected state
                 int playerindex = Context._eggSelectedCursorIndex[_eggIndex];
                 Context._eggSelected[_eggIndex] = true;
-                Context._onPlayerEggStateChange();
+                // Context._onPlayerEggStateChange();
                 Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().enabled = true;
                 Context.Context._chickens[_eggIndex].GetComponent<Rigidbody>().isKinematic = false;
                 Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().Init(Context._getRewiredIDFromGameplayerId(playerindex));
@@ -1075,6 +1092,7 @@ public class ComicMenu : MonoBehaviour
         {
             base.OnEnter();
             Sequence sequence = DOTween.Sequence();
+            Context.SceneCamera.enabled = false;
             sequence.AppendInterval(_MenuData.CharacterSelectionToLoadingPauseDuration);
             sequence.Append(_MainCamera.transform.DOMove(_MenuData.CharacterSelectionToLoadingCameraLocationEase.EndValue,
             _MenuData.CharacterSelectionToLoadingCameraLocationEase.Duration).SetEase(_MenuData.CharacterSelectionToLoadingCameraFOVEase.Ease));
@@ -1094,6 +1112,10 @@ public class ComicMenu : MonoBehaviour
                 foreach (TextMeshPro tmp in Context.SelectionPage.GetComponentsInChildren<TextMeshPro>())
                 {
                     tmp.sortingLayerID = 0;
+                }
+                foreach (Canvas c in Context.SelectionPage.GetComponentsInChildren<Canvas>())
+                {
+                    c.sortingLayerID = 0;
                 }
             });
             sequence.Append(Context.SelectionPage.transform.DOMove(_MenuData.CharacterSelectionToLoadingPageMovementEase2.EndValue,

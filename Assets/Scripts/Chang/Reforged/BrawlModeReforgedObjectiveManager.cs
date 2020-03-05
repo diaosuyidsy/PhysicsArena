@@ -133,7 +133,6 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     {
         if (gameEnd || !gameStart)
         {
-            Debug.Log ("rua");
             return;
         }
 
@@ -161,8 +160,6 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         }
 
         RefreshScore ();
-
-        Debug.Log ("Fuck");
     }
 
     private void OnGameStart (GameStart e)

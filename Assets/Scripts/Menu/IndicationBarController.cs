@@ -63,8 +63,9 @@ public class IndicationBarController : MonoBehaviour
         if (_playerInCircleCount == MaxPlayers && _chickenCount != 0 && _duckCount != 0)
         {
             _addCharge(Time.deltaTime * (1f / ChargeTime));
-            if (_charge >= 1f && !_chargedUp)
+            if (_charge > 1f && !_chargedUp)
             {
+                IndicationImage.fillAmount = 1;
                 _chargedUp = true;
                 ComicMenu.ChargedUp();
             }
@@ -79,7 +80,7 @@ public class IndicationBarController : MonoBehaviour
     private void _addCharge(float charge)
     {
         _charge += charge;
-        _charge = Mathf.Clamp(_charge, 0f, 1f);
+        _charge = Mathf.Clamp(_charge, 0f, 1.05f);
         IndicationImage.fillAmount = _charge;
 
     }

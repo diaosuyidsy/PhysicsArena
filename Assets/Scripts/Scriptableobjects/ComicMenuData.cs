@@ -100,7 +100,7 @@ public class ComicMenuData : ScriptableObject
     public FloatEase CharacterSelectionToLoadingCameraFOVEase;
     public Vector3Ease CharacterSelectionToLoadingPageMovementEase1;
     public Vector3Ease CharacterSelectionToLoadingPageMovementEase2;
-
+    public Vector3Ease CharacterSelectionToLoadingPageRotationEase1;
 }
 
 [Serializable]

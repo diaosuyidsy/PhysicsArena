@@ -8,9 +8,9 @@ public class ComicMenuGame : MonoBehaviour
     public AudioData AudioData;
     public VFXData VFXData;
     public ConfigData ConfigData;
+    public WeaponData WeaponData;
     public GameFeelData GameFeelData;
     public GameMapData GameMapData;
-
 
     private void Awake()
     {
@@ -18,18 +18,53 @@ public class ComicMenuGame : MonoBehaviour
         Services.AudioManager = new AudioManager(AudioData);
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
+        Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
+        Services.GameStateManager = new MenuGameStateManager(GameMapData, ConfigData, gameObject);
     }
 
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = new Color(1, 0, 0, 0.5f);
+        Gizmos.DrawCube(new Vector3(0f, 6.5f, 0f), GameMapData.WeaponSpawnerSize);
+        Gizmos.color = new Color(0, 0, 0, 0.5f);
+        Gizmos.DrawCube(GameMapData.WorldCenter, GameMapData.WorldSize);
+        for (int i = 0; i < GameMapData.ChickenLandingPosition.Length; i++)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(GameMapData.ChickenLandingPosition[i], 0.2f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(GameMapData.DuckLandingPostion[i], 0.2f);
+        }
+        for (int i = 0; i < GameMapData.Team1RespawnPoints.Length; i++)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawSphere(GameMapData.Team1RespawnPoints[i], 0.2f);
+            Gizmos.color = Color.blue;
+            Gizmos.DrawSphere(GameMapData.Team2RespawnPoints[i], 0.2f);
+        }
+    }
+    void Update()
+    {
+        Services.WeaponGenerationManager.Update();
+        Services.GameStateManager.Update();
+
+    }
     private void OnDestroy()
     {
         Services.AudioManager.Destroy();
         Services.AudioManager = null;
+
+        Services.WeaponGenerationManager.Destroy();
+        Services.WeaponGenerationManager = null;
 
         Services.GameFeelManager.Destory();
         Services.GameFeelManager = null;
 
         Services.VisualEffectManager.Destory();
         Services.VisualEffectManager = null;
+
+        Services.GameStateManager.Destroy();
+        Services.GameStateManager = null;
 
         Services.Config.Destroy();
         Services.Config = null;

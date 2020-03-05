@@ -4,6 +4,8 @@ using UnityEngine;
 using DG.Tweening;
 using Rewired;
 using TMPro;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class ComicMenu : MonoBehaviour
 {
@@ -21,6 +23,8 @@ public class ComicMenu : MonoBehaviour
     public Camera SceneCamera;
     public GameObject IndicationBars;
     public IndicationBarController IndicationBarController;
+    public TextMeshPro LoadingTitle;
+    public Image LoadingBarFillImage;
     [HideInInspector]
     public string SelectedMapName = "BrawlModeReforged";
     private PlayerInformation _finalPlayerInformation;
@@ -498,6 +502,12 @@ public class ComicMenu : MonoBehaviour
             }
         }
 
+        public override void OnExit()
+        {
+            base.OnExit();
+            _saveData();
+        }
+
         public override void Update()
         {
             base.Update();
@@ -508,17 +518,17 @@ public class ComicMenu : MonoBehaviour
             /// 4. Both team has players
             foreach (PlayerMap _pm in _playerMap)
             {
-                if (ReInput.players.GetPlayer(_pm.RewiredPlayerID).GetButtonDown("Jump") &&
-                    _playersFSM[_pm.GamePlayerID] != null &&
-                    _playersFSM[_pm.GamePlayerID].CurrentState.GetType().Equals(typeof(SelectedState)) &&
-                    _playerMap.Count >= 2 &&
-                    _blueEggsSelectedAmount > 0 &&
-                    _redEggsSelectedAmount > 0 && _playerMap.Count == _eggsSelectedAmount)
-                {
-                    _saveData();
-                    TransitionTo<CharacterSelectionToLoadingTransition>();
-                    return;
-                }
+                // if (ReInput.players.GetPlayer(_pm.RewiredPlayerID).GetButtonDown("Jump") &&
+                //     _playersFSM[_pm.GamePlayerID] != null &&
+                //     _playersFSM[_pm.GamePlayerID].CurrentState.GetType().Equals(typeof(SelectedState)) &&
+                //     _playerMap.Count >= 2 &&
+                //     _blueEggsSelectedAmount > 0 &&
+                //     _redEggsSelectedAmount > 0 && _playerMap.Count == _eggsSelectedAmount)
+                // {
+                //     _saveData();
+                //     TransitionTo<CharacterSelectionToLoadingTransition>();
+                //     return;
+                // }
             }
             if (_BDown && _playerMap.Count == 0)
             {
@@ -923,6 +933,7 @@ public class ComicMenu : MonoBehaviour
                 Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(castedEggIndex).GetComponent<SpriteRenderer>().color = Color.white;
                 Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleSelectedColor[castedEggIndex];
                 Context.Context.IndicationBars.transform.GetChild(castedEggIndex).gameObject.SetActive(true);
+                (Services.GameStateManager as MenuGameStateManager).SetPlayerInformation(_rewiredPlayerIndex, _gamePlayerIndex, castedEggIndex);
             }
         }
 
@@ -945,6 +956,7 @@ public class ComicMenu : MonoBehaviour
                 int castedEggIndex = Context._cursorSelectedEggIndex[_gamePlayerIndex];
                 Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<EggNormalState>();
                 Context._eggSelected[Context._cursorSelectedEggIndex[_gamePlayerIndex]] = false;
+                (Services.GameStateManager as MenuGameStateManager).ClearPlayerInformation(castedEggIndex);
                 // Context._onPlayerEggStateChange();
                 Context.Context.IndicationBars.transform.GetChild(castedEggIndex).gameObject.SetActive(false);
                 TransitionTo<UnselectingState>();
@@ -1102,6 +1114,9 @@ public class ComicMenu : MonoBehaviour
             sequence.Append(Context.SelectionPage.transform.DOMove(_MenuData.CharacterSelectionToLoadingPageMovementEase1.EndValue,
             _MenuData.CharacterSelectionToLoadingPageMovementEase1.Duration).SetEase(_MenuData.CharacterSelectionToLoadingPageMovementEase1.Ease)
             .SetRelative(_MenuData.CharacterSelectionToLoadingPageMovementEase1.Relative));
+            sequence.Append(Context.SelectionPage.transform.DOLocalRotate(_MenuData.CharacterSelectionToLoadingPageRotationEase1.EndValue,
+            _MenuData.CharacterSelectionToLoadingPageRotationEase1.Duration).SetEase(_MenuData.CharacterSelectionToLoadingPageRotationEase1.Ease)
+            .SetRelative(_MenuData.CharacterSelectionToLoadingPageRotationEase1.Relative));
             sequence.AppendCallback(() =>
             {
                 foreach (SpriteRenderer sr in Context.SelectionPage.GetComponentsInChildren<SpriteRenderer>())
@@ -1131,5 +1146,36 @@ public class ComicMenu : MonoBehaviour
     private class LoadingState : MenuState
     {
 
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context.StartCoroutine(_loadScene());
+        }
+
+        IEnumerator _loadScene()
+        {
+            yield return 5f;
+            float loadingProgress = 0f;
+            AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.SelectedMapName);
+            asyncload.allowSceneActivation = false;
+            while (!asyncload.isDone)
+            {
+                if (loadingProgress <= 0.9f)
+                    loadingProgress += Time.deltaTime;
+                //Context._loadingBarFillImage.fillAmount = asyncload.progress * (1f / 0.9f);
+                if (asyncload.progress >= 0.9f && loadingProgress >= 0.8f)
+                {
+                    Context.LoadingBarFillImage.fillAmount = 1f;
+                    Context.LoadingTitle.text = "Press A To Continue";
+                    if (_ADown)
+                        asyncload.allowSceneActivation = true;
+                }
+                else
+                {
+                    Context.LoadingBarFillImage.fillAmount = loadingProgress;
+                }
+                yield return null;
+            }
+        }
     }
 }

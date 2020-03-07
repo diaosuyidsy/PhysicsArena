@@ -417,7 +417,6 @@ public class ComicMenu : MonoBehaviour
         }
     }
 
-
     private class CharacterSelectionState : MenuState
     {
         private List<PlayerMap> _playerMap;
@@ -516,20 +515,20 @@ public class ComicMenu : MonoBehaviour
             /// 2. This player is in selected state
             /// 3. All players are in selected state
             /// 4. Both team has players
-            foreach (PlayerMap _pm in _playerMap)
-            {
-                // if (ReInput.players.GetPlayer(_pm.RewiredPlayerID).GetButtonDown("Jump") &&
-                //     _playersFSM[_pm.GamePlayerID] != null &&
-                //     _playersFSM[_pm.GamePlayerID].CurrentState.GetType().Equals(typeof(SelectedState)) &&
-                //     _playerMap.Count >= 2 &&
-                //     _blueEggsSelectedAmount > 0 &&
-                //     _redEggsSelectedAmount > 0 && _playerMap.Count == _eggsSelectedAmount)
-                // {
-                //     _saveData();
-                //     TransitionTo<CharacterSelectionToLoadingTransition>();
-                //     return;
-                // }
-            }
+            // foreach (PlayerMap _pm in _playerMap)
+            // {
+            //     if (ReInput.players.GetPlayer(_pm.RewiredPlayerID).GetButtonDown("Jump") &&
+            //         _playersFSM[_pm.GamePlayerID] != null &&
+            //         _playersFSM[_pm.GamePlayerID].CurrentState.GetType().Equals(typeof(SelectedState)) &&
+            //         _playerMap.Count >= 2 &&
+            //         _blueEggsSelectedAmount > 0 &&
+            //         _redEggsSelectedAmount > 0 && _playerMap.Count == _eggsSelectedAmount)
+            //     {
+            //         _saveData();
+            //         TransitionTo<CharacterSelectionToLoadingTransition>();
+            //         return;
+            //     }
+            // }
             if (_BDown && _playerMap.Count == 0)
             {
                 TransitionTo<CharacterSelectionToMapTransition>();

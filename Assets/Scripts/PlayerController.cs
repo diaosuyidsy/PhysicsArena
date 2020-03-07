@@ -597,7 +597,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
-            Context.OnDeathHidden[2].SetActive(true);
+            // Context.OnDeathHidden[2].SetActive(true);
             Context._jumpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.JumpCD;
         }
     }

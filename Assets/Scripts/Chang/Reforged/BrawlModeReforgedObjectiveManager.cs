@@ -30,45 +30,47 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     private float OneSecTimer;
     private int Timer;
 
-    public BrawlModeReforgedObjectiveManager(BrawlModeReforgedModeData Data) : base()
+    public BrawlModeReforgedObjectiveManager (BrawlModeReforgedModeData Data) : base ()
     {
 
         ModeData = Data;
         Timer = Data.TotalTime;
 
-        EventManager.Instance.AddHandler<GameStart>(OnGameStart);
-        EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
-        EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
+        Debug.Log (Data.name);
+
+        EventManager.Instance.AddHandler<GameStart> (OnGameStart);
+        EventManager.Instance.AddHandler<PlayerDied> (OnPlayerDied);
+        EventManager.Instance.AddHandler<BagelSent> (OnBagelSent);
 
 
-        TeamAScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
-        TeamBScoreText = GameUI.Find("Team2Score").GetComponent<TextMeshProUGUI>();
-        TimerText = GameUI.Find("TimerText").GetComponent<TextMeshProUGUI>();
-        Counter = GameUI.Find("Counter").GetComponent<Image>();
+        TeamAScoreText = GameUI.Find ("Team1Score").GetComponent<TextMeshProUGUI> ();
+        TeamBScoreText = GameUI.Find ("Team2Score").GetComponent<TextMeshProUGUI> ();
+        TimerText = GameUI.Find ("TimerText").GetComponent<TextMeshProUGUI> ();
+        Counter = GameUI.Find ("Counter").GetComponent<Image> ();
 
         TeamAScore = 0;
         TeamBScore = 0;
-        RefreshScore();
+        RefreshScore ();
         gameEnd = false;
 
     }
 
-    public override void Destroy()
+    public override void Destroy ()
     {
-        EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
-        EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
-        EventManager.Instance.RemoveHandler<BagelSent>(OnBagelSent);
+        EventManager.Instance.RemoveHandler<GameStart> (OnGameStart);
+        EventManager.Instance.RemoveHandler<PlayerDied> (OnPlayerDied);
+        EventManager.Instance.RemoveHandler<BagelSent> (OnBagelSent);
     }
 
-    public override void Update()
+    public override void Update ()
     {
         if (gameEnd || !gameStart) return;
 
-        UpdateTime();
+        UpdateTime ();
 
     }
 
-    private void UpdateTime()
+    private void UpdateTime ()
     {
         OneSecTimer += Time.deltaTime;
         if (OneSecTimer >= 1f)
@@ -82,40 +84,40 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             TimerText.text = "0:00";
             if (TeamAScore != TeamBScore)
             {
-                EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+                EventManager.Instance.TriggerEvent (new GameEnd (winner, Camera.main.ScreenToWorldPoint (TimerText.transform.position), GameWinType.ScoreWin));
                 gameEnd = true;
                 return;
             }
         }
         else
         {
-            TimerText.text = TimerToMinute();
+            TimerText.text = TimerToMinute ();
         }
 
     }
 
-    private string TimerToMinute()
+    private string TimerToMinute ()
     {
         int seconds = Timer % 10;
         int tenseconds = (Timer % 60) / 10;
         int minute = Timer / 60;
-        return minute.ToString("F0") + ":" + tenseconds.ToString("F0") + seconds.ToString("F0");
+        return minute.ToString ("F0") + ":" + tenseconds.ToString ("F0") + seconds.ToString ("F0");
     }
 
-    private void RefreshScore()
+    private void RefreshScore ()
     {
-        TeamAScoreText.text = TeamAScore.ToString();
-        TeamBScoreText.text = TeamBScore.ToString();
+        TeamAScoreText.text = TeamAScore.ToString ();
+        TeamBScoreText.text = TeamBScore.ToString ();
     }
 
-    private void OnBagelSent(BagelSent e)
+    private void OnBagelSent (BagelSent e)
     {
         if (gameEnd || !gameStart)
         {
             return;
         }
 
-        if (e.Basket.name.Contains("1"))
+        if (e.Basket.name.Contains ("LForceField"))
         {
             TeamAScore += 3;
         }
@@ -124,19 +126,20 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             TeamBScore += 3;
         }
 
-        RefreshScore();
+        RefreshScore ();
     }
 
-    private void OnPlayerDied(PlayerDied e)
+    private void OnPlayerDied (PlayerDied e)
     {
         if (gameEnd || !gameStart)
         {
+            Debug.Log ("rua");
             return;
         }
 
-        if (e.ImpactObject.name.Contains("Canon"))
+        if (e.ImpactObject.name.Contains ("Canon"))
         {
-            if (e.Player.tag.Contains("1"))
+            if (e.Player.tag.Contains ("1"))
             {
                 TeamBScore += ModeData.BagelKillPoint;
             }
@@ -147,7 +150,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         }
         else
         {
-            if (e.Player.tag.Contains("1"))
+            if (e.Player.tag.Contains ("1"))
             {
                 TeamBScore += ModeData.NormalKillPoint;
             }
@@ -157,10 +160,12 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             }
         }
 
-        RefreshScore();
+        RefreshScore ();
+
+        Debug.Log ("Fuck");
     }
 
-    private void OnGameStart(GameStart e)
+    private void OnGameStart (GameStart e)
     {
         gameStart = true;
     }

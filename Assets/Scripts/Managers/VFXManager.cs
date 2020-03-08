@@ -27,44 +27,46 @@ public class VFXManager
             GameObject[] HittedFeetVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedFeetVFX : VFXDataStore.DuckHittedFeetVFX;
             _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerUITransform);
         }
-        GameObject[] HitVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHitVFX : VFXDataStore.DuckHitVFX;
-        if (HitVFX != null)
+        if (!ph.IsABlock)
         {
-            for (int i = 0; i < HitVFX.Length; i++)
+            GameObject[] HitVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHitVFX : VFXDataStore.DuckHitVFX;
+            if (HitVFX != null)
             {
-                GameObject VFX = HitVFX[i];
-                Vector3 hittedPos = ph.Hiter.transform.position +
-                                    ph.Hiter.transform.forward * VFX.transform.position.z +
-                                    ph.Hiter.transform.right * VFX.transform.position.x +
-                                    ph.Hiter.transform.up * VFX.transform.position.y;
-                Vector3 force = ph.Force;
-                _instantiateVFX(HitVFX[i],
-                                hittedPos,
-                                Quaternion.Euler(0f,
-                                                HitVFX[i].transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
-                                                0f));
+                for (int i = 0; i < HitVFX.Length; i++)
+                {
+                    GameObject VFX = HitVFX[i];
+                    Vector3 hittedPos = ph.Hiter.transform.position +
+                                        ph.Hiter.transform.forward * VFX.transform.position.z +
+                                        ph.Hiter.transform.right * VFX.transform.position.x +
+                                        ph.Hiter.transform.up * VFX.transform.position.y;
+                    Vector3 force = ph.Force;
+                    _instantiateVFX(HitVFX[i],
+                                    hittedPos,
+                                    Quaternion.Euler(0f,
+                                                    HitVFX[i].transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
+                                                    0f));
+                }
+            }
+
+            GameObject[] HittedBodyVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
+            if (HittedBodyVFX != null)
+            {
+                for (int i = 0; i < HittedBodyVFX.Length; i++)
+                {
+                    GameObject VFX = HittedBodyVFX[i];
+                    Vector3 hittedPos = ph.Hitted.transform.position +
+                                        ph.Hitted.transform.forward * VFX.transform.position.z +
+                                        ph.Hitted.transform.right * VFX.transform.position.x +
+                                        ph.Hitted.transform.up * VFX.transform.position.y;
+                    Vector3 force = ph.Force;
+                    _instantiateVFX(VFX,
+                                    hittedPos,
+                                    Quaternion.Euler(0f,
+                                                    VFX.transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
+                                                    0f));
+                }
             }
         }
-
-        GameObject[] HittedBodyVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
-        if (HittedBodyVFX != null)
-        {
-            for (int i = 0; i < HittedBodyVFX.Length; i++)
-            {
-                GameObject VFX = HittedBodyVFX[i];
-                Vector3 hittedPos = ph.Hitted.transform.position +
-                                    ph.Hitted.transform.forward * VFX.transform.position.z +
-                                    ph.Hitted.transform.right * VFX.transform.position.x +
-                                    ph.Hitted.transform.up * VFX.transform.position.y;
-                Vector3 force = ph.Force;
-                _instantiateVFX(VFX,
-                                hittedPos,
-                                Quaternion.Euler(0f,
-                                                VFX.transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
-                                                0f));
-            }
-        }
-
     }
 
     private void _onPlayerDied(PlayerDied pd)
@@ -144,24 +146,24 @@ public class VFXManager
 
     private void _onBlockStart(BlockStart bs)
     {
-        GameObject VFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockVFX : VFXDataStore.DuckBlockVFX;
+        // GameObject VFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockVFX : VFXDataStore.DuckBlockVFX;
         // GameObject UIVFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockUIVFX : VFXDataStore.DuckBlockUIVFX;
-        GameObject BlockVFXHolder = bs.Player.GetComponent<PlayerController>().BlockVFXHolder;
-        if (BlockVFXHolder == null)
-        {
-            bs.Player.GetComponent<PlayerController>().BlockVFXHolder = GameObject.Instantiate(VFX, bs.Player.transform);
-        }
+        // GameObject BlockVFXHolder = bs.Player.GetComponent<PlayerController>().BlockVFXHolder;
+        // if (BlockVFXHolder == null)
+        // {
+        //     bs.Player.GetComponent<PlayerController>().BlockVFXHolder = GameObject.Instantiate(VFX, bs.Player.transform);
+        // }
         // if (bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder == null)
         // {
         //     bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder = GameObject.Instantiate(UIVFX, bs.Player.transform);
         // }
-        bs.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(true);
+        // bs.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(true);
         // bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder.SetActive(true);
     }
 
     private void _onBlockEnd(BlockEnd be)
     {
-        be.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(false);
+        // be.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(false);
         // be.Player.GetComponent<PlayerController>().BlockUIVFXHolder.SetActive(false);
     }
 

@@ -250,11 +250,11 @@ public class PlayerControllerNetworking : MonoBehaviourPun, IPunInstantiateMagic
     {
         _rb.AddForce(force, forcemode);
         OnImpact(enforcer, impactType);
-        if (force.magnitude > CharacterDataStore.DropWeaponForceThreshold &&
-            _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
-        {
-            _actionFSM.TransitionTo<IdleActionState>();
-        }
+        // if (force.magnitude > CharacterDataStore.DropWeaponForceThreshold &&
+        //     _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+        // {
+        //     _actionFSM.TransitionTo<IdleActionState>();
+        // }
     }
 
     public void OnImpact(GameObject enforcer, ImpactType impactType)

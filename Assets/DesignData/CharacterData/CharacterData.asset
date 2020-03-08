@@ -23,11 +23,9 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 286720
   MinRotationSpeed: 10
-  DropWeaponForceThreshold: 500
   FrontIsCliff: 0.2
   CliffPreventionForce: 100
   CliffPreventionTimer: 0.4
-  DropForce: {x: 0, y: 2, z: -2}
   MaxStamina: 1.5
   StaminaRegenInterval: 3
   StaminaRegenRate: 1
@@ -48,11 +46,11 @@ MonoBehaviour:
   PunchDistance: 0.05
   PunchForce: 800
   MeleeHoldTime: Infinity
-  HitUncontrollableTimeSmall: 0.3
+  HitUncontrollableTimeSmall: 0.25
   HitSmallThreshold: 500
   HitUncontrollableTimeBig: 0.4
   HitBigThreshold: 900
-  PunchReleaseRotationMultiplier: 0.2
+  PunchReleaseRotationMultiplier: 0.5
   PunchResetVelocityBeforeHitDuration: 0.5
   CanHitLayer:
     serializedVersion: 2

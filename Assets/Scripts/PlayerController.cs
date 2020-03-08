@@ -91,6 +91,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private List<Rigidbody> _playerBodies;
     private IEnumerator _deadInvincible;
     private int _playerBodiesLayer;
+    private Vector3 _storedVelocity;
+    private Vector3 _storedForce;
     #endregion
 
     private void Awake()
@@ -204,15 +206,6 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         _rb.AddForce(force, forcemode);
         OnImpact(enforcer, impactType);
-        if (force.magnitude > CharacterDataStore.DropWeaponForceThreshold &&
-            _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
-        {
-            _actionFSM.TransitionTo<IdleActionState>();
-        }
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(ButtStrikeState)))
-        {
-            _actionFSM.TransitionTo<IdleActionState>();
-        }
 
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
@@ -221,13 +214,22 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
             }
-            _movementFSM.TransitionTo<HitUncontrollableState>();
-            if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
-                _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
-                _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)))
+            if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
+            {
+                _movementFSM.TransitionTo<HitUncontrollableState>();
+            }
+
+            if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
             {
                 _actionFSM.TransitionTo<HitUnControllableActionState>();
             }
+            // if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
+            //     _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
+            //     _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)) ||
+            //     _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+            // {
+            //     _actionFSM.TransitionTo<HitUnControllableActionState>();
+            // }
         }
     }
 
@@ -478,7 +480,7 @@ public class PlayerController : MonoBehaviour, IHittable
         protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
         protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
         protected bool _B { get { return Context._player.GetButton("Block"); } }
-
+        public virtual bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         public void OnEnterDeathZone()
         {
             Parent.TransitionTo<DeadState>();
@@ -692,11 +694,6 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
-    private class PunchReleasingMovementState : ControllableMovementState
-    {
-
-    }
-
     private class JetPackState : ControllableMovementState
     {
         private JetData _jetData;
@@ -791,6 +788,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class BazookaMovmentAimState : MovementState
     {
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -815,7 +814,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private class BazookaMovementLaunchState : MovementState
     {
         private Vector3 _diff;
-
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
         public override void OnEnter()
         {
             base.OnEnter();
@@ -923,6 +922,14 @@ public class PlayerController : MonoBehaviour, IHittable
         protected bool _BDown { get { return Context._player.GetButtonDown("Block"); } }
         protected bool _BUp { get { return Context._player.GetButtonUp("Block"); } }
 
+        public virtual bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
+
+        // public override void OnEnter()
+        // {
+        //     base.OnEnter();
+        //     print(GetType().Name);
+        // }
+
         public override void Update()
         {
             base.Update();
@@ -948,6 +955,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private class IdleActionState : ActionState
     {
         private float _pickUpTimer;
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1093,6 +1102,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class HoldingState : ActionState
     {
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1207,6 +1218,8 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         private float _startHoldingTime;
         private bool _holding;
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
 
         public override void OnEnter()
         {
@@ -1287,7 +1300,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 {
                     if (hit.transform.GetComponentInParent<IHittable>() == null) return;
                     _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
+                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>(true))
                     {
                         rb.velocity = Vector3.zero;
                     }
@@ -1326,6 +1339,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._dropHandObject();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
             EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
@@ -1479,7 +1493,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private class BlockingState : ActionState
     {
         private float _timer;
-
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         public override void OnEnter()
         {
             base.OnEnter();

@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour, IHittable
     public GameObject RightFoot;
     public GameObject[] OnDeathHidden;
     public GameObject BlockUIVFXHolder;
+    public ShieldController BlockShield;
 
     public int PlayerNumber;
 
@@ -42,7 +43,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private float _distToGround;
     private float _currentStamina;
     private float _lastTimeUseStamina;
-    private float _lastTimeUSeStaminaUnimportant;
+    // private float _lastTimeUSeStaminaUnimportant;
     private Vector2 _staminaUISize;
     private float _sideStepTimer;
     private float _jumpTimer;
@@ -444,27 +445,36 @@ public class PlayerController : MonoBehaviour, IHittable
             return true;
         else
         {
-            _lastTimeUSeStaminaUnimportant = Time.timeSinceLevelLoad;
-            BlockUIVFXHolder.SetActive(true);
-            BlockUIVFXHolder.GetComponent<DOTweenAnimation>().DORestart();
+            // BlockUIVFXHolder.SetActive(true);
+            // BlockUIVFXHolder.GetComponent<DOTweenAnimation>().DORestart();
             return false;
         }
     }
 
     private void _drainStamina(float drain)
     {
-        if (drain <= 0f) return;
+        // if (drain <= 0f) return;
         if (_currentStamina - drain < 0f)
             _currentStamina = 0f;
+        else if (_currentStamina - drain > CharacterDataStore.MaxStamina)
+        {
+            _currentStamina = CharacterDataStore.MaxStamina;
+        }
         else
+        {
             _currentStamina -= drain;
-        _lastTimeUseStamina = Time.timeSinceLevelLoad;
-        _lastTimeUSeStaminaUnimportant = Time.timeSinceLevelLoad;
+        }
 
-        BlockUIVFXHolder.SetActive(true);
-        Vector2 _nextStaminaUISize = _staminaUISize;
-        _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
-        BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
+        if (drain > 0f)
+        {
+            _lastTimeUseStamina = Time.timeSinceLevelLoad;
+        }
+        BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
+
+        // BlockUIVFXHolder.SetActive(true);
+        // Vector2 _nextStaminaUISize = _staminaUISize;
+        // _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
+        // BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
     }
     #endregion
 
@@ -929,13 +939,14 @@ public class PlayerController : MonoBehaviour, IHittable
             /// Regen when past 3 seconds after block
             if (Time.timeSinceLevelLoad > Context._lastTimeUseStamina + Context.CharacterDataStore.StaminaRegenInterval)
             {
-                if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._currentStamina += (Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
+                // if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._currentStamina += (Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
+                if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._drainStamina(-Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
             }
             /// Stamina Regen UI Linger Time
-            if (Context.BlockUIVFXHolder != null && Context.BlockUIVFXHolder.activeSelf && Time.timeSinceLevelLoad > Context._lastTimeUSeStaminaUnimportant + Context.CharacterDataStore.BlockUILingerDuration)
-            {
-                Context.BlockUIVFXHolder.SetActive(false);
-            }
+            // if (Context.BlockUIVFXHolder != null && Context.BlockUIVFXHolder.activeSelf && Time.timeSinceLevelLoad > Context._lastTimeUSeStaminaUnimportant + Context.CharacterDataStore.BlockUILingerDuration)
+            // {
+            //     Context.BlockUIVFXHolder.SetActive(false);
+            // }
         }
 
         public virtual void OnEnterDeathZone()
@@ -1029,67 +1040,6 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("IdleUpper", false);
         }
     }
-
-    // private class PickingState : ActionState
-    // {
-    //     public override void OnEnter()
-    //     {
-    //         base.OnEnter();
-    //         Context._animator.SetBool("Picking", true);
-    //     }
-
-    //     public override void Update()
-    //     {
-    //         base.Update();
-    //         if (_LeftTriggerUp)
-    //         {
-    //             TransitionTo<IdleActionState>();
-    //             return;
-    //         }
-    //         _pickupcheck();
-    //     }
-
-    //     private void _pickupcheck()
-    //     {
-    //         RaycastHit hit;
-    //         if (Physics.SphereCast(Context.Chest.transform.position,
-    //             Context.CharacterDataStore.Radius,
-    //             Vector3.down,
-    //             out hit,
-    //             Context._distToGround,
-    //             Context.CharacterDataStore.PickUpLayer))
-    //         {
-
-    //             if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>() != null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
-    //             {
-    //                 EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
-    //                 // Tell other necessary components that it has taken something
-    //                 Context.HandObject = hit.collider.gameObject;
-
-    //                 // Tell the collected weapon who picked it up
-    //                 hit.collider.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
-    //                 TransitionTo<HoldingState>();
-    //                 return;
-    //             }
-    //             else if (Context.EquipmentObject == null &&
-    //                     hit.collider.GetComponent<EquipmentBase>() != null &&
-    //                     hit.collider.GetComponent<EquipmentBase>().CanBePickedUp)
-    //             {
-    //                 EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
-    //                 Context.EquipmentObject = hit.collider.gameObject;
-    //                 hit.collider.GetComponent<EquipmentBase>().OnPickUp(Context.gameObject);
-    //                 TransitionTo<IdleActionState>();
-    //                 return;
-    //             }
-    //         }
-    //     }
-
-    //     public override void OnExit()
-    //     {
-    //         base.OnExit();
-    //         Context._animator.SetBool("Picking", false);
-    //     }
-    // }
 
     private class HoldingState : ActionState
     {
@@ -1485,8 +1435,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             Context._animator.SetBool("Blocking", true);
-            Context._permaSlow++;
-            Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.BlockSpeedMultiplier;
+            Context.BlockShield.SetShield(true);
             _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
         }
 
@@ -1539,8 +1488,7 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
-            Context._permaSlow--;
-            Context._permaSlowWalkSpeedMultiplier = 1f;
+            Context.BlockShield.SetShield(false);
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
     }

@@ -66,4 +66,5 @@ public class CharacterData : ScriptableObject
     public float PickUpCD = 0f;
     public LayerMask PickUpLayer;
     public float DropRecoveryTime = 0.2f;
+    public int HitStopFrames = 6;
 }

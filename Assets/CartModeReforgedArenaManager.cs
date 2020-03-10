@@ -521,7 +521,6 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
             for (int i = CurrentTeam1Checkpoints; i < CheckPointList.Count / 2; i++)
             {
-                Debug.Log(Team2CheckPointHopTimer);
 
                 if (Team2CheckPointHopTimer <= FeelData.TextHopTime / 2)
                 {

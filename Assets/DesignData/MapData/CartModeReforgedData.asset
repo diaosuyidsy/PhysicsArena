@@ -10,18 +10,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e1a1b76f45552cc46b47ae11c86de24d, type: 3}
-  m_Name: BrawlModeReforgedMapData
+  m_Name: CartModeReforgedData
   m_EditorClassIdentifier: 
-  GameMapMode: 6
+  GameMapMode: 2
   Team1RespawnPoints:
-  - {x: 14.5, y: 0.573, z: -17}
-  - {x: 14, y: 0.573, z: -17.5}
-  - {x: 14.5, y: 0.573, z: -18}
+  - {x: 9.5, y: 0.573, z: -12}
+  - {x: 9.5, y: 0.573, z: -13}
+  - {x: 9.5, y: 0.573, z: -14}
   Team2RespawnPoints:
-  - {x: 20.5, y: 0.573, z: -17}
-  - {x: 21, y: 0.573, z: -17.5}
-  - {x: 20.5, y: 0.573, z: -18}
-  RespawnTime: 2
+  - {x: 25.5, y: 0.573, z: -23}
+  - {x: 25.5, y: 0.573, z: -22}
+  - {x: 25.5, y: 0.573, z: -21}
+  RespawnTime: 3
   InvincibleTime: 1
   TutorialImageMoveInDuration: 0.5
   TutorialImageMoveInEase: 27
@@ -29,13 +29,13 @@ MonoBehaviour:
   HoldAMoveInDelay: 0.2
   FillASpeed: 2
   ChickenLandingPosition:
-  - {x: 11.5, y: 15, z: -22}
-  - {x: 11, y: 15, z: -22.5}
-  - {x: 11.5, y: 15, z: -23}
+  - {x: 9.5, y: 20, z: -12}
+  - {x: 9.5, y: 20, z: -13}
+  - {x: 9.5, y: 20, z: -14}
   DuckLandingPostion:
-  - {x: 23.5, y: 15, z: -22}
-  - {x: 24, y: 15, z: -22.5}
-  - {x: 23.5, y: 15, z: -23}
+  - {x: 25.5, y: 20, z: -23}
+  - {x: 25.5, y: 20, z: -22}
+  - {x: 25.5, y: 20, z: -21}
   BirdsFlyDownDuration: 1
   BirdsFlyDownDelay:
   - 0
@@ -43,12 +43,12 @@ MonoBehaviour:
   - 0.4
   - 0.4
   - 0.4
-  - 0.4
+  - 2
   BirdsFlyDownEase: 11
-  CameraMoveToPosition: {x: 17.5, y: 8.2, z: -25.6}
+  CameraMoveToPosition: {x: 17.5, y: 8.2, z: -17.5}
   CameraMoveDuration: 2
   CameraMoveDelay: 0
-  CameraTargetFOV: 25
+  CameraTargetFOV: 15
   CameraMoveEase: 12
   CountDownStartDelay: 1
   FightEase: 24
@@ -73,7 +73,7 @@ MonoBehaviour:
   MaxAmountWeaponAtOnetime: 0
   WeaponsInformation:
   - WeaponName: SuckGun
-    WeaponSetNumber: 0
+    WeaponSetNumber: 1
     WeaponPrefab: {fileID: 4836811480432223405, guid: 72c3811b922351f46a96df8c012db16c,
       type: 3}
   - WeaponName: HookGun
@@ -92,14 +92,6 @@ MonoBehaviour:
     WeaponSetNumber: 0
     WeaponPrefab: {fileID: 5372403526962513977, guid: 9a4898bcb2e7bdf489c4a6305e4a6d40,
       type: 3}
-  - WeaponName: SmallBaz
-    WeaponSetNumber: 0
-    WeaponPrefab: {fileID: 7538341981120125636, guid: e1b8787b48be05847b559a505b945fc5,
-      type: 3}
-  - WeaponName: Boomerang
-    WeaponSetNumber: 0
-    WeaponPrefab: {fileID: 7538341981120125636, guid: 50dd9b962222adf45af0e9b777f95f4e,
-      type: 3}
   WeaponSpawnerSize: {x: 5, y: 0, z: 5}
   WorldCenter: {x: 17.3, y: -1.34, z: -17.1}
-  WorldSize: {x: 15.9, y: 0, z: 14.3}
+  WorldSize: {x: 16.5, y: 0, z: 10.6}

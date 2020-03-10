@@ -784,13 +784,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             Info.Rocket.transform.up = Vector3.down;
             Info.Rocket.transform.position += Vector3.down * (FeelData.BombInvisibleHeight - Info.Mark.transform.position.y)/FeelData.BombFallTime*Time.deltaTime;
             //MarkFollow(Info,false);
-            MarkDash(Info);
+            //MarkDash(Info);
+            Info.Mark.GetComponent<SpriteRenderer>().color = Color.red;
+
         }
         else if(Info.Timer >= Data.CanonFireTime - Data.CanonFireAlertTime)
         {
             Info.Mark.GetComponent<SpriteRenderer>().color = FeelData.MarkAlertColor;
-            //MarkFollow(Info,false);
-            MarkDash(Info);
+            MarkFollow(Info,false);
+            //MarkDash(Info);
         }
         else
         {

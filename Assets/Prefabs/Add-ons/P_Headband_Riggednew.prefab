@@ -166,7 +166,7 @@ GameObject:
   - component: {fileID: 3341149699518391976}
   - component: {fileID: 4671400712820149202}
   - component: {fileID: 7720455355895110635}
-  - component: {fileID: 1483569415}
+  - component: {fileID: 1004684888}
   m_Layer: 0
   m_Name: P_Headband_Riggednew
   m_TagString: Untagged
@@ -183,7 +183,7 @@ Transform:
   m_GameObject: {fileID: 1730926160124351675}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: 0}
-  m_LocalScale: {x: 1.0441, y: 1.0441, z: 1.0441}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 7440185090369408470}
   - {fileID: 2611577231998050585}
@@ -228,7 +228,7 @@ MonoBehaviour:
   m_Root: {fileID: 2611577231998050585}
   m_UpdateRate: 60
   m_UpdateMode: 0
-  m_Damping: 0.364
+  m_Damping: 0.3
   m_DampingDistrib:
     serializedVersion: 2
     m_Curve:
@@ -253,7 +253,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_Elasticity: 0.083
+  m_Elasticity: 0.026
   m_ElasticityDistrib:
     serializedVersion: 2
     m_Curve:
@@ -278,7 +278,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_Stiffness: 0.153
+  m_Stiffness: 0.02
   m_StiffnessDistrib:
     serializedVersion: 2
     m_Curve:
@@ -317,24 +317,24 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_Radius: 0.15
+  m_Radius: 0.07
   m_RadiusDistrib:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0.004166667
       value: 1.0124999
-      inSlope: -0.762605
-      outSlope: -0.762605
+      inSlope: -0.0062633557
+      outSlope: -0.0062633557
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.99583334
-      value: 0.25624996
-      inSlope: -0.762605
-      outSlope: -0.762605
+      time: 0.9922933
+      value: 1.0063109
+      inSlope: -0.0062633557
+      outSlope: -0.0062633557
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -344,7 +344,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   m_EndLength: 0
   m_EndOffset: {x: 0, y: 0, z: 0}
-  m_Gravity: {x: 0, y: 0, z: 0}
+  m_Gravity: {x: 0, y: -0.002, z: 0}
   m_Force: {x: 0, y: 0, z: 0}
   m_Colliders:
   - {fileID: 8571538578748679822}
@@ -353,7 +353,7 @@ MonoBehaviour:
   m_DistantDisable: 0
   m_ReferenceObject: {fileID: 0}
   m_DistanceToObject: 20
---- !u!114 &1483569415
+--- !u!114 &1004684888
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -368,7 +368,7 @@ MonoBehaviour:
   m_Root: {fileID: 7918393188205107559}
   m_UpdateRate: 60
   m_UpdateMode: 0
-  m_Damping: 0.364
+  m_Damping: 0.221
   m_DampingDistrib:
     serializedVersion: 2
     m_Curve:
@@ -393,7 +393,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_Elasticity: 0.152
+  m_Elasticity: 0.07
   m_ElasticityDistrib:
     serializedVersion: 2
     m_Curve:
@@ -418,7 +418,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_Stiffness: 0.153
+  m_Stiffness: 0.02
   m_StiffnessDistrib:
     serializedVersion: 2
     m_Curve:
@@ -457,24 +457,24 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  m_Radius: 0.15
+  m_Radius: 0.07
   m_RadiusDistrib:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
       time: 0.004166667
       value: 1.0124999
-      inSlope: -0.762605
-      outSlope: -0.762605
+      inSlope: -0.0062633557
+      outSlope: -0.0062633557
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
       outWeight: 0.33333334
     - serializedVersion: 3
-      time: 0.99583334
-      value: 0.25624996
-      inSlope: -0.762605
-      outSlope: -0.762605
+      time: 0.9922933
+      value: 1.0063109
+      inSlope: -0.0062633557
+      outSlope: -0.0062633557
       tangentMode: 34
       weightedMode: 0
       inWeight: 0.33333334
@@ -484,7 +484,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   m_EndLength: 0
   m_EndOffset: {x: 0, y: 0, z: 0}
-  m_Gravity: {x: 0, y: 0, z: 0}
+  m_Gravity: {x: 0, y: -0.002, z: 0}
   m_Force: {x: 0, y: 0, z: 0}
   m_Colliders:
   - {fileID: 8571538578748679822}
@@ -1176,7 +1176,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Direction: 1
-  m_Center: {x: 0, y: 0, z: 0.09}
+  m_Center: {x: 0, y: -0.03, z: 0.08}
   m_Bound: 0
-  m_Radius: 0.05
-  m_Height: 0
+  m_Radius: 0.04
+  m_Height: 0.16

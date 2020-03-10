@@ -44,11 +44,16 @@ public class JiffycrewPPLine : MonoBehaviour
     public Material lineMaterial;
     public Material compositeMaterial;
 
+    private float _SILineThickness;
+    private float _CRLineThickness;
+    private float _SCLineThickness;
+    private float _SHLineThickness;
     void OnEnable()
     {
         cam = GetComponent<Camera>();
         cam.depthTextureMode = DepthTextureMode.DepthNormals;
-
+        
+        
         if (utilCamObject == null)
         {
             utilCamObject = GameObject.Find("JiffycrewUtilCam");
@@ -69,6 +74,15 @@ public class JiffycrewPPLine : MonoBehaviour
 #endif
     }
 
+    void ScaleThickness()
+    {
+        float screenResolutionScale = (float)Screen.width / 1920.0f;
+        _SILineThickness = SILineThickness * screenResolutionScale;
+        _CRLineThickness = CRLineThickness * screenResolutionScale;
+        _SCLineThickness = SCLineThickness * screenResolutionScale;
+        _SHLineThickness = SHLineThickness * screenResolutionScale;
+    }
+
     private void OnDisable()
     {
         DestroyImmediate(utilCamObject);
@@ -76,6 +90,7 @@ public class JiffycrewPPLine : MonoBehaviour
 
     void OnRenderImage(RenderTexture src, RenderTexture dest)
     {
+        ScaleThickness();
         //Depth and Normal
         RenderTexture depthNormalTexture = RenderTexture.GetTemporary(Screen.width*2, Screen.height*2, 32, RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear, 1);
         depthNormalTexture.filterMode = FilterMode.Point;
@@ -114,22 +129,22 @@ public class JiffycrewPPLine : MonoBehaviour
         lineMaterial.SetColor("_BGColor", BGColor);
 
         lineMaterial.SetFloat("_SILineEnable", System.Convert.ToSingle(SILineEnable));
-        lineMaterial.SetFloat("_SILineThickness", SILineThickness);
+        lineMaterial.SetFloat("_SILineThickness", _SILineThickness);
         lineMaterial.SetFloat("_SILineThreshold", SILineThreshold);
         lineMaterial.SetColor("_SILineColor", SILineColor);
 
         lineMaterial.SetFloat("_CRLineEnable", System.Convert.ToSingle(CRLineEnable));
-        lineMaterial.SetFloat("_CRLineThickness", CRLineThickness);
+        lineMaterial.SetFloat("_CRLineThickness", _CRLineThickness);
         lineMaterial.SetFloat("_CRLineThreshold", CRLineThreshold);
         lineMaterial.SetColor("_CRLineColor", CRLineColor);
 
         lineMaterial.SetFloat("_SCLineEnable", System.Convert.ToSingle(SCLineEnable));
-        lineMaterial.SetFloat("_SCLineThickness", SCLineThickness);
+        lineMaterial.SetFloat("_SCLineThickness", _SCLineThickness);
         lineMaterial.SetFloat("_SCLineThreshold", SCLineThreshold);
         lineMaterial.SetColor("_SCLineColor", SCLineColor);
 
         lineMaterial.SetFloat("_SHLineEnable", System.Convert.ToSingle(SHLineEnable));
-        lineMaterial.SetFloat("_SHLineThickness", SHLineThickness);
+        lineMaterial.SetFloat("_SHLineThickness", _SHLineThickness);
         lineMaterial.SetFloat("_SHLineThreshold", SHLineThreshold);
         lineMaterial.SetColor("_SHLineColor", SHLineColor);
 

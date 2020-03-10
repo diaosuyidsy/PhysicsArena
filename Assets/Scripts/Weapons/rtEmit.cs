@@ -86,7 +86,7 @@ public class rtEmit : WeaponBase
             if (hit.transform.GetComponentInParent<IHittable>() != null &&
                 !hit.transform.GetComponentInParent<IHittable>().CanBlock(Owner.transform.forward))
                 hit.transform.GetComponentInParent<IHittable>().OnImpact(_waterGunData.WaterForce * Owner.transform.forward,
-                ForceMode.Acceleration,
+                ForceMode.VelocityChange,
                 Owner,
                 ImpactType.WaterGun);
             else if (hit.transform.GetComponentInParent<IHittable>() != null)

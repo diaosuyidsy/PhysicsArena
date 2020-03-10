@@ -549,7 +549,10 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     private bool PlayerInCart(GameObject Player)
     {
         Vector3 Offset = Cart.transform.position - Player.transform.position;
-        Offset.y = 0;
+        if (Offset.y <= 5)
+        {
+            Offset.y = 0;
+        }
         return Offset.magnitude <= CartRadius;
     }
 

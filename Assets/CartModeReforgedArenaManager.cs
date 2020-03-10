@@ -134,17 +134,21 @@ public class CartModeReforgedArenaManager : MonoBehaviour
             {
                 CurrentSide = CartSide.Team1;
                 CurrentSpeed = Data.BaseCartSpeed + Data.CartSpeedBonusPerLevel * (Team1Level-Team2Level);
+                CurrentSpeed = 0;
             }
             else if (Team2Level > Team1Level)
             {
                 CurrentSide = CartSide.Team2;
                 CurrentSpeed = Data.BaseCartSpeed + Data.CartSpeedBonusPerLevel * (Team2Level - Team1Level);
+                CurrentSpeed = 0;
             }
             else
             {
                 CurrentSide = CartSide.Neutral;
                 CurrentSpeed = 0;
             }
+
+            CurrentSide = CartSide.Neutral;
         }
         else if (Team1Count > 0)
         {
@@ -379,7 +383,7 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         else if (CurrentTeam1Checkpoints > CurrentTeam2Checkpoints)
         {
 
-            for (int i = CheckPointList.Count / 2 - 1; i < CurrentTeam1Checkpoints; i++)
+            for (int i = CheckPointList.Count / 2; i < CurrentTeam1Checkpoints; i++)
             {
                 if (Team1CheckPointHopTimer <= FeelData.TextHopTime / 2)
                 {

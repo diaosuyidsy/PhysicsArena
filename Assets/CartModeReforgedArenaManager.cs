@@ -383,6 +383,11 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         else if (CurrentTeam1Checkpoints > CurrentTeam2Checkpoints)
         {
 
+            for(int i = 0; i < CheckPointList.Count / 2; i++)
+            {
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
+            }
+
             for (int i = CheckPointList.Count / 2; i < CurrentTeam1Checkpoints; i++)
             {
                 if (Team1CheckPointHopTimer <= FeelData.TextHopTime / 2)
@@ -549,10 +554,15 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     private bool PlayerInCart(GameObject Player)
     {
         Vector3 Offset = Cart.transform.position - Player.transform.position;
-        if (Offset.y <= 5)
+        if (Player.transform.position.y <= 5)
         {
             Offset.y = 0;
         }
+        else
+        {
+            return false;
+        }
+
         return Offset.magnitude <= CartRadius;
     }
 

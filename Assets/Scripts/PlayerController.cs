@@ -94,7 +94,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private IEnumerator _deadInvincible;
     private int _playerBodiesLayer;
     private Vector3 _storedVelocity;
-    private Vector3 _storedForce;
+    private int _hitStopFrames;
     #endregion
 
     private void Awake()
@@ -213,22 +213,28 @@ public class PlayerController : MonoBehaviour, IHittable
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
+			_hitStopFrames = CharacterDataStore.HitStopFramesSmall;
             if (force.magnitude > CharacterDataStore.HitBigThreshold)
             {
                 _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
-            }
-            if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
+				_hitStopFrames = CharacterDataStore.HitStopFramesBig;
+			}
+			if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
-                // _movementFSM.TransitionTo<HitUncontrollableState>();
-                _movementFSM.TransitionTo<PunchHittedStopMovementState>();
-            }
+				if(impactType == ImpactType.Melee || impactType == ImpactType.Block)
+					_movementFSM.TransitionTo<PunchHittedStopMovementState>();
+				else
+					_movementFSM.TransitionTo<HitUncontrollableState>();
+			}
 
-            if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
+			if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
             {
-                // _actionFSM.TransitionTo<HitUnControllableActionState>();
-                _actionFSM.TransitionTo<PunchHittedStopActionState>();
-            }
-        }
+				if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+					_actionFSM.TransitionTo<PunchHittedStopActionState>();
+				else
+					_actionFSM.TransitionTo<HitUnControllableActionState>();
+			}
+		}
     }
 
     public void OnImpact(GameObject enforcer, ImpactType impactType)
@@ -705,11 +711,13 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         private int _counter;
         private int _firstPhysicsFrame;
+
         public override void OnEnter()
         {
             base.OnEnter();
             _counter = 0;
             _firstPhysicsFrame = 2;
+
         }
 
         public override void Update()
@@ -717,7 +725,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.Update();
             if (_firstPhysicsFrame > 0) return;
             _counter++;
-            if (_counter > Context.CharacterDataStore.HitStopFrames)
+            if (_counter > Context._hitStopFrames)
             {
                 TransitionTo<IdleState>();
                 return;
@@ -736,19 +744,23 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         private int _counter;
         private int _firstPhysicsFrame;
-        public override void OnEnter()
+		private Tweener _shakeTween;
+
+		public override void OnEnter()
         {
             base.OnEnter();
             _counter = 0;
             _firstPhysicsFrame = 2;
-        }
+		}
 
         public override void Update()
         {
             base.Update();
             if (_firstPhysicsFrame > 0) return;
-            _counter++;
-            if (_counter > Context.CharacterDataStore.HitStopFrames)
+			if(_shakeTween == null || !_shakeTween.IsPlaying()) _shakeTween = Context.transform.DOShakePosition(Time.unscaledDeltaTime * Context._hitStopFrames, Context.CharacterDataStore.HitStopViberation, Context.CharacterDataStore.HitStopViberato,
+	   Context.CharacterDataStore.HitStopRandomness).SetEase(Context.CharacterDataStore.HitStopViberationEase);
+			_counter++;
+            if (_counter > Context._hitStopFrames)
             {
                 TransitionTo<HitUncontrollableState>();
                 return;
@@ -760,7 +772,13 @@ public class PlayerController : MonoBehaviour, IHittable
             base.FixedUpdate();
             _firstPhysicsFrame--;
         }
-    }
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			_shakeTween.Kill();
+		}
+	}
 
     private class JetPackState : ControllableMovementState
     {
@@ -1159,6 +1177,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class DroppingState : ActionState
     {
+    	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1186,6 +1206,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private class DroppedRecoveryState : ActionState
     {
         private float _timer;
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1297,6 +1319,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
+					Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
                     TransitionTo<PunchHitStopActionState>();
                     Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
                     return;
@@ -1321,6 +1344,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private class HitUnControllableActionState : ActionState
     {
         private float _timer;
+     	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1359,7 +1384,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.Update();
             if (_firstPhysicsFrame > 0) return;
             _counter++;
-            if (_counter > Context.CharacterDataStore.HitStopFrames)
+            if (_counter > Context._hitStopFrames)
             {
                 TransitionTo<IdleActionState>();
                 return;
@@ -1411,7 +1436,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.Update();
             if (_firstPhysicsFrame > 0) return;
             _counter++;
-            if (_counter > Context.CharacterDataStore.HitStopFrames)
+            if (_counter > Context._hitStopFrames)
             {
                 TransitionTo<HitUnControllableActionState>();
                 return;

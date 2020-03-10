@@ -59,6 +59,11 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     private int Team1AccumulatedExp;
     private int Team2AccumulatedExp;
 
+    private float Team1CheckPointHopTimer;
+    private float Team2CheckPointHopTimer;
+
+    private float CheckPointExpTimer;
+
     private bool GameStart;
     private bool GameEnd;
 
@@ -77,6 +82,9 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         Team2LevelTextHopTimer = FeelData.TextHopTime;
         Team2ExpTextHopTimer = FeelData.TextHopTime + FeelData.ExpTextStayTime;
 
+        Team1CheckPointHopTimer = FeelData.TextHopTime;
+        Team2CheckPointHopTimer = FeelData.TextHopTime;
+
         InitCheckPoint();
     }
 
@@ -93,6 +101,8 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         SetDotline();
         CartMove();
         SetTextHop();
+        SetCheckPointScale();
+        CountCheckPointExp();
     }
 
     private void DetectCartSide()
@@ -345,8 +355,83 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         Team2ExpCounter.GetComponent<Image>().fillAmount = (float)Team2Exp / Data.LevelUpExp;
     }
 
+    private void SetCheckPointScale()
+    {
+        Team1CheckPointHopTimer += Time.deltaTime;
+        Team2CheckPointHopTimer += Time.deltaTime;
+
+        if (CurrentTeam1Checkpoints == CurrentTeam2Checkpoints)
+        {
+            for (int i = 0; i < CurrentTeam1Checkpoints; i++)
+            {
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
+            }
+
+            for (int i = CurrentTeam1Checkpoints; i < CheckPointList.Count; i++)
+            {
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
+            }
+
+
+
+
+        }
+        else if (CurrentTeam1Checkpoints > CurrentTeam2Checkpoints)
+        {
+
+            for (int i = CheckPointList.Count / 2 - 1; i < CurrentTeam1Checkpoints; i++)
+            {
+                if (Team1CheckPointHopTimer <= FeelData.TextHopTime / 2)
+                {
+                    float Scale = Mathf.Lerp(FeelData.ActivatedScale, FeelData.HopScale, Team1CheckPointHopTimer / (FeelData.TextHopTime / 2));
+                    CheckPointList[i].transform.localScale = new Vector3(Scale, 0.1f, Scale);
+                }
+                else if (Team1CheckPointHopTimer <= FeelData.TextHopTime)
+                {
+                    float Scale = Mathf.Lerp(FeelData.HopScale, FeelData.ActivatedScale, (Team1CheckPointHopTimer - FeelData.TextHopTime / 2) / (FeelData.TextHopTime / 2));
+                    CheckPointList[i].transform.localScale = new Vector3(Scale, 0.1f, Scale);
+                }
+                else
+                {
+                    CheckPointList[i].transform.localScale = new Vector3(FeelData.ActivatedScale, 0.1f, FeelData.ActivatedScale);
+                }
+            }
+
+            for (int i = CurrentTeam1Checkpoints; i < CheckPointList.Count; i++)
+            {
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
+            }
+        }
+        else
+        {
+            for (int i = 0; i < CurrentTeam1Checkpoints; i++)
+            {
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
+            }
+
+            for (int i = CurrentTeam1Checkpoints; i < CheckPointList.Count / 2; i++)
+            {
+                if (Team2CheckPointHopTimer <= FeelData.TextHopTime / 2)
+                {
+                    float Scale = Mathf.Lerp(FeelData.ActivatedScale, FeelData.HopScale, Team2CheckPointHopTimer / (FeelData.TextHopTime / 2));
+                    CheckPointList[i].transform.localScale = new Vector3(Scale, 0.1f, Scale);
+                }
+                else if (Team2CheckPointHopTimer <= FeelData.TextHopTime)
+                {
+                    float Scale = Mathf.Lerp(FeelData.HopScale, FeelData.ActivatedScale, (Team2CheckPointHopTimer - FeelData.TextHopTime / 2) / (FeelData.TextHopTime / 2));
+                    CheckPointList[i].transform.localScale = new Vector3(Scale, 0.1f, Scale);
+                }
+                else
+                {
+                    CheckPointList[i].transform.localScale = new Vector3(FeelData.ActivatedScale, 0.1f, FeelData.ActivatedScale);
+                }
+            }
+        }
+    }
+
     private void SetCheckPointAppearance()
     {
+
         if (CurrentTeam1Checkpoints == CurrentTeam2Checkpoints)
         {
             for (int i = 0; i < CurrentTeam1Checkpoints; i++)
@@ -354,7 +439,9 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CheckPointList[i].GetComponent<Renderer>().material = FeelData.EmissiveRed;
                 Material mat = CheckPointList[i].GetComponent<Renderer>().material;
                 mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", FeelData.RedCheckpointColor * FeelData.DeactivatedEmission);
+                //mat.SetColor("_EmissionColor", FeelData.RedCheckpointColor * FeelData.DeactivatedEmission);
+
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
             }
 
             for (int i = CurrentTeam1Checkpoints; i < CheckPointList.Count; i++)
@@ -362,8 +449,14 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CheckPointList[i].GetComponent<Renderer>().material = FeelData.EmissiveBlue;
                 Material mat = CheckPointList[i].GetComponent<Renderer>().material;
                 mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", FeelData.BlueCheckpointColor * FeelData.DeactivatedEmission);
+                //mat.SetColor("_EmissionColor", FeelData.BlueCheckpointColor * FeelData.DeactivatedEmission);
+
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
             }
+
+            
+
+
         }
         else if(CurrentTeam1Checkpoints > CurrentTeam2Checkpoints)
         {
@@ -372,7 +465,27 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CheckPointList[i].GetComponent<Renderer>().material = FeelData.EmissiveRed;
                 Material mat = CheckPointList[i].GetComponent<Renderer>().material;
                 mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", FeelData.RedCheckpointColor * FeelData.ActivatedEmission);
+                //mat.SetColor("_EmissionColor", FeelData.RedCheckpointColor * FeelData.ActivatedEmission);
+
+                
+            }
+
+            for(int i= CheckPointList.Count / 2 - 1; i < CurrentTeam1Checkpoints; i++)
+            {
+                if(Team1CheckPointHopTimer <= FeelData.TextHopTime / 2)
+                {
+                    float Scale = Mathf.Lerp(FeelData.ActivatedScale, FeelData.HopScale, Team1CheckPointHopTimer / (FeelData.TextHopTime / 2));
+                    CheckPointList[i].transform.localScale = new Vector3(Scale , 0.1f, Scale);
+                }
+                else if(Team1CheckPointHopTimer <= FeelData.TextHopTime)
+                {
+                    float Scale = Mathf.Lerp(FeelData.HopScale, FeelData.ActivatedScale, (Team1CheckPointHopTimer- FeelData.TextHopTime / 2) / (FeelData.TextHopTime / 2));
+                    CheckPointList[i].transform.localScale = new Vector3(Scale, 0.1f, Scale);
+                }
+                else
+                {
+                    CheckPointList[i].transform.localScale = new Vector3(FeelData.ActivatedScale, 0.1f, FeelData.ActivatedScale);
+                }
             }
 
             for (int i = CurrentTeam1Checkpoints; i < CheckPointList.Count; i++)
@@ -380,7 +493,9 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CheckPointList[i].GetComponent<Renderer>().material = FeelData.EmissiveBlue;
                 Material mat = CheckPointList[i].GetComponent<Renderer>().material;
                 mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", FeelData.BlueCheckpointColor * FeelData.DeactivatedEmission);
+                //mat.SetColor("_EmissionColor", FeelData.BlueCheckpointColor * FeelData.DeactivatedEmission);
+
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
             }
         }
         else
@@ -390,7 +505,9 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CheckPointList[i].GetComponent<Renderer>().material = FeelData.EmissiveRed;
                 Material mat = CheckPointList[i].GetComponent<Renderer>().material;
                 mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", FeelData.RedCheckpointColor * FeelData.DeactivatedEmission);
+                //mat.SetColor("_EmissionColor", FeelData.RedCheckpointColor * FeelData.DeactivatedEmission);
+
+                CheckPointList[i].transform.localScale = new Vector3(FeelData.NormalScale, 0.1f, FeelData.NormalScale);
             }
 
             for (int i = CurrentTeam1Checkpoints; i < CheckPointList.Count; i++)
@@ -398,9 +515,32 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CheckPointList[i].GetComponent<Renderer>().material = FeelData.EmissiveBlue;
                 Material mat = CheckPointList[i].GetComponent<Renderer>().material;
                 mat.EnableKeyword("_EMISSION");
-                mat.SetColor("_EmissionColor", FeelData.BlueCheckpointColor * FeelData.ActivatedEmission);
+                //mat.SetColor("_EmissionColor", FeelData.BlueCheckpointColor * FeelData.ActivatedEmission);
+            }
+
+
+            for (int i = CurrentTeam1Checkpoints; i < CheckPointList.Count / 2; i++)
+            {
+                Debug.Log(Team2CheckPointHopTimer);
+
+                if (Team2CheckPointHopTimer <= FeelData.TextHopTime / 2)
+                {
+                    float Scale = Mathf.Lerp(FeelData.ActivatedScale, FeelData.HopScale, Team2CheckPointHopTimer / (FeelData.TextHopTime / 2));
+                    CheckPointList[i].transform.localScale = new Vector3(Scale, 0.1f, Scale);
+                }
+                else if (Team2CheckPointHopTimer <= FeelData.TextHopTime)
+                {
+                    float Scale = Mathf.Lerp(FeelData.HopScale, FeelData.ActivatedScale, (Team2CheckPointHopTimer - FeelData.TextHopTime / 2) / (FeelData.TextHopTime / 2));
+                    CheckPointList[i].transform.localScale = new Vector3(Scale, 0.1f, Scale);
+                }
+                else
+                {
+                    CheckPointList[i].transform.localScale = new Vector3(FeelData.ActivatedScale, 0.1f, FeelData.ActivatedScale);
+                }
             }
         }
+
+
     }
 
     private bool PlayerInCart(GameObject Player)
@@ -410,6 +550,39 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         return Offset.magnitude <= CartRadius;
     }
 
+    private void CountCheckPointExp()
+    {
+        if(CurrentTeam1Checkpoints > CurrentTeam2Checkpoints)
+        {
+            CheckPointExpTimer += Time.deltaTime;
+            if (CheckPointExpTimer >= Data.CheckPointExpTimeInterval)
+            {
+                GainExp((CurrentTeam1Checkpoints - CheckPointList.Count / 2) * Data.CheckPointExp,true);
+                CheckPointExpTimer = 0;
+
+                Team1CheckPointHopTimer = 0;
+            }
+
+        }
+        else if (CurrentTeam2Checkpoints > CurrentTeam1Checkpoints)
+        {
+            CheckPointExpTimer += Time.deltaTime;
+            if (CheckPointExpTimer >= Data.CheckPointExpTimeInterval)
+            {
+                GainExp((CurrentTeam2Checkpoints - CheckPointList.Count / 2) * Data.CheckPointExp, false);
+                CheckPointExpTimer = 0;
+
+                Team2CheckPointHopTimer = 0;
+            }
+        }
+        else
+        {
+            CheckPointExpTimer = 0;
+        }
+
+        SetUI();
+    }
+
     private void OnPlayerDied(PlayerDied e)
     {
         if(GameEnd || !GameStart)
@@ -417,13 +590,25 @@ public class CartModeReforgedArenaManager : MonoBehaviour
             return;
         }
 
+
+        int Amount = Data.KillExp;
+
         if (e.Player.tag.Contains("1"))
         {
-            GainExp(Data.KillExp, false);
+
+            if (Team1Level > Team2Level)
+            {
+                Amount += Data.KillExpBonusPerLevelDif * (Team1Level - Team2Level);
+            }
+            GainExp(Amount, false);
         }
         else
         {
-            GainExp(Data.KillExp, true);
+            if (Team2Level > Team1Level)
+            {
+                Amount += Data.KillExpBonusPerLevelDif * (Team2Level - Team1Level);
+            }
+            GainExp(Amount, true);
         }
 
         SetUI();
@@ -434,10 +619,6 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         if (Team1)
         {
             Team1Exp += Amount;
-            if (Team2Level > Team1Level)
-            {
-                Team1Exp += Data.KillExpBonusPerLevelDif * (Team2Level - Team1Level);
-            }
             if (Team1Exp >= Data.LevelUpExp)
             {
                 int LevelUp = Team1Exp / Data.LevelUpExp;
@@ -454,10 +635,6 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         else
         {
             Team2Exp += Amount;
-            if (Team1Level > Team2Level)
-            {
-                Team2Exp += Data.KillExpBonusPerLevelDif * (Team1Level - Team2Level);
-            }
             if (Team2Exp >= Data.LevelUpExp)
             {
                 int LevelUp = Team2Exp / Data.LevelUpExp;

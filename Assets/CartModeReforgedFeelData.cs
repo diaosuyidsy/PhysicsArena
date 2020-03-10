@@ -13,6 +13,10 @@ public class CartModeReforgedFeelData : MonoBehaviour
     public Color RedCheckpointColor;
     public Color BlueCheckpointColor;
 
+    public float ActivatedScale;
+    public float NormalScale;
+    public float HopScale;
+
     public float ActivatedEmission;
     public float DeactivatedEmission;
 

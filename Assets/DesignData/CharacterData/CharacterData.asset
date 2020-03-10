@@ -47,9 +47,11 @@ MonoBehaviour:
   PunchForce: 800
   MeleeHoldTime: Infinity
   HitUncontrollableTimeSmall: 0.25
+  HitStopFramesSmall: 6
   HitSmallThreshold: 500
   HitUncontrollableTimeBig: 0.4
   HitBigThreshold: 900
+  HitStopFramesBig: 12
   PunchReleaseRotationMultiplier: 0.5
   PunchResetVelocityBeforeHitDuration: 0.5
   CanHitLayer:
@@ -61,3 +63,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1048576
   DropRecoveryTime: 0.2
+  HitStopViberation: {x: 1, y: 0, z: 1}
+  HitStopViberato: 90
+  HitStopRandomness: 90
+  HitStopViberationEase: 27

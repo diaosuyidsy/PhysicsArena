@@ -221,18 +221,18 @@ public class PlayerController : MonoBehaviour, IHittable
 			}
 			if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
-				if(impactType == ImpactType.Melee || impactType == ImpactType.Block)
-					_movementFSM.TransitionTo<PunchHittedStopMovementState>();
-				else
-					_movementFSM.TransitionTo<HitUncontrollableState>();
+				//if(impactType == ImpactType.Melee || impactType == ImpactType.Block)
+				//	_movementFSM.TransitionTo<PunchHittedStopMovementState>();
+				//else
+				_movementFSM.TransitionTo<HitUncontrollableState>();
 			}
 
 			if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
             {
-				if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
-					_actionFSM.TransitionTo<PunchHittedStopActionState>();
-				else
-					_actionFSM.TransitionTo<HitUnControllableActionState>();
+				//if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+				//	_actionFSM.TransitionTo<PunchHittedStopActionState>();
+				//else
+				_actionFSM.TransitionTo<HitUnControllableActionState>();
 			}
 		}
     }

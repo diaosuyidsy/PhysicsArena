@@ -90,10 +90,11 @@ public class PlayerController : MonoBehaviour, IHittable
     }
     private float _rotationSpeedMultiplier = 1f;
     private List<Rigidbody> _playerBodies;
+    private Rigidbody[] _allPlayerRBs;
     private IEnumerator _deadInvincible;
     private int _playerBodiesLayer;
     private Vector3 _storedVelocity;
-    private Vector3 _storedForce;
+    private int _hitStopFrames;
     #endregion
 
     private void Awake()
@@ -112,6 +113,7 @@ public class PlayerController : MonoBehaviour, IHittable
         _currentStamina = CharacterDataStore.MaxStamina;
         _staminaUISize = BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
         _playerBodiesLayer = gameObject.layer;
+        _allPlayerRBs = GetComponentsInChildren<Rigidbody>(true);
         foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
         {
             if (rb.gameObject.layer != LayerMask.NameToLayer("NoCollision"))
@@ -211,27 +213,28 @@ public class PlayerController : MonoBehaviour, IHittable
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
+			_hitStopFrames = CharacterDataStore.HitStopFramesSmall;
             if (force.magnitude > CharacterDataStore.HitBigThreshold)
             {
                 _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
-            }
-            if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
+				_hitStopFrames = CharacterDataStore.HitStopFramesBig;
+			}
+			if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
-                _movementFSM.TransitionTo<HitUncontrollableState>();
-            }
+				if(impactType == ImpactType.Melee || impactType == ImpactType.Block)
+					_movementFSM.TransitionTo<PunchHittedStopMovementState>();
+				else
+					_movementFSM.TransitionTo<HitUncontrollableState>();
+			}
 
-            if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
+			if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
             {
-                _actionFSM.TransitionTo<HitUnControllableActionState>();
-            }
-            // if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
-            //     _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
-            //     _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)) ||
-            //     _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
-            // {
-            //     _actionFSM.TransitionTo<HitUnControllableActionState>();
-            // }
-        }
+				if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+					_actionFSM.TransitionTo<PunchHittedStopActionState>();
+				else
+					_actionFSM.TransitionTo<HitUnControllableActionState>();
+			}
+		}
     }
 
     public void OnImpact(GameObject enforcer, ImpactType impactType)
@@ -322,7 +325,7 @@ public class PlayerController : MonoBehaviour, IHittable
     #region Helper Method
     private void _setVelocity(Vector3 vel)
     {
-        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
+        foreach (Rigidbody rb in _allPlayerRBs)
         {
             rb.velocity = vel;
         }
@@ -704,6 +707,79 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    private class PunchHitStopMovementState : ControllableMovementState
+    {
+        private int _counter;
+        private int _firstPhysicsFrame;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _counter = 0;
+            _firstPhysicsFrame = 2;
+
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_firstPhysicsFrame > 0) return;
+            _counter++;
+            if (_counter > Context._hitStopFrames)
+            {
+                TransitionTo<IdleState>();
+                return;
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            _firstPhysicsFrame--;
+        }
+
+    }
+
+    private class PunchHittedStopMovementState : ControllableMovementState
+    {
+        private int _counter;
+        private int _firstPhysicsFrame;
+		private Tweener _shakeTween;
+
+		public override void OnEnter()
+        {
+            base.OnEnter();
+            _counter = 0;
+            _firstPhysicsFrame = 2;
+		}
+
+        public override void Update()
+        {
+            base.Update();
+            if (_firstPhysicsFrame > 0) return;
+			if(_shakeTween == null || !_shakeTween.IsPlaying()) _shakeTween = Context.transform.DOShakePosition(Time.unscaledDeltaTime * Context._hitStopFrames, Context.CharacterDataStore.HitStopViberation, Context.CharacterDataStore.HitStopViberato,
+	   Context.CharacterDataStore.HitStopRandomness).SetEase(Context.CharacterDataStore.HitStopViberationEase);
+			_counter++;
+            if (_counter > Context._hitStopFrames)
+            {
+                TransitionTo<HitUncontrollableState>();
+                return;
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            _firstPhysicsFrame--;
+        }
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			_shakeTween.Kill();
+		}
+	}
+
     private class JetPackState : ControllableMovementState
     {
         private JetData _jetData;
@@ -949,11 +1025,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 // if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._currentStamina += (Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
                 if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._drainStamina(-Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
             }
-            /// Stamina Regen UI Linger Time
-            // if (Context.BlockUIVFXHolder != null && Context.BlockUIVFXHolder.activeSelf && Time.timeSinceLevelLoad > Context._lastTimeUSeStaminaUnimportant + Context.CharacterDataStore.BlockUILingerDuration)
-            // {
-            //     Context.BlockUIVFXHolder.SetActive(false);
-            // }
         }
 
         public virtual void OnEnterDeathZone()
@@ -981,20 +1052,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            // if (_LeftTrigger)
-            // {
-            //     TransitionTo<PickingState>();
-            //     return;
-            // }
-            if (_RightTriggerDown && Context.EquipmentObject != null &&
-            Context.EquipmentObject.GetComponent<rtJet>() != null &&
-            Context._canDrainStamina(Context.EquipmentObject.GetComponent<rtJet>().m_JetData.ButtStaminaDrain))
-            {
-                Context.EquipmentObject.GetComponent<EquipmentBase>().OnUse();
-                TransitionTo<ButtAnticipationState>();
-                return;
-            }
-            else if (_RightTrigger && (Context.EquipmentObject == null || Context.EquipmentObject.GetComponent<rtJet>() == null))
+            if (_RightTrigger)
             {
                 TransitionTo<PunchHoldingState>();
                 return;
@@ -1119,6 +1177,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class DroppingState : ActionState
     {
+    	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1146,6 +1206,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private class DroppedRecoveryState : ActionState
     {
         private float _timer;
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1233,7 +1295,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
-            // Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
         }
 
         public override void Update()
@@ -1258,6 +1319,10 @@ public class PlayerController : MonoBehaviour, IHittable
                     hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
+					Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
+                    TransitionTo<PunchHitStopActionState>();
+                    Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
+                    return;
                 }
             }
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
@@ -1266,12 +1331,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            // if (_LeftTrigger)
-            // {
-            //     EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
-            //     TransitionTo<PickingState>();
-            //     return;
-            // }
         }
 
         public override void OnExit()
@@ -1279,13 +1338,14 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("PunchReleased", false);
             Context._rotationSpeedMultiplier = 1f;
-            // Context._movementFSM.TransitionTo<IdleState>();
         }
     }
 
     private class HitUnControllableActionState : ActionState
     {
         private float _timer;
+     	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1305,138 +1365,106 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
-    private class ButtState : ActionState
+    private class PunchHitStopActionState : ActionState
     {
-        protected JetData _jetData;
+        private int _counter;
+        private Vector3[] _storedVelocity;
+        private int _firstPhysicsFrame;
         public override void OnEnter()
         {
             base.OnEnter();
-            _jetData = Context.EquipmentObject.GetComponent<rtJet>().m_JetData;
-        }
-    }
-    private class ButtAnticipationState : ButtState
-    {
-        private float _timer;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _timer = _jetData.ButtAnticipationDuration + Time.timeSinceLevelLoad;
-            Context._rb.velocity = Vector3.zero;
-            Context._movementFSM.TransitionTo<ButtStrikeMovementState>();
-            Context._drainStamina(_jetData.ButtStaminaDrain);
-            Context._animator.SetBool("ButtAnticipation", true);
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_timer < Time.timeSinceLevelLoad)
-            {
-                RaycastHit hit;
-                if (Physics.SphereCast(Context.transform.position, _jetData.ButtStrikeRaidus, Context.transform.forward, out hit, _jetData.ButtStrikeStopDistance, _jetData.ButtHitStopLayer))
-                {
-                    TransitionTo<ButtRecoveryState>();
-                    return;
-                }
-                TransitionTo<ButtStrikeState>();
-                return;
-            }
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context._animator.SetBool("ButtAnticipation", false);
-        }
-    }
-
-    private class ButtStrikeState : ButtState
-    {
-        private float _timer;
-        private bool _hitOnce;
-        private Tweener _hitTween;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _timer = _jetData.ButtStrikeDuration + Time.timeSinceLevelLoad;
-            _hitOnce = false;
-            _hitTween = Context.transform.DOMove(Context.transform.forward * _jetData.ButtStrikeForwardPush, _jetData.ButtStrikeDuration)
-            .SetRelative(true)
-            .SetEase(Ease.OutCirc);
-            Context._animator.SetBool("ButtStrike", true);
+            _counter = 0;
+            _firstPhysicsFrame = 2;
+            _storedVelocity = new Vector3[Context._allPlayerRBs.Length];
 
         }
 
         public override void Update()
         {
             base.Update();
-
-            if (_timer < Time.timeSinceLevelLoad)
-            {
-                TransitionTo<ButtRecoveryState>();
-                return;
-            }
-            else
-            {
-                RaycastHit hit;
-                // This Layermask get all player's layer except this player's
-                int layermask = 0;
-                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
-                else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
-                if (!_hitOnce && Physics.SphereCast(Context.transform.position, _jetData.ButtStrikeRaidus, Context.transform.forward, out hit, _jetData.ButtStrikeDistance, layermask))
-                {
-                    if (hit.transform.GetComponentInParent<IHittable>() == null) return;
-                    _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
-                    {
-                        rb.velocity = Vector3.zero;
-                    }
-                    Vector3 force = Context.transform.forward * _jetData.ButtStrikeStrength;
-                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
-                    TransitionTo<ButtRecoveryState>();
-                    return;
-                }
-                if (Physics.SphereCast(Context.transform.position, _jetData.ButtStrikeRaidus, Context.transform.forward, out hit, _jetData.ButtStrikeStopDistance, _jetData.ButtHitStopLayer))
-                {
-                    print("On Hit Obstacles");
-                    TransitionTo<ButtRecoveryState>();
-                    return;
-                }
-            }
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            _hitTween.Kill();
-            Context._animator.SetBool("ButtStrike", false);
-        }
-    }
-
-    private class ButtRecoveryState : ButtState
-    {
-        private float _timer;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _timer = _jetData.ButtRecoveryDuration + Time.timeSinceLevelLoad;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_timer < Time.timeSinceLevelLoad)
+            if (_firstPhysicsFrame > 0) return;
+            _counter++;
+            if (_counter > Context._hitStopFrames)
             {
                 TransitionTo<IdleActionState>();
                 return;
             }
         }
 
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            _firstPhysicsFrame--;
+            if (_firstPhysicsFrame == 0)
+            {
+                for (int i = 0; i < _storedVelocity.Length; i++)
+                {
+                    _storedVelocity[i] = Context._allPlayerRBs[i].velocity;
+                    Context._allPlayerRBs[i].isKinematic = true;
+                }
+            }
+        }
 
         public override void OnExit()
         {
             base.OnExit();
-            Context._movementFSM.TransitionTo<IdleState>();
+            for (int i = 0; i < _storedVelocity.Length; i++)
+            {
+                Context._allPlayerRBs[i].velocity = _storedVelocity[i];
+                Context._allPlayerRBs[i].isKinematic = false;
+            }
+            EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+        }
+    }
+
+    private class PunchHittedStopActionState : ActionState
+    {
+        private int _counter;
+        private Vector3[] _storedVelocity;
+        private int _firstPhysicsFrame;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _counter = 0;
+            _firstPhysicsFrame = 2;
+            _storedVelocity = new Vector3[Context._allPlayerRBs.Length];
+
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_firstPhysicsFrame > 0) return;
+            _counter++;
+            if (_counter > Context._hitStopFrames)
+            {
+                TransitionTo<HitUnControllableActionState>();
+                return;
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            _firstPhysicsFrame--;
+            if (_firstPhysicsFrame == 0)
+            {
+                for (int i = 0; i < _storedVelocity.Length; i++)
+                {
+                    _storedVelocity[i] = Context._allPlayerRBs[i].velocity;
+                    Context._allPlayerRBs[i].isKinematic = true;
+                }
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            for (int i = 0; i < _storedVelocity.Length; i++)
+            {
+                Context._allPlayerRBs[i].velocity = _storedVelocity[i];
+                Context._allPlayerRBs[i].isKinematic = false;
+            }
         }
     }
 

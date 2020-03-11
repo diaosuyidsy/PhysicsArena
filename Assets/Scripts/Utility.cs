@@ -277,6 +277,7 @@ public enum GameMapMode
 {
     FoodMode,
     CartMode,
+    CartModeReforged,
     FoodCartMode,
     ObjectiveMode,
     BrawlMode,

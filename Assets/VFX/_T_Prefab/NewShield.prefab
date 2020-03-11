@@ -1495,6 +1495,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7774201354144324315}
   - component: {fileID: 5088278394932193677}
+  - component: {fileID: 3493202704117727302}
   m_Layer: 0
   m_Name: NewShield
   m_TagString: Untagged
@@ -1543,6 +1544,25 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &3493202704117727302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6753388613632059592}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1ce5cc27b4e6b6e49bf45bbc0ce25d3d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Animator: {fileID: 5088278394932193677}
+  ShieldRenderers:
+  - {fileID: 1305990557306486775}
+  - {fileID: 6698988140887710578}
+  - {fileID: 515786700224453773}
+  Shield: {fileID: 3849302034651315326}
+  ShieldCrack: {fileID: 6753388613594536895}
 --- !u!1 &6924715818426836636
 GameObject:
   m_ObjectHideFlags: 0
@@ -2250,6 +2270,12 @@ PrefabInstance:
       objectReference: {fileID: 2100000, guid: 36bb65e31db65bf4783fec233b2d683f, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c9f3d7d291eec1a45bf439bce8db853b, type: 3}
+--- !u!1 &6753388613594536895 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: -927199367670048503, guid: c9f3d7d291eec1a45bf439bce8db853b,
+    type: 3}
+  m_PrefabInstance: {fileID: 3357774644906492598}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &7774201354728155564 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -4216859302048453862, guid: c9f3d7d291eec1a45bf439bce8db853b,

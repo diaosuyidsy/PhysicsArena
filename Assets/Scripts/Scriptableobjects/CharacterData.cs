@@ -16,7 +16,6 @@ public class CharacterData : ScriptableObject
     public float JumpForce = 230f;
     public LayerMask JumpMask;
     public float MinRotationSpeed = 4f;
-    public float DropWeaponForceThreshold = 500f;
     public float FrontIsCliff = 0.2f;
     public float CliffPreventionForce = 100f;
     public float CliffPreventionTimer = 0.4f;
@@ -55,9 +54,12 @@ public class CharacterData : ScriptableObject
     [Tooltip("How much time player can hold the punch, default is infinity")]
     public float MeleeHoldTime = Mathf.Infinity;
     public float HitUncontrollableTimeSmall = 0.5f;
+    public int HitStopFramesSmall = 6;
     public float HitSmallThreshold = 500f;
     public float HitUncontrollableTimeBig = 0.5f;
     public float HitBigThreshold = 900f;
+    public int HitStopFramesBig = 12;
+
     public float PunchReleaseRotationMultiplier = 0.2f;
     public float PunchResetVelocityBeforeHitDuration = 0.5f;
     public LayerMask CanHitLayer;
@@ -67,4 +69,8 @@ public class CharacterData : ScriptableObject
     public float PickUpCD = 0f;
     public LayerMask PickUpLayer;
     public float DropRecoveryTime = 0.2f;
+	public Vector3 HitStopViberation = new Vector3(1f, 0.1f, 1f);
+	public int HitStopViberato = 90;
+	public float HitStopRandomness = 90f;
+	public Ease HitStopViberationEase = Ease.OutBack;
 }

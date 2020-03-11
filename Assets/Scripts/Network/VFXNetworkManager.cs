@@ -226,11 +226,11 @@ public class VFXNetworkManager
 
     private void _onBlocked(Blocked ev)
     {
-        GameObject parryvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockParryVFX : VFXDataStore.DuckBlockParryVFX;
-        GameObject startvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockShieldStarVFX : VFXDataStore.DuckBlockShieldStarVFX;
-        PlayerControllerNetworking pc = ev.Blocker.GetComponent<PlayerControllerNetworking>();
-        GameObject.Instantiate(parryvfx, pc.transform);
-        GameObject.Instantiate(parryvfx, pc.BlockVFXHolder.transform);
+        // GameObject parryvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockParryVFX : VFXDataStore.DuckBlockParryVFX;
+        // GameObject startvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockShieldStarVFX : VFXDataStore.DuckBlockShieldStarVFX;
+        // PlayerControllerNetworking pc = ev.Blocker.GetComponent<PlayerControllerNetworking>();
+        // GameObject.Instantiate(parryvfx, pc.transform);
+        // GameObject.Instantiate(parryvfx, pc.BlockVFXHolder.transform);
     }
     #endregion
 

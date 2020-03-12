@@ -34,6 +34,9 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     public GameObject Team2LevelText;
     public GameObject Team2ExpText;
 
+    public GameObject Canvas;
+    public GameObject ExpTextPrefab;
+
     public float CartRadius;
     public GameObject CartDotline;
 
@@ -577,6 +580,13 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CheckPointExpTimer = 0;
 
                 Team1CheckPointHopTimer = 0;
+
+                for(int i = CheckPointList.Count / 2; i < CurrentTeam1Checkpoints; i++)
+                {
+                    GenerateExpText(CheckPointList[i].transform.position, true,  Data.CheckPointExp);
+                }
+
+
             }
 
         }
@@ -589,6 +599,13 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CheckPointExpTimer = 0;
 
                 Team2CheckPointHopTimer = 0;
+
+                for (int i = CurrentTeam1Checkpoints ; i < CheckPointList.Count / 2; i++)
+                {
+                    GenerateExpText(CheckPointList[i].transform.position, false, Data.CheckPointExp);
+                }
+
+
             }
         }
         else
@@ -597,6 +614,26 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         }
 
         SetUI();
+    }
+
+    private void GenerateExpText(Vector3 WorldPosition,bool Team1,int Amount)
+    {
+        Vector3 ScreenPos = Camera.main.WorldToScreenPoint(WorldPosition);
+
+        GameObject Text = GameObject.Instantiate(ExpTextPrefab);
+        if (Team1)
+        {
+            Text.GetComponent<TextMesh>().color = Color.red;
+        }
+        else
+        {
+            Text.GetComponent<TextMesh>().color = Color.blue;
+        }
+        Text.GetComponent<TextMesh>().text = "+" + Amount.ToString();
+
+        Text.transform.position = WorldPosition;
+        //Text.transform.parent = Canvas.transform;
+        //Text.GetComponent<RectTransform>().localPosition = new Vector3(ScreenPos.x, ScreenPos.y, 0);
     }
 
     private void OnPlayerDied(PlayerDied e)
@@ -617,6 +654,8 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 Amount += Data.KillExpBonusPerLevelDif * (Team1Level - Team2Level);
             }
             GainExp(Amount, false);
+
+            GenerateExpText(e.Player.transform.position,false,Amount);
         }
         else
         {
@@ -625,6 +664,8 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 Amount += Data.KillExpBonusPerLevelDif * (Team2Level - Team1Level);
             }
             GainExp(Amount, true);
+
+            GenerateExpText(e.Player.transform.position, true,Amount);
         }
 
         SetUI();

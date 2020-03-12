@@ -299,6 +299,24 @@ public class VFXManager
     {
         GameObject.Instantiate(VFXDataStore.VanishVFX, ev.FistPos, VFXDataStore.VanishVFX.transform.rotation);
     }
+
+    private void _onFistGunHit(FistGunHit ev)
+    {
+        if (VFXDataStore.FistGunHitVFX != null)
+        {
+            foreach (GameObject VFX in VFXDataStore.FistGunHitVFX)
+            {
+                Vector3 hittedPos = ev.Fist.transform.position +
+                                       ev.Fist.transform.forward * VFX.transform.position.z +
+                                       ev.Fist.transform.right * VFX.transform.position.x +
+                                       ev.Fist.transform.up * VFX.transform.position.y;
+
+                Vector3 hittedRotation = ev.Fist.transform.eulerAngles + VFX.transform.eulerAngles;
+                _instantiateVFX(VFX, hittedPos, Quaternion.Euler(hittedRotation.x, hittedRotation.y, hittedRotation.z));
+            }
+        }
+    }
+
     private void _onBazookaLaunched(BazookaFired ev)
     {
         // GameObject.Instantiate(VFXDataStore.BazookaStartVFX, ev.FistPos, VFXDataStore.BazookaStartVFX.transform.rotation);
@@ -429,6 +447,7 @@ public class VFXManager
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawned);
         EventManager.Instance.AddHandler<FootStep>(_onFootStep);
         EventManager.Instance.AddHandler<PunchInterruptted>(_onPunchInterrupted);
+        EventManager.Instance.AddHandler<FistGunHit>(_onFistGunHit);
         _blinkTime = Services.Config.GameMapData.InvincibleTime;
     }
 
@@ -460,6 +479,7 @@ public class VFXManager
         EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawned);
         EventManager.Instance.RemoveHandler<FootStep>(_onFootStep);
         EventManager.Instance.RemoveHandler<PunchInterruptted>(_onPunchInterrupted);
+        EventManager.Instance.RemoveHandler<FistGunHit>(_onFistGunHit);
     }
 
     public void Destory()

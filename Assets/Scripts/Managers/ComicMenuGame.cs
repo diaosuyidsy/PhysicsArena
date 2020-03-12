@@ -8,7 +8,6 @@ public class ComicMenuGame : MonoBehaviour
     public AudioData AudioData;
     public VFXData VFXData;
     public ConfigData ConfigData;
-    public WeaponData WeaponData;
     public GameFeelData GameFeelData;
     public GameMapData GameMapData;
 
@@ -18,7 +17,6 @@ public class ComicMenuGame : MonoBehaviour
         Services.AudioManager = new AudioManager(AudioData);
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
-        Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
         Services.GameStateManager = new MenuGameStateManager(GameMapData, ConfigData, gameObject);
     }
 
@@ -45,7 +43,6 @@ public class ComicMenuGame : MonoBehaviour
     }
     void Update()
     {
-        Services.WeaponGenerationManager.Update();
         Services.GameStateManager.Update();
 
     }
@@ -53,9 +50,6 @@ public class ComicMenuGame : MonoBehaviour
     {
         Services.AudioManager.Destroy();
         Services.AudioManager = null;
-
-        Services.WeaponGenerationManager.Destroy();
-        Services.WeaponGenerationManager = null;
 
         Services.GameFeelManager.Destory();
         Services.GameFeelManager = null;

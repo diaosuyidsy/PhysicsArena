@@ -139,7 +139,7 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
 
     private void OnObjectDespawned(ObjectDespawned e)
     {
-        if(e.Obj.CompareTag("Weapon_OnChest") || e.Obj.CompareTag("Weapon_OnHead"))
+        if(e.Obj.GetComponent<WeaponBase>() && (e.Obj.CompareTag("Weapon_OnChest") || e.Obj.CompareTag("Weapon_OnHead")))
         {
             CurrentWeaponCount--;
         }

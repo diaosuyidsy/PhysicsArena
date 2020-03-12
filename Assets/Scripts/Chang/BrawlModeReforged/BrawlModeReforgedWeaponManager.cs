@@ -47,8 +47,7 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<WeaponGeneratorSwtich>(OnGeneratorSwtich);
-        EventManager.Instance.AddHandler<WeaponHitDeathTrigger>(OnWeaponFall);
-        EventManager.Instance.AddHandler<WeaponUsedUp>(OnWeaponUsedUp);
+        EventManager.Instance.AddHandler<ObjectDespawned>(OnObjectDespawned);
 
         CurrentMaxWeaponNumber = WeaponGeneratorList.Count;
         InitPrefabBag();
@@ -60,8 +59,7 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
     {
         EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
         EventManager.Instance.RemoveHandler<WeaponGeneratorSwtich>(OnGeneratorSwtich);
-        EventManager.Instance.RemoveHandler<WeaponHitDeathTrigger>(OnWeaponFall);
-        EventManager.Instance.RemoveHandler<WeaponUsedUp>(OnWeaponUsedUp);
+        EventManager.Instance.RemoveHandler<ObjectDespawned>(OnObjectDespawned);
     }
 
     // Update is called once per frame
@@ -84,11 +82,9 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
 
             while (Valid > 0)
             {
-
-
                 int Ran = Random.Range(0, AvailableGenerators.Count);
 
-                if(BagIndex >= WeaponPrefabBag.Count)
+                if (BagIndex >= WeaponPrefabBag.Count)
                 {
                     ShuffleBag();
                 }
@@ -139,6 +135,14 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
             WeaponPrefabBag.Add(Temp[i]);
         }
 
+    }
+
+    private void OnObjectDespawned(ObjectDespawned e)
+    {
+        if(e.Obj.CompareTag("Weapon_OnChest") || e.Obj.CompareTag("Weapon_OnHead"))
+        {
+            CurrentWeaponCount--;
+        }
     }
 
     private void OnWeaponFall(WeaponHitDeathTrigger e)

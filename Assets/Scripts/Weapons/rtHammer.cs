@@ -17,11 +17,13 @@ public class rtHammer : WeaponBase
     private float _distToGround;
     private float _HLAxis { get { return _player.GetAxis("Move Horizontal"); } }
     private float _VLAxis { get { return _player.GetAxis("Move Vertical"); } }
+    private HammerData _hammerData;
 
     protected override void Awake()
     {
         base.Awake();
-        _ammo = WeaponDataStore.HammerDataStore.MaxAmmo;
+        _hammerData = WeaponDataBase as HammerData;
+        _ammo = _hammerData.MaxAmmo;
     }
 
     protected override void Update()
@@ -30,21 +32,21 @@ public class rtHammer : WeaponBase
         if (_hammerState == HammerState.Out)
         {
             _curTravelTime += Time.deltaTime;
-            if (_curTravelTime >= WeaponDataStore.HammerDataStore.MaxTravelTime)
+            if (_curTravelTime >= _hammerData.MaxTravelTime)
             {
                 _onWeaponUsedOnce();
                 _hammerState = HammerState.Idle;
                 return;
             }
-            transform.position += -transform.forward * WeaponDataStore.HammerDataStore.Speed * Time.deltaTime;
+            transform.position += -transform.forward * _hammerData.Speed * Time.deltaTime;
             if (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis))
             {
                 Vector3 transeuler = transform.eulerAngles;
-                transeuler.y = Mathf.LerpAngle(transeuler.y, Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Time.deltaTime * WeaponDataStore.HammerDataStore.RotationSpeed);
+                transeuler.y = Mathf.LerpAngle(transeuler.y, Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Time.deltaTime * _hammerData.RotationSpeed);
                 transform.eulerAngles = transeuler;
             }
             RaycastHit hit;
-            if (Physics.SphereCast(Owner.transform.position, 0.3f, -transform.forward, out hit, 0.3f, WeaponDataStore.HammerDataStore.CanCollideLayer))
+            if (Physics.SphereCast(Owner.transform.position, 0.3f, -transform.forward, out hit, 0.3f, _hammerData.CanCollideLayer))
             {
                 _onWeaponUsedOnce();
                 _hammerState = HammerState.Idle;
@@ -56,7 +58,7 @@ public class rtHammer : WeaponBase
 
     private void FixedUpdate()
     {
-        if (_hammerState == HammerState.Out && !Physics.Raycast(transform.position, Vector3.down, Owner.GetComponent<CapsuleCollider>().bounds.extents.y, WeaponDataStore.HammerDataStore.CanCollideLayer))
+        if (_hammerState == HammerState.Out && !Physics.Raycast(transform.position, Vector3.down, Owner.GetComponent<CapsuleCollider>().bounds.extents.y, _hammerData.CanCollideLayer))
         {
             transform.position += new Vector3(0f, 0.5f * Physics.gravity.y * Time.fixedDeltaTime * Time.fixedDeltaTime * 10f);
         }
@@ -68,7 +70,7 @@ public class rtHammer : WeaponBase
         {
             _player = ReInput.players.GetPlayer(Owner.GetComponent<PlayerController>().PlayerNumber);
             _followHand = false;
-            GetComponent<SphereCollider>().radius = WeaponDataStore.HammerDataStore.CollisionRange;
+            GetComponent<SphereCollider>().radius = _hammerData.CollisionRange;
             _hammerState = HammerState.Out;
         }
     }
@@ -76,7 +78,7 @@ public class rtHammer : WeaponBase
     protected override void _onWeaponDespawn()
     {
         _hammerState = HammerState.Idle;
-        _ammo = WeaponDataStore.HammerDataStore.MaxAmmo;
+        _ammo = _hammerData.MaxAmmo;
         _curTravelTime = 0f;
         _player = null;
         _followHand = true;
@@ -92,11 +94,11 @@ public class rtHammer : WeaponBase
             other.gameObject.GetComponent<PlayerController>() != null)
         {
             Vector3 dir = other.transform.position - transform.position;
-            if (Vector3.Angle(-transform.forward, dir) < WeaponDataStore.HammerDataStore.CollisionAngle)
+            if (Vector3.Angle(-transform.forward, dir) < _hammerData.CollisionAngle)
             {
                 dir = dir.normalized;
-                dir.y = WeaponDataStore.HammerDataStore.UpwardMultiplier;
-                other.gameObject.GetComponent<IHittable>().OnImpact(dir * WeaponDataStore.HammerDataStore.CollideForce, ForceMode.Impulse, Owner, ImpactType.HammerGun);
+                dir.y = _hammerData.UpwardMultiplier;
+                other.gameObject.GetComponent<IHittable>().OnImpact(dir * _hammerData.CollideForce, ForceMode.Impulse, Owner, ImpactType.HammerGun);
             }
         }
     }

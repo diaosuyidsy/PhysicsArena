@@ -27,44 +27,46 @@ public class VFXManager
             GameObject[] HittedFeetVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedFeetVFX : VFXDataStore.DuckHittedFeetVFX;
             _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerUITransform);
         }
-        GameObject[] HitVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHitVFX : VFXDataStore.DuckHitVFX;
-        if (HitVFX != null)
+        if (!ph.IsABlock)
         {
-            for (int i = 0; i < HitVFX.Length; i++)
+            GameObject[] HitVFX = ph.Hiter.CompareTag("Team1") ? VFXDataStore.ChickenHitVFX : VFXDataStore.DuckHitVFX;
+            if (HitVFX != null)
             {
-                GameObject VFX = HitVFX[i];
-                Vector3 hittedPos = ph.Hiter.transform.position +
-                                    ph.Hiter.transform.forward * VFX.transform.position.z +
-                                    ph.Hiter.transform.right * VFX.transform.position.x +
-                                    ph.Hiter.transform.up * VFX.transform.position.y;
-                Vector3 force = ph.Force;
-                _instantiateVFX(HitVFX[i],
-                                hittedPos,
-                                Quaternion.Euler(0f,
-                                                HitVFX[i].transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
-                                                0f));
+                for (int i = 0; i < HitVFX.Length; i++)
+                {
+                    GameObject VFX = HitVFX[i];
+                    Vector3 hittedPos = ph.Hiter.transform.position +
+                                        ph.Hiter.transform.forward * VFX.transform.position.z +
+                                        ph.Hiter.transform.right * VFX.transform.position.x +
+                                        ph.Hiter.transform.up * VFX.transform.position.y;
+                    Vector3 force = ph.Force;
+                    _instantiateVFX(HitVFX[i],
+                                    hittedPos,
+                                    Quaternion.Euler(0f,
+                                                    HitVFX[i].transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
+                                                    0f));
+                }
+            }
+
+            GameObject[] HittedBodyVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
+            if (HittedBodyVFX != null)
+            {
+                for (int i = 0; i < HittedBodyVFX.Length; i++)
+                {
+                    GameObject VFX = HittedBodyVFX[i];
+                    Vector3 hittedPos = ph.Hitted.transform.position +
+                                        ph.Hitted.transform.forward * VFX.transform.position.z +
+                                        ph.Hitted.transform.right * VFX.transform.position.x +
+                                        ph.Hitted.transform.up * VFX.transform.position.y;
+                    Vector3 force = ph.Force;
+                    _instantiateVFX(VFX,
+                                    hittedPos,
+                                    Quaternion.Euler(0f,
+                                                    VFX.transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
+                                                    0f));
+                }
             }
         }
-
-        GameObject[] HittedBodyVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedBodyVFX : VFXDataStore.DuckHittedBodyVFX;
-        if (HittedBodyVFX != null)
-        {
-            for (int i = 0; i < HittedBodyVFX.Length; i++)
-            {
-                GameObject VFX = HittedBodyVFX[i];
-                Vector3 hittedPos = ph.Hitted.transform.position +
-                                    ph.Hitted.transform.forward * VFX.transform.position.z +
-                                    ph.Hitted.transform.right * VFX.transform.position.x +
-                                    ph.Hitted.transform.up * VFX.transform.position.y;
-                Vector3 force = ph.Force;
-                _instantiateVFX(VFX,
-                                hittedPos,
-                                Quaternion.Euler(0f,
-                                                VFX.transform.eulerAngles.y + Vector3.SignedAngle(Vector3.forward, new Vector3(force.x, 0f, force.z), Vector3.up),
-                                                0f));
-            }
-        }
-
     }
 
     private void _onPlayerDied(PlayerDied pd)
@@ -97,6 +99,19 @@ public class VFXManager
         (ev.PlayerFootLeftRight == 0 ? VFXDataStore.ChickenRightFootStepVFX : VFXDataStore.ChickenLeftFootStepVFX) :
         (ev.PlayerFootLeftRight == 0 ? VFXDataStore.DuckRightFootStepVFX : VFXDataStore.DuckLeftFootStepVFX);
         _instantiateVFX(VFX, ev.PlayerActualFoot.transform.position, Quaternion.Euler(VFX.transform.eulerAngles.x, ev.Player.transform.eulerAngles.y, ev.Player.transform.eulerAngles.z));
+        GameObject[] VFX2 = ev.Player.CompareTag("Team1") ? VFXDataStore.ChickenFootVFX : VFXDataStore.DuckFootVFX;
+        if (VFX2 != null)
+        {
+            for (int i = 0; i < VFX2.Length; i++)
+            {
+                GameObject VFX2s = VFX2[i];
+                Vector3 pos = ev.PlayerActualFoot.transform.position +
+                            ev.Player.transform.forward * VFX2s.transform.position.z +
+                            ev.Player.transform.right * VFX2s.transform.position.x +
+                            ev.Player.transform.up * VFX2s.transform.position.y;
+                _instantiateVFX(VFX2s, pos, Quaternion.Euler(VFX.transform.eulerAngles.x, ev.Player.transform.eulerAngles.y, ev.Player.transform.eulerAngles.z));
+            }
+        }
     }
 
     private void _onPlayerJump(PlayerJump pj)
@@ -127,29 +142,6 @@ public class VFXManager
                 break;
         }
         _instantiateVFX(VFX, pl.PlayerFeet.transform.position, VFX.transform.rotation);
-    }
-
-    private void _onBlockStart(BlockStart bs)
-    {
-        GameObject VFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockVFX : VFXDataStore.DuckBlockVFX;
-        // GameObject UIVFX = bs.Player.CompareTag("Team1") ? VFXDataStore.ChickenBlockUIVFX : VFXDataStore.DuckBlockUIVFX;
-        GameObject BlockVFXHolder = bs.Player.GetComponent<PlayerController>().BlockVFXHolder;
-        if (BlockVFXHolder == null)
-        {
-            bs.Player.GetComponent<PlayerController>().BlockVFXHolder = GameObject.Instantiate(VFX, bs.Player.transform);
-        }
-        // if (bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder == null)
-        // {
-        //     bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder = GameObject.Instantiate(UIVFX, bs.Player.transform);
-        // }
-        bs.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(true);
-        // bs.Player.GetComponent<PlayerController>().BlockUIVFXHolder.SetActive(true);
-    }
-
-    private void _onBlockEnd(BlockEnd be)
-    {
-        be.Player.GetComponent<PlayerController>().BlockVFXHolder.SetActive(false);
-        // be.Player.GetComponent<PlayerController>().BlockUIVFXHolder.SetActive(false);
     }
 
     private void _onPunchStart(PunchStart ps)
@@ -322,11 +314,19 @@ public class VFXManager
 
     private void _onBlocked(Blocked ev)
     {
-        GameObject parryvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockParryVFX : VFXDataStore.DuckBlockParryVFX;
-        GameObject startvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockShieldStarVFX : VFXDataStore.DuckBlockShieldStarVFX;
+        GameObject[] parryvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockParryVFX : VFXDataStore.DuckBlockParryVFX;
         PlayerController pc = ev.Blocker.GetComponent<PlayerController>();
-        GameObject.Instantiate(parryvfx, pc.transform);
-        GameObject.Instantiate(parryvfx, pc.BlockVFXHolder.transform);
+        if (parryvfx != null)
+        {
+            for (int i = 0; i < parryvfx.Length; i++)
+            {
+                GameObject VFX = parryvfx[i];
+                _instantiateVFX(VFX, pc.BlockShield.transform.position, Quaternion.Euler(0f,
+                                                    VFX.transform.eulerAngles.y + pc.transform.eulerAngles.y,
+                                                    0f));
+            }
+        }
+
     }
 
     private void _onPlayerRespawned(PlayerRespawned ev)
@@ -381,6 +381,17 @@ public class VFXManager
         return result;
     }
 
+    private GameObject[] _instantiateVFX(GameObject[] _vfx, Vector3 _pos)
+    {
+        if (_vfx.Length == 0) return null;
+        GameObject[] result = new GameObject[_vfx.Length];
+        for (int i = 0; i < _vfx.Length; i++)
+        {
+            result[i] = GameObject.Instantiate(_vfx[i], _pos, _vfx[i].transform.rotation);
+        }
+        return result;
+    }
+
     private GameObject[] _instantiateVFX(GameObject[] _vfx, Transform parent)
     {
         if (_vfx.Length == 0) return null;
@@ -404,8 +415,6 @@ public class VFXManager
         EventManager.Instance.AddHandler<PunchReleased>(_onPunchReleased);
         EventManager.Instance.AddHandler<PunchDone>(_onPunchDone);
         EventManager.Instance.AddHandler<BazookaBombed>(_onBazookaBombed);
-        EventManager.Instance.AddHandler<BlockStart>(_onBlockStart);
-        EventManager.Instance.AddHandler<BlockEnd>(_onBlockEnd);
         EventManager.Instance.AddHandler<PlayerStunned>(_onPlayerStunned);
         EventManager.Instance.AddHandler<PlayerUnStunned>(_onPlayerUnStunned);
         EventManager.Instance.AddHandler<PlayerSlowed>(_onPlayerSlowed);
@@ -437,8 +446,6 @@ public class VFXManager
         EventManager.Instance.RemoveHandler<PunchReleased>(_onPunchReleased);
         EventManager.Instance.RemoveHandler<PunchDone>(_onPunchDone);
         EventManager.Instance.RemoveHandler<BazookaBombed>(_onBazookaBombed);
-        EventManager.Instance.RemoveHandler<BlockStart>(_onBlockStart);
-        EventManager.Instance.RemoveHandler<BlockEnd>(_onBlockEnd);
         EventManager.Instance.RemoveHandler<PlayerStunned>(_onPlayerStunned);
         EventManager.Instance.RemoveHandler<PlayerUnStunned>(_onPlayerUnStunned);
         EventManager.Instance.RemoveHandler<PlayerSlowed>(_onPlayerSlowed);

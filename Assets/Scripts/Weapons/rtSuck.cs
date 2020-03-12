@@ -25,16 +25,17 @@ public class rtSuck : WeaponBase
 
     private State _ballState;
     private SuckBallController _sbc;
-
+    private SuckGunData _suckGunData;
 
     protected override void Awake()
     {
         base.Awake();
+        _suckGunData = WeaponDataBase as SuckGunData;
         _ballState = State.In;
         _suckBall = transform.GetChild(0).gameObject;
         _sbc = _suckBall.GetComponent<SuckBallController>();
         _suckBallInitialScale = new Vector3(_suckBall.transform.localScale.x, _suckBall.transform.localScale.y, _suckBall.transform.localScale.z);
-        _ammo = WeaponDataStore.SuckGunDataStore.SuckGunMaxUseTimes;
+        _ammo = _suckGunData.SuckGunMaxUseTimes;
         _ballEffectQuaternion = suckBallEffect.transform.rotation;
 
     }
@@ -44,9 +45,9 @@ public class rtSuck : WeaponBase
         base.Update();
         if (_ballState == State.Out)
         {
-            _suckBall.transform.position += Time.deltaTime * -1f * _suckBall.transform.right * WeaponDataStore.SuckGunDataStore.BallTravelSpeed;
+            _suckBall.transform.position += Time.deltaTime * -1f * _suckBall.transform.right * _suckGunData.BallTravelSpeed;
             _ballTraveledTime += Time.deltaTime;
-            if (_ballTraveledTime >= WeaponDataStore.SuckGunDataStore.MaxBallTravelTime)
+            if (_ballTraveledTime >= _suckGunData.MaxBallTravelTime)
             {
                 _ballTraveledTime = 0f;
                 _suckBall.transform.parent = transform;
@@ -119,7 +120,7 @@ public class rtSuck : WeaponBase
 
         foreach (GameObject go in gos)
         {
-            Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * WeaponDataStore.SuckGunDataStore.SuckStrength;
+            Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * _suckGunData.SuckStrength;
             go.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
         }
         yield return new WaitForSeconds(0.45f);
@@ -160,7 +161,7 @@ public class rtSuck : WeaponBase
         _suckBall.transform.localScale = _suckBallInitialScale;
         _suckBall.SetActive(false);
         _ballState = State.In;
-        _ammo = WeaponDataStore.SuckGunDataStore.SuckGunMaxUseTimes;
+        _ammo = _suckGunData.SuckGunMaxUseTimes;
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         // Need a little clean up the line renderer and stuff
         _sbc.CleanUpAll();

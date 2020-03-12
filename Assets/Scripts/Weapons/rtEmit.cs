@@ -9,8 +9,9 @@ public class rtEmit : WeaponBase
     public ObiParticleRenderer ParticleRenderer;
     public GameObject WaterUI;
     public GameObject GunUI;
-    public override float HelpAimAngle { get { return WeaponDataStore.WaterGunDataStore.HelpAimAngle; } }
-    public override float HelpAimDistance { get { return WeaponDataStore.WaterGunDataStore.HelpAimDistance; } }
+    public override float HelpAimAngle { get { return _waterGunData.HelpAimAngle; } }
+    public override float HelpAimDistance { get { return _waterGunData.HelpAimDistance; } }
+    private WaterGunData _waterGunData;
     private float _shootCD = 0f;
 
     private enum State
@@ -24,8 +25,9 @@ public class rtEmit : WeaponBase
     protected override void Awake()
     {
         base.Awake();
+        _waterGunData = WeaponDataBase as WaterGunData;
         _waterGunState = State.Empty;
-        _ammo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
+        _ammo = _waterGunData.MaxAmmo;
     }
 
     protected override void Update()
@@ -35,7 +37,7 @@ public class rtEmit : WeaponBase
         {
             case State.Shooting:
                 _shootCD += Time.deltaTime;
-                if (_shootCD >= WeaponDataStore.WaterGunDataStore.ShootMaxCD)
+                if (_shootCD >= _waterGunData.ShootMaxCD)
                 {
                     WaterBall.speed = 0f;
                     _waterGunState = State.Empty;
@@ -59,9 +61,9 @@ public class rtEmit : WeaponBase
         {
             _waterGunState = State.Shooting;
             GunUI.SetActive(true);
-            WaterBall.speed = WeaponDataStore.WaterGunDataStore.Speed;
-            Owner.GetComponent<Rigidbody>().AddForce(-Owner.transform.forward * WeaponDataStore.WaterGunDataStore.BackFireThrust, ForceMode.Impulse);
-            Owner.GetComponent<Rigidbody>().AddForce(Owner.transform.up * WeaponDataStore.WaterGunDataStore.UpThrust, ForceMode.Impulse);
+            WaterBall.speed = _waterGunData.Speed;
+            Owner.GetComponent<Rigidbody>().AddForce(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.Impulse);
+            Owner.GetComponent<Rigidbody>().AddForce(Owner.transform.up * _waterGunData.UpThrust, ForceMode.Impulse);
             EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
         }
         else
@@ -83,8 +85,8 @@ public class rtEmit : WeaponBase
             //     hit.transform.GetComponentInParent<IHittable>().OnImpact(Owner, ImpactType.WaterGun);
             if (hit.transform.GetComponentInParent<IHittable>() != null &&
                 !hit.transform.GetComponentInParent<IHittable>().CanBlock(Owner.transform.forward))
-                hit.transform.GetComponentInParent<IHittable>().OnImpact(WeaponDataStore.WaterGunDataStore.WaterForce * Owner.transform.forward,
-                ForceMode.Acceleration,
+                hit.transform.GetComponentInParent<IHittable>().OnImpact(_waterGunData.WaterForce * Owner.transform.forward,
+                ForceMode.VelocityChange,
                 Owner,
                 ImpactType.WaterGun);
             else if (hit.transform.GetComponentInParent<IHittable>() != null)
@@ -96,7 +98,7 @@ public class rtEmit : WeaponBase
 
     private void ChangeAmmoUI()
     {
-        float scaleY = _ammo * 1.0f / WeaponDataStore.WaterGunDataStore.MaxAmmo;
+        float scaleY = _ammo * 1.0f / _waterGunData.MaxAmmo;
         WaterUI.transform.localScale = new Vector3(1f, scaleY, 1f);
     }
 
@@ -104,7 +106,7 @@ public class rtEmit : WeaponBase
     {
         _shootCD = 0f;
         WaterBall.speed = 0f;
-        _ammo = WeaponDataStore.WaterGunDataStore.MaxAmmo;
+        _ammo = _waterGunData.MaxAmmo;
         ChangeAmmoUI();
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         gameObject.SetActive(false);

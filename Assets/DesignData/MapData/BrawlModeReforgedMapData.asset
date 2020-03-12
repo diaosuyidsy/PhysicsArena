@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e1a1b76f45552cc46b47ae11c86de24d, type: 3}
   m_Name: BrawlModeReforgedMapData
   m_EditorClassIdentifier: 
-  GameMapMode: 5
+  GameMapMode: 6
   Team1RespawnPoints:
-  - {x: 14, y: 0.573, z: -17}
-  - {x: 13.5, y: 0.573, z: -17.5}
-  - {x: 14, y: 0.573, z: -18}
+  - {x: 14.5, y: 0.573, z: -17}
+  - {x: 14, y: 0.573, z: -17.5}
+  - {x: 14.5, y: 0.573, z: -18}
   Team2RespawnPoints:
   - {x: 20.5, y: 0.573, z: -17}
   - {x: 21, y: 0.573, z: -17.5}
@@ -29,13 +29,13 @@ MonoBehaviour:
   HoldAMoveInDelay: 0.2
   FillASpeed: 2
   ChickenLandingPosition:
-  - {x: 14, y: 20, z: -17}
-  - {x: 13.5, y: 20, z: -17.5}
-  - {x: 16.12, y: 20, z: -18}
+  - {x: 11.5, y: 15, z: -22}
+  - {x: 11, y: 15, z: -22.5}
+  - {x: 11.5, y: 15, z: -23}
   DuckLandingPostion:
-  - {x: 20.5, y: 20, z: -17}
-  - {x: 21, y: 20, z: -17.5}
-  - {x: 20.5, y: 20, z: -18}
+  - {x: 23.5, y: 15, z: -22}
+  - {x: 24, y: 15, z: -22.5}
+  - {x: 23.5, y: 15, z: -23}
   BirdsFlyDownDuration: 1
   BirdsFlyDownDelay:
   - 0
@@ -45,10 +45,10 @@ MonoBehaviour:
   - 0.4
   - 0.4
   BirdsFlyDownEase: 11
-  CameraMoveToPosition: {x: 17.13, y: 8.2, z: -25.6}
+  CameraMoveToPosition: {x: 17.5, y: 8.2, z: -25.6}
   CameraMoveDuration: 2
   CameraMoveDelay: 0
-  CameraTargetFOV: 15
+  CameraTargetFOV: 25
   CameraMoveEase: 12
   CountDownStartDelay: 1
   FightEase: 24
@@ -68,6 +68,7 @@ MonoBehaviour:
   TitleTextInDelay: 0.5
   BackgroundMusicMixer: {fileID: 24100000, guid: 42e1f810734d8a447bb905f6bc63d0e5,
     type: 2}
+  CameraClampRelativePosition: {x: 6, y: 0, z: 5}
   WeaponSpawnCD: 1
   MaxAmountWeaponAtOnetime: 0
   WeaponsInformation:

@@ -24,14 +24,14 @@ public class HookControl : MonoBehaviour
         if (!CanHook) return;
 
         // If Hook Gun Reached a hookable place
-        if (_rth.WeaponDataStore.HookGunDataStore.BackwardHookableLayer == (_rth.WeaponDataStore.HookGunDataStore.BackwardHookableLayer | (1 << other.gameObject.layer)))
+        if (_rth._hookGunData.BackwardHookableLayer == (_rth._hookGunData.BackwardHookableLayer | (1 << other.gameObject.layer)))
         {
             CanHook = false;
             _rth.HookStaticObject();
             return;
         }
 
-        if (_rth.WeaponDataStore.HookGunDataStore.HookableLayer != (_rth.WeaponDataStore.HookGunDataStore.HookableLayer | (1 << other.gameObject.layer))
+        if (_rth._hookGunData.HookableLayer != (_rth._hookGunData.HookableLayer | (1 << other.gameObject.layer))
             || other.gameObject.layer == _rth.Owner.layer)
             return;
         if (other.GetComponent<WeaponBase>() != null) return;

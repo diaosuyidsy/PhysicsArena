@@ -22,6 +22,7 @@ public class PlayerController : MonoBehaviour, IHittable
     public GameObject RightFoot;
     public GameObject[] OnDeathHidden;
     public GameObject BlockUIVFXHolder;
+    public ShieldController BlockShield;
 
     public int PlayerNumber;
 
@@ -42,7 +43,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private float _distToGround;
     private float _currentStamina;
     private float _lastTimeUseStamina;
-    private float _lastTimeUSeStaminaUnimportant;
+    // private float _lastTimeUSeStaminaUnimportant;
     private Vector2 _staminaUISize;
     private float _sideStepTimer;
     private float _jumpTimer;
@@ -89,8 +90,11 @@ public class PlayerController : MonoBehaviour, IHittable
     }
     private float _rotationSpeedMultiplier = 1f;
     private List<Rigidbody> _playerBodies;
+    private Rigidbody[] _allPlayerRBs;
     private IEnumerator _deadInvincible;
     private int _playerBodiesLayer;
+    private Vector3 _storedVelocity;
+    private int _hitStopFrames;
     #endregion
 
     private void Awake()
@@ -109,6 +113,7 @@ public class PlayerController : MonoBehaviour, IHittable
         _currentStamina = CharacterDataStore.MaxStamina;
         _staminaUISize = BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
         _playerBodiesLayer = gameObject.layer;
+        _allPlayerRBs = GetComponentsInChildren<Rigidbody>(true);
         foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
         {
             if (rb.gameObject.layer != LayerMask.NameToLayer("NoCollision"))
@@ -204,31 +209,32 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         _rb.AddForce(force, forcemode);
         OnImpact(enforcer, impactType);
-        if (force.magnitude > CharacterDataStore.DropWeaponForceThreshold &&
-            _actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
-        {
-            _actionFSM.TransitionTo<IdleActionState>();
-        }
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(ButtStrikeState)))
-        {
-            _actionFSM.TransitionTo<IdleActionState>();
-        }
 
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
+			_hitStopFrames = CharacterDataStore.HitStopFramesSmall;
             if (force.magnitude > CharacterDataStore.HitBigThreshold)
             {
                 _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
-            }
-            _movementFSM.TransitionTo<HitUncontrollableState>();
-            if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
-                _actionFSM.CurrentState.GetType().Equals(typeof(PunchHoldingState)) ||
-                _actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)))
+				_hitStopFrames = CharacterDataStore.HitStopFramesBig;
+			}
+			if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
-                _actionFSM.TransitionTo<HitUnControllableActionState>();
-            }
-        }
+				//if(impactType == ImpactType.Melee || impactType == ImpactType.Block)
+				//	_movementFSM.TransitionTo<PunchHittedStopMovementState>();
+				//else
+				_movementFSM.TransitionTo<HitUncontrollableState>();
+			}
+
+			if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
+            {
+				//if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+				//	_actionFSM.TransitionTo<PunchHittedStopActionState>();
+				//else
+				_actionFSM.TransitionTo<HitUnControllableActionState>();
+			}
+		}
     }
 
     public void OnImpact(GameObject enforcer, ImpactType impactType)
@@ -281,13 +287,9 @@ public class PlayerController : MonoBehaviour, IHittable
     public void ForceDropHandObject()
     {
         if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
-            _actionFSM.TransitionTo<IdleActionState>();
-    }
-    public void FireBirdFood()
-    {
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
             _actionFSM.TransitionTo<DroppedRecoveryState>();
     }
+
     public void ForceDropEquipment(EquipmentPositionType posType)
     {
         if (posType == EquipmentPositionType.OnBack && _movementFSM.CurrentState.GetType().Equals(typeof(JetPackState)))
@@ -323,7 +325,7 @@ public class PlayerController : MonoBehaviour, IHittable
     #region Helper Method
     private void _setVelocity(Vector3 vel)
     {
-        foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
+        foreach (Rigidbody rb in _allPlayerRBs)
         {
             rb.velocity = vel;
         }
@@ -380,11 +382,6 @@ public class PlayerController : MonoBehaviour, IHittable
         if (HandObject == null) return;
         // Drop the thing
         HandObject.GetComponent<WeaponBase>().OnDrop();
-        HandObject.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        Vector3 forceToAdd = transform.right * CharacterDataStore.DropForce.x +
-            transform.forward * CharacterDataStore.DropForce.z +
-            transform.up * CharacterDataStore.DropForce.y;
-        HandObject.GetComponent<Rigidbody>().AddForce(forceToAdd, ForceMode.VelocityChange);
 
         EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
         // Return the body to normal position
@@ -453,32 +450,36 @@ public class PlayerController : MonoBehaviour, IHittable
             return true;
         else
         {
-            _lastTimeUSeStaminaUnimportant = Time.timeSinceLevelLoad;
-            BlockUIVFXHolder.SetActive(true);
-            BlockUIVFXHolder.GetComponent<DOTweenAnimation>().DORestart();
+            // BlockUIVFXHolder.SetActive(true);
+            // BlockUIVFXHolder.GetComponent<DOTweenAnimation>().DORestart();
             return false;
         }
     }
 
     private void _drainStamina(float drain)
     {
-        if (drain <= 0f) return;
+        // if (drain <= 0f) return;
         if (_currentStamina - drain < 0f)
             _currentStamina = 0f;
+        else if (_currentStamina - drain > CharacterDataStore.MaxStamina)
+        {
+            _currentStamina = CharacterDataStore.MaxStamina;
+        }
         else
+        {
             _currentStamina -= drain;
-        _lastTimeUseStamina = Time.timeSinceLevelLoad;
-        _lastTimeUSeStaminaUnimportant = Time.timeSinceLevelLoad;
+        }
 
-        BlockUIVFXHolder.SetActive(true);
-        Vector2 _nextStaminaUISize = _staminaUISize;
-        _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
-        BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
-    }
+        if (drain > 0f)
+        {
+            _lastTimeUseStamina = Time.timeSinceLevelLoad;
+        }
+        BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
 
-    public GameObject GetGameObject()
-    {
-        return gameObject;
+        // BlockUIVFXHolder.SetActive(true);
+        // Vector2 _nextStaminaUISize = _staminaUISize;
+        // _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
+        // BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
     }
     #endregion
 
@@ -492,7 +493,7 @@ public class PlayerController : MonoBehaviour, IHittable
         protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
         protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
         protected bool _B { get { return Context._player.GetButton("Block"); } }
-
+        public virtual bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         public void OnEnterDeathZone()
         {
             Parent.TransitionTo<DeadState>();
@@ -611,7 +612,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
-            Context.OnDeathHidden[2].SetActive(true);
+            // Context.OnDeathHidden[2].SetActive(true);
             Context._jumpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.JumpCD;
         }
     }
@@ -706,10 +707,78 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
-    private class PunchReleasingMovementState : ControllableMovementState
+    private class PunchHitStopMovementState : ControllableMovementState
     {
+        private int _counter;
+        private int _firstPhysicsFrame;
+
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _counter = 0;
+            _firstPhysicsFrame = 2;
+
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_firstPhysicsFrame > 0) return;
+            _counter++;
+            if (_counter > Context._hitStopFrames)
+            {
+                TransitionTo<IdleState>();
+                return;
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            _firstPhysicsFrame--;
+        }
 
     }
+
+    private class PunchHittedStopMovementState : ControllableMovementState
+    {
+        private int _counter;
+        private int _firstPhysicsFrame;
+		private Tweener _shakeTween;
+
+		public override void OnEnter()
+        {
+            base.OnEnter();
+            _counter = 0;
+            _firstPhysicsFrame = 2;
+		}
+
+        public override void Update()
+        {
+            base.Update();
+            if (_firstPhysicsFrame > 0) return;
+			if(_shakeTween == null || !_shakeTween.IsPlaying()) _shakeTween = Context.transform.DOShakePosition(Time.unscaledDeltaTime * Context._hitStopFrames, Context.CharacterDataStore.HitStopViberation, Context.CharacterDataStore.HitStopViberato,
+	   Context.CharacterDataStore.HitStopRandomness).SetEase(Context.CharacterDataStore.HitStopViberationEase);
+			_counter++;
+            if (_counter > Context._hitStopFrames)
+            {
+                TransitionTo<HitUncontrollableState>();
+                return;
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            _firstPhysicsFrame--;
+        }
+
+		public override void OnExit()
+		{
+			base.OnExit();
+			_shakeTween.Kill();
+		}
+	}
 
     private class JetPackState : ControllableMovementState
     {
@@ -805,6 +874,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class BazookaMovmentAimState : MovementState
     {
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -829,7 +900,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private class BazookaMovementLaunchState : MovementState
     {
         private Vector3 _diff;
-
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
         public override void OnEnter()
         {
             base.OnEnter();
@@ -937,18 +1008,22 @@ public class PlayerController : MonoBehaviour, IHittable
         protected bool _BDown { get { return Context._player.GetButtonDown("Block"); } }
         protected bool _BUp { get { return Context._player.GetButtonUp("Block"); } }
 
+        public virtual bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
+
+        // public override void OnEnter()
+        // {
+        //     base.OnEnter();
+        //     print(GetType().Name);
+        // }
+
         public override void Update()
         {
             base.Update();
             /// Regen when past 3 seconds after block
             if (Time.timeSinceLevelLoad > Context._lastTimeUseStamina + Context.CharacterDataStore.StaminaRegenInterval)
             {
-                if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._currentStamina += (Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
-            }
-            /// Stamina Regen UI Linger Time
-            if (Context.BlockUIVFXHolder != null && Context.BlockUIVFXHolder.activeSelf && Time.timeSinceLevelLoad > Context._lastTimeUSeStaminaUnimportant + Context.CharacterDataStore.BlockUILingerDuration)
-            {
-                Context.BlockUIVFXHolder.SetActive(false);
+                // if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._currentStamina += (Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
+                if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._drainStamina(-Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
             }
         }
 
@@ -962,6 +1037,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private class IdleActionState : ActionState
     {
         private float _pickUpTimer;
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -975,20 +1052,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            // if (_LeftTrigger)
-            // {
-            //     TransitionTo<PickingState>();
-            //     return;
-            // }
-            if (_RightTriggerDown && Context.EquipmentObject != null &&
-            Context.EquipmentObject.GetComponent<rtJet>() != null &&
-            Context._canDrainStamina(Context.EquipmentObject.GetComponent<rtJet>().m_JetData.ButtStaminaDrain))
-            {
-                Context.EquipmentObject.GetComponent<EquipmentBase>().OnUse();
-                TransitionTo<ButtAnticipationState>();
-                return;
-            }
-            else if (_RightTrigger && (Context.EquipmentObject == null || Context.EquipmentObject.GetComponent<rtJet>() == null))
+            if (_RightTrigger)
             {
                 TransitionTo<PunchHoldingState>();
                 return;
@@ -1044,69 +1108,10 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
-    // private class PickingState : ActionState
-    // {
-    //     public override void OnEnter()
-    //     {
-    //         base.OnEnter();
-    //         Context._animator.SetBool("Picking", true);
-    //     }
-
-    //     public override void Update()
-    //     {
-    //         base.Update();
-    //         if (_LeftTriggerUp)
-    //         {
-    //             TransitionTo<IdleActionState>();
-    //             return;
-    //         }
-    //         _pickupcheck();
-    //     }
-
-    //     private void _pickupcheck()
-    //     {
-    //         RaycastHit hit;
-    //         if (Physics.SphereCast(Context.Chest.transform.position,
-    //             Context.CharacterDataStore.Radius,
-    //             Vector3.down,
-    //             out hit,
-    //             Context._distToGround,
-    //             Context.CharacterDataStore.PickUpLayer))
-    //         {
-
-    //             if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>() != null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
-    //             {
-    //                 EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
-    //                 // Tell other necessary components that it has taken something
-    //                 Context.HandObject = hit.collider.gameObject;
-
-    //                 // Tell the collected weapon who picked it up
-    //                 hit.collider.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
-    //                 TransitionTo<HoldingState>();
-    //                 return;
-    //             }
-    //             else if (Context.EquipmentObject == null &&
-    //                     hit.collider.GetComponent<EquipmentBase>() != null &&
-    //                     hit.collider.GetComponent<EquipmentBase>().CanBePickedUp)
-    //             {
-    //                 EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
-    //                 Context.EquipmentObject = hit.collider.gameObject;
-    //                 hit.collider.GetComponent<EquipmentBase>().OnPickUp(Context.gameObject);
-    //                 TransitionTo<IdleActionState>();
-    //                 return;
-    //             }
-    //         }
-    //     }
-
-    //     public override void OnExit()
-    //     {
-    //         base.OnExit();
-    //         Context._animator.SetBool("Picking", false);
-    //     }
-    // }
-
     private class HoldingState : ActionState
     {
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1172,6 +1177,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class DroppingState : ActionState
     {
+    	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1199,6 +1206,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private class DroppedRecoveryState : ActionState
     {
         private float _timer;
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1221,6 +1230,8 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         private float _startHoldingTime;
         private bool _holding;
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
 
         public override void OnEnter()
         {
@@ -1284,7 +1295,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
-            // Context._movementFSM.TransitionTo<PunchReleasingMovementState>();
         }
 
         public override void Update()
@@ -1301,7 +1311,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 {
                     if (hit.transform.GetComponentInParent<IHittable>() == null) return;
                     _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<IHittable>().GetGameObject().GetComponentsInChildren<Rigidbody>())
+                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>(true))
                     {
                         rb.velocity = Vector3.zero;
                     }
@@ -1309,6 +1319,10 @@ public class PlayerController : MonoBehaviour, IHittable
                     hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
+					Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
+                    TransitionTo<PunchHitStopActionState>();
+                    Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
+                    return;
                 }
             }
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
@@ -1317,12 +1331,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            // if (_LeftTrigger)
-            // {
-            //     EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
-            //     TransitionTo<PickingState>();
-            //     return;
-            // }
         }
 
         public override void OnExit()
@@ -1330,16 +1338,18 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("PunchReleased", false);
             Context._rotationSpeedMultiplier = 1f;
-            // Context._movementFSM.TransitionTo<IdleState>();
         }
     }
 
     private class HitUnControllableActionState : ActionState
     {
         private float _timer;
+     	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._dropHandObject();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
             EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
@@ -1355,152 +1365,119 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
-    private class ButtState : ActionState
+    private class PunchHitStopActionState : ActionState
     {
-        protected JetData _jetData;
+        private int _counter;
+        private Vector3[] _storedVelocity;
+        private int _firstPhysicsFrame;
         public override void OnEnter()
         {
             base.OnEnter();
-            _jetData = Context.EquipmentObject.GetComponent<rtJet>().m_JetData;
-        }
-    }
-    private class ButtAnticipationState : ButtState
-    {
-        private float _timer;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _timer = _jetData.ButtAnticipationDuration + Time.timeSinceLevelLoad;
-            Context._rb.velocity = Vector3.zero;
-            Context._movementFSM.TransitionTo<ButtStrikeMovementState>();
-            Context._drainStamina(_jetData.ButtStaminaDrain);
-            Context._animator.SetBool("ButtAnticipation", true);
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_timer < Time.timeSinceLevelLoad)
-            {
-                RaycastHit hit;
-                if (Physics.SphereCast(Context.transform.position, _jetData.ButtStrikeRaidus, Context.transform.forward, out hit, _jetData.ButtStrikeStopDistance, _jetData.ButtHitStopLayer))
-                {
-                    TransitionTo<ButtRecoveryState>();
-                    return;
-                }
-                TransitionTo<ButtStrikeState>();
-                return;
-            }
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context._animator.SetBool("ButtAnticipation", false);
-        }
-    }
-
-    private class ButtStrikeState : ButtState
-    {
-        private float _timer;
-        private bool _hitOnce;
-        private Tweener _hitTween;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _timer = _jetData.ButtStrikeDuration + Time.timeSinceLevelLoad;
-            _hitOnce = false;
-            _hitTween = Context.transform.DOMove(Context.transform.forward * _jetData.ButtStrikeForwardPush, _jetData.ButtStrikeDuration)
-            .SetRelative(true)
-            .SetEase(Ease.OutCirc);
-            Context._animator.SetBool("ButtStrike", true);
+            _counter = 0;
+            _firstPhysicsFrame = 2;
+            _storedVelocity = new Vector3[Context._allPlayerRBs.Length];
 
         }
 
         public override void Update()
         {
             base.Update();
-
-            if (_timer < Time.timeSinceLevelLoad)
-            {
-                TransitionTo<ButtRecoveryState>();
-                return;
-            }
-            else
-            {
-                RaycastHit hit;
-                // This Layermask get all player's layer except this player's
-                int layermask = 0;
-                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
-                else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
-                if (!_hitOnce && Physics.SphereCast(Context.transform.position, _jetData.ButtStrikeRaidus, Context.transform.forward, out hit, _jetData.ButtStrikeDistance, layermask))
-                {
-                    if (hit.transform.GetComponentInParent<IHittable>() == null) return;
-                    _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>())
-                    {
-                        rb.velocity = Vector3.zero;
-                    }
-                    Vector3 force = Context.transform.forward * _jetData.ButtStrikeStrength;
-                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
-                    TransitionTo<ButtRecoveryState>();
-                    return;
-                }
-                if (Physics.SphereCast(Context.transform.position, _jetData.ButtStrikeRaidus, Context.transform.forward, out hit, _jetData.ButtStrikeStopDistance, _jetData.ButtHitStopLayer))
-                {
-                    print("On Hit Obstacles");
-                    TransitionTo<ButtRecoveryState>();
-                    return;
-                }
-            }
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            _hitTween.Kill();
-            Context._animator.SetBool("ButtStrike", false);
-        }
-    }
-
-    private class ButtRecoveryState : ButtState
-    {
-        private float _timer;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _timer = _jetData.ButtRecoveryDuration + Time.timeSinceLevelLoad;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_timer < Time.timeSinceLevelLoad)
+            if (_firstPhysicsFrame > 0) return;
+            _counter++;
+            if (_counter > Context._hitStopFrames)
             {
                 TransitionTo<IdleActionState>();
                 return;
             }
         }
 
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            _firstPhysicsFrame--;
+            if (_firstPhysicsFrame == 0)
+            {
+                for (int i = 0; i < _storedVelocity.Length; i++)
+                {
+                    _storedVelocity[i] = Context._allPlayerRBs[i].velocity;
+                    Context._allPlayerRBs[i].isKinematic = true;
+                }
+            }
+        }
 
         public override void OnExit()
         {
             base.OnExit();
-            Context._movementFSM.TransitionTo<IdleState>();
+            for (int i = 0; i < _storedVelocity.Length; i++)
+            {
+                Context._allPlayerRBs[i].velocity = _storedVelocity[i];
+                Context._allPlayerRBs[i].isKinematic = false;
+            }
+            EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+        }
+    }
+
+    private class PunchHittedStopActionState : ActionState
+    {
+        private int _counter;
+        private Vector3[] _storedVelocity;
+        private int _firstPhysicsFrame;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _counter = 0;
+            _firstPhysicsFrame = 2;
+            _storedVelocity = new Vector3[Context._allPlayerRBs.Length];
+
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_firstPhysicsFrame > 0) return;
+            _counter++;
+            if (_counter > Context._hitStopFrames)
+            {
+                TransitionTo<HitUnControllableActionState>();
+                return;
+            }
+        }
+
+        public override void FixedUpdate()
+        {
+            base.FixedUpdate();
+            _firstPhysicsFrame--;
+            if (_firstPhysicsFrame == 0)
+            {
+                for (int i = 0; i < _storedVelocity.Length; i++)
+                {
+                    _storedVelocity[i] = Context._allPlayerRBs[i].velocity;
+                    Context._allPlayerRBs[i].isKinematic = true;
+                }
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            for (int i = 0; i < _storedVelocity.Length; i++)
+            {
+                Context._allPlayerRBs[i].velocity = _storedVelocity[i];
+                Context._allPlayerRBs[i].isKinematic = false;
+            }
         }
     }
 
     private class BlockingState : ActionState
     {
         private float _timer;
-
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         public override void OnEnter()
         {
             base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             Context._animator.SetBool("Blocking", true);
-            Context._permaSlow++;
-            Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.BlockSpeedMultiplier;
+            Context.BlockShield.SetShield(true);
             _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
         }
 
@@ -1553,8 +1530,7 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
-            Context._permaSlow--;
-            Context._permaSlowWalkSpeedMultiplier = 1f;
+            Context.BlockShield.SetShield(false);
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
     }

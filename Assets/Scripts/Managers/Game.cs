@@ -8,7 +8,6 @@ public class Game : MonoBehaviour
     public AudioData AudioData;
     public VFXData VFXData;
     public ConfigData ConfigData;
-    public WeaponData WeaponData;
     public GameFeelData GameFeelData;
     public ModeSepcificData ModeSpecificData;
     public GameMapData GameMapData;
@@ -21,7 +20,7 @@ public class Game : MonoBehaviour
         Services.AudioManager = new AudioManager(AudioData);
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
-        Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData, WeaponData);
+        Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData);
         Services.StatisticsManager = new StatisticsManager();
         Services.TinylyticsManager = new TinylyticsHandler();
         Services.GameStateManager = new GameStateManager(GameMapData, ConfigData, gameObject);
@@ -42,7 +41,6 @@ public class Game : MonoBehaviour
                 {
                     Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData);
                 }
-                Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData);
                 break;
             case GameMapMode.RaceMode:
                 Services.GameObjectiveManager = new SushiModeObjectiveManager((SushiModeData)ModeSpecificData);

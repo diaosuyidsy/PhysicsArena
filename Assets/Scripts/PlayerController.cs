@@ -1320,8 +1320,8 @@ public class PlayerController : MonoBehaviour, IHittable
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
 					Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
-                    TransitionTo<PunchHitStopActionState>();
-                    Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
+                    //TransitionTo<PunchHitStopActionState>();
+                    //Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
                     return;
                 }
             }

@@ -207,22 +207,22 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
         if (isServer) Debug.Log("It's server");
         if (isClient) Debug.Log("It's Client");
         if (!isServer && !isClient) Debug.Log("It's neither");
-        CmdOnImpact(force, sender);
+        // CmdOnImpact(force, sender);
+        // RpcOnImpact(force)
+        // _rb.AddForce(force, ForceMode.Impulse);
+        // OnImpact(force, ForceMode.Impulse, sender, ImpactType.Melee);
     }
+
     [Command]
-    public void CmdOnImpact(Vector3 force, GameObject sender)
+    private void CmdHit(GameObject receiver, Vector3 force)
     {
-        Debug.Log("Server Received: " + transform.name);
-        _rb.AddForce(force, ForceMode.Impulse);
-        // RpcOnImpact(force, sender);
+        RpcHit(receiver, force);
     }
 
     [ClientRpc]
-    public void RpcOnImpact(Vector3 force, GameObject sender)
+    private void RpcHit(GameObject reciver, Vector3 force)
     {
-        // if (!isLocalPlayer) return;
-        Debug.Log("Target Received: " + transform.name);
-        OnImpact(force, ForceMode.Impulse, sender, ImpactType.Melee);
+        reciver.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, reciver, ImpactType.Melee);
     }
     /// <summary>
     /// This function is called when enemies want to impact the player
@@ -232,9 +232,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
     /// <param name="enforcer">who is the impactor</param>
     public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType)
     {
+        if (!isLocalPlayer) return;
         _rb.AddForce(force, forcemode);
         OnImpact(enforcer, impactType);
-
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
@@ -1341,12 +1341,16 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
                         rb.velocity = Vector3.zero;
                     }
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
-                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    // hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    if (Context.isServer)
+                        Context.RpcHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force);
+                    else
+                        Context.CmdHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
                     Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
-                    TransitionTo<PunchHitStopActionState>();
-                    Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
+                    // TransitionTo<PunchHitStopActionState>();
+                    // Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
                     return;
                 }
             }

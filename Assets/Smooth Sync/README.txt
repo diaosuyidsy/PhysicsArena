@@ -1,5 +1,5 @@
-Plugin Version: 3.22
-Unity Version: 5.3.* - 2019 1.*
+Plugin Version: 3.25
+Unity Version: 5.6.* - 2019.2.*
 
 # Smooth Sync
 Performs interpolation and extrapolation in order to make your objects smooth and more accurate over the network.

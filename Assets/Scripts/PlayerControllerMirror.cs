@@ -133,28 +133,28 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
     // Update is called once per frame
     private void Update()
     {
-        if(!isLocalPlayer) return;
+        if (!isLocalPlayer) return;
         _movementFSM.Update();
         _actionFSM.Update();
     }
 
     private void FixedUpdate()
     {
-        if(!isLocalPlayer) return;
+        if (!isLocalPlayer) return;
         _movementFSM.FixedUpdate();
         _actionFSM.FixedUpdate();
     }
 
     private void LateUpdate()
     {
-        if(!isLocalPlayer) return;
+        if (!isLocalPlayer) return;
         _movementFSM.LateUpdate();
         _actionFSM.LateUpdate();
     }
 
     private void OnTriggerEnter(Collider other)
     {
-        if(!isLocalPlayer) return;
+        if (!isLocalPlayer) return;
         if (other.CompareTag("DeathZone") || other.CompareTag("DeathModeTrapZone"))
         {
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
@@ -164,8 +164,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
     }
 
     private void OnCollisionEnter(Collision other)
-    {        
-        if(!isLocalPlayer) return;
+    {
+        if (!isLocalPlayer) return;
         ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
     }
 
@@ -203,19 +203,26 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
         //     EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
         //     OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
         // }
-        CmdOnImpact(force, sender);
+        Debug.Log("Normal On Impact Called: " + transform.name);
+        if (isServer) Debug.Log("It's server");
+        if (isClient) Debug.Log("It's Client");
+        if (!isServer && !isClient) Debug.Log("It's neither");
+        // CmdOnImpact(force, sender);
+        // RpcOnImpact(force)
+        // _rb.AddForce(force, ForceMode.Impulse);
+        // OnImpact(force, ForceMode.Impulse, sender, ImpactType.Melee);
     }
+
     [Command]
-    public void CmdOnImpact(Vector3 force, GameObject sender)
+    private void CmdHit(GameObject receiver, Vector3 force)
     {
-        RpcOnImpact(force, sender);
+        RpcHit(receiver, force);
     }
 
     [ClientRpc]
-    public void RpcOnImpact(Vector3 force, GameObject sender)
+    private void RpcHit(GameObject reciver, Vector3 force)
     {
-        if(!isLocalPlayer) return;
-        OnImpact(force, ForceMode.Impulse, sender, ImpactType.Melee);
+        reciver.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, reciver, ImpactType.Melee);
     }
     /// <summary>
     /// This function is called when enemies want to impact the player
@@ -225,34 +232,34 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
     /// <param name="enforcer">who is the impactor</param>
     public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType)
     {
+        if (!isLocalPlayer) return;
         _rb.AddForce(force, forcemode);
         OnImpact(enforcer, impactType);
-
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
-			_hitStopFrames = CharacterDataStore.HitStopFramesSmall;
+            _hitStopFrames = CharacterDataStore.HitStopFramesSmall;
             if (force.magnitude > CharacterDataStore.HitBigThreshold)
             {
                 _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
-				_hitStopFrames = CharacterDataStore.HitStopFramesBig;
-			}
-			if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
+                _hitStopFrames = CharacterDataStore.HitStopFramesBig;
+            }
+            if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
-				//if(impactType == ImpactType.Melee || impactType == ImpactType.Block)
-				//	_movementFSM.TransitionTo<PunchHittedStopMovementState>();
-				//else
-				_movementFSM.TransitionTo<HitUncontrollableState>();
-			}
+                //if(impactType == ImpactType.Melee || impactType == ImpactType.Block)
+                //	_movementFSM.TransitionTo<PunchHittedStopMovementState>();
+                //else
+                _movementFSM.TransitionTo<HitUncontrollableState>();
+            }
 
-			if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
+            if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
             {
-				//if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
-				//	_actionFSM.TransitionTo<PunchHittedStopActionState>();
-				//else
-				_actionFSM.TransitionTo<HitUnControllableActionState>();
-			}
-		}
+                //if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+                //	_actionFSM.TransitionTo<PunchHittedStopActionState>();
+                //else
+                _actionFSM.TransitionTo<HitUnControllableActionState>();
+            }
+        }
     }
 
     public void OnImpact(GameObject enforcer, ImpactType impactType)
@@ -762,22 +769,22 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
     {
         private int _counter;
         private int _firstPhysicsFrame;
-		private Tweener _shakeTween;
+        private Tweener _shakeTween;
 
-		public override void OnEnter()
+        public override void OnEnter()
         {
             base.OnEnter();
             _counter = 0;
             _firstPhysicsFrame = 2;
-		}
+        }
 
         public override void Update()
         {
             base.Update();
             if (_firstPhysicsFrame > 0) return;
-			if(_shakeTween == null || !_shakeTween.IsPlaying()) _shakeTween = Context.transform.DOShakePosition(Time.unscaledDeltaTime * Context._hitStopFrames, Context.CharacterDataStore.HitStopViberation, Context.CharacterDataStore.HitStopViberato,
-	   Context.CharacterDataStore.HitStopRandomness).SetEase(Context.CharacterDataStore.HitStopViberationEase);
-			_counter++;
+            if (_shakeTween == null || !_shakeTween.IsPlaying()) _shakeTween = Context.transform.DOShakePosition(Time.unscaledDeltaTime * Context._hitStopFrames, Context.CharacterDataStore.HitStopViberation, Context.CharacterDataStore.HitStopViberato,
+        Context.CharacterDataStore.HitStopRandomness).SetEase(Context.CharacterDataStore.HitStopViberationEase);
+            _counter++;
             if (_counter > Context._hitStopFrames)
             {
                 TransitionTo<HitUncontrollableState>();
@@ -791,12 +798,12 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
             _firstPhysicsFrame--;
         }
 
-		public override void OnExit()
-		{
-			base.OnExit();
-			_shakeTween.Kill();
-		}
-	}
+        public override void OnExit()
+        {
+            base.OnExit();
+            _shakeTween.Kill();
+        }
+    }
 
     private class JetPackState : ControllableMovementState
     {
@@ -1195,7 +1202,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
 
     private class DroppingState : ActionState
     {
-    	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
 
         public override void OnEnter()
         {
@@ -1334,12 +1341,16 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
                         rb.velocity = Vector3.zero;
                     }
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
-                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    // hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    if (Context.isServer)
+                        Context.RpcHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force);
+                    else
+                        Context.CmdHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
-					Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
-                    TransitionTo<PunchHitStopActionState>();
-                    Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
+                    Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
+                    // TransitionTo<PunchHitStopActionState>();
+                    // Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
                     return;
                 }
             }
@@ -1362,7 +1373,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
     private class HitUnControllableActionState : ActionState
     {
         private float _timer;
-     	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
 
         public override void OnEnter()
         {

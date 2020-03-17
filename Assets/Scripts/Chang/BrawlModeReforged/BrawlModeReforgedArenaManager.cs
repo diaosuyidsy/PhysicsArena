@@ -295,10 +295,30 @@ public class CanonCooldown : CanonAction
 
 public class CanonFiring_Normal : CanonAction
 {
+    private float Timer;
 
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Timer = 0;
+    }
+
+    private void CheckTimer()
+    {
+        Timer += Time.deltaTime;
+        if (Timer >= Context.Data.CanonCooldown)
+        {
+            TransitionTo<CanonFiring_Alert>();
+        }
+    }
 }
 
 public class CanonFiring_Alert : CanonAction
+{
+
+}
+
+public class CanonFiring_Fall : CanonAction
 {
 
 }

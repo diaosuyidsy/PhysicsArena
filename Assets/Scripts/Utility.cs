@@ -381,3 +381,41 @@ public interface IHittable
     /// <param name="status"></param>
     void OnImpact(Status status);
 }
+
+public interface IHittableNetwork
+{
+    /// <summary>
+    /// Can Block The attack or not
+    /// </summary>
+    /// <param name="forwardAngle"></param>
+    /// <returns></returns>
+    bool CanBlock(Vector3 forwardAngle);
+    /// <summary>
+    /// A method to call when hitting a blockable object
+    /// </summary>
+    /// <param name="force"></param>
+    /// <param name="_meleeCharge"></param>
+    /// <param name="sender"></param>
+    /// <param name="_blockable"></param>
+    void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable);
+    /// <summary>
+    /// A method to call when directly dealing impact with no blocking possiblity
+    /// </summary>
+    /// <param name="force"></param>
+    /// <param name="forcemode"></param>
+    /// <param name="enforcer"></param>
+    /// <param name="impactType"></param>
+    void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType);
+    void OnImpact(Vector3 force, ForceMode forceMode);
+    /// <summary>
+    /// A method simply mark the object with the enforcer
+    /// </summary>
+    /// <param name="enforcer"></param>
+    /// <param name="impactType"></param>
+    void OnImpact(GameObject enforcer, ImpactType impactType);
+    /// <summary>
+    /// A impact method with status effect
+    /// </summary>
+    /// <param name="status"></param>
+    void OnImpact(Status status);
+}

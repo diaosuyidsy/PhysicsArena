@@ -6,7 +6,7 @@ using System;
 using DG.Tweening;
 using Mirror;
 
-public class PlayerControllerMirror : NetworkBehaviour, IHittable
+public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 {
     [Header("Player Data Section")]
     public CharacterData CharacterDataStore;
@@ -169,6 +169,34 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
         ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
     }
 
+    #region Networking Function
+    [Command]
+    private void CmdHit(GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
+    {
+        // RpcHit(receiver, force);
+        TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, force, _blockable, sender);
+    }
+
+    [TargetRpc]
+    private void TargetHit(NetworkConnection connection, GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
+    {
+        receiver.GetComponent<IHittableNetwork>().OnImpact(force, 1f, sender, _blockable);
+    }
+
+    [Command]
+    private void CmdBlockPush(GameObject receiver, Vector3 force)
+    {
+        // RpcHit(receiver, force);
+        TargetBlockPush(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, force);
+    }
+
+    [TargetRpc]
+    private void TargetBlockPush(NetworkConnection connection, GameObject receiver, Vector3 force)
+    {
+        receiver.GetComponent<IHittableNetwork>().OnImpact(force, ForceMode.VelocityChange);
+    }
+    #endregion
+
     public bool CanBeBlockPushed()
     {
         return _actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
@@ -198,26 +226,13 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
             CanBlock(sender.transform.forward))
         {
             CmdHit(sender, -force * CharacterDataStore.BlockMultiplier, false, gameObject);
-            // sender.GetComponentInParent<IHittable>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
+            // sender.GetComponentInParent<IHittableNetwork>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
         }
         else // Player is hit cause he could not block
         {
             EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
             OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
         }
-    }
-
-    [Command]
-    private void CmdHit(GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
-    {
-        // RpcHit(receiver, force);
-        TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, force, _blockable, sender);
-    }
-
-    [TargetRpc]
-    private void TargetHit(NetworkConnection connection, GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
-    {
-        receiver.GetComponent<IHittable>().OnImpact(force, 1f, sender, _blockable);
     }
 
     /// <summary>
@@ -255,6 +270,15 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
                 //else
                 _actionFSM.TransitionTo<HitUnControllableActionState>();
             }
+        }
+    }
+
+    public void OnImpact(Vector3 force, ForceMode forceMode)
+    {
+        if (!isLocalPlayer) return;
+        if (CanBeBlockPushed())
+        {
+            _rb.AddForce(force, forceMode);
         }
     }
 
@@ -1330,18 +1354,17 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
                 else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
                 {
-                    if (hit.transform.GetComponentInParent<IHittable>() == null) return;
+                    if (hit.transform.GetComponentInParent<IHittableNetwork>() == null) return;
                     _hitOnce = true;
                     foreach (var rb in hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject.GetComponentsInChildren<Rigidbody>(true))
                     {
                         rb.velocity = Vector3.zero;
                     }
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
-                    // hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
-                    Context.CmdHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force, true, Context.gameObject);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
                     Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
+                    Context.CmdHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force, true, Context.gameObject);
                     // TransitionTo<PunchHitStopActionState>();
                     // Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
                 }
@@ -1492,6 +1515,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
     private class BlockingState : ActionState
     {
         private float _timer;
+        private bool _pushedOnce;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         public override void OnEnter()
         {
@@ -1500,6 +1524,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
             Context._animator.SetBool("Blocking", true);
             Context.BlockShield.SetShield(true);
             _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
+            _pushedOnce = false;
         }
 
         public override void Update()
@@ -1527,6 +1552,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
 
         private void _blockPush()
         {
+            if (_pushedOnce) return;
             RaycastHit hit;
             // This Layermask get all player's layer except this player's
             int layermask = 0;
@@ -1534,16 +1560,15 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
             else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
             if (Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
             {
-                IHittable ihit = hit.transform.GetComponentInParent<IHittable>();
+                IHittableNetwork ihit = hit.transform.GetComponentInParent<IHittableNetwork>();
                 if (ihit == null) return;
-                if (!ihit.CanBeBlockPushed()) return;
-
+                _pushedOnce = true;
                 foreach (var rb in hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject.GetComponentsInChildren<Rigidbody>())
                 {
                     rb.velocity = Vector3.zero;
                 }
                 Vector3 force = Context.transform.forward * Context.CharacterDataStore.BlockPushForce;
-                ihit.OnImpact(force, ForceMode.VelocityChange, Context.gameObject, ImpactType.Block);
+                Context.CmdBlockPush(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force);
             }
         }
 

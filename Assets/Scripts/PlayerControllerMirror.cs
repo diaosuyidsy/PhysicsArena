@@ -192,38 +192,34 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
 
     public void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
     {
-        // // First check if the player could block the attack
-        // if (_blockable &&
-        //     CanBlock(sender.transform.forward))
-        // {
-        //     sender.GetComponentInParent<IHittable>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
-        // }
-        // else // Player is hit cause he could not block
-        // {
-        //     EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
-        //     OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
-        // }
-        Debug.Log("Normal On Impact Called: " + transform.name);
-        if (isServer) Debug.Log("It's server");
-        if (isClient) Debug.Log("It's Client");
-        if (!isServer && !isClient) Debug.Log("It's neither");
-        // CmdOnImpact(force, sender);
-        // RpcOnImpact(force)
-        // _rb.AddForce(force, ForceMode.Impulse);
-        // OnImpact(force, ForceMode.Impulse, sender, ImpactType.Melee);
+        // First check if the player could block the attack
+        if (!isLocalPlayer) return;
+        if (_blockable &&
+            CanBlock(sender.transform.forward))
+        {
+            CmdHit(sender, -force * CharacterDataStore.BlockMultiplier, false, gameObject);
+            // sender.GetComponentInParent<IHittable>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
+        }
+        else // Player is hit cause he could not block
+        {
+            EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
+            OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
+        }
     }
 
     [Command]
-    private void CmdHit(GameObject receiver, Vector3 force)
+    private void CmdHit(GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
     {
-        RpcHit(receiver, force);
+        // RpcHit(receiver, force);
+        TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, force, _blockable, sender);
     }
 
-    [ClientRpc]
-    private void RpcHit(GameObject reciver, Vector3 force)
+    [TargetRpc]
+    private void TargetHit(NetworkConnection connection, GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
     {
-        reciver.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, reciver, ImpactType.Melee);
+        receiver.GetComponent<IHittable>().OnImpact(force, 1f, sender, _blockable);
     }
+
     /// <summary>
     /// This function is called when enemies want to impact the player
     /// </summary>
@@ -1342,16 +1338,12 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittable
                     }
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
                     // hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
-                    if (Context.isServer)
-                        Context.RpcHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force);
-                    else
-                        Context.CmdHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force);
+                    Context.CmdHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force, true, Context.gameObject);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
                     Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
                     // TransitionTo<PunchHitStopActionState>();
                     // Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
-                    return;
                 }
             }
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)

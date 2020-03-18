@@ -14,14 +14,11 @@ public class CanonFeelData : MonoBehaviour
     public float MinPadDis;
     public float MaxPadDis;
 
-    public float PercentageFollowSpeed;
+    public float AimingPercentageFollowSpeed;
+    public float ShootPercentageFollowSpeed;
     public float PercentageIgnoreError;
 
     public float RotateSpeed;
-
-
-    public float MaxPipeAngle;
-    public float PipeRotateSpeed;
 
     public float CabelStartEmission;
     public float CabelEndEmission;
@@ -30,19 +27,12 @@ public class CanonFeelData : MonoBehaviour
     public Color RedCabelColor;
     public Color BlueCabelColor;
 
-    public Vector3 PipeEndStartLocalPos;
-    public float PipeEndFireTime;
-    public float PipeEndRecoverTime;
-    public float PipeEndShakeDis;
-
     public float MarkAppearTime;
     public Color MarkDefaultColor;
     public Color MarkAlertColor;
+    public Color MarkFallColor;
 
-    public GameObject BombPrefab;
-    public float BombInvisibleHeight;
-    public float BombRiseTime;
-    public float BombFallTime;
+    public float BombVerticalSpeedPercentage;
 
 
     // Start is called before the first frame update

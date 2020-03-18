@@ -14337,6 +14337,8 @@ MonoBehaviour:
   CanonPad: {fileID: 406714843}
   CanonLJoint: {fileID: 1649044590}
   CanonRJoint: {fileID: 784331821}
+  CanonFinalLJoint: {fileID: 1841163112}
+  CanonFinalRJoint: {fileID: 1521511004}
   CameraFocus: {fileID: 1125871932}
   Team1Cabel: {fileID: 1269142062}
   Team2Cabel: {fileID: 457170680}
@@ -14350,6 +14352,8 @@ MonoBehaviour:
   BagelPrefab: {fileID: 5812035999268780057, guid: d7031a4afcc5a7546b347692f86e6b4c,
     type: 3}
   MarkPrefab: {fileID: 3267023963952904208, guid: 568b7f47b40207c449318c3cf015d554,
+    type: 3}
+  BombPrefab: {fileID: 7948990237570148476, guid: 422ff544bcd195f41b1864fcbeb888ca,
     type: 3}
   ExplosionVFX: {fileID: 1924789974987344, guid: ff88062c6299ba24694ece87ffe4bf5a,
     type: 3}
@@ -14367,35 +14371,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MinShootDisShape: 2
-  MaxShootDisShape: 15
-  MinPercentage: 0.3
+  MaxShootDisShape: 10
+  MinPercentage: 0.2
   MaxPercentage: 1
   MinLinearLimit: 0.1
   MaxLinearLimit: 10.07
   MinPadDis: 0.006370004
   MaxPadDis: 0.18
-  PercentageFollowSpeed: 30
+  AimingPercentageFollowSpeed: 5
+  ShootPercentageFollowSpeed: 20
   PercentageIgnoreError: 0.05
   RotateSpeed: 60
-  MaxPipeAngle: 90
-  PipeRotateSpeed: 180
   CabelStartEmission: 1
   CabelEndEmission: 2
   CabelShineTime: 0.5
   RedCabelColor: {r: 0.8117647, g: 0.28627452, b: 0.28627452, a: 1}
   BlueCabelColor: {r: 0.3019608, g: 0.6666667, b: 0.8509804, a: 1}
-  PipeEndStartLocalPos: {x: 0, y: 0.8, z: 0}
-  PipeEndFireTime: 0.2
-  PipeEndRecoverTime: 1
-  PipeEndShakeDis: 1
   MarkAppearTime: 0.5
   MarkDefaultColor: {r: 1, g: 1, b: 1, a: 0}
   MarkAlertColor: {r: 0.8352941, g: 0.1764706, b: 0.8666667, a: 1}
-  BombPrefab: {fileID: 5766329749968335211, guid: eaf25f58b8bc9d5438b493ef86c5899e,
-    type: 3}
-  BombInvisibleHeight: 12
-  BombRiseTime: 0.5
-  BombFallTime: 0.5
+  MarkFallColor: {r: 1, g: 0, b: 0, a: 1}
+  BombVerticalSpeedPercentage: 1
 --- !u!1 &556353934
 GameObject:
   m_ObjectHideFlags: 0

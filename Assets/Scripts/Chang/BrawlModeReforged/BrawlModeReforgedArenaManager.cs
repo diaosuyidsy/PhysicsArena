@@ -34,8 +34,10 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             {
                 Context.Info.LastSide = Context.Info.CurrentSide;
                 Context.Info.CurrentSide = CanonSide.Red;
+                Context.Info.LockedPlayer = null;
 
                 Context.DeliveryEvent = null;
+
 
                 TransitionTo<CanonSwtich>();
 
@@ -45,6 +47,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             {
                 Context.Info.LastSide = Context.Info.CurrentSide;
                 Context.Info.CurrentSide = CanonSide.Blue;
+                Context.Info.LockedPlayer = null;
 
                 Context.DeliveryEvent = null;
 
@@ -149,8 +152,11 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         TargetPercentage = (Dis - Context.FeelData.MinShootDisShape) / (Context.FeelData.MaxShootDisShape - Context.FeelData.MinShootDisShape);
         TargetPercentage = Mathf.Lerp(Context.FeelData.MinPercentage, Context.FeelData.MaxPercentage,TargetPercentage);
 
-        SetCanon(TargetPercentage, TargetAngle);
+        SetCanon(TargetPercentage, TargetAngle,Context.FeelData.AimingPercentageFollowSpeed);
 
+
+        Context.Info.Bomb.transform.position = (Context.CanonFinalLJoint.transform.position + Context.CanonFinalRJoint.transform.position) / 2;
+        //Context.Info.Bomb.transform.position += Context.Info.CameraFocus.transform.forward * 0.5f;
     }
 
     protected void FireSetCanon()
@@ -160,14 +166,14 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         float TargetAngle;
         TargetAngle = Vector3.SignedAngle(Offset, Vector3.back, Vector3.up);
 
-        SetCanon(0, TargetAngle);
+        SetCanon(0, TargetAngle,Context.FeelData.ShootPercentageFollowSpeed);
     }
 
-    protected void SetCanon(float TargetPercentage, float TargetAngle)
+    protected void SetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed)
     {
 
 
-        Context.Info.CurrentPercentage = Mathf.Lerp(Context.Info.CurrentPercentage, TargetPercentage, Context.FeelData.PercentageFollowSpeed*Time.deltaTime);
+        Context.Info.CurrentPercentage = Mathf.Lerp(Context.Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed*Time.deltaTime);
         if (Mathf.Abs(Context.Info.CurrentPercentage - TargetPercentage) <= Context.FeelData.PercentageIgnoreError)
         {
             Context.Info.CurrentPercentage = TargetPercentage;
@@ -178,14 +184,12 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         SoftJointLimit JointLimit = new SoftJointLimit();
         JointLimit.limit = Mathf.Lerp(Context.FeelData.MinLinearLimit, Context.FeelData.MaxLinearLimit, Context.Info.CurrentPercentage);
 
-        Debug.Log(JointLimit.limit);
-
         Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
         Context.Info.RightJoint.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
 
         if (Mathf.Abs(TargetAngle - Context.Info.CurrentAngle) <= Context.FeelData.RotateSpeed * Time.deltaTime)
         {
-            Context.Info.Entity.transform.Rotate(Vector3.up * (TargetAngle - Context.Info.CurrentAngle), Space.Self);
+            Context.Info.Entity.transform.Rotate(Vector3.down * (TargetAngle - Context.Info.CurrentAngle), Space.Self);
             Context.Info.CurrentAngle = TargetAngle;
         }
         else
@@ -209,10 +213,8 @@ public class CanonIdle: CanonAction
     public override void Update()
     {
         base.Update();
-        SetCanon(0, 0);
+        SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
         CheckDelivery();
-
-
     }
 
 }
@@ -238,7 +240,7 @@ public class CanonSwtich : CanonAction
     {
         base.Update();
         Timer += Time.deltaTime;
-        SetCanon(0,0);
+        SetCanon(0,0, Context.FeelData.AimingPercentageFollowSpeed);
         SetCabel();
         CheckTimer();
 
@@ -336,7 +338,7 @@ public class CanonCooldown : CanonAction
     {
         base.Update();
 
-        SetCanon(0,0);
+        SetCanon(0,0, Context.FeelData.AimingPercentageFollowSpeed);
 
         if (CheckDelivery())
         {
@@ -365,6 +367,7 @@ public class CanonFiring_Normal : CanonAction
     {
         base.OnEnter();
         Timer = 0;
+        PlayerLocked = false;
 
         if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
         {
@@ -378,27 +381,36 @@ public class CanonFiring_Normal : CanonAction
 
         if (CheckDelivery())
         {
+            GameObject.Destroy(Context.Info.Mark);
             return;
         }
 
         if (PlayerLocked)
         {
             AimingSetCanon();
-
-            Debug.Log(Context.Info.CurrentPercentage);
-            Debug.Log(Context.Info.CurrentAngle);
+            MarkFollow(true);
 
             Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
             Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime);
 
+            if(Context.Info.LockedPlayer == null)
+            {
+                TransitionTo<CanonFiring_Fall>();
+                return;
+            }
 
             CheckTimer();
         }
         else
         {
-            SetCanon(0, 0);
+            SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
             if (LockPlayer())
             {
+                Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
+                Context.Info.Bomb.transform.parent = Context.Info.Entity.transform;
+
+                AimingSetCanon();
+
                 PlayerLocked = true;
             }
         }
@@ -410,7 +422,7 @@ public class CanonFiring_Normal : CanonAction
     private void CheckTimer()
     {
         Timer += Time.deltaTime;
-        if (Timer >= Context.Data.CanonFireTime-Context.Data.CanonFireAlertTime)
+        if (Timer >= Context.Data.CanonFireTime)
         {
             TransitionTo<CanonFiring_Alert>();
         }
@@ -438,9 +450,18 @@ public class CanonFiring_Alert : CanonAction
         base.Update();
 
         AimingSetCanon();
+        MarkFollow(false);
+
+        if (Context.Info.LockedPlayer == null)
+        {
+            
+            TransitionTo<CanonFiring_Fall>();
+            return;
+        }
 
         if (CheckDelivery())
         {
+            GameObject.Destroy(Context.Info.Mark);
             return;
         }
         CheckTimer();
@@ -459,12 +480,22 @@ public class CanonFiring_Alert : CanonAction
 public class CanonFiring_Fall : CanonAction
 {
     private float Timer;
+    private float HorizontalSpeed;
+    private Vector3 HorizontalDirection;
+    private float VerticalSpeed;
+    private float VerticalSpeedAcceleration;
 
     public override void OnEnter()
     {
         base.OnEnter();
         Timer = 0;
-        Context.Info.Mark.GetComponent<SpriteRenderer>().color = Color.red;
+
+        Context.Info.Bomb.transform.parent = null;
+
+        GetBombFlyInfo();
+
+
+        Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkFallColor;
 
         if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
         {
@@ -477,6 +508,7 @@ public class CanonFiring_Fall : CanonAction
         base.Update();
 
         FireSetCanon();
+        BombFly();
         CheckTimer();
     }
 
@@ -486,8 +518,35 @@ public class CanonFiring_Fall : CanonAction
         if (Timer >= Context.Data.CanonFireFinalTime)
         {
             BombFall();
+
+            if (CheckDelivery())
+            {
+                return;
+            }
+
             TransitionTo<CanonCooldown>();
         }
+    }
+
+    private void GetBombFlyInfo()
+    {
+        Vector3 Offset = Context.Info.Mark.transform.position - Context.Info.Bomb.transform.position;
+
+        HorizontalDirection = Offset;
+        HorizontalDirection.y = 0;
+
+        HorizontalSpeed = HorizontalDirection.magnitude / Context.Data.CanonFireFinalTime;
+        HorizontalDirection.Normalize();
+
+        VerticalSpeed = Context.FeelData.BombVerticalSpeedPercentage * HorizontalSpeed;
+        VerticalSpeedAcceleration = 2 * ( Mathf.Abs(Offset.y) + VerticalSpeed * Context.Data.CanonFireFinalTime) / Mathf.Pow(Context.Data.CanonFireFinalTime, 2);
+
+    }
+
+    private void BombFly()
+    {
+        Context.Info.Bomb.transform.position += HorizontalDirection * HorizontalSpeed * Time.deltaTime + Vector3.up * VerticalSpeed * Time.deltaTime;
+        VerticalSpeed -= VerticalSpeedAcceleration * Time.deltaTime;
     }
 
     private void BombFall()
@@ -532,7 +591,10 @@ public class CanonFiring_Fall : CanonAction
             }
         }
 
+        Context.Info.LockedPlayer = null;
+
         GameObject.Instantiate(Context.ExplosionVFX, Context.Info.Mark.transform.position, Context.ExplosionVFX.transform.rotation);
+        GameObject.Destroy(Context.Info.Bomb);
         GameObject.Destroy(Context.Info.Mark);
     }
 }
@@ -550,20 +612,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public float CurrentPercentage;
         public float CurrentAngle;
 
-        public CanonState State;
         public CanonSide CurrentSide;
         public CanonSide LastSide;
         public float Timer;
         public int FireCount;
 
+        public GameObject Bomb;
+
         public GameObject Mark;
         public GameObject LockedPlayer;
-
-        public float PipeAngle;
-
-        public bool ReadyToFire;
-
-        public Vector3 MarkDirection;
 
 
         public CanonInfo(GameObject entity, GameObject pad, GameObject LJoint, GameObject RJoint, GameObject Focus)
@@ -574,7 +631,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             RightJoint = RJoint;
             CameraFocus = Focus;
 
-            State = CanonState.Unactivated;
             CurrentSide = LastSide = CanonSide.Neutral;
 
             FireCount = 0;
@@ -583,9 +639,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             Mark = null;
             LockedPlayer = null;
 
-            PipeAngle = 0;
-
-            ReadyToFire = false;
         }
         
     }
@@ -606,6 +659,9 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public GameObject CanonLJoint;
     public GameObject CanonRJoint;
 
+    public GameObject CanonFinalLJoint;
+    public GameObject CanonFinalRJoint;
+
     public GameObject CameraFocus;
 
     public GameObject Team1Cabel;
@@ -617,6 +673,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public GameObject BagelPrefab;
     public GameObject MarkPrefab;
+    public GameObject BombPrefab;
     public GameObject ExplosionVFX;
 
     public BrawlModeReforgedModeData Data;
@@ -718,10 +775,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             if (Info.CurrentSide != CanonSide.Red)
             {
-
-                Info.LockedPlayer = null;
-                Destroy(Info.Mark);
-
                 DeliveryEvent = e;
             }
         }
@@ -729,10 +782,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             if (Info.CurrentSide != CanonSide.Blue)
             {
-
-                Info.LockedPlayer = null;
-                Destroy(Info.Mark);
-
                 DeliveryEvent = e;
 
             }

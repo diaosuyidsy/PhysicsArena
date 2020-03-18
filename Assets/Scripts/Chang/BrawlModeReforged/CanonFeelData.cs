@@ -4,12 +4,20 @@ using UnityEngine;
 
 public class CanonFeelData : MonoBehaviour
 {
-    public float MinLinearLimit;
-    public float MaxLinearLimit;
     public float MinShootDisShape;
     public float MaxShootDisShape;
+    public float MinPercentage;
+    public float MaxPercentage;
+
+    public float MinLinearLimit;
+    public float MaxLinearLimit;
     public float MinPadDis;
     public float MaxPadDis;
+
+    public float PercentageFollowSpeed;
+    public float PercentageIgnoreError;
+
+    public float RotateSpeed;
 
 
     public float MaxPipeAngle;

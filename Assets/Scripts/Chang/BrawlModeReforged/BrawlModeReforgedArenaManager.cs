@@ -156,7 +156,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
 
         Context.Info.Bomb.transform.position = (Context.CanonFinalLJoint.transform.position + Context.CanonFinalRJoint.transform.position) / 2;
-        //Context.Info.Bomb.transform.position += Context.Info.CameraFocus.transform.forward * 0.5f;
+        Context.Info.Bomb.transform.position -= Context.Info.CameraFocus.transform.forward * 1.5f;
     }
 
     protected void FireSetCanon()
@@ -485,10 +485,13 @@ public class CanonFiring_Fall : CanonAction
     private float VerticalSpeed;
     private float VerticalSpeedAcceleration;
 
+    private bool InfoGot;
+
     public override void OnEnter()
     {
         base.OnEnter();
         Timer = 0;
+        InfoGot = false;
 
         Context.Info.Bomb.transform.parent = null;
 
@@ -508,7 +511,22 @@ public class CanonFiring_Fall : CanonAction
         base.Update();
 
         FireSetCanon();
-        BombFly();
+        if(Context.Info.CurrentPercentage == 0)
+        {
+            if (!InfoGot)
+            {
+                InfoGot = true;
+                GetBombFlyInfo();
+            }
+            BombFly();
+        }
+        else
+        {
+            Context.Info.Bomb.transform.position = (Context.CanonFinalLJoint.transform.position + Context.CanonFinalRJoint.transform.position) / 2;
+            Context.Info.Bomb.transform.position -= Context.Info.CameraFocus.transform.forward * 1.5f;
+        }
+
+
         CheckTimer();
     }
 
@@ -530,16 +548,18 @@ public class CanonFiring_Fall : CanonAction
 
     private void GetBombFlyInfo()
     {
+        float time = Context.Data.CanonFireFinalTime - Timer;
+
         Vector3 Offset = Context.Info.Mark.transform.position - Context.Info.Bomb.transform.position;
 
         HorizontalDirection = Offset;
         HorizontalDirection.y = 0;
 
-        HorizontalSpeed = HorizontalDirection.magnitude / Context.Data.CanonFireFinalTime;
+        HorizontalSpeed = HorizontalDirection.magnitude / time;
         HorizontalDirection.Normalize();
 
         VerticalSpeed = Context.FeelData.BombVerticalSpeedPercentage * HorizontalSpeed;
-        VerticalSpeedAcceleration = 2 * ( Mathf.Abs(Offset.y) + VerticalSpeed * Context.Data.CanonFireFinalTime) / Mathf.Pow(Context.Data.CanonFireFinalTime, 2);
+        VerticalSpeedAcceleration = 2 * ( Mathf.Abs(Offset.y) + VerticalSpeed * time) / Mathf.Pow(time, 2);
 
     }
 

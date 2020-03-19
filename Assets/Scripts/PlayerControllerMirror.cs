@@ -174,20 +174,24 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [Command]
     private void CmdHit(GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
     {
-        // RpcHit(receiver, force);
+        Vector3 receiverPos = receiver.transform.position;
+        receiverPos.y = 0f;
+        Vector3 selfPos = transform.position;
+        selfPos.y = 0f;
+        if (Vector3.Distance(receiverPos, selfPos) > (CharacterDataStore.PunchDistance + 2f * CharacterDataStore.PunchRadius) * 1.5f) return;
         TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, force, _blockable, sender);
     }
 
     [TargetRpc]
     private void TargetHit(NetworkConnection connection, GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
     {
+
         receiver.GetComponent<IHittableNetwork>().OnImpact(force, 1f, sender, _blockable);
     }
 
     [Command]
     private void CmdBlockPush(GameObject receiver, Vector3 force)
     {
-        // RpcHit(receiver, force);
         TargetBlockPush(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, force);
     }
 
@@ -343,6 +347,27 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     {
         EventManager.Instance.TriggerEvent(new BlockEnd(player, 0));
     }
+
+    [Command]
+    private void CmdDieOrLive(bool live)
+    {
+        RpcDieOrLive(live);
+    }
+    [ClientRpc]
+    private void RpcDieOrLive(bool live)
+    {
+        foreach (GameObject go in OnDeathHidden) { go.SetActive(live); }
+        if (!live)
+        {
+            if (_deadInvincible != null)
+                StopCoroutine(_deadInvincible);
+        }
+        else
+        {
+            _deadInvincible = _deadInvincibleIenumerator(NetworkServices.Config.GameMapData.InvincibleTime);
+            StartCoroutine(_deadInvincible);
+        }
+    }
     #endregion
 
     public bool CanBeBlockPushed()
@@ -379,6 +404,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         else // Player is hit cause he could not block
         {
             CmdTriggerPlayerHit(sender, gameObject, force, !_blockable);
+            _setVelocity(Vector3.zero);
             // EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
             OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
         }
@@ -537,22 +563,19 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         if (hit.collider == null) return true;
         return false;
     }
+
     private void _setToSpawn(float yOffset)
     {
-        int colorindex = 0;
-        for (int j = 0; j < Services.GameStateManager.PlayersInformation.RewiredID.Length; j++)
-        {
-            if (PlayerNumber == Services.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = Services.GameStateManager.PlayersInformation.ColorIndex[j];
-        }
+        int colorindex = Utility.GetColorIndexFromPlayer(gameObject);
         if (CompareTag("Team1"))
         {
-            Vector3 pos = Services.Config.Team1RespawnPoints[colorindex - 3];
+            Vector3 pos = NetworkServices.Config.Team1RespawnPoints[colorindex - 3];
             pos.y += yOffset;
             transform.position = pos;
         }
         else
         {
-            Vector3 pos = Services.Config.Team2RespawnPoints[colorindex];
+            Vector3 pos = NetworkServices.Config.Team2RespawnPoints[colorindex];
             pos.y += yOffset;
             transform.position = pos;
         }
@@ -1153,7 +1176,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private class DeadState : FSM<PlayerControllerMirror>.State
     {
         private float _startTime;
-        private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
+        private float _respawnTime { get { return NetworkServices.Config.GameMapData.RespawnTime; } }
 
         public override void OnEnter()
         {
@@ -1162,9 +1185,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context._rb.isKinematic = true;
             Context._setToSpawn(10f);
             Context._animator.SetBool("IdleDowner", true);
-            foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
-            if (Context._deadInvincible != null)
-                Context.StopCoroutine(Context._deadInvincible);
+            Context.CmdDieOrLive(false);
+
         }
 
         public override void Update()
@@ -1184,9 +1206,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.OnExit();
             Context._rb.isKinematic = false;
             Context._setToSpawn(0f);
-            foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(true); }
-            Context._deadInvincible = Context._deadInvincibleIenumerator(Services.Config.GameMapData.InvincibleTime);
-            Context.StartCoroutine(Context._deadInvincible);
+            Context.CmdDieOrLive(true);
         }
     }
     #endregion
@@ -1514,10 +1534,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 {
                     if (hit.transform.GetComponentInParent<IHittableNetwork>() == null) return;
                     _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject.GetComponentsInChildren<Rigidbody>(true))
-                    {
-                        rb.velocity = Vector3.zero;
-                    }
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
@@ -1723,10 +1739,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 IHittableNetwork ihit = hit.transform.GetComponentInParent<IHittableNetwork>();
                 if (ihit == null) return;
                 _pushedOnce = true;
-                foreach (var rb in hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject.GetComponentsInChildren<Rigidbody>())
-                {
-                    rb.velocity = Vector3.zero;
-                }
                 Vector3 force = Context.transform.forward * Context.CharacterDataStore.BlockPushForce;
                 Context.CmdBlockPush(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force);
             }
@@ -1805,7 +1817,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private class ActionDeadState : ActionState
     {
         private float _startTime;
-        private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime + Services.Config.GameMapData.InvincibleTime; } }
+        private float _respawnTime { get { return NetworkServices.Config.GameMapData.RespawnTime + NetworkServices.Config.GameMapData.InvincibleTime; } }
 
         public override void OnEnter()
         {

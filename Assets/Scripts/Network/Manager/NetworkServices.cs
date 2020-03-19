@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class ServicesNetwork
+public static class NetworkServices
 {
-    private static AudioManager _audiomanager;
-    public static AudioManager AudioManager
+    private static NetworkAudioManager _audiomanager;
+    public static NetworkAudioManager AudioManager
     {
         get
         {
@@ -18,8 +18,8 @@ public static class ServicesNetwork
         }
     }
 
-    private static GameFeelNetworkManager _gameFeelManager;
-    public static GameFeelNetworkManager GameFeelManager
+    private static NetworkGameFeelManager _gameFeelManager;
+    public static NetworkGameFeelManager GameFeelManager
     {
         get
         {
@@ -32,8 +32,8 @@ public static class ServicesNetwork
         }
     }
 
-    private static VFXNetworkManager _visualEffectManager;
-    public static VFXNetworkManager VisualEffectManager
+    private static NetworkVFXManager _visualEffectManager;
+    public static NetworkVFXManager VisualEffectManager
     {
         get
         {
@@ -102,8 +102,8 @@ public static class ServicesNetwork
         }
     }
 
-    private static GameStateNetworkManager _gamestatemanager;
-    public static GameStateNetworkManager GameStateManager
+    private static NetworkGameStateManager _gamestatemanager;
+    public static NetworkGameStateManager GameStateManager
     {
         get
         {
@@ -127,20 +127,6 @@ public static class ServicesNetwork
         set
         {
             _gameObjectiveManager = value;
-        }
-    }
-
-    private static NetworkEventManager _networkEventManager;
-    public static NetworkEventManager NetworkEventManager
-    {
-        get
-        {
-            Debug.Assert(_networkEventManager != null);
-            return _networkEventManager;
-        }
-        set
-        {
-            _networkEventManager = value;
         }
     }
 }

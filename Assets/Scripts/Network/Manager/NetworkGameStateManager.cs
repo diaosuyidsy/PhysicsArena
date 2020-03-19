@@ -9,19 +9,16 @@ using CharTween;
 using UnityEngine.SceneManagement;
 using TextFx;
 using System;
-using Photon.Realtime;
-using Photon.Pun;
-using System.Linq;
 
-public class GameStateNetworkManager
+public class NetworkGameStateManager
 {
-    public List<PlayerControllerNetworking> PlayerControllers;
+    public PlayerController[] PlayerControllers;
     public PlayerInformation PlayersInformation;
-    public List<Transform> CameraTargets => PhotonNetwork.PlayerList.Select(i => (((GameObject)i.TagObject).transform)).ToList();
+    public List<Transform> CameraTargets;
 
-    private GameMapData _gameMapdata;
+    public GameMapData _gameMapdata;
     private ConfigData _configData;
-    private FSM<GameStateNetworkManager> _gameStateFSM;
+    private FSM<NetworkGameStateManager> _gameStateFSM;
     private TextMeshProUGUI _holdAText;
     private Image _holdAImage;
     private TextMeshProUGUI _holdBText;
@@ -58,13 +55,15 @@ public class GameStateNetworkManager
     private Transform _gameUI;
     private int _winner;
     private GameObject _gameManager;
+    private int _hitStopFrames;
+    private float _hitStopTimeScale;
 
-    public GameStateNetworkManager(GameMapData _gmp, ConfigData _cfd, GameObject _gm)
+    public NetworkGameStateManager(GameMapData _gmp, ConfigData _cfd, GameObject _gm)
     {
         _gameMapdata = _gmp;
         _gameManager = _gm;
         _configData = _cfd;
-        _gameStateFSM = new FSM<GameStateNetworkManager>(this);
+        _gameStateFSM = new FSM<NetworkGameStateManager>(this);
         _gameUI = GameObject.Find("GameUI").transform;
         _gameEndCanvas = GameObject.Find("GameEndCanvas").transform;
         _gameEndBlackbackground = _gameEndCanvas.Find("EndImageBackground").gameObject;
@@ -90,7 +89,7 @@ public class GameStateNetworkManager
         _pauseResume = _pauseMenu.Find("Resume");
         _pauseQuit = _pauseMenu.Find("Quit");
         _pauseWholeMask = _pauseMenu.Find("WholeMask");
-        PlayerControllers = new List<PlayerControllerNetworking>();
+        PlayerControllers = new PlayerController[PlayersInformation.ColorIndex.Length];
         _statisticPanel = _gameEndCanvas.Find("StatisticPanel");
         _MVPDisplay = _statisticPanel.Find("MVPDisplay");
         _MVPTitle = _statisticPanel.Find("MVPTitle");
@@ -100,22 +99,23 @@ public class GameStateNetworkManager
         _MVPPlayerHolder = _MVP.Find("MVPPlayerHolder");
         _MVPSpotLight = _MVP.Find("MVPSpotLight");
         _MVPPodium = _MVP.Find("MVPPodium");
-        // CameraTargets = new List<Transform>();
+        CameraTargets = new List<Transform>();
         for (int i = 0; i < 6; i++)
         {
             _playersOutestHolder[i] = _playersHolder.GetChild(i);
         }
-        // for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
-        // {
-        //     PlayerControllers[i] = _playersOutestHolder[PlayersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
-        //     CameraTargets.Add(PlayerControllers[i].transform);
-        // }
+        for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
+        {
+            PlayerControllers[i] = _playersOutestHolder[PlayersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
+            CameraTargets.Add(PlayerControllers[i].transform);
+        }
         EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
+        EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-        // _gameStateFSM.TransitionTo<FoodCartTutorialState>();
+        _gameStateFSM.TransitionTo<FoodCartTutorialState>();
         // _gameStateFSM.TransitionTo<MVPEndPanelState>();
     }
 
@@ -148,8 +148,19 @@ public class GameStateNetworkManager
         EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawn);
+        EventManager.Instance.RemoveHandler<HitStopEvent>(_onHitStop);
         if (_gameStateFSM.CurrentState != null)
             _gameStateFSM.CurrentState.CleanUp();
+    }
+
+    private void _onHitStop(HitStopEvent ev)
+    {
+        _hitStopFrames = ev.StopFrames;
+        _hitStopTimeScale = ev.TimeScale;
+        if (_gameStateFSM.CurrentState.GetType().Equals(typeof(GameLoop)))
+        {
+            _gameStateFSM.TransitionTo<HitStop>();
+        }
     }
 
     private void _onGameEnd(GameEnd ge)
@@ -167,15 +178,15 @@ public class GameStateNetworkManager
 
     private void _onPlayerDied(PlayerDied pd)
     {
-        // CameraTargets.Remove(pd.Player.transform);
+        CameraTargets.Remove(pd.Player.transform);
     }
 
     private void _onPlayerRespawn(PlayerRespawned pr)
     {
-        // CameraTargets.Add(pr.Player.transform);
+        CameraTargets.Add(pr.Player.transform);
     }
 
-    private abstract class GameState : FSM<GameStateNetworkManager>.State
+    private abstract class GameState : FSM<NetworkGameStateManager>.State
     {
         protected PlayerInformation _PlayersInformation;
         protected bool _AnyADown
@@ -521,6 +532,39 @@ public class GameStateNetworkManager
                 return;
             }
         }
+    }
+
+    private class HitStop : GameState
+    {
+        private float timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            timer = Time.unscaledTime + Context._hitStopFrames * Time.unscaledDeltaTime;
+            Time.timeScale = Context._hitStopTimeScale;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (timer < Time.unscaledTime)
+            {
+                TransitionTo<GameLoop>();
+                return;
+            }
+            if (_AnyPauseDown)
+            {
+                TransitionTo<PauseState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Time.timeScale = 1f;
+        }
+
     }
 
     private class PauseState : GameState

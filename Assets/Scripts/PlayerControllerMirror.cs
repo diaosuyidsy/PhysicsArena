@@ -159,7 +159,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
-            EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
+            CmdTriggerPlayerDeath(gameObject, other.gameObject);
+            // EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
         }
     }
 
@@ -194,6 +195,153 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void TargetBlockPush(NetworkConnection connection, GameObject receiver, Vector3 force)
     {
         receiver.GetComponent<IHittableNetwork>().OnImpact(force, ForceMode.VelocityChange);
+    }
+
+    [Command]
+    private void CmdTriggerPlayerHit(GameObject sender, GameObject receiver, Vector3 force, bool isABlock)
+    {
+        RpcTriggerPlayerHit(sender, receiver, force, isABlock);
+    }
+
+    [ClientRpc]
+    private void RpcTriggerPlayerHit(GameObject sender, GameObject receiver, Vector3 force, bool isABlock)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, 0, 1f, isABlock));
+    }
+
+    [Command]
+    private void CmdTriggerPlayerDeath(GameObject player, GameObject impactObject)
+    {
+        RpcTriggerPlayerDeath(player, impactObject);
+    }
+    [ClientRpc]
+    private void RpcTriggerPlayerDeath(GameObject player, GameObject impactObject)
+    {
+        //TODO: Need to correctly record who killed player
+        EventManager.Instance.TriggerEvent(new PlayerDied(player, PlayerNumber, new ImpactMarker(player, 0f, ImpactType.Melee), impactObject));
+    }
+
+    [Command]
+    private void CmdTriggerObjectDropped(GameObject player, GameObject HandObject)
+    {
+        RpcTriggerObjectDropped(player, HandObject);
+    }
+    [ClientRpc]
+    private void RpcTriggerObjectDropped(GameObject player, GameObject handObject)
+    {
+        EventManager.Instance.TriggerEvent(new ObjectDropped(player, 0, handObject));
+    }
+
+    [Command]
+    private void CmdTriggerPlayerJump(GameObject player, string groundTag)
+    {
+        RpcTriggerPlayerJump(player, groundTag);
+    }
+    [ClientRpc]
+    private void RpcTriggerPlayerJump(GameObject player, string groundTag)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerJump(player, player.GetComponent<PlayerControllerMirror>().OnDeathHidden[1], 0, groundTag));
+    }
+
+    [Command]
+    private void CmdTriggerPlayerLand(GameObject player, string groundTag)
+    {
+        RpcTriggerPlayerLand(player, groundTag);
+    }
+    [ClientRpc]
+    private void RpcTriggerPlayerLand(GameObject player, string groundTag)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerLand(player, player.GetComponent<PlayerControllerMirror>().OnDeathHidden[1], 0, groundTag));
+    }
+    //TODO: Trigger Player Stunned, need to sync var stuntimer
+    //TODO: Trigger Player Unstunned
+
+    [Command]
+    private void CmdTriggerPlayerRespawned(GameObject player)
+    {
+        RpcTriggerPlayerRespawned(player);
+    }
+    [ClientRpc]
+    private void RpcTriggerPlayerRespawned(GameObject player)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerRespawned(player));
+    }
+
+    [Command]
+    private void CmdTriggerObjectPickedUp(GameObject player, GameObject _object)
+    {
+        RpcTriggerObjectPickedUp(player, _object);
+    }
+    [ClientRpc]
+    private void RpcTriggerObjectPickedUp(GameObject player, GameObject _object)
+    {
+        EventManager.Instance.TriggerEvent(new ObjectPickedUp(player, 0, _object));
+    }
+
+    [Command]
+    private void CmdTriggerPunchStart(GameObject player)
+    {
+        RpcTriggerPunchStart(player);
+    }
+    [ClientRpc]
+    private void RpcTriggerPunchStart(GameObject player)
+    {
+        EventManager.Instance.TriggerEvent(new PunchStart(player, 0, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
+    }
+
+    [Command]
+    private void CmdTriggerPunchHolding(GameObject player)
+    {
+        RpcTriggerPunchHolding(player);
+    }
+    [ClientRpc]
+    private void RpcTriggerPunchHolding(GameObject player)
+    {
+        EventManager.Instance.TriggerEvent(new PunchHolding(player, 0, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
+    }
+
+    [Command]
+    private void CmdTriggerPunchDone(GameObject player)
+    {
+        RpcTriggerPunchDone(player);
+    }
+    [ClientRpc]
+    private void RpcTriggerPunchDone(GameObject player)
+    {
+        EventManager.Instance.TriggerEvent(new PunchDone(player, 0, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
+    }
+
+    [Command]
+    private void CmdTriggerPunchReleased(GameObject player)
+    {
+        RpcTriggerPunchReleased(player);
+    }
+    [ClientRpc]
+    private void RpcTriggerPunchReleased(GameObject player)
+    {
+        EventManager.Instance.TriggerEvent(new PunchReleased(player, 0));
+    }
+
+    [Command]
+    private void CmdTriggerBlockStart(GameObject player)
+    {
+        RpcTriggerBlockStart(player);
+    }
+    [ClientRpc]
+    private void RpcTriggerBlockStart(GameObject player)
+    {
+        EventManager.Instance.TriggerEvent(new BlockStart(player, 0));
+    }
+
+    [Command]
+    private void CmdTriggerBlockEnd(GameObject player)
+    {
+        RpcTriggerBlockEnd(player);
+    }
+    [ClientRpc]
+    private void RpcTriggerBlockEnd(GameObject player)
+    {
+        EventManager.Instance.TriggerEvent(new BlockEnd(player, 0));
     }
     #endregion
 
@@ -230,7 +378,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         }
         else // Player is hit cause he could not block
         {
-            EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
+            CmdTriggerPlayerHit(sender, gameObject, force, !_blockable);
+            // EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
             OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
         }
     }
@@ -428,7 +577,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         // Drop the thing
         HandObject.GetComponent<WeaponBase>().OnDrop();
 
-        EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
+        CmdTriggerObjectDropped(gameObject, HandObject);
+        // EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
         // Return the body to normal position
         // _resetBodyAnimation();
         // Nullify the holder
@@ -623,7 +773,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.OnEnter();
             Context.OnDeathHidden[2].SetActive(false);
             Context._rb.AddForce(new Vector3(0, Context.CharacterDataStore.JumpForce, 0), ForceMode.Impulse);
-            EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
+            // EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
+            Context.CmdTriggerPlayerJump(Context.gameObject, Context._getGroundTag());
         }
 
         public override void OnCollisionEnter(Collision other)
@@ -631,7 +782,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             if (Context.CharacterDataStore.JumpMask == (Context.CharacterDataStore.JumpMask | (1 << other.gameObject.layer)))
             {
                 TransitionTo<IdleState>();
-                EventManager.Instance.TriggerEvent(new PlayerLand(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
+                Context.CmdTriggerPlayerLand(Context.gameObject, Context._getGroundTag());
+                // EventManager.Instance.TriggerEvent(new PlayerLand(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
             }
         }
         public override void FixedUpdate()
@@ -1020,7 +1172,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.Update();
             if (Time.time >= _startTime + _respawnTime)
             {
-                EventManager.Instance.TriggerEvent(new PlayerRespawned(Context.gameObject));
+                // EventManager.Instance.TriggerEvent(new PlayerRespawned(Context.gameObject));
+                Context.CmdTriggerPlayerRespawned(Context.gameObject);
                 TransitionTo<IdleState>();
                 return;
             }
@@ -1124,7 +1277,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
                 if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>() != null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
                 {
-                    EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
+                    Context.CmdTriggerObjectPickedUp(Context.gameObject, hit.collider.gameObject);
+                    // EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
                     // Tell other necessary components that it has taken something
                     Context.HandObject = hit.collider.gameObject;
 
@@ -1283,7 +1437,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.OnEnter();
             Context._animator.SetFloat("ClockFistTime", 1f / Context.CharacterDataStore.ClockFistTime);
             Context._animator.SetBool("PunchHolding", true);
-            EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            // EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            Context.CmdTriggerPunchStart(Context.gameObject);
             _holding = false;
             _startHoldingTime = Time.time;
         }
@@ -1294,7 +1449,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
                 _holding = true;
-                EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                // EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                Context.CmdTriggerPunchHolding(Context.gameObject);
             }
 
             if (_RightTriggerUp && _holding)
@@ -1309,7 +1465,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             }
             if (_holding && (_BDown || _LeftTriggerDown))
             {
-                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                // EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                Context.CmdTriggerPunchDone(Context.gameObject);
                 TransitionTo<BlockingState>();
                 return;
             }
@@ -1338,7 +1495,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
-            EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
+            // EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
+            Context.CmdTriggerPunchReleased(Context.gameObject);
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
         }
 
@@ -1371,7 +1529,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             }
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
             {
-                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                // EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                Context.CmdTriggerPunchDone(Context.gameObject);
                 TransitionTo<IdleActionState>();
                 return;
             }
@@ -1520,7 +1679,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void OnEnter()
         {
             base.OnEnter();
-            EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
+            // EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
+            Context.CmdTriggerBlockStart(Context.gameObject);
             Context._animator.SetBool("Blocking", true);
             Context.BlockShield.SetShield(true);
             _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
@@ -1577,7 +1737,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
             Context.BlockShield.SetShield(false);
-            EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
+            // EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
+            Context.CmdTriggerBlockEnd(Context.gameObject);
         }
     }
 

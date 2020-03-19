@@ -2,15 +2,16 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Rewired;
+using DG.Tweening;
 
 /// <summary>
 /// Game Feel Manager Manages Controller vibration
 /// and screen shakes
 /// </summary>
-public class GameFeelNetworkManager
+public class NetworkGameFeelManager
 {
     public GameFeelData GameFeelData;
-    public GameFeelNetworkManager(GameFeelData _gfd)
+    public NetworkGameFeelManager(GameFeelData _gfd)
     {
         GameFeelData = _gfd;
         OnEnable();
@@ -26,6 +27,12 @@ public class GameFeelNetworkManager
         /// If the hiter number is below 0, means it's a block
         /// and blocked attack don't have a hitter
         _vibrateController(ph.HiterPlayerNumber, 1.0f * charge, 0.15f * charge);
+        // Also Shake the hitted
+        ph.Hitted.transform.DOShakePosition(GameFeelData.MeleeHitStopInformation.Frames * Time.unscaledDeltaTime,
+        GameFeelData.MeleeHitStopInformation.Viberation,
+        GameFeelData.MeleeHitStopInformation.Vibrato,
+        GameFeelData.MeleeHitStopInformation.Randomness).SetUpdate(true).SetEase(GameFeelData.MeleeHitStopInformation.ViberationEase);
+        EventManager.Instance.TriggerEvent(new HitStopEvent(GameFeelData.MeleeHitStopInformation.Frames, GameFeelData.MeleeHitStopInformation.TimeScale));
     }
 
     private void _onPlayerDied(PlayerDied pd)
@@ -68,7 +75,7 @@ public class GameFeelNetworkManager
 
     private void _onPlayerRespawned(PlayerRespawned ev)
     {
-        _vibrateController(ev.Player.GetComponent<PlayerControllerNetworking>().PlayerNumber
+        _vibrateController(ev.Player.GetComponent<PlayerController>().PlayerNumber
         , GameFeelData.PlayerRespawnViberationInformation.MotorLevel
         , GameFeelData.PlayerRespawnViberationInformation.Duration);
     }

@@ -172,7 +172,6 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
     protected void SetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed)
     {
 
-
         Context.Info.CurrentPercentage = Mathf.Lerp(Context.Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed*Time.deltaTime);
         if (Mathf.Abs(Context.Info.CurrentPercentage - TargetPercentage) <= Context.FeelData.PercentageIgnoreError)
         {
@@ -186,6 +185,25 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
         Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
         Context.Info.RightJoint.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+
+        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
+        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
+        //Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Euler(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage),0);
+        //Context.Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Euler(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0);
+
+        JointDrive Joint1Drive = new JointDrive();
+        Joint1Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint1AngularYZ, Context.FeelData.MaxJoint1AngularYZ, Context.Info.CurrentPercentage);
+        Joint1Drive.maximumForce = float.PositiveInfinity;
+
+        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+
+        JointDrive Joint0Drive = new JointDrive();
+        Joint0Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint0AngularYZ, Context.FeelData.MaxJoint0AngularYZ, Context.Info.CurrentPercentage);
+        Joint0Drive.maximumForce = float.PositiveInfinity;
+
+        Context.Info.LJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
+        Context.Info.RJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
 
         if (Mathf.Abs(TargetAngle - Context.Info.CurrentAngle) <= Context.FeelData.RotateSpeed * Time.deltaTime)
         {
@@ -629,6 +647,9 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public GameObject RightJoint;
         public GameObject CameraFocus;
 
+        public GameObject LJoint0;
+        public GameObject RJoint0;
+
         public float CurrentPercentage;
         public float CurrentAngle;
 
@@ -643,13 +664,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public GameObject LockedPlayer;
 
 
-        public CanonInfo(GameObject entity, GameObject pad, GameObject LJoint, GameObject RJoint, GameObject Focus)
+        public CanonInfo(GameObject entity, GameObject pad, GameObject LJoint, GameObject RJoint,GameObject L0, GameObject R0, GameObject Focus)
         {
             Entity = entity;
             Pad = pad;
             LeftJoint = LJoint;
             RightJoint = RJoint;
             CameraFocus = Focus;
+            LJoint0 = L0;
+            RJoint0 = R0;
 
             CurrentSide = LastSide = CanonSide.Neutral;
 
@@ -681,6 +704,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public GameObject CanonFinalLJoint;
     public GameObject CanonFinalRJoint;
+    public GameObject CanonLJoint0;
+    public GameObject CanonRJoint0;
 
     public GameObject CameraFocus;
 
@@ -723,7 +748,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         Team1Basket = Basket1;
         Team2Basket = Basket2;
 
-        Info = new CanonInfo(CanonEntity,CanonPad,CanonLJoint,CanonRJoint,CameraFocus);
+        Info = new CanonInfo(CanonEntity,CanonPad,CanonLJoint,CanonRJoint,CanonLJoint0,CanonRJoint0, CameraFocus);
 
         GenerateBagel();
 

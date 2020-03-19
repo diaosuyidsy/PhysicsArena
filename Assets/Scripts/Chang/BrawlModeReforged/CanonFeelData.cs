@@ -13,6 +13,12 @@ public class CanonFeelData : MonoBehaviour
     public float MaxLinearLimit;
     public float MinPadDis;
     public float MaxPadDis;
+    public float MinJoint0AngularYZ;
+    public float MaxJoint0AngularYZ;
+    public float MinJoint1AngularYZ;
+    public float MaxJoint1AngularYZ;
+    public float MinJointRotation;
+    public float MaxJointRotation;
 
     public float AimingPercentageFollowSpeed;
     public float ShootPercentageFollowSpeed;

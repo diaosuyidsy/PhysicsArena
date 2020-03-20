@@ -646,3 +646,25 @@ public class OnScore : GameEvent
     }
 }
 #endregion
+
+public class OnAddCameraTargets : GameEvent
+{
+    public GameObject Target;
+    public int Weight;
+
+    public OnAddCameraTargets(GameObject target, int weight)
+    {
+        Target = target;
+        Weight = weight;
+    }
+}
+
+public class OnRemoveCameraTargets : GameEvent
+{
+    public GameObject Target;
+
+    public OnRemoveCameraTargets(GameObject target)
+    {
+        Target = target;
+    }
+}

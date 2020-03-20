@@ -171,6 +171,14 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     }
 
     #region Networking Function
+    public override void OnStartClient()
+    {
+        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(gameObject, isLocalPlayer ? 3 : 1));
+    }
+    private void OnDestroy()
+    {
+        EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(gameObject));
+    }
     [Command]
     private void CmdHit(GameObject receiver, Vector3 force, bool _blockable, GameObject sender)
     {

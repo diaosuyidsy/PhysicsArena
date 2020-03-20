@@ -102,8 +102,8 @@ public class NetworkGame : NetworkBehaviour
         // NetworkServices.TinylyticsManager.Destory();
         // NetworkServices.TinylyticsManager = null;
 
-        // NetworkServices.Config.Destroy();
-        // NetworkServices.Config = null;
+        NetworkServices.Config.Destroy();
+        NetworkServices.Config = null;
 
         // NetworkServices.GameStateManager.Destroy();
         // NetworkServices.GameStateManager = null;

@@ -12,7 +12,7 @@ using System;
 
 public class NetworkGameStateManager
 {
-    public PlayerController[] PlayerControllers;
+    public List<PlayerControllerMirror> PlayerControllers;
     public PlayerInformation PlayersInformation;
     public List<Transform> CameraTargets;
 
@@ -89,7 +89,7 @@ public class NetworkGameStateManager
         _pauseResume = _pauseMenu.Find("Resume");
         _pauseQuit = _pauseMenu.Find("Quit");
         _pauseWholeMask = _pauseMenu.Find("WholeMask");
-        PlayerControllers = new PlayerController[PlayersInformation.ColorIndex.Length];
+        PlayerControllers = new List<PlayerControllerMirror>();
         _statisticPanel = _gameEndCanvas.Find("StatisticPanel");
         _MVPDisplay = _statisticPanel.Find("MVPDisplay");
         _MVPTitle = _statisticPanel.Find("MVPTitle");
@@ -106,7 +106,6 @@ public class NetworkGameStateManager
         }
         for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
         {
-            PlayerControllers[i] = _playersOutestHolder[PlayersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
             CameraTargets.Add(PlayerControllers[i].transform);
         }
         EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
@@ -115,7 +114,7 @@ public class NetworkGameStateManager
         EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-        _gameStateFSM.TransitionTo<FoodCartTutorialState>();
+        // _gameStateFSM.TransitionTo<FoodCartTutorialState>();
         // _gameStateFSM.TransitionTo<MVPEndPanelState>();
     }
 
@@ -140,7 +139,7 @@ public class NetworkGameStateManager
 
     public void Update()
     {
-        _gameStateFSM.Update();
+        // _gameStateFSM.Update();
     }
 
     public void Destroy()

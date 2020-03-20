@@ -7,7 +7,7 @@ public class NetworkManagerBrawlMode : NetworkManager
 {
     public GameObject[] PlayerPrefabs;
 
-    public override void OnServerAddPlayer(NetworkConnection conn, AddPlayerMessage extraMessage)
+    public override void OnServerAddPlayer(NetworkConnection conn)
     {
         if (numPlayers > 6) return;
         Transform startPos = GetStartPosition();

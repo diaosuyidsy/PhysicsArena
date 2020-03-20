@@ -441,3 +441,15 @@ public interface IHittableNetwork
     /// <param name="status"></param>
     void OnImpact(Status status);
 }
+
+public class CameraTargets
+{
+    public GameObject Target;
+    public int Weight;
+
+    public CameraTargets(GameObject target, int weight = 1)
+    {
+        Target = target;
+        Weight = weight;
+    }
+}

@@ -29,6 +29,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     protected virtual void Update()
     {
         // WeaponBaseFSM.Update();
+        // if ((isClient && !hasAuthority) || (isServer && hasAuthority)) return;
         if (Owner != null && _followHand)
         {
             Vector3 targetposition = (Owner.GetComponent<PlayerControllerMirror>().LeftHand.transform.position
@@ -68,6 +69,8 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     protected virtual void OnCollisionEnter(Collision other)
     {
         // ((WeaponState)WeaponBaseFSM.CurrentState).OnCollisionEnter(other);
+        // if ((isClient && !hasAuthority) || (isServer && hasAuthority)) return;
+        if (!isServer) return;
         if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer))
         {
             _onWeaponDespawn();
@@ -80,6 +83,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         {
             if (!_hitGroundOnce)
             {
+                GetComponent<NetworkIdentity>().RemoveClientAuthority();
                 gameObject.layer = LayerMask.NameToLayer("Pickup");
                 RpcHitGround();
                 CanBePickedUp = true;
@@ -120,12 +124,15 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     public void RpcOnDrop()
     {
         GetComponent<Rigidbody>().isKinematic = false;
+        // GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
+        // Owner.transform.up * WeaponDataBase.DropForce.y +
+        // Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
     }
 
     public virtual void OnPickUp(GameObject owner)
     {
         Owner = owner;
-
+        gameObject.layer = owner.layer;
         GetComponent<NetworkIdentity>().AssignClientAuthority(owner.GetComponent<NetworkIdentity>().connectionToClient);
         // TargetOnPickUp(GetComponent<NetworkIdentity>().connectionToClient, owner);
         // GetComponent<Rigidbody>().isKinematic = true;

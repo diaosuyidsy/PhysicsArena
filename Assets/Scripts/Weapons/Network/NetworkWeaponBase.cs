@@ -125,8 +125,11 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     public virtual void OnPickUp(GameObject owner)
     {
         Owner = owner;
-        GetComponent<Rigidbody>().isKinematic = true;
-        gameObject.layer = owner.layer;
+
+        GetComponent<NetworkIdentity>().AssignClientAuthority(owner.GetComponent<NetworkIdentity>().connectionToClient);
+        // TargetOnPickUp(GetComponent<NetworkIdentity>().connectionToClient, owner);
+        // GetComponent<Rigidbody>().isKinematic = true;
+        // gameObject.layer = owner.layer;
         RpcOnPickUp(owner);
     }
 

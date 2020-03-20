@@ -549,7 +549,7 @@ public class FistGunStartCharging : FistGunEvent
 
 public class FistGunCharged : FistGunEvent
 {
-    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, Vector3 fistPos) : base(fistGun, fistGunOwner, fistGunOwner == null ? -1 : fistGunOwner.GetComponent<PlayerController>().PlayerNumber)
+    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, Vector3 fistPos) : base(fistGun, fistGunOwner, 0)
     {
         FistPos = fistPos;
     }

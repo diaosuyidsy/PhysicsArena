@@ -98,6 +98,11 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private int _hitStopFrames;
     #endregion
 
+    #region Network Variables
+    [SyncVar]
+    private bool _isBlocking;
+    #endregion
+
     private void Awake()
     {
         _movementFSM = new FSM<PlayerControllerMirror>(this);
@@ -393,6 +398,12 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     {
         handObject.GetComponent<NetworkWeaponBase>().Fire(fire);
     }
+
+    [Command]
+    private void CmdSetBlock(bool block)
+    {
+        _isBlocking = block;
+    }
     #endregion
 
     public bool CanBeBlockPushed()
@@ -410,7 +421,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     /// <returns></returns>
     public bool CanBlock(Vector3 forwardAngle)
     {
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
+        if (_isBlocking &&
             _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle))
             return true;
         return false;
@@ -1716,6 +1727,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.OnEnter();
             // EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             Context.CmdTriggerBlockStart(Context.gameObject);
+            Context.CmdSetBlock(true);
             Context._animator.SetBool("Blocking", true);
             Context.BlockShield.SetShield(true);
             _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
@@ -1768,6 +1780,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.OnExit();
             Context._animator.SetBool("Blocking", false);
             Context.BlockShield.SetShield(false);
+            Context.CmdSetBlock(false);
             // EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
             Context.CmdTriggerBlockEnd(Context.gameObject);
         }

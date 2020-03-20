@@ -188,7 +188,6 @@ public class NetworkCameraController : NetworkBehaviour
 
     private void _onRemoveCameraTarget(OnRemoveCameraTargets ev)
     {
-        print("Remove Player");
         int index = -1;
         for (int i = 0; i < _cameraTargets.Count; i++)
         {

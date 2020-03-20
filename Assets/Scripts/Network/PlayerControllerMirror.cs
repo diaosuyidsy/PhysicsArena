@@ -376,6 +376,23 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             StartCoroutine(_deadInvincible);
         }
     }
+    [Command]
+    private void CmdPickUpObject(GameObject _object, GameObject owner)
+    {
+        _object.GetComponent<NetworkWeaponBase>().OnPickUp(owner);
+    }
+
+    [Command]
+    private void CmdDropObject(GameObject _object)
+    {
+        _object.GetComponent<NetworkWeaponBase>().OnDrop();
+    }
+
+    [Command]
+    private void CmdFire(GameObject handObject, bool fire)
+    {
+        handObject.GetComponent<NetworkWeaponBase>().Fire(fire);
+    }
     #endregion
 
     public bool CanBeBlockPushed()
@@ -606,7 +623,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     {
         if (HandObject == null) return;
         // Drop the thing
-        HandObject.GetComponent<WeaponBase>().OnDrop();
+        // HandObject.GetComponent<NetworkWeaponBase>().OnDrop();
+        CmdDropObject(HandObject);
 
         CmdTriggerObjectDropped(gameObject, HandObject);
         // EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
@@ -1303,7 +1321,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 Context.CharacterDataStore.PickUpLayer))
             {
 
-                if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>() != null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
+                if (Context.HandObject == null && hit.collider.GetComponent<NetworkWeaponBase>() != null && hit.collider.GetComponent<NetworkWeaponBase>().CanBePickedUp)
                 {
                     Context.CmdTriggerObjectPickedUp(Context.gameObject, hit.collider.gameObject);
                     // EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
@@ -1311,18 +1329,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                     Context.HandObject = hit.collider.gameObject;
 
                     // Tell the collected weapon who picked it up
-                    hit.collider.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
+                    Context.CmdPickUpObject(hit.collider.gameObject, Context.gameObject);
+                    // hit.collider.GetComponent<NetworkWeaponBase>().OnPickUp(Context.gameObject);
                     TransitionTo<HoldingState>();
-                    return;
-                }
-                else if (Context.EquipmentObject == null &&
-                        hit.collider.GetComponent<EquipmentBase>() != null &&
-                        hit.collider.GetComponent<EquipmentBase>().CanBePickedUp)
-                {
-                    EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
-                    Context.EquipmentObject = hit.collider.gameObject;
-                    hit.collider.GetComponent<EquipmentBase>().OnPickUp(Context.gameObject);
-                    TransitionTo<IdleActionState>();
                     return;
                 }
             }
@@ -1358,7 +1367,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                     break;
             }
             Context._permaSlow++;
-            Context._permaSlowWalkSpeedMultiplier = Context.HandObject.GetComponent<WeaponBase>().WeaponDataBase.PickupSlowMultiplier;
+            Context._permaSlowWalkSpeedMultiplier = Context.HandObject.GetComponent<NetworkWeaponBase>().WeaponDataBase.PickupSlowMultiplier;
         }
 
         public override void Update()
@@ -1371,26 +1380,28 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             }
             if (_RightTriggerDown)
             {
-                WeaponBase wb = Context.HandObject.GetComponent<WeaponBase>();
+                NetworkWeaponBase wb = Context.HandObject.GetComponent<NetworkWeaponBase>();
                 Context._helpAim(wb.HelpAimAngle, wb.HelpAimDistance);
-                Context.HandObject.GetComponent<WeaponBase>().Fire(true);
-                if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtBazooka)))
+                // Context.HandObject.GetComponent<NetworkWeaponBase>().Fire(true);
+                Context.CmdFire(Context.HandObject, true);
+                if (Context.HandObject.GetComponent<NetworkWeaponBase>().GetType().Equals(typeof(rtBazooka)))
                 {
                     Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
                     TransitionTo<BazookaActionState>();
                 }
-                else if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtBoomerang)))
+                else if (Context.HandObject.GetComponent<NetworkWeaponBase>().GetType().Equals(typeof(rtBoomerang)))
                 {
                     TransitionTo<BoomerangActionState>();
                 }
-                else if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtSmallBaz)))
+                else if (Context.HandObject.GetComponent<NetworkWeaponBase>().GetType().Equals(typeof(rtSmallBaz)))
                 {
                     TransitionTo<IdleActionState>();
                 }
             }
             if (_RightTriggerUp)
             {
-                Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+                // Context.HandObject.GetComponent<NetworkWeaponBase>().Fire(false);
+                Context.CmdFire(Context.HandObject, false);
             }
         }
 
@@ -1774,7 +1785,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.Update();
             if (_RightTriggerUp)
             {
-                Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+                // Context.HandObject.GetComponent<NetworkWeaponBase>().Fire(false);
+                Context.CmdFire(Context.HandObject, false);
             }
         }
     }
@@ -1791,7 +1803,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.Update();
             if (_RightTriggerUp)
             {
-                Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+                // Context.HandObject.GetComponent<NetworkWeaponBase>().Fire(false);
+                Context.CmdFire(Context.HandObject, false);
                 TransitionTo<IdleActionState>();
             }
         }

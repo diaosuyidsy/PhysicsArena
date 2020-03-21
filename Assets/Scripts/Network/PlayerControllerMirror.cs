@@ -542,16 +542,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
     public void ForceDropHandObject()
     {
+        if (!isLocalPlayer) return;
         if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
             _actionFSM.TransitionTo<DroppedRecoveryState>();
-    }
-
-    public void ForceDropEquipment(EquipmentPositionType posType)
-    {
-        if (posType == EquipmentPositionType.OnBack && _movementFSM.CurrentState.GetType().Equals(typeof(JetPackState)))
-        {
-            _movementFSM.TransitionTo<IdleState>();
-        }
     }
 
     /// <summary>

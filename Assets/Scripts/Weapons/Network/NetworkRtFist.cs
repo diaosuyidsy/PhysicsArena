@@ -77,11 +77,11 @@ public class NetworkRtFist : NetworkWeaponBase
                     _switchToRecharge();
                     return;
                 }
-            }
-            if (Vector3.Distance(_fistDup.transform.position, _maxDistance) <= 0.2f)
-            {
-                _switchToRecharge(true);
-                return;
+                if (Vector3.Distance(_fistDup.transform.position, _maxDistance) <= 0.2f)
+                {
+                    _switchToRecharge(true);
+                    return;
+                }
             }
         }
         if (_fistGunState == FistGunState.Recharging)
@@ -93,11 +93,10 @@ public class NetworkRtFist : NetworkWeaponBase
             else
             {
                 // Charged
-                // RpcTriggerFistGunCharged(gameObject, Owner, transform.position);
-                EventManager.Instance.TriggerEvent(new FistGunCharged(gameObject, Owner, transform.position));
+                RpcFistGunCharged(gameObject, Owner, transform.position);
                 Destroy(_fistDup);
                 _fistDup = null;
-                _fist.gameObject.SetActive(true);
+                // _fist.gameObject.SetActive(true);
                 _fistGunState = FistGunState.Idle;
                 return;
             }
@@ -132,19 +131,20 @@ public class NetworkRtFist : NetworkWeaponBase
         _fistGunState = FistGunState.Idle;
         float rechargetimeleft = _chargeTimer + _fistGunData.ReloadTime - Time.time;
         rechargetimeleft = rechargetimeleft > 0f ? rechargetimeleft : 0f;
+        RpcDespawnFistGun(rechargetimeleft, gameObject);
         if (_fistDup != null) Destroy(_fistDup, rechargetimeleft);
         _fistDup = null;
         _fist.gameObject.SetActive(true);
         _ammo = _fistGunData.MaxAmmo;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         gameObject.SetActive(false);
     }
 
+    // This is only called from server
     private void _switchToRecharge(bool maintainSpeed = false)
     {
         _fistGunState = FistGunState.Recharging;
-        _fist.DOScale(0f, _fistGunData.ReloadTime).SetEase(_fistGunData.ReloadEase).From().OnPlay(() => _fist.gameObject.SetActive(true));
-        EventManager.Instance.TriggerEvent(new FistGunStartCharging(gameObject, _fireOwner, _fireOwner.GetComponent<PlayerControllerMirror>().PlayerNumber));
+        RpcSwitchToRecharge(maintainSpeed);
+        // _fist.DOScale(0f, _fistGunData.ReloadTime).SetEase(_fistGunData.ReloadEase).From().OnPlay(() => _fist.gameObject.SetActive(true));
         _chargeTimer = Time.time;
         _fistDup.GetComponent<Rigidbody>().isKinematic = false;
         _fistDup.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -160,6 +160,22 @@ public class NetworkRtFist : NetworkWeaponBase
     }
 
     #region Network Functions
+    [ClientRpc]
+    private void RpcSwitchToRecharge(bool maintainSpeed)
+    {
+        _fist.DOScale(0f, _fistGunData.ReloadTime).SetEase(_fistGunData.ReloadEase).From().OnPlay(() => _fist.gameObject.SetActive(true));
+        EventManager.Instance.TriggerEvent(new FistGunStartCharging(gameObject, _fireOwner, 0));
+        _fistDup.GetComponent<Rigidbody>().isKinematic = false;
+        _fistDup.GetComponent<Rigidbody>().velocity = Vector3.zero;
+        if (maintainSpeed)
+            _fistDup.GetComponent<Rigidbody>().velocity = -_fistDup.transform.right * _fistGunData.FistSpeed;
+        else
+        {
+            Vector3 rebound = _fistDup.transform.right;
+            rebound.y = _fistGunData.FistReboundY;
+            _fistDup.GetComponent<Rigidbody>().AddForce(_fistGunData.FistReboundForce * rebound, ForceMode.Impulse);
+        }
+    }
     [TargetRpc]
     private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner)
     {
@@ -185,9 +201,12 @@ public class NetworkRtFist : NetworkWeaponBase
     }
 
     [ClientRpc]
-    private void RpcTriggerFistGunCharged(GameObject fistGun, GameObject owner, Vector3 position)
+    private void RpcFistGunCharged(GameObject fistGun, GameObject owner, Vector3 position)
     {
         EventManager.Instance.TriggerEvent(new FistGunCharged(fistGun, owner, position));
+        Destroy(_fistDup);
+        _fistDup = null;
+        _fist.gameObject.SetActive(true);
     }
 
 
@@ -200,6 +219,16 @@ public class NetworkRtFist : NetworkWeaponBase
         _fistDup.GetComponent<Collider>().isTrigger = false;
         _fist.gameObject.SetActive(false);
         owner.GetComponent<PlayerControllerMirror>().OnImpact(-owner.transform.forward * _fistGunData.BackfireHitForce, ForceMode.VelocityChange, owner, ImpactType.FistGun);
+    }
+
+    [ClientRpc]
+    private void RpcDespawnFistGun(float rechargeTimeLeft, GameObject gun)
+    {
+        if (_fistDup != null) Destroy(_fistDup, rechargeTimeLeft);
+        _fistDup = null;
+        _fist.gameObject.SetActive(true);
+        EventManager.Instance.TriggerEvent(new ObjectDespawned(gun));
+        gun.gameObject.SetActive(false);
     }
     #endregion
 }

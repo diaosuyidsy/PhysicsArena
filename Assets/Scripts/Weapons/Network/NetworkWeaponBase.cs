@@ -59,10 +59,16 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         if (_ammo <= 0)
         {
             CanBePickedUp = false;
-            EventManager.Instance.TriggerEvent(new WeaponUsedUp());
-            if (Owner != null)
-                Owner.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
+            RpcAmmoUsedUp(Owner);
         }
+    }
+
+    [ClientRpc]
+    private void RpcAmmoUsedUp(GameObject owner)
+    {
+        EventManager.Instance.TriggerEvent(new WeaponUsedUp());
+        if (owner != null)
+            owner.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
     }
 
     protected virtual void OnCollisionEnter(Collision other)

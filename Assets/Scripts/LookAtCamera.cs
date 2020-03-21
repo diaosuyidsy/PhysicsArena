@@ -4,10 +4,13 @@ using UnityEngine;
 
 public class LookAtCamera : MonoBehaviour
 {
+    public Transform Cam;
 
-
-	void Update()
-	{
-		transform.LookAt(Camera.main.transform.position);
-	}
+    void Update()
+    {
+		if (Cam == null)
+			transform.LookAt(Camera.main.transform.position);
+		else
+			transform.rotation = Cam.rotation;
+    }
 }

@@ -481,10 +481,15 @@ public class PlayerController : MonoBehaviour, IHittable
         // _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
         // BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
     }
-    #endregion
 
-    #region Movment States
-    private class MovementState : FSM<PlayerController>.State
+	public GameObject GetGameObject()
+	{
+		return gameObject;
+	}
+	#endregion
+
+	#region Movment States
+	private class MovementState : FSM<PlayerController>.State
     {
         protected float _HLAxis { get { return Context._player.GetAxis("Move Horizontal"); } }
         protected float _VLAxis { get { return Context._player.GetAxis("Move Vertical"); } }

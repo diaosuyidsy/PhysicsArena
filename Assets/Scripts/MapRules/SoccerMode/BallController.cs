@@ -81,4 +81,9 @@ public class BallController : MonoBehaviour, IHittable
     {
         return;
     }
+
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
 }

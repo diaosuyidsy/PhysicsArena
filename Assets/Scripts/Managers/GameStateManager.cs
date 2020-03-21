@@ -10,13 +10,13 @@ using UnityEngine.SceneManagement;
 using TextFx;
 using System;
 
-public class GameStateManager
+public class GameStateManager : GameStateManagerBase
 {
-    public PlayerController[] PlayerControllers;
-    public PlayerInformation PlayersInformation;
-    public List<Transform> CameraTargets;
+    // public PlayerController[] PlayerControllers;
+    // public PlayerInformation PlayersInformation;
+    // public List<Transform> CameraTargets;
 
-    public GameMapData _gameMapdata;
+    // public GameMapData _gameMapdata;
     private ConfigData _configData;
     private FSM<GameStateManager> _gameStateFSM;
     private TextMeshProUGUI _holdAText;
@@ -138,12 +138,12 @@ public class GameStateManager
         return -1;
     }
 
-    public void Update()
+    public override void Update()
     {
         _gameStateFSM.Update();
     }
 
-    public void Destroy()
+    public override void Destroy()
     {
         EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);

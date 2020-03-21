@@ -106,6 +106,7 @@ public static class Utility
     {
         float time = 0f;
         float mass = 0f;
+        if (ev.Hitted.GetComponent<CapsuleCollider>() == null) return false;
         float frictionCoeffcient = ev.Hitted.GetComponent<CapsuleCollider>().material.dynamicFriction;
         foreach (Rigidbody rb in ev.Hitted.GetComponentsInChildren<Rigidbody>(true))
         {
@@ -368,6 +369,7 @@ public interface IAimable
 
 public interface IHittable
 {
+    GameObject GetGameObject();
     bool CanBeBlockPushed();
     /// <summary>
     /// Can Block The attack or not

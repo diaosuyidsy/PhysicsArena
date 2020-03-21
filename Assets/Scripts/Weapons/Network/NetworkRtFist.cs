@@ -12,7 +12,9 @@ public class NetworkRtFist : NetworkWeaponBase
     private Transform _fist;
     private GameObject _fistDup;
     private Fist _fistScript;
+    [SyncVar]
     private FistGunState _fistGunState = FistGunState.Idle;
+    [SyncVar]
     private GameObject _fireOwner;
     private enum FistGunState
     {
@@ -20,9 +22,10 @@ public class NetworkRtFist : NetworkWeaponBase
         Out,
         Recharging,
     }
+    [SyncVar]
     private Vector3 _maxDistance;
+    [SyncVar]
     private float _chargeTimer;
-    public GameObject FistPrefab;
 
     protected override void Awake()
     {
@@ -42,35 +45,38 @@ public class NetworkRtFist : NetworkWeaponBase
         {
             Vector3 nextPos = (_maxDistance - _fistDup.transform.position).normalized;
             _fistDup.transform.Translate(nextPos * Time.deltaTime * _fistGunData.FistSpeed, Space.World);
-            RaycastHit hit;
-            if (Physics.SphereCast(_fistDup.transform.position, _fistGunData.FistHitScanRadius, -_fistDup.transform.right, out hit, _fistGunData.FistHitScanDist, _fistGunData.AllThingFistCanCollideLayer ^ (1 << _fireOwner.layer)))
+            if (isServer)
             {
-                if (hit.collider.GetComponent<NetworkWeaponBase>() != null) return;
-                IHittableNetwork IHittableNetwork = hit.collider.GetComponentInParent<IHittableNetwork>();
-                PlayerControllerMirror pc = hit.collider.GetComponentInParent<PlayerControllerMirror>();
-                if (IHittableNetwork != null && !IHittableNetwork.CanBlock(-_fistDup.transform.right))
+                RaycastHit hit;
+                if (Physics.SphereCast(_fistDup.transform.position, _fistGunData.FistHitScanRadius, -_fistDup.transform.right, out hit, _fistGunData.FistHitScanDist, _fistGunData.AllThingFistCanCollideLayer ^ (1 << _fireOwner.layer)))
                 {
-                    // IHittableNetwork.OnImpact(-_fistDup.transform.right * _fistGunData.FistHitForce, ForceMode.Impulse, _fireOwner, ImpactType.FistGun);
-                    TargetHit(hit.collider.GetComponent<NetworkIdentity>().connectionToClient, hit.collider.gameObject, _fistDup, _fireOwner);
-                    RpcTriggerFistGunHit(gameObject, _fistDup, Owner, hit.collider.gameObject);
-                    // EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, Owner, ((MonoBehaviour)IHittableNetwork).gameObject, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, pc == null ? 6 : pc.PlayerNumber));
-                }
-                else if (pc != null)
-                {
-                    _maxDistance = pc.transform.position + pc.transform.forward * _fistGunData.MaxFlyDistance;
-                    _fireOwner = pc.gameObject;
-                    _fistDup.transform.rotation = Quaternion.LookRotation(pc.transform.right, _fistDup.transform.up);
-                    RpcTriggerFistGunBlocked(gameObject, _fistDup, Owner, hit.collider.gameObject);
-                    // EventManager.Instance.TriggerEvent(new FistGunBlocked(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _fistDup, pc.gameObject, pc.PlayerNumber));
+                    if (hit.collider.GetComponent<NetworkWeaponBase>() != null) return;
+                    IHittableNetwork IHittableNetwork = hit.collider.GetComponentInParent<IHittableNetwork>();
+                    PlayerControllerMirror pc = hit.collider.GetComponentInParent<PlayerControllerMirror>();
+                    if (IHittableNetwork != null && !IHittableNetwork.CanBlock(-_fistDup.transform.right))
+                    {
+                        // IHittableNetwork.OnImpact(-_fistDup.transform.right * _fistGunData.FistHitForce, ForceMode.Impulse, _fireOwner, ImpactType.FistGun);
+                        TargetHit(pc.GetComponent<NetworkIdentity>().connectionToClient, pc.gameObject, _fireOwner);
+                        RpcTriggerFistGunHit(gameObject, Owner, pc.gameObject);
+                        // EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, Owner, ((MonoBehaviour)IHittableNetwork).gameObject, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, pc == null ? 6 : pc.PlayerNumber));
+                    }
+                    else if (pc != null)
+                    {
+                        _maxDistance = pc.transform.position + pc.transform.forward * _fistGunData.MaxFlyDistance;
+                        _fireOwner = pc.gameObject;
+                        _fistDup.transform.rotation = Quaternion.LookRotation(pc.transform.right, _fistDup.transform.up);
+                        RpcTriggerFistGunBlocked(gameObject, Owner, hit.collider.gameObject);
+                        // EventManager.Instance.TriggerEvent(new FistGunBlocked(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _fistDup, pc.gameObject, pc.PlayerNumber));
+                        return;
+                    }
+                    else if (pc == null)
+                    {
+                        RpcTriggerFistGunHit(gameObject, Owner, hit.collider.gameObject);
+                        // EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, Owner, hit.collider.gameObject, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, -1));
+                    }
+                    _switchToRecharge();
                     return;
                 }
-                else if (pc == null)
-                {
-                    RpcTriggerFistGunHit(gameObject, _fistDup, Owner, hit.collider.gameObject);
-                    // EventManager.Instance.TriggerEvent(new FistGunHit(gameObject, _fistDup, Owner, hit.collider.gameObject, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, -1));
-                }
-                _switchToRecharge();
-                return;
             }
             if (Vector3.Distance(_fistDup.transform.position, _maxDistance) <= 0.2f)
             {
@@ -87,9 +93,9 @@ public class NetworkRtFist : NetworkWeaponBase
             else
             {
                 // Charged
-                RpcTriggerFistGunCharged(gameObject, Owner, transform.position);
-                // EventManager.Instance.TriggerEvent(new FistGunCharged(gameObject, Owner, transform.position));
-                NetworkServer.Destroy(_fistDup);
+                // RpcTriggerFistGunCharged(gameObject, Owner, transform.position);
+                EventManager.Instance.TriggerEvent(new FistGunCharged(gameObject, Owner, transform.position));
+                Destroy(_fistDup);
                 _fistDup = null;
                 _fist.gameObject.SetActive(true);
                 _fistGunState = FistGunState.Idle;
@@ -106,16 +112,15 @@ public class NetworkRtFist : NetworkWeaponBase
             {
                 _fireOwner = Owner;
                 _maxDistance = transform.position + -transform.right * _fistGunData.MaxFlyDistance;
-                _fistDup = Instantiate(FistPrefab, transform);
-                NetworkServer.Spawn(_fistDup);
+                _fistDup = Instantiate(_fist.gameObject, transform);
                 _fistDup.transform.position = _fist.position;
                 _fistDup.transform.parent = null;
                 _fistDup.GetComponent<Collider>().isTrigger = false;
+                // NetworkServer.Spawn(_fistDup);
                 _fist.gameObject.SetActive(false);
                 /// Add Backfire force to player as well
-                Owner.GetComponent<Rigidbody>().AddForce(transform.right * _fistGunData.BackfireHitForce, ForceMode.VelocityChange);
-                RpcOnFire();
-                RpcTriggerFistGunFired(gameObject, _fistDup, Owner);
+                RpcOnFire(Owner);
+                RpcTriggerFistGunFired(gameObject, Owner);
                 // EventManager.Instance.TriggerEvent(new FistGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _fistDup));
                 _fistGunState = FistGunState.Out;
             }
@@ -156,27 +161,27 @@ public class NetworkRtFist : NetworkWeaponBase
 
     #region Network Functions
     [TargetRpc]
-    private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject fistDup, GameObject owner)
+    private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner)
     {
-        receiver.GetComponent<IHittableNetwork>().OnImpact(-fistDup.transform.right * _fistGunData.FistHitForce, ForceMode.Impulse, owner, ImpactType.FistGun);
+        receiver.GetComponent<IHittableNetwork>().OnImpact(-_fistDup.transform.right * _fistGunData.FistHitForce, ForceMode.Impulse, owner, ImpactType.FistGun);
     }
 
     [ClientRpc]
-    private void RpcTriggerFistGunHit(GameObject fistgun, GameObject fist, GameObject fistgunUser, GameObject hitted)
+    private void RpcTriggerFistGunHit(GameObject fistgun, GameObject fistgunUser, GameObject hitted)
     {
-        EventManager.Instance.TriggerEvent(new FistGunHit(fistgun, fist, fistgunUser, hitted, 0, 0));
+        EventManager.Instance.TriggerEvent(new FistGunHit(fistgun, _fistDup, fistgunUser, hitted, 0, 0));
     }
 
     [ClientRpc]
-    private void RpcTriggerFistGunBlocked(GameObject fistgun, GameObject fist, GameObject fistgunUser, GameObject hitted)
+    private void RpcTriggerFistGunBlocked(GameObject fistgun, GameObject fistgunUser, GameObject hitted)
     {
-        EventManager.Instance.TriggerEvent(new FistGunBlocked(fistgun, fistgunUser, 0, fist, hitted, 0));
+        EventManager.Instance.TriggerEvent(new FistGunBlocked(fistgun, fistgunUser, 0, _fistDup, hitted, 0));
     }
 
     [ClientRpc]
-    private void RpcTriggerFistGunFired(GameObject fistgun, GameObject fist, GameObject fistgunUser)
+    private void RpcTriggerFistGunFired(GameObject fistgun, GameObject fistgunUser)
     {
-        EventManager.Instance.TriggerEvent(new FistGunFired(fistgun, fistgunUser, 0, fist));
+        EventManager.Instance.TriggerEvent(new FistGunFired(fistgun, fistgunUser, 0, _fistDup));
     }
 
     [ClientRpc]
@@ -187,10 +192,14 @@ public class NetworkRtFist : NetworkWeaponBase
 
 
     [ClientRpc]
-    public void RpcOnFire()
+    public void RpcOnFire(GameObject owner)
     {
+        _fistDup = Instantiate(_fist.gameObject, transform);
+        _fistDup.transform.position = _fist.position;
+        _fistDup.transform.parent = null;
+        _fistDup.GetComponent<Collider>().isTrigger = false;
         _fist.gameObject.SetActive(false);
-        Owner.GetComponent<Rigidbody>().AddForce(transform.right * _fistGunData.BackfireHitForce, ForceMode.VelocityChange);
+        owner.GetComponent<PlayerControllerMirror>().OnImpact(-owner.transform.forward * _fistGunData.BackfireHitForce, ForceMode.VelocityChange, owner, ImpactType.FistGun);
     }
     #endregion
 }

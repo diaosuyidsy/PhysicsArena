@@ -26,13 +26,21 @@ public class NetworkMenuGameState : NetworkBehaviour
         selectedCharacter = new bool[6];
     }
 
-    public void ConfirmSelection(NetworkConnection connection, int selectedCharacterIndex, bool select)
+    public void ConfirmSelection(NetworkConnection connection, int selectedCharacterIndex, bool select, string name)
     {
         selectedCharacter[selectedCharacterIndex] = select;
         if (select)
+        {
             (NetworkManager.singleton as NetworkManagerBirfia).PlayerSelection.Add(connection.connectionId, selectedCharacterIndex);
+            (NetworkManager.singleton as NetworkManagerBirfia).PlayerNames.Add(connection.connectionId, name);
+            (NetworkManager.singleton as NetworkManagerBirfia).PlayerReady.Add(connection.connectionId, false);
+        }
         else
+        {
             (NetworkManager.singleton as NetworkManagerBirfia).PlayerSelection.Remove(connection.connectionId);
+            (NetworkManager.singleton as NetworkManagerBirfia).PlayerNames.Remove(connection.connectionId);
+            (NetworkManager.singleton as NetworkManagerBirfia).PlayerReady.Remove(connection.connectionId);
+        }
         if (!select && _startGameCoroutine != null)
             StopCoroutine(_startGameCoroutine);
 

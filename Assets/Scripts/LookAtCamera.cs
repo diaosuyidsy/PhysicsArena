@@ -8,9 +8,9 @@ public class LookAtCamera : MonoBehaviour
 
     void Update()
     {
-		if (Cam == null)
-			transform.LookAt(Camera.main.transform.position);
-		else
-			transform.rotation = Cam.rotation;
+        if (Cam == null)
+            transform.rotation = Camera.main.transform.rotation;
+        else
+            transform.rotation = Cam.rotation;
     }
 }

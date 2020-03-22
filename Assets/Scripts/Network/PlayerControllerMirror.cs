@@ -5,6 +5,7 @@ using Rewired;
 using System;
 using DG.Tweening;
 using Mirror;
+using TMPro;
 
 public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 {
@@ -24,6 +25,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     public GameObject[] OnDeathHidden;
     public GameObject BlockUIVFXHolder;
     public ShieldController BlockShield;
+    public GameObject NamePlate;
 
     public int PlayerNumber;
 
@@ -101,6 +103,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     #region Network Variables
     [SyncVar]
     private bool _isBlocking;
+    [SyncVar(hook = nameof(OnChangeName))]
+    public string PlayerName;
     #endregion
 
     private void Awake()
@@ -127,6 +131,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 _playerBodies.Add(rb);
             }
         }
+        if (transform.parent == null)
+            transform.parent = GameObject.Find("Players").transform;
     }
 
     public void Init(int controllernumber)
@@ -183,6 +189,11 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void OnDestroy()
     {
         EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(gameObject));
+    }
+
+    void OnChangeName(string oldName, string newName)
+    {
+        NamePlate.GetComponent<TextMeshPro>().text = newName;
     }
     [Command]
     private void CmdHit(GameObject receiver, Vector3 force, bool _blockable, GameObject sender)

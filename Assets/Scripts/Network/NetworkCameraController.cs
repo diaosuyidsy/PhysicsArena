@@ -35,7 +35,6 @@ public class NetworkCameraController : NetworkBehaviour
         {
             EventManager.Instance.TriggerEvent(new OnAddCameraTargets(t, t.GetComponent<NetworkBehaviour>().isLocalPlayer ? 3 : 1));
         }
-        _camFSM.TransitionTo<TrackingState>();
     }
     // Update is called once per frame
     void Update()

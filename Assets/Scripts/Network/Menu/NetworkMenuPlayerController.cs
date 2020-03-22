@@ -83,7 +83,7 @@ public class NetworkMenuPlayerController : NetworkBehaviour
         selectedSpot.transform.GetChild(0).GetComponentInChildren<TextMeshPro>().color = Color.black;
         selectedSpot.transform.GetChild(1).GetChild(0).GetComponent<SpriteRenderer>().color = Color.white;
         // Tell Game State About Selection
-        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), true);
+        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), true, Name);
         RpcSelectGameObject(selectedSpot, Name);
     }
 
@@ -109,7 +109,7 @@ public class NetworkMenuPlayerController : NetworkBehaviour
         selectedSpot.GetComponent<BoxCollider>().enabled = true;
         selectedSpot.transform.GetChild(0).GetComponentInChildren<TextMeshPro>().text = "";
         selectedSpot.transform.GetChild(1).GetChild(0).gameObject.SetActive(false);
-        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), false);
+        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), false, "");
         RpcUnselect(selectedSpot);
     }
 

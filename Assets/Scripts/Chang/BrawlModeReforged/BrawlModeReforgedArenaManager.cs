@@ -26,7 +26,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         Debug.Log(this.GetType().Name);
     }
 
-    protected bool CheckDelivery()
+    protected bool CheckDelivery() // Check if there is an available delivery for switch
     {
         if (Context.DeliveryEvent != null)
         {
@@ -60,7 +60,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         return false;
     }
 
-    protected void MarkFollow(bool Normal)
+    protected void MarkFollow(bool Normal) // Bomb area follows target
     {
         if (Context.Info.LockedPlayer == null)
         {
@@ -95,7 +95,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         }
     }
 
-    protected bool LockPlayer()
+    protected bool LockPlayer() // Try to lock a target for bomb
     {
         List<GameObject> AvailablePlayer = new List<GameObject>();
         List<Vector3> AvailablePoint = new List<Vector3>();
@@ -137,7 +137,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         }
     }
 
-    protected void AimingSetCanon()
+    protected void AimingSetCanon() // Set the shape and transform of canon object and ammo 
     {
         Vector3 Offset = Context.Info.Mark.transform.position - Context.Info.Entity.transform.position;
         Offset.y = 0;
@@ -155,11 +155,10 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         SetCanon(TargetPercentage, TargetAngle,Context.FeelData.AimingPercentageFollowSpeed);
 
 
-        Context.Info.Bomb.transform.position = (Context.CanonFinalLJoint.transform.position + Context.CanonFinalRJoint.transform.position) / 2;
-        Context.Info.Bomb.transform.position -= Context.Info.CameraFocus.transform.forward * 1.5f;
+        Context.Info.Bomb.transform.localPosition = new Vector3(0, 0, Mathf.Lerp(Context.FeelData.MinAmmoPos, Context.FeelData.MaxAmmoPos, Context.Info.CurrentPercentage));
     }
 
-    protected void FireSetCanon()
+    protected void FireSetCanon() // Set the shape and transform of canon object and ammo 
     {
         Vector3 Offset = Context.Info.Mark.transform.position - Context.Info.Entity.transform.position;
         Offset.y = 0;
@@ -169,7 +168,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         SetCanon(0, TargetAngle,Context.FeelData.ShootPercentageFollowSpeed);
     }
 
-    protected void SetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed)
+    protected void SetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed) // Set Canon transform and shape
     {
 
         Context.Info.CurrentPercentage = Mathf.Lerp(Context.Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed*Time.deltaTime);
@@ -188,8 +187,6 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
         Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
         Context.Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
-        //Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Euler(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage),0);
-        //Context.Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = Quaternion.Euler(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0);
 
         JointDrive Joint1Drive = new JointDrive();
         Joint1Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint1AngularYZ, Context.FeelData.MaxJoint1AngularYZ, Context.Info.CurrentPercentage);
@@ -237,7 +234,7 @@ public class CanonIdle: CanonAction
 
 }
 
-public class CanonSwtich : CanonAction
+public class CanonSwtich : CanonAction // Canon switches side
 {
     private float Timer;
 
@@ -272,7 +269,7 @@ public class CanonSwtich : CanonAction
         }
     }
 
-    private void SetCabel()
+    private void SetCabel() // Set cabel appearance
     {
         switch (Context.Info.CurrentSide)
         {
@@ -376,7 +373,7 @@ public class CanonCooldown : CanonAction
     }
 }
 
-public class CanonFiring_Normal : CanonAction
+public class CanonFiring_Normal : CanonAction // Lock and follow player (white mark)
 {
     private float Timer;
     private bool PlayerLocked;
@@ -425,7 +422,7 @@ public class CanonFiring_Normal : CanonAction
             if (LockPlayer())
             {
                 Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
-                Context.Info.Bomb.transform.parent = Context.Info.Entity.transform;
+                Context.Info.Bomb.transform.parent = Context.Info.CameraFocus.transform;
 
                 AimingSetCanon();
 
@@ -447,7 +444,7 @@ public class CanonFiring_Normal : CanonAction
     }
 }
 
-public class CanonFiring_Alert : CanonAction
+public class CanonFiring_Alert : CanonAction // Purple mark follows target
 {
     private float Timer;
 
@@ -495,7 +492,7 @@ public class CanonFiring_Alert : CanonAction
     }
 }
 
-public class CanonFiring_Fall : CanonAction
+public class CanonFiring_Fall : CanonAction // Shoot ammo
 {
     private float Timer;
     private float HorizontalSpeed;
@@ -564,7 +561,7 @@ public class CanonFiring_Fall : CanonAction
         }
     }
 
-    private void GetBombFlyInfo()
+    private void GetBombFlyInfo() // Calculate how ammo should fly
     {
         float time = Context.Data.CanonFireFinalTime - Timer;
 
@@ -587,7 +584,7 @@ public class CanonFiring_Fall : CanonAction
         VerticalSpeed -= VerticalSpeedAcceleration * Time.deltaTime;
     }
 
-    private void BombFall()
+    private void BombFall() //Impact
     {
 
         RaycastHit[] AllHits = Physics.SphereCastAll(Context.Info.Mark.transform.position, Context.Data.CanonRadius, Vector3.up, 0, Context.PlayerLayer);
@@ -643,8 +640,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     {
         public GameObject Entity;
         public GameObject Pad;
-        public GameObject LeftJoint;
-        public GameObject RightJoint;
+        public GameObject LeftJoint; //Joint1
+        public GameObject RightJoint; //Joint1
         public GameObject CameraFocus;
 
         public GameObject LJoint0;

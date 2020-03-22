@@ -14386,6 +14386,8 @@ MonoBehaviour:
   MaxJoint1AngularYZ: 40
   MinJointRotation: 0
   MaxJointRotation: 8.8
+  MinAmmoPos: 0.00279
+  MaxAmmoPos: 0.1132
   AimingPercentageFollowSpeed: 3
   ShootPercentageFollowSpeed: 20
   PercentageIgnoreError: 0.05
@@ -69400,7 +69402,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1631360270}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 14.77, y: -8.91, z: -8.18}
+  m_LocalPosition: {x: 14.77, y: -3.96, z: -8.18}
   m_LocalScale: {x: 100, y: 3.0872655, z: 100}
   m_Children: []
   m_Father: {fileID: 0}
@@ -83657,11 +83659,6 @@ PrefabInstance:
       propertyPath: m_LocalPosition.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 81368121330123058, guid: f8d6c631da37749db9f9744813be0f39,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 4212387840270291849, guid: f8d6c631da37749db9f9744813be0f39,
         type: 3}
       propertyPath: m_ClearFlags
@@ -83725,6 +83722,11 @@ PrefabInstance:
     - target: {fileID: 4212387840270291849, guid: f8d6c631da37749db9f9744813be0f39,
         type: 3}
       propertyPath: m_ForceIntoRT
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 81368121330123058, guid: f8d6c631da37749db9f9744813be0f39,
+        type: 3}
+      propertyPath: m_Enabled
       value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []

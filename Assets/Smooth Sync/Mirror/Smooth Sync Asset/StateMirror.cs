@@ -202,7 +202,7 @@ namespace Smooth
             bool sendPosition, sendRotation, sendScale, sendVelocity, sendAngularVelocity, sendAtPositionalRestTag, sendAtRotationalRestTag;
 
             // If is a server trying to relay client information back out to other clients.
-            if (NetworkServer.active && !smoothSync.hasAuthority)
+            if (NetworkServer.active && !smoothSync.hasAuthorityOrUnownedOnServer)
             {
                 sendPosition = state.serverShouldRelayPosition;
                 sendRotation = state.serverShouldRelayRotation;
@@ -232,11 +232,11 @@ namespace Smooth
                 if (sendAngularVelocity) smoothSync.lastAngularVelocityWhenStateWasSent = state.angularVelocity;
             }
 
-            writer.Write(encodeSyncInformation(sendPosition, sendRotation, sendScale,
+            writer.WriteByte(encodeSyncInformation(sendPosition, sendRotation, sendScale,
                 sendVelocity, sendAngularVelocity, sendAtPositionalRestTag, sendAtRotationalRestTag));
-            writer.Write(smoothSync.netID);
+            writer.WriteNetworkIdentity(smoothSync.netID);
             writer.WritePackedUInt32((uint)smoothSync.syncIndex);
-            writer.Write(state.ownerTimestamp);
+            writer.WriteSingle(state.ownerTimestamp);
 
             // Write position.
             if (sendPosition)
@@ -245,30 +245,30 @@ namespace Smooth
                 {
                     if (smoothSync.isSyncingXPosition)
                     {
-                        writer.Write(HalfHelper.Compress(state.position.x));
+                        writer.WriteUInt16(HalfHelper.Compress(state.position.x));
                     }
                     if (smoothSync.isSyncingYPosition)
                     {
-                        writer.Write(HalfHelper.Compress(state.position.y));
+                        writer.WriteUInt16(HalfHelper.Compress(state.position.y));
                     }
                     if (smoothSync.isSyncingZPosition)
                     {
-                        writer.Write(HalfHelper.Compress(state.position.z));
+                        writer.WriteUInt16(HalfHelper.Compress(state.position.z));
                     }
                 }
                 else
                 {
                     if (smoothSync.isSyncingXPosition)
                     {
-                        writer.Write(state.position.x);
+                        writer.WriteSingle(state.position.x);
                     }
                     if (smoothSync.isSyncingYPosition)
                     {
-                        writer.Write(state.position.y);
+                        writer.WriteSingle(state.position.y);
                     }
                     if (smoothSync.isSyncingZPosition)
                     {
-                        writer.Write(state.position.z);
+                        writer.WriteSingle(state.position.z);
                     }
                 }
             }
@@ -281,30 +281,30 @@ namespace Smooth
                     // Convert to radians for more accurate Half numbers
                     if (smoothSync.isSyncingXRotation)
                     {
-                        writer.Write(HalfHelper.Compress(rot.x * Mathf.Deg2Rad));
+                        writer.WriteUInt16(HalfHelper.Compress(rot.x * Mathf.Deg2Rad));
                     }
                     if (smoothSync.isSyncingYRotation)
                     {
-                        writer.Write(HalfHelper.Compress(rot.y * Mathf.Deg2Rad));
+                        writer.WriteUInt16(HalfHelper.Compress(rot.y * Mathf.Deg2Rad));
                     }
                     if (smoothSync.isSyncingZRotation)
                     {
-                        writer.Write(HalfHelper.Compress(rot.z * Mathf.Deg2Rad));
+                        writer.WriteUInt16(HalfHelper.Compress(rot.z * Mathf.Deg2Rad));
                     }
                 }
                 else
                 {
                     if (smoothSync.isSyncingXRotation)
                     {
-                        writer.Write(rot.x);
+                        writer.WriteSingle(rot.x);
                     }
                     if (smoothSync.isSyncingYRotation)
                     {
-                        writer.Write(rot.y);
+                        writer.WriteSingle(rot.y);
                     }
                     if (smoothSync.isSyncingZRotation)
                     {
-                        writer.Write(rot.z);
+                        writer.WriteSingle(rot.z);
                     }
                 }
             }
@@ -315,30 +315,30 @@ namespace Smooth
                 {
                     if (smoothSync.isSyncingXScale)
                     {
-                        writer.Write(HalfHelper.Compress(state.scale.x));
+                        writer.WriteUInt16(HalfHelper.Compress(state.scale.x));
                     }
                     if (smoothSync.isSyncingYScale)
                     {
-                        writer.Write(HalfHelper.Compress(state.scale.y));
+                        writer.WriteUInt16(HalfHelper.Compress(state.scale.y));
                     }
                     if (smoothSync.isSyncingZScale)
                     {
-                        writer.Write(HalfHelper.Compress(state.scale.z));
+                        writer.WriteUInt16(HalfHelper.Compress(state.scale.z));
                     }
                 }
                 else
                 {
                     if (smoothSync.isSyncingXScale)
                     {
-                        writer.Write(state.scale.x);
+                        writer.WriteSingle(state.scale.x);
                     }
                     if (smoothSync.isSyncingYScale)
                     {
-                        writer.Write(state.scale.y);
+                        writer.WriteSingle(state.scale.y);
                     }
                     if (smoothSync.isSyncingZScale)
                     {
-                        writer.Write(state.scale.z);
+                        writer.WriteSingle(state.scale.z);
                     }
                 }
             }
@@ -349,30 +349,30 @@ namespace Smooth
                 {
                     if (smoothSync.isSyncingXVelocity)
                     {
-                        writer.Write(HalfHelper.Compress(state.velocity.x));
+                        writer.WriteUInt16(HalfHelper.Compress(state.velocity.x));
                     }
                     if (smoothSync.isSyncingYVelocity)
                     {
-                        writer.Write(HalfHelper.Compress(state.velocity.y));
+                        writer.WriteUInt16(HalfHelper.Compress(state.velocity.y));
                     }
                     if (smoothSync.isSyncingZVelocity)
                     {
-                        writer.Write(HalfHelper.Compress(state.velocity.z));
+                        writer.WriteUInt16(HalfHelper.Compress(state.velocity.z));
                     }
                 }
                 else
                 {
                     if (smoothSync.isSyncingXVelocity)
                     {
-                        writer.Write(state.velocity.x);
+                        writer.WriteSingle(state.velocity.x);
                     }
                     if (smoothSync.isSyncingYVelocity)
                     {
-                        writer.Write(state.velocity.y);
+                        writer.WriteSingle(state.velocity.y);
                     }
                     if (smoothSync.isSyncingZVelocity)
                     {
-                        writer.Write(state.velocity.z);
+                        writer.WriteSingle(state.velocity.z);
                     }
                 }
             }
@@ -384,37 +384,37 @@ namespace Smooth
                     // Convert to radians for more accurate Half numbers
                     if (smoothSync.isSyncingXAngularVelocity)
                     {
-                        writer.Write(HalfHelper.Compress(state.angularVelocity.x * Mathf.Deg2Rad));
+                        writer.WriteUInt16(HalfHelper.Compress(state.angularVelocity.x * Mathf.Deg2Rad));
                     }
                     if (smoothSync.isSyncingYAngularVelocity)
                     {
-                        writer.Write(HalfHelper.Compress(state.angularVelocity.y * Mathf.Deg2Rad));
+                        writer.WriteUInt16(HalfHelper.Compress(state.angularVelocity.y * Mathf.Deg2Rad));
                     }
                     if (smoothSync.isSyncingZAngularVelocity)
                     {
-                        writer.Write(HalfHelper.Compress(state.angularVelocity.z * Mathf.Deg2Rad));
+                        writer.WriteUInt16(HalfHelper.Compress(state.angularVelocity.z * Mathf.Deg2Rad));
                     }
                 }
                 else
                 {
                     if (smoothSync.isSyncingXAngularVelocity)
                     {
-                        writer.Write(state.angularVelocity.x);
+                        writer.WriteSingle(state.angularVelocity.x);
                     }
                     if (smoothSync.isSyncingYAngularVelocity)
                     {
-                        writer.Write(state.angularVelocity.y);
+                        writer.WriteSingle(state.angularVelocity.y);
                     }
                     if (smoothSync.isSyncingZAngularVelocity)
                     {
-                        writer.Write(state.angularVelocity.z);
+                        writer.WriteSingle(state.angularVelocity.z);
                     }
                 }
             }
             // Only the server sends out owner information.
             if (smoothSync.isSmoothingAuthorityChanges && NetworkServer.active)
             {
-                writer.Write((byte)smoothSync.ownerChangeIndicator);
+                writer.WriteByte((byte)smoothSync.ownerChangeIndicator); 
             }
         }
 
@@ -466,7 +466,7 @@ namespace Smooth
             }
 
             // If we want the server to relay non-owned object information out to other clients, set these variables so we know what we need to send.
-            if (NetworkServer.active && !smoothSync.hasAuthority)
+            if (NetworkServer.active && !smoothSync.hasAuthorityOrUnownedOnServer)
             {
                 state.serverShouldRelayPosition = syncPosition;
                 state.serverShouldRelayRotation = syncRotation;

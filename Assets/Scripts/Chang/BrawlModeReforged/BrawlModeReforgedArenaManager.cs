@@ -149,8 +149,10 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
         float Dis = Mathf.Clamp(Offset.magnitude, Context.FeelData.MinShootDisShape, Context.FeelData.MaxShootDisShape);
 
-        TargetPercentage = (Dis - Context.FeelData.MinShootDisShape) / (Context.FeelData.MaxShootDisShape - Context.FeelData.MinShootDisShape);
-        TargetPercentage = Mathf.Lerp(Context.FeelData.MinPercentage, Context.FeelData.MaxPercentage,TargetPercentage);
+        TargetPercentage = Mathf.Lerp(0, Context.FeelData.MaxPercentage, Dis / Context.FeelData.MaxShootDisShape);
+
+        //TargetPercentage = (Dis - Context.FeelData.MinShootDisShape) / (Context.FeelData.MaxShootDisShape - Context.FeelData.MinShootDisShape);
+        //TargetPercentage = Mathf.Lerp(Context.FeelData.MinPercentage, Context.FeelData.MaxPercentage,TargetPercentage);
 
         SetCanon(TargetPercentage, TargetAngle,Context.FeelData.AimingPercentageFollowSpeed);
 

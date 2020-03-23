@@ -47,7 +47,7 @@ public class SmoothSyncMirrorExamplePlayerController : NetworkBehaviour
             smoothSync.validateStateMethod = validateStateOfPlayer;
         }
     }
-
+    
     /// <summary>
     /// Simple movement. 
     /// <remarks>
@@ -75,7 +75,7 @@ public class SmoothSyncMirrorExamplePlayerController : NetworkBehaviour
             }
         }
 
-        if (!hasAuthority) return;
+        if (!(hasAuthority || (NetworkServer.active && netIdentity.connectionToClient == null))) return;
 
         // If you need to send a State update, call forceStateSendNextFrame() and the next fixed update's State will be sent.
         // Useful for collisions and fast changes in direction so you can be as accurate as possible in between your send rate.

@@ -330,7 +330,7 @@ namespace Smooth
         public float sendRate = 30;
 
         /// <summary>The channel to send network updates on.</summary>
-        //public int networkChannel = Channels.DefaultUnreliable;
+        public int networkChannel = Channels.DefaultUnreliable;
 
         /// <summary>Child object to sync</summary>
         /// <remarks>
@@ -556,6 +556,12 @@ namespace Smooth
         /// <summary> Used to check if we should be sending a "JustStartedMoving" State. If we are teleporting, don't send one. </summary>
         Quaternion latestTeleportedFromRotation;
 
+        public bool hasAuthorityOrUnownedOnServer {
+            get {
+                return base.hasAuthority || (NetworkServer.active && netIdentity.connectionToClient == null);
+            }
+        }
+
         #endregion Runtime data
 
         #region Unity methods
@@ -568,6 +574,30 @@ namespace Smooth
             int calculatedStateBufferSize = ((int)(sendRate * interpolationBackTime) + 1) * 2;
             stateBuffer = new StateMirror[Mathf.Max(calculatedStateBufferSize, 30)];
 
+            SetObjectToSync(childObjectToSync);
+
+            // If we want to extrapolate forever, force variables accordingly. 
+            if (extrapolationMode == ExtrapolationMode.Unlimited)
+            {
+                useExtrapolationDistanceLimit = false;
+                useExtrapolationTimeLimit = false;
+            }
+
+            targetTempState = new StateMirror();
+            sendingTempState = new NetworkStateMirror();
+
+            // Smooth ownership changes are broken this release pending an update from Mirror to resurrect the clientAuthorityCallback.
+            // If you need it immediately you can call AssignAuthorityCallback manually after changing authority on the server.
+            //NetworkIdentity.clientAuthorityCallback = AssignAuthorityCallback;
+            if (isSmoothingAuthorityChanges)
+            {
+                Debug.LogWarning("Smooth ownership changes are broken this release pending an update from Mirror to resurrect the clientAuthorityCallback. If you need it you can call AssignAuthorityCallback manually after changing authority on the server.");
+            }
+        }
+
+        public void SetObjectToSync(GameObject childObjectToSync)
+        {
+            this.childObjectToSync = childObjectToSync;
             // If you want to sync a child object, assign it.
             if (childObjectToSync)
             {
@@ -595,16 +625,30 @@ namespace Smooth
             else
             {
                 realObjectToSync = this.gameObject;
+                childObjectSmoothSyncs = GetComponents<SmoothSyncMirror>();
+
+                // Throw a warning if there is already a SmoothSync component with no childObjectToSync
+                // And then disable this component
+                for (int i = 0; i < childObjectSmoothSyncs.Length; i++)
+                {
+                    if (childObjectSmoothSyncs[i] == this) break;
+                    if (childObjectSmoothSyncs[i].childObjectToSync == null)
+                    {
+                        Debug.LogWarning("More than one SmoothSync instance with no childObjectToSync on " + gameObject + ". Disabling all but one.");
+                        enabled = false;
+                        return;
+                    }
+                }
+
 
                 int indexToGive = 0;
-                childObjectSmoothSyncs = GetComponents<SmoothSyncMirror>();
                 for (int i = 0; i < childObjectSmoothSyncs.Length; i++)
                 {
                     childObjectSmoothSyncs[i].syncIndex = indexToGive;
                     indexToGive++;
                 }
             }
-
+            
             netID = GetComponent<NetworkIdentity>();
             rb = realObjectToSync.GetComponent<Rigidbody>();
             rb2D = realObjectToSync.GetComponent<Rigidbody2D>();
@@ -625,24 +669,13 @@ namespace Smooth
                 syncVelocity = SyncMode.NONE;
                 syncAngularVelocity = SyncMode.NONE;
             }
-
-            // If we want to extrapolate forever, force variables accordingly. 
-            if (extrapolationMode == ExtrapolationMode.Unlimited)
-            {
-                useExtrapolationDistanceLimit = false;
-                useExtrapolationTimeLimit = false;
-            }
-
-            targetTempState = new StateMirror();
-            sendingTempState = new NetworkStateMirror();
-            NetworkIdentity.clientAuthorityCallback = AssignAuthorityCallback;
         }
 
         /// <summary>Set the interpolated / extrapolated Transforms and Rigidbodies of non-owned objects.</summary>
         void Update()
         {
             // Set the interpolated / extrapolated Transforms and Rigidbodies of non-owned objects.
-            if (!hasAuthority && whenToUpdateTransform == WhenToUpdateTransform.Update)
+            if (!hasAuthorityOrUnownedOnServer && whenToUpdateTransform == WhenToUpdateTransform.Update)
             {
                 adjustOwnerTime();
                 applyInterpolationOrExtrapolation();
@@ -657,7 +690,7 @@ namespace Smooth
         void FixedUpdate()
         {
             // Set the interpolated / extrapolated Transforms and Rigidbodies of non-owned objects.
-            if (!hasAuthority && whenToUpdateTransform == WhenToUpdateTransform.FixedUpdate)
+            if (!hasAuthorityOrUnownedOnServer && whenToUpdateTransform == WhenToUpdateTransform.FixedUpdate)
             {
                 adjustOwnerTime();
                 applyInterpolationOrExtrapolation();
@@ -680,10 +713,12 @@ namespace Smooth
         public void OnEnable()
         {
             if (!NetworkServer.active) registerClientHandlers();
-            if (hasAuthority)
-            {
-                teleportOwnedObjectFromOwner();
-            }
+        }
+
+        public override void OnStartAuthority()
+        {
+            base.OnStartAuthority();
+            teleportOwnedObjectFromOwner();
         }
 
         #endregion
@@ -694,7 +729,7 @@ namespace Smooth
         void sendState()
         {
             // We only want to send from owners who are ready and if sendRate is not 0.
-            if (!hasAuthority || (!NetworkServer.active && !ClientScene.ready) || sendRate == 0) return;
+            if (!hasAuthorityOrUnownedOnServer || (!NetworkServer.active && !ClientScene.ready) || sendRate == 0) return;
 
             // Resting position logic.
             if (syncPosition != SyncMode.NONE)
@@ -833,16 +868,17 @@ namespace Smooth
                 if (sendVelocity) lastVelocityWhenStateWasSent = sendingTempState.state.velocity;
                 if (sendAngularVelocity) lastAngularVelocityWhenStateWasSent = sendingTempState.state.angularVelocity;
             }
-            else
+            else if (NetworkClient.active)
             {
                 // If owner is not the host then send the state to the host so they can send it to everyone else.
-                NetworkClient.Send<NetworkStateMirror>(sendingTempState);
+                NetworkClient.Send<NetworkStateMirror>(sendingTempState, networkChannel);
             }
         }
         /// <summary> If smoothing authority changes and just gained authority, set velocity to keep smooth. </summary>
         void authorityChangeUpdate()
         {
-            if (hasAuthority && !hadAuthorityLastFrame && stateBuffer[0] != null)
+            // If authority is gained
+            if (hasAuthorityOrUnownedOnServer && !hadAuthorityLastFrame && stateBuffer[0] != null)
             {
                 if (hasRigidbody)
                 {
@@ -857,7 +893,7 @@ namespace Smooth
                 // Clear the buffer so that you'll have only correct states if ownership changes again.
                 clearBuffer();
             }
-            hadAuthorityLastFrame = hasAuthority;
+            hadAuthorityLastFrame = hasAuthorityOrUnownedOnServer;
         }
 
         bool triedToExtrapolateTooFar = false;
@@ -994,16 +1030,16 @@ namespace Smooth
                 }
 
                 // Reset to 0 so that velocity doesn't affect movement since we set position every frame.
-                if (hasRigidbody && !rb.isKinematic)
-                {
-                    rb.velocity = Vector3.zero;
-                    rb.angularVelocity = Vector3.zero;
-                }
-                else if (hasRigidbody2D && !rb2D.isKinematic)
-                {
-                    rb2D.velocity = Vector2.zero;
-                    rb2D.angularVelocity = 0;
-                }
+                //if (hasRigidbody && !rb.isKinematic)
+                //{
+                //    rb.velocity = Vector3.zero;
+                //    rb.angularVelocity = Vector3.zero;
+                //}
+                //else if (hasRigidbody2D && !rb2D.isKinematic)
+                //{
+                //    rb2D.velocity = Vector2.zero;
+                //    rb2D.angularVelocity = 0;
+                //}
                 if (syncPosition != SyncMode.NONE)// && !targetTempState.atPositionalRest)
                 {
                     if (changedPositionEnough)
@@ -1460,7 +1496,7 @@ namespace Smooth
         /// </remarks>
         public void teleportOwnedObjectFromOwner()
         {
-            if (!hasAuthority)
+            if (!hasAuthorityOrUnownedOnServer)
             {
                 if (NetworkServer.active)
                 {
@@ -1478,7 +1514,6 @@ namespace Smooth
             if (NetworkServer.active)
             {
                 RpcTeleport(getPosition(), getRotation().eulerAngles, getScale(), Time.realtimeSinceStartup);
-
             }
             else if (hasAuthority)
             {
@@ -1494,13 +1529,8 @@ namespace Smooth
         /// </remarks>
         public void teleportAnyObjectFromServer(Vector3 newPosition, Quaternion newRotation, Vector3 newScale)
         {
-            if (!hasAuthority && !NetworkServer.active)
-            {
-                Debug.LogWarning("Call this from the server.");
-                return;
-            }
             // If have authority, set transform and send to non-owners.
-            if (hasAuthority)
+            if (hasAuthorityOrUnownedOnServer)
             {
                 setPosition(newPosition, true);
                 setRotation(newRotation, true);
@@ -1508,15 +1538,19 @@ namespace Smooth
                 teleportOwnedObjectFromOwner();
             }
             // If server and don't have authority, send RPC to tell the owner to send a teleport out.
-            if (NetworkServer.active && !hasAuthority)
+            else if (NetworkServer.active)
             {
                 RpcNonServerOwnedTeleportFromServer(newPosition, newRotation.eulerAngles, newScale);
+            }
+            else
+            {
+                Debug.LogWarning("Call this from the server.");
             }
         }
         [ClientRpc]
         public void RpcNonServerOwnedTeleportFromServer(Vector3 newPosition, Vector3 newRotation, Vector3 newScale)
         {
-            if (hasAuthority)
+            if (hasAuthorityOrUnownedOnServer)
             {
                 setPosition(newPosition, true);
                 setRotation(Quaternion.Euler(newRotation), true);
@@ -1549,7 +1583,7 @@ namespace Smooth
         public void RpcTeleport(Vector3 position, Vector3 rotation, Vector3 scale, float tempOwnerTime)
         {
             // Owner doesn't need teleport info, so return. Happens on Server when it calls RPC, no bandwidth is used. 
-            if (hasAuthority || NetworkServer.active) return;
+            if (hasAuthorityOrUnownedOnServer || NetworkServer.active) return;
 
             StateMirror teleportState = new StateMirror();
             teleportState.copyFromSmoothSync(this);
@@ -1560,6 +1594,7 @@ namespace Smooth
 
             addTeleportState(teleportState);
         }
+
         /// <summary>
         /// Add the teleport State at the correct place in the State buffer.
         /// </summary>
@@ -1612,8 +1647,17 @@ namespace Smooth
         }
 
         /// <summary>Is automatically called on authority change on server.</summary>
-        internal void AssignAuthorityCallback(NetworkConnection conn, NetworkIdentity theNetID, bool authorityState)
+        static void AssignAuthorityCallback(NetworkConnection conn, NetworkIdentity theNetID, bool authorityState)
         {
+            var target = NetworkIdentity.spawned[theNetID.netId];
+            if (target == null)
+            {
+                Debug.LogError("Can not find target for authority change");
+                return;
+            }
+
+            var childObjectSmoothSyncs = target.GetComponent<SmoothSyncMirror>().childObjectSmoothSyncs;
+
             // Change the owner on parent and children.
             for (int i = 0; i < childObjectSmoothSyncs.Length; i++)
             {
@@ -1637,11 +1681,8 @@ namespace Smooth
         /// <summary>Register network message handlers on server.</summary>
         public override void OnStartServer()
         {
-            if (GetComponent<NetworkIdentity>().localPlayerAuthority)
-            {
-                NetworkServer.RegisterHandler<NetworkStateMirror>(HandleSync);
-                NetworkClient.RegisterHandler<NetworkStateMirror>(HandleSync);
-            }
+            NetworkServer.RegisterHandler<NetworkStateMirror>(HandleSync);
+            NetworkClient.RegisterHandler<NetworkStateMirror>(HandleSync);
         }
 
         /// <summary>Register network message handlers on clients.</summary>
@@ -2022,13 +2063,13 @@ namespace Smooth
             foreach (var kv in netID.observers)
             {
                 NetworkConnection conn = kv.Value;
-
+                
                 // Skip sending to clientAuthorityOwner since owners don't need their own State back.
                 // Also skip sending to localClient since the State was already recorded.
-                if (conn != null && conn != netID.clientAuthorityOwner && conn.GetType() == typeof(NetworkConnection) && conn.isReady)
+                if (conn != null && conn != netID.connectionToClient && conn.GetType() == typeof(NetworkConnectionToClient) && conn.isReady)
                 {
                     // Send the message. This calls HandleSync on the receiving clients.
-                    conn.Send<NetworkStateMirror>(state);
+                    conn.Send<NetworkStateMirror>(state, networkChannel);
                 }
             }
         }
@@ -2037,11 +2078,8 @@ namespace Smooth
         {
             if (NetworkServer.active)
             {
-                if (networkState.smoothSync == null ||
-                    networkState.smoothSync.netID.clientAuthorityOwner != conn) return;
-
                 // Ignore all messages that do not match the server determined authority.
-                if (networkState.smoothSync.netID.clientAuthorityOwner != conn) return;
+                if (networkState.smoothSync == null || networkState.smoothSync.netID.connectionToClient != conn) return;
 
                 // Always accept the first State so we have something to compare to. (if latestValidatedState == null)
                 // Check each other State to make sure it passes the validation method. By default all States are accepted.
@@ -2053,28 +2091,28 @@ namespace Smooth
                     networkState.smoothSync.latestValidatedState.receivedOnServerTimestamp = Time.realtimeSinceStartup;
                     networkState.smoothSync.SendStateToNonOwners(networkState);
                     networkState.smoothSync.addState(networkState.state);
-                    networkState.smoothSync.checkIfOwnerHasChanged();
+                    networkState.smoothSync.checkIfOwnerHasChanged(networkState.state);
                 }
             }
             else
             {
-                if (networkState != null && networkState.smoothSync != null && !networkState.smoothSync.hasAuthority)
+                if (networkState != null && networkState.smoothSync != null && !networkState.smoothSync.hasAuthorityOrUnownedOnServer)
                 {
                     networkState.smoothSync.addState(networkState.state);
-                    networkState.smoothSync.checkIfOwnerHasChanged();
+                    networkState.smoothSync.checkIfOwnerHasChanged(networkState.state);
                 }
             }
         }
 
         /// <summary> Checks if the owner has changed on each received State. If it has, add a "fake" received State to the 
         /// State array with the current Transform so that you can lerp between it and the first State from the new owner. </summary>
-        public void checkIfOwnerHasChanged()
+        public void checkIfOwnerHasChanged(StateMirror newState)
         {
             if (isSmoothingAuthorityChanges &&
                 ownerChangeIndicator != previousReceivedOwnerInt)
             {
                 // Change estimated time on owner to match the new owner's time. Index 0 is the newest received State.
-                approximateNetworkTimeOnOwner = stateBuffer[0].ownerTimestamp;
+                approximateNetworkTimeOnOwner = newState.ownerTimestamp;
                 latestAuthorityChangeZeroTime = Time.realtimeSinceStartup;
                 stateCount = 0;
                 firstReceivedMessageZeroTime = 1.0f; // TODO: this is messy

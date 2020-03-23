@@ -71,6 +71,12 @@ public class NetworkBrawlModeReforgedObjectiveManager : NetworkBehaviour
         {
             OneSecTimer = 0f;
             Timer--;
+            if (TeamAScore != TeamBScore)
+            {
+                EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+                gameEnd = true;
+                return;
+            }
         }
     }
 
@@ -79,12 +85,6 @@ public class NetworkBrawlModeReforgedObjectiveManager : NetworkBehaviour
         if (newTime <= 0)
         {
             TimerText.text = "0:00";
-            if (TeamAScore != TeamBScore)
-            {
-                EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
-                gameEnd = true;
-                return;
-            }
         }
         else
         {

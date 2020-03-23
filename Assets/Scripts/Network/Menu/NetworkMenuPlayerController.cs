@@ -40,7 +40,6 @@ public class NetworkMenuPlayerController : NetworkBehaviour
     public void CmdFetchInfo()
     {
         GameObject playerslots = GameObject.Find("PlayerSlots");
-        print(playerslots.transform.childCount);
         bool[] colliderEnabled = new bool[6];
         bool[] headImageEnabled = new bool[6];
         string[] names = new string[6];

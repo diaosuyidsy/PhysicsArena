@@ -668,3 +668,13 @@ public class OnRemoveCameraTargets : GameEvent
         Target = target;
     }
 }
+
+public class ButtonPressed : GameEvent
+{
+    public string ButtonName;
+
+    public ButtonPressed(string buttonName)
+    {
+        ButtonName = buttonName;
+    }
+}

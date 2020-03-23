@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using TMPro;
 using UnityEngine.SceneManagement;
+using System.Linq;
 
 public class NetworkManagerBirfia : NetworkManager
 {
@@ -48,6 +49,11 @@ public class NetworkManagerBirfia : NetworkManager
         if (allready)
         {
             GameObject.Find("NetworkGameManager").GetComponent<NetworkGameStateManager>().OnStart();
+            for (int i = 0; i < PlayerReady.Count; i++)
+            {
+                var item = PlayerReady.ElementAt(i);
+                PlayerReady[item.Key] = false;
+            }
         }
     }
 }

@@ -30,7 +30,6 @@ public class NetworkGameStateManager : NetworkBehaviour
     private TextMeshProUGUI _countDownText;
     private Camera _cam;
     private Vector3 _endFocusPosition;
-    private DarkCornerEffect _darkCornerEffect;
     private Transform _gameEndCanvas;
     private GameObject _gameEndBlackbackground;
     private Transform _gameEndTitleText;
@@ -55,10 +54,10 @@ public class NetworkGameStateManager : NetworkBehaviour
     private float _hitStopTimeScale;
     private GameObject _gameManager;
 
+
     public void Awake()
     {
         _gameManager = GetComponent<NetworkGame>().gameObject;
-        _gameStateFSM = new FSM<NetworkGameStateManager>(this);
         _gameUI = GameObject.Find("GameUI").transform;
         _gameEndCanvas = GameObject.Find("GameEndCanvas").transform;
         _gameEndBlackbackground = _gameEndCanvas.Find("EndImageBackground").gameObject;
@@ -74,7 +73,6 @@ public class NetworkGameStateManager : NetworkBehaviour
         _tutorialBackgroundMask = GameObject.Find("TutorialCanvas").transform.Find("BackgroundMask");
         _tutorialObjectiveImages = GameObject.Find("TutorialCanvas").transform.Find("ObjectiveImages");
         Debug.Assert(_tutorialImage != null);
-        // _playersOutestHolder = new Transform[_playersHolder.childCount];
         _countDownText = GameObject.Find("TutorialCanvas").transform.Find("CountDown").GetComponent<TextMeshProUGUI>();
         _pauseMenu = GameObject.Find("PauseMenu").transform;
         _pauseBackgroundMask = _pauseMenu.Find("BackgroundMask");
@@ -91,35 +89,33 @@ public class NetworkGameStateManager : NetworkBehaviour
         _MVPPlayerHolder = _MVP.Find("MVPPlayerHolder");
         _MVPSpotLight = _MVP.Find("MVPSpotLight");
         _MVPPodium = _MVP.Find("MVPPodium");
-        // for (int i = 0; i < _playersHolder.childCount; i++)
-        // {
-        //     _playersOutestHolder[i] = _playersHolder.GetChild(i);
-        // }
-        EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
-        EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
-        // _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-        _gameStateFSM.TransitionTo<EmptyState>();
-        // _gameStateFSM.TransitionTo<FoodCartTutorialState>();
-        // _gameStateFSM.TransitionTo<MVPEndPanelState>();
+        // _gameStateFSM.TransitionTo<EmptyState>();
     }
 
     public void OnStart()
     {
+        _gameStateFSM = new FSM<NetworkGameStateManager>(this);
         _gameStateFSM.TransitionTo<LandingState>();
     }
 
     public void Update()
     {
-        if (isServer)
+        if (isServer && _gameStateFSM != null)
             _gameStateFSM.Update();
     }
 
-    public void Destroy()
+    private void OnEnable()
+    {
+        EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
+        EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
+    }
+
+    public void OnDisable()
     {
         EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.RemoveHandler<HitStopEvent>(_onHitStop);
-        if (_gameStateFSM.CurrentState != null)
+        if (_gameStateFSM != null && _gameStateFSM.CurrentState != null)
             _gameStateFSM.CurrentState.CleanUp();
     }
 
@@ -135,7 +131,7 @@ public class NetworkGameStateManager : NetworkBehaviour
 
     private void _onGameEnd(GameEnd ge)
     {
-        if (_gameStateFSM.CurrentState.GetType().Equals(typeof(GameLoop)))
+        if (_gameStateFSM != null && _gameStateFSM.CurrentState.GetType().Equals(typeof(GameLoop)))
         {
             if (ge.WinnedObjective != null)
                 _endFocusPosition = ge.WinnedObjective.position;
@@ -145,6 +141,7 @@ public class NetworkGameStateManager : NetworkBehaviour
             return;
         }
     }
+
 
     private abstract class GameState : FSM<NetworkGameStateManager>.State
     {
@@ -244,28 +241,34 @@ public class NetworkGameStateManager : NetworkBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._darkCornerEffect.enabled = false;
+            Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = false;
+            Context.RpcEnableDarkCornerEffect(false);
         }
     }
 
     private class MVPEndPanelState : StatisticsWordState
     {
-        private bool _canHold;
+        private bool _canHold = false;
+        private bool _Apressed;
+        private bool _Bpressed;
+        private bool _Ypressed;
         public override void OnEnter()
         {
             base.OnEnter();
-            // for (int i = 0; i < Context._playersOutestHolder.Length; i++)
-            // {
-            //     PlayerControllerMirror playercontroller = Context._playersOutestHolder[i].GetComponentInChildren<PlayerControllerMirror>(true);
-            //     playercontroller.enabled = false;
-            //     playercontroller.GetComponent<Rigidbody>().isKinematic = false;
-            // }
+            EventManager.Instance.AddHandler<ButtonPressed>(_onButtonPressed);
+            Context.RpcMVP();
+            for (int i = 0; i < Context._playersHolder.childCount; i++)
+            {
+                PlayerControllerMirror playercontroller = Context._playersHolder.GetChild(i).GetComponentInChildren<PlayerControllerMirror>(true);
+                playercontroller.enabled = false;
+                playercontroller.GetComponent<Rigidbody>().isKinematic = false;
+            }
             Context._MVPDisplay.gameObject.SetActive(true);
             Context._MVPCamera.gameObject.SetActive(true);
             Context._MVPPlayerHolder.gameObject.SetActive(true);
             Context._MVPSpotLight.gameObject.SetActive(true);
             Context._MVPPodium.gameObject.SetActive(true);
-            // int MVPColorIndex = Context.GetColorIndexFromRewiredID(Services.StatisticsManager.GetMVPRewiredID());
+            // int MVPColorIndex = Context.GetColorIndexFromRewiredID(NetworkServices.StatisticsManager.GetMVPRewiredID());
             int MVPColorIndex = 0;
             Transform MVPChicken = Context._MVPPlayerHolder.GetChild(MVPColorIndex);
             MVPChicken.gameObject.SetActive(true);
@@ -275,19 +278,19 @@ public class NetworkGameStateManager : NetworkBehaviour
             Context._MVPTitle.GetComponent<TextMeshProUGUI>().color = MVPColor;
             Sequence seq = DOTween.Sequence();
             seq.Append(Context._MVPPodium.DOLocalMoveY(0.7f, _configData.MVPPodiumMoveDuration).SetEase(_configData.MVPPodiumMoveEase).SetRelative(true)
-                .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.MVPLandRiseAudioClip)));
+                .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLandRiseAudioClip)));
             seq.Append(Context._MVPSpotLight.GetComponent<Light>().DOIntensity(_configData.MVPSpotLightIntensity, _configData.MVPSpotLightDuration).SetEase(_configData.MVPSpotLightEase).SetLoops(3, LoopType.Yoyo)
-            .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.MVPLightFlickerAudioClip)));
+            .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLightFlickerAudioClip)));
             seq.AppendInterval(_configData.MVPSpotLightToLandDuration);
             seq.Append(MVPChicken.DOLocalMoveY(-3.116f, 0.2f).SetEase(Ease.InCirc).SetRelative(true)
             .OnComplete(() =>
             {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.MVPBirdLandAudioClip);
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBirdLandAudioClip);
                 Context._MVPCamera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
                 MVPChicken.GetComponent<Animator>().SetTrigger("Pose");
             }));
             seq.AppendInterval(_configData.MVPLandToWordShowDuration);
-            seq.Append(Context._MVPTitle.DOScale(5f, 0.2f).From().SetEase(Ease.OutCirc).SetRelative(true).OnComplete(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.MVPBadgeStampAudioClip)));
+            seq.Append(Context._MVPTitle.DOScale(5f, 0.2f).From().SetEase(Ease.OutCirc).SetRelative(true).OnComplete(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBadgeStampAudioClip)));
             seq.Join(Context._MVPTitle.GetComponent<TextMeshProUGUI>().DOFade(1f, 0.2f));
             seq.AppendInterval(_configData.MVPToUIMoveInDuration);
             seq.Append(Context._MVPPlayerHolder.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
@@ -295,18 +298,17 @@ public class NetworkGameStateManager : NetworkBehaviour
             seq.Join(Context._MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
             seq.Join(Context._MVPTitle.DOLocalMove(new Vector3(-587f, 187f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
             seq.Join(Context._MVPTitle.DOScale(0.6f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
-            var statsresult = Services.StatisticsManager.GetStatisticResult();
+            // var statsresult = NetworkServices.StatisticsManager.GetStatisticResult();
             /// Move in all players 
             GameObject.Instantiate(_configData.MVPBadgePrefab, Context._statisticUIHolder.GetChild(MVPColorIndex));
-            // for (int i = 0; i < Context._playersOutestHolder.Length; i++)
-            // {
-            //     int rewiredID = _PlayersInformation.RewiredID[i];
-            //     int colorindex = Context.GetColorIndexFromRewiredID(rewiredID);
-            //     Transform frame = Context._statisticUIHolder.GetChild(colorindex);
-            //     frame.GetChild(0).GetComponent<Image>().sprite = statsresult[rewiredID].StatisticIcon;
-            //     frame.GetChild(1).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticName;
-            //     frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticsInformation;
-            // }
+            for (int i = 0; i < Context._playersHolder.childCount; i++)
+            {
+                int colorindex = Utility.GetColorIndexFromPlayer(Context._playersHolder.GetChild(i).gameObject);
+                Transform frame = Context._statisticUIHolder.GetChild(colorindex);
+                // frame.GetChild(0).GetComponent<Image>().sprite = statsresult[rewiredID].StatisticIcon;
+                // frame.GetChild(1).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticName;
+                // frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticsInformation;
+            }
             // int[] ci = _PlayersInformation.ColorIndex;
             // Array.Sort(ci);
             // for (int i = 0; i < ci.Length; i++)
@@ -316,7 +318,7 @@ public class NetworkGameStateManager : NetworkBehaviour
             //     // seq.Append(Context._statisticUIHolder.GetChild(x).DOLocalMoveX(770f, _configData.FrameMoveInDuration)
             //     seq.Append(Context._statisticUIHolder.GetChild(x).DOScale(0.7f, _configData.FrameMoveInDuration)
             //     .SetEase(Ease.OutBack)
-            //     .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
+            //     .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
             // }
             seq.Append(Context._holdAText.DOText("Next Map", 0.2f).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
             seq.Join(Context._holdBText.DOText("Menu", 0.2f).OnPlay(() => Context._holdBText.gameObject.SetActive(true)));
@@ -324,51 +326,114 @@ public class NetworkGameStateManager : NetworkBehaviour
             seq.AppendCallback(() => _canHold = true);
         }
 
+        private void _onButtonPressed(ButtonPressed ev)
+        {
+            if (ev.ButtonName == "Jump")
+                _Apressed = true;
+            if (ev.ButtonName == "Block")
+                _Bpressed = true;
+            if (ev.ButtonName == "Left Trigger")
+                _Ypressed = true;
+        }
+
         public override void Update()
         {
             base.Update();
-            if (_canHold && _AnyAHolding)
+            if (_canHold && _Apressed)
             {
-                Context._holdAImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
-                if (Context._holdAImage.fillAmount >= 1f)
-                {
-                    if (SceneManager.GetActiveScene().buildIndex < SceneManager.sceneCountInBuildSettings - 1)
-                        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-                    else
-                        SceneManager.LoadScene(1);
-                }
-            }
-            else
-            {
-                Context._holdAImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
+                if (SceneManager.GetActiveScene().buildIndex < SceneManager.sceneCountInBuildSettings - 1)
+                    NetworkManager.singleton.ServerChangeScene(Utility.GetNextSceneName());
+                else
+                    NetworkManager.singleton.ServerChangeScene(Utility.GetSceneNameByBuildIndex(1));
             }
 
-            if (_canHold && _AnyBHolding)
+            if (_canHold && _Bpressed)
             {
-                Context._holdBImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
-                if (Context._holdBImage.fillAmount >= 1f)
-                {
-                    SceneManager.LoadScene("NewMenu");
-                }
-            }
-            else
-            {
-                Context._holdBImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
+                NetworkManager.singleton.ServerChangeScene("OnlineMenu");
             }
 
-            if (_canHold && _AnyYHolding)
+            if (_canHold && _Ypressed)
             {
-                Context._holdYImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
-                if (Context._holdYImage.fillAmount >= 1f)
-                {
-                    SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
-                }
-            }
-            else
-            {
-                Context._holdYImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
+                NetworkManager.singleton.ServerChangeScene(SceneManager.GetActiveScene().name);
             }
         }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            EventManager.Instance.RemoveHandler<ButtonPressed>(_onButtonPressed);
+        }
+    }
+
+    [ClientRpc]
+    private void RpcMVP()
+    {
+        for (int i = 0; i < _playersHolder.childCount; i++)
+        {
+            PlayerControllerMirror playercontroller = _playersHolder.GetChild(i).GetComponentInChildren<PlayerControllerMirror>(true);
+            playercontroller.enabled = false;
+            playercontroller.GetComponent<Rigidbody>().isKinematic = false;
+        }
+        _MVPDisplay.gameObject.SetActive(true);
+        _MVPCamera.gameObject.SetActive(true);
+        _MVPPlayerHolder.gameObject.SetActive(true);
+        _MVPSpotLight.gameObject.SetActive(true);
+        _MVPPodium.gameObject.SetActive(true);
+        // int MVPColorIndex = Context.GetColorIndexFromRewiredID(NetworkServices.StatisticsManager.GetMVPRewiredID());
+        int MVPColorIndex = 0;
+        Transform MVPChicken = _MVPPlayerHolder.GetChild(MVPColorIndex);
+        MVPChicken.gameObject.SetActive(true);
+        MVPChicken.GetComponent<Animator>().SetTrigger("Enter");
+        Color MVPColor = _configData.IndexToColor[MVPColorIndex];
+        MVPColor.a = 0f;
+        _MVPTitle.GetComponent<TextMeshProUGUI>().color = MVPColor;
+        Sequence seq = DOTween.Sequence();
+        seq.Append(_MVPPodium.DOLocalMoveY(0.7f, _configData.MVPPodiumMoveDuration).SetEase(_configData.MVPPodiumMoveEase).SetRelative(true)
+            .OnPlay(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLandRiseAudioClip)));
+        seq.Append(_MVPSpotLight.GetComponent<Light>().DOIntensity(_configData.MVPSpotLightIntensity, _configData.MVPSpotLightDuration).SetEase(_configData.MVPSpotLightEase).SetLoops(3, LoopType.Yoyo)
+        .OnPlay(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLightFlickerAudioClip)));
+        seq.AppendInterval(_configData.MVPSpotLightToLandDuration);
+        seq.Append(MVPChicken.DOLocalMoveY(-3.116f, 0.2f).SetEase(Ease.InCirc).SetRelative(true)
+        .OnComplete(() =>
+        {
+            _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBirdLandAudioClip);
+            _MVPCamera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
+            MVPChicken.GetComponent<Animator>().SetTrigger("Pose");
+        }));
+        seq.AppendInterval(_configData.MVPLandToWordShowDuration);
+        seq.Append(_MVPTitle.DOScale(5f, 0.2f).From().SetEase(Ease.OutCirc).SetRelative(true).OnComplete(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBadgeStampAudioClip)));
+        seq.Join(_MVPTitle.GetComponent<TextMeshProUGUI>().DOFade(1f, 0.2f));
+        seq.AppendInterval(_configData.MVPToUIMoveInDuration);
+        seq.Append(_MVPPlayerHolder.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+        seq.Join(_MVPSpotLight.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+        seq.Join(_MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+        seq.Join(_MVPTitle.DOLocalMove(new Vector3(-587f, 187f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+        seq.Join(_MVPTitle.DOScale(0.6f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+        // var statsresult = NetworkServices.StatisticsManager.GetStatisticResult();
+        /// Move in all players 
+        GameObject.Instantiate(_configData.MVPBadgePrefab, _statisticUIHolder.GetChild(MVPColorIndex));
+        for (int i = 0; i < _playersHolder.childCount; i++)
+        {
+            int colorindex = Utility.GetColorIndexFromPlayer(_playersHolder.GetChild(i).gameObject);
+            Transform frame = _statisticUIHolder.GetChild(colorindex);
+            // frame.GetChild(0).GetComponent<Image>().sprite = statsresult[rewiredID].StatisticIcon;
+            // frame.GetChild(1).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticName;
+            // frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticsInformation;
+        }
+        // int[] ci = _PlayersInformation.ColorIndex;
+        // Array.Sort(ci);
+        // for (int i = 0; i < ci.Length; i++)
+        // {
+        //     int x = _PlayersInformation.ColorIndex[i];
+        //     Context._statisticUIHolder.GetChild(x).DOLocalMoveY(_configData.FrameYPosition[i], 0f);
+        //     // seq.Append(Context._statisticUIHolder.GetChild(x).DOLocalMoveX(770f, _configData.FrameMoveInDuration)
+        //     seq.Append(Context._statisticUIHolder.GetChild(x).DOScale(0.7f, _configData.FrameMoveInDuration)
+        //     .SetEase(Ease.OutBack)
+        //     .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
+        // }
+        seq.Append(_holdAText.DOText("Next Map", 0.2f).OnPlay(() => _holdAText.gameObject.SetActive(true)));
+        seq.Join(_holdBText.DOText("Menu", 0.2f).OnPlay(() => _holdBText.gameObject.SetActive(true)));
+        seq.Join(_holdYText.DOText("Replay", 0.2f).OnPlay(() => _holdYText.gameObject.SetActive(true)));
     }
 
     private class WinState : GameState
@@ -397,7 +462,7 @@ public class NetworkGameStateManager : NetworkBehaviour
             {
                 if (Context._winner == 1 || Context._winner == 2)
                 {
-                    return Services.Config.ConfigData.TeamColor[Context._winner - 1];
+                    return NetworkServices.Config.ConfigData.TeamColor[Context._winner - 1];
                 }
                 else
                 {
@@ -405,26 +470,30 @@ public class NetworkGameStateManager : NetworkBehaviour
                 }
             }
         }
+        private NetworkDarkCornerEffect _darkCornerEffect;
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._darkCornerEffect.CenterPosition = _targetPosition;
+            _darkCornerEffect = Camera.main.GetComponent<NetworkDarkCornerEffect>();
+            Debug.Assert(_darkCornerEffect != null, "Dark Corner Effect Missing");
+            _darkCornerEffect.CenterPosition = _targetPosition;
 
             float maxlength = Utility.GetMaxLengthToCorner(_targetPosition);
-            Context._darkCornerEffect.enabled = true;
-            Context._darkCornerEffect.Length = maxlength;
+            _darkCornerEffect.enabled = true;
+            Context.RpcEnableDarkCornerEffect(true);
+            _darkCornerEffect.Length = maxlength;
             float middlelength = maxlength * _GameMapData.DarkCornerMiddlePercentage;
             float finallength = maxlength * _GameMapData.DarkCornerFinalPercentage;
             Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().text = _victoryTeam;
             Context._gameEndTitleText.GetComponent<TextMeshProUGUI>().color = _virtoryTeamColor;
             Sequence seq = DOTween.Sequence();
-            seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, middlelength, _GameMapData.DarkCornerToMiddleDuration));
+            seq.Append(DOTween.To(() => _darkCornerEffect.Length, x => _darkCornerEffect.Length = x, middlelength, _GameMapData.DarkCornerToMiddleDuration));
             seq.Join(Context._gameEndTitleText.DOScale(1f, _GameMapData.TitleTextInDuration).SetEase(_GameMapData.TitleTextInCurve).
                 SetDelay(_GameMapData.TitleTextInDelay));
             seq.Join(Context._gameEndTitleText.DOScale(0f, _GameMapData.TitleTextOutDuration).SetDelay(_GameMapData.TitleStayDuration + _GameMapData.TitleTextInDuration).SetEase(Ease
                 .InBack));
             seq.AppendInterval(_GameMapData.DarkCornerMiddleStayDuration);
-            seq.Append(DOTween.To(() => Context._darkCornerEffect.Length, x => Context._darkCornerEffect.Length = x, finallength, _GameMapData.DarkCornerToFinalDuration));
+            seq.Append(DOTween.To(() => _darkCornerEffect.Length, x => _darkCornerEffect.Length = x, finallength, _GameMapData.DarkCornerToFinalDuration));
             seq.AppendCallback(() =>
             {
                 Context._gameEndTitleText.GetComponent<TMP_Text>().text = "";
@@ -436,11 +505,17 @@ public class NetworkGameStateManager : NetworkBehaviour
         public override void Update()
         {
             base.Update();
-            if (Context._darkCornerEffect.enabled)
+            if (_darkCornerEffect.enabled)
             {
-                Context._darkCornerEffect.CenterPosition = _targetPosition;
+                _darkCornerEffect.CenterPosition = _targetPosition;
             }
         }
+    }
+
+    [ClientRpc]
+    public void RpcEnableDarkCornerEffect(bool enable)
+    {
+        Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = enable;
     }
 
     private class GameLoop : GameState
@@ -523,34 +598,34 @@ public class NetworkGameStateManager : NetworkBehaviour
             base.Update();
             if (_AnyBDown || _AnyPauseDown)
             {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
                 TransitionTo<GameLoop>();
                 return;
             }
             if (onresume && _AnyADown)
             {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
                 TransitionTo<GameLoop>();
                 return;
             }
             if (!onresume && _AnyADown)
             {
                 Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene("NewMenu"));
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
                 TransitionTo<GameQuitState>();
                 return;
             }
             if (_AnyVLAxisRaw < -0.2f && !_vAxisInUse && !onresume)
             {
                 onresume = true;
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
                 _switchMenu();
                 return;
             }
             else if (_AnyVLAxisRaw > 0.2f && !_vAxisInUse && onresume)
             {
                 onresume = false;
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
+                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
                 _switchMenu();
                 return;
             }
@@ -630,22 +705,22 @@ public class NetworkGameStateManager : NetworkBehaviour
                 seq.Join(Context._playersHolder.GetChild(playerIndex).DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[temp]).SetEase(_GameMapData.BirdsFlyDownEase).
                 OnComplete(() =>
                 {
-                    // Services.GameFeelManager.ViberateController(rewiredID, 1f, 0.3f);
-                    // _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FirstLandAudioClip);
+                    // NetworkServices.GameFeelManager.ViberateController(rewiredID, 1f, 0.3f);
+                    // _cam.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.FirstLandAudioClip);
                     _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree");
                 }));
             }
             seq.AppendInterval(_GameMapData.FightDelay);
             seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale / 2f, 0.8f).SetEase(Ease.InSine).OnPlay(() =>
             {
-                // _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.ReadyAudioClip);
+                // _cam.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.ReadyAudioClip);
                 Context._countDownText.text = Context._configData.ReadyString;
             }));
             seq.AppendInterval(0.3f);
             seq.Append(Context._countDownText.DOScale(0f, 0.2f));
             seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.FightEase).OnPlay(() =>
             {
-                // _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FightAudioClip);
+                // _cam.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.FightAudioClip);
                 Context._countDownText.text = Context._configData.FightString;
             }));
             seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
@@ -710,22 +785,22 @@ public class NetworkGameStateManager : NetworkBehaviour
             seq.Join(_playersHolder.GetChild(i).DOLocalMoveY(0.64f, _gameMapdata.BirdsFlyDownDuration).SetDelay(_gameMapdata.BirdsFlyDownDelay[temp]).SetEase(_gameMapdata.BirdsFlyDownEase).
             OnComplete(() =>
             {
-                // Services.GameFeelManager.ViberateController(rewiredID, 1f, 0.3f);
-                // _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FirstLandAudioClip);
+                // NetworkServices.GameFeelManager.ViberateController(rewiredID, 1f, 0.3f);
+                // _cam.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.FirstLandAudioClip);
                 _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree");
             }));
         }
         seq.AppendInterval(_gameMapdata.FightDelay);
         seq.Append(_countDownText.DOScale(_gameMapdata.FightScale / 2f, 0.8f).SetEase(Ease.InSine).OnPlay(() =>
         {
-            // _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.ReadyAudioClip);
+            // _cam.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.ReadyAudioClip);
             _countDownText.text = _configData.ReadyString;
         }));
         seq.AppendInterval(0.3f);
         seq.Append(_countDownText.DOScale(0f, 0.2f));
         seq.Append(_countDownText.DOScale(_gameMapdata.FightScale, _gameMapdata.FightDuration).SetEase(_gameMapdata.FightEase).OnPlay(() =>
         {
-            // _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FightAudioClip);
+            // _cam.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.FightAudioClip);
             _countDownText.text = _configData.FightString;
         }));
         seq.AppendInterval(_gameMapdata.FightStayOnScreenDuration);

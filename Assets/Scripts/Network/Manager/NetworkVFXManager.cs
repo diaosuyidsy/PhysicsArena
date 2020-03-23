@@ -9,13 +9,12 @@ public class NetworkVFXManager
     private NetworkGame _networkGame;
     private float _blinkTime = 3f;
     private float _blinkDeltaTime = 10f;
-    private Transform _mainCameraTransform;
+    private Transform _mainCameraTransform => Camera.main.transform;
 
     public NetworkVFXManager(VFXData _vfxdata, NetworkGame networkGame)
     {
         VFXDataStore = _vfxdata;
         _networkGame = networkGame;
-        _mainCameraTransform = Camera.main.transform;
         OnEnable();
     }
 

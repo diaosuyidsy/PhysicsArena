@@ -15,10 +15,10 @@ public class NetworkGame : NetworkBehaviour
 
     public ModeSepcificData ModeSpecificData_2Player;
 
-    public override void OnStartClient()
+    public void Awake()
     {
         NetworkServices.Config = new Config(ConfigData, GameMapData, CharacterData);
-        // NetworkServices.AudioManager = new NetworkAudioManager(AudioData);
+        NetworkServices.AudioManager = new NetworkAudioManager(AudioData);
         // NetworkServices.GameFeelManager = new NetworkGameFeelManager(GameFeelData);
         NetworkServices.VisualEffectManager = new NetworkVFXManager(VFXData, this);
         // NetworkServices.WeaponGenerationManager = new WeaponGenerationManager(GameMapData);
@@ -87,8 +87,8 @@ public class NetworkGame : NetworkBehaviour
 
     public override void OnNetworkDestroy()
     {
-        // NetworkServices.AudioManager.Destroy();
-        // NetworkServices.AudioManager = null;
+        NetworkServices.AudioManager.Destroy();
+        NetworkServices.AudioManager = null;
 
         // NetworkServices.GameFeelManager.Destory();
         // NetworkServices.GameFeelManager = null;

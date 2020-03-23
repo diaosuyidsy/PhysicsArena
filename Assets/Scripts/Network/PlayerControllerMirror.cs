@@ -240,6 +240,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [Command]
     private void CmdTriggerPlayerDeath(GameObject player, GameObject impactObject)
     {
+        EventManager.Instance.TriggerEvent(new PlayerDied(player, PlayerNumber, new ImpactMarker(player, 0f, ImpactType.Melee), impactObject));
         RpcTriggerPlayerDeath(player, impactObject);
     }
     [ClientRpc]

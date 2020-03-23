@@ -511,7 +511,7 @@ public class NetworkGameStateManager : NetworkBehaviour
     [ClientRpc]
     public void RpcOnWin(Vector3 _endFocusPosition, string _victoryTeam, float _victoryTeamColorR, float _victoryTeamColorG, float _victoryTeamColorB, float _victoryTeamColorA)
     {
-        Vector2 _targetPosition = Camera.main.WorldToScreenPoint(_endFocusPosition);
+        Vector2 _targetPosition = new Vector2(Screen.width / 2f, Screen.height / 2f);
         _targetPosition.y = Screen.height - _targetPosition.y;
         NetworkDarkCornerEffect _darkCornerEffect = Camera.main.GetComponent<NetworkDarkCornerEffect>();
         Debug.Assert(_darkCornerEffect != null, "Dark Corner Effect Missing");

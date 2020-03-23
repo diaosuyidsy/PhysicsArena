@@ -238,12 +238,6 @@ public class NetworkGameStateManager : NetworkBehaviour
             base.Init();
             _configData = Context._configData;
         }
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = false;
-            Context.RpcEnableDarkCornerEffect(false);
-        }
     }
 
     private class MVPEndPanelState : StatisticsWordState
@@ -256,6 +250,7 @@ public class NetworkGameStateManager : NetworkBehaviour
         {
             base.OnEnter();
             EventManager.Instance.AddHandler<ButtonPressed>(_onButtonPressed);
+            Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = false;
             Context.RpcMVP();
             for (int i = 0; i < Context._playersHolder.childCount; i++)
             {
@@ -368,6 +363,7 @@ public class NetworkGameStateManager : NetworkBehaviour
     [ClientRpc]
     private void RpcMVP()
     {
+        Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = false;
         for (int i = 0; i < _playersHolder.childCount; i++)
         {
             PlayerControllerMirror playercontroller = _playersHolder.GetChild(i).GetComponentInChildren<PlayerControllerMirror>(true);
@@ -474,13 +470,13 @@ public class NetworkGameStateManager : NetworkBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context.RpcOnWin(Context._endFocusPosition, _victoryTeam, _virtoryTeamColor.r, _virtoryTeamColor.g, _virtoryTeamColor.b, _virtoryTeamColor.a);
             _darkCornerEffect = Camera.main.GetComponent<NetworkDarkCornerEffect>();
             Debug.Assert(_darkCornerEffect != null, "Dark Corner Effect Missing");
             _darkCornerEffect.CenterPosition = _targetPosition;
 
             float maxlength = Utility.GetMaxLengthToCorner(_targetPosition);
             _darkCornerEffect.enabled = true;
-            Context.RpcEnableDarkCornerEffect(true);
             _darkCornerEffect.Length = maxlength;
             float middlelength = maxlength * _GameMapData.DarkCornerMiddlePercentage;
             float finallength = maxlength * _GameMapData.DarkCornerFinalPercentage;
@@ -513,9 +509,33 @@ public class NetworkGameStateManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcEnableDarkCornerEffect(bool enable)
+    public void RpcOnWin(Vector3 _endFocusPosition, string _victoryTeam, float _victoryTeamColorR, float _victoryTeamColorG, float _victoryTeamColorB, float _victoryTeamColorA)
     {
-        Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = enable;
+        Vector2 _targetPosition = Camera.main.WorldToScreenPoint(_endFocusPosition);
+        _targetPosition.y = Screen.height - _targetPosition.y;
+        NetworkDarkCornerEffect _darkCornerEffect = Camera.main.GetComponent<NetworkDarkCornerEffect>();
+        Debug.Assert(_darkCornerEffect != null, "Dark Corner Effect Missing");
+        _darkCornerEffect.CenterPosition = _targetPosition;
+
+        float maxlength = Utility.GetMaxLengthToCorner(_targetPosition);
+        _darkCornerEffect.enabled = true;
+        _darkCornerEffect.Length = maxlength;
+        float middlelength = maxlength * _gameMapdata.DarkCornerMiddlePercentage;
+        float finallength = maxlength * _gameMapdata.DarkCornerFinalPercentage;
+        _gameEndTitleText.GetComponent<TextMeshProUGUI>().text = _victoryTeam;
+        _gameEndTitleText.GetComponent<TextMeshProUGUI>().color = new Color(_victoryTeamColorR, _victoryTeamColorG, _victoryTeamColorB, _victoryTeamColorA);
+        Sequence seq = DOTween.Sequence();
+        seq.Append(DOTween.To(() => _darkCornerEffect.Length, x => _darkCornerEffect.Length = x, middlelength, _gameMapdata.DarkCornerToMiddleDuration));
+        seq.Join(_gameEndTitleText.DOScale(1f, _gameMapdata.TitleTextInDuration).SetEase(_gameMapdata.TitleTextInCurve).
+            SetDelay(_gameMapdata.TitleTextInDelay));
+        seq.Join(_gameEndTitleText.DOScale(0f, _gameMapdata.TitleTextOutDuration).SetDelay(_gameMapdata.TitleStayDuration + _gameMapdata.TitleTextInDuration).SetEase(Ease
+            .InBack));
+        seq.AppendInterval(_gameMapdata.DarkCornerMiddleStayDuration);
+        seq.Append(DOTween.To(() => _darkCornerEffect.Length, x => _darkCornerEffect.Length = x, finallength, _gameMapdata.DarkCornerToFinalDuration));
+        seq.AppendCallback(() =>
+        {
+            _gameEndTitleText.GetComponent<TMP_Text>().text = "";
+        });
     }
 
     private class GameLoop : GameState

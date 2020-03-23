@@ -5,9 +5,7 @@ using Mirror;
 
 public class NetworkDarkCornerEffect : NetworkBehaviour
 {
-    [SyncVar]
     public float Length;
-    [SyncVar]
     public Vector2 CenterPosition;
 
     public Material Material;

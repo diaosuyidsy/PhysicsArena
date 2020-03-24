@@ -211,6 +211,7 @@ public class PunchMessage
 public class StatsTuple
 {
     public int Index;
+    // NetID in Networking Context
     public int RewiredID;
     public float RawData;
     public float WeightData;

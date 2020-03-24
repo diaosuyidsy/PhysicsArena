@@ -60,6 +60,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         if (_ammo <= 0)
         {
             CanBePickedUp = false;
+            EventManager.Instance.TriggerEvent(new WeaponUsedUp());
             RpcAmmoUsedUp(Owner);
         }
     }

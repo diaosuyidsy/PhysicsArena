@@ -44,6 +44,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private Player _player;
     private Rigidbody _rb;
     private float _distToGround;
+    [SyncVar(hook = nameof(SetStamina))]
     private float _currentStamina;
     private float _lastTimeUseStamina;
     // private float _lastTimeUSeStaminaUnimportant;
@@ -353,6 +354,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerBlockStart(GameObject player)
     {
+        BlockShield.SetShield(true);
         EventManager.Instance.TriggerEvent(new BlockStart(player, PlayerNumber));
     }
 
@@ -364,6 +366,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerBlockEnd(GameObject player)
     {
+        BlockShield.SetShield(false);
         EventManager.Instance.TriggerEvent(new BlockEnd(player, PlayerNumber));
     }
 
@@ -409,6 +412,17 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void CmdSetBlock(bool block)
     {
         _isBlocking = block;
+    }
+
+    [Command]
+    private void CmdSetStamina(float stamina)
+    {
+        _currentStamina = stamina;
+    }
+
+    private void SetStamina(float oldStamina, float newStamina)
+    {
+        BlockShield.SetEnergy(newStamina / CharacterDataStore.MaxStamina);
     }
     #endregion
 
@@ -729,12 +743,13 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             _lastTimeUseStamina = Time.timeSinceLevelLoad;
         }
         BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
-
+        CmdSetStamina(_currentStamina);
         // BlockUIVFXHolder.SetActive(true);
         // Vector2 _nextStaminaUISize = _staminaUISize;
         // _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
         // BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
     }
+
     #endregion
 
     #region Movment States

@@ -31,6 +31,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         // WeaponBaseFSM.Update();
         if (Owner != null && _followHand)
         {
+            GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0f;
             Vector3 targetposition = (Owner.GetComponent<PlayerControllerMirror>().LeftHand.transform.position
             + Owner.GetComponent<PlayerControllerMirror>().RightHand.transform.position) / 2f;
             transform.position = targetposition;
@@ -112,6 +113,8 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
 
     public virtual void OnDrop()
     {
+        GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
+        RpcOnDrop();
         _hitGroundOnce = false;
         CanBePickedUp = false;
         GetComponent<Rigidbody>().isKinematic = false;
@@ -119,14 +122,18 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
         Owner.transform.up * WeaponDataBase.DropForce.y +
         Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
-        RpcOnDrop();
         Owner = null;
     }
 
     [ClientRpc]
     public void RpcOnDrop()
     {
+        GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
         GetComponent<Rigidbody>().isKinematic = false;
+        GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
+        Owner.transform.up * WeaponDataBase.DropForce.y +
+        Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
     }
 
     public virtual void OnPickUp(GameObject owner)

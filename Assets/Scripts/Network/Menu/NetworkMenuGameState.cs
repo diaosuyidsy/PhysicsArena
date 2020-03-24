@@ -41,36 +41,36 @@ public class NetworkMenuGameState : NetworkBehaviour
             (NetworkManager.singleton as NetworkManagerBirfia).PlayerNames.Remove(connection.connectionId);
             (NetworkManager.singleton as NetworkManagerBirfia).PlayerReady.Remove(connection.connectionId);
         }
-        //if (!select && _startGameCoroutine != null)
-        //    StopCoroutine(_startGameCoroutine);
+        if (!select && _startGameCoroutine != null)
+            StopCoroutine(_startGameCoroutine);
 
-        //int team1Num = 0;
-        //int team2Num = 0;
-        //for (int i = 0; i < selectedCharacter.Length; i++)
-        //{
-        //    if (i < 3 && selectedCharacter[i])
-        //        team1Num++;
-        //    if (i > 2 && selectedCharacter[i])
-        //        team2Num++;
-        //}
-        //int totalNum = team1Num + team2Num;
-        //if (totalNum == 1)
-        //    RpcChangeText("Need more players");
-        //else if (totalNum > 1 && (team1Num == 0 || team2Num == 0))
-        //    RpcChangeText("Need players on both team");
-        //else if (TotalConnectionCount > totalNum)
-        //    RpcChangeText("Everybody needs to select a character!");
-        //else if (TotalConnectionCount == totalNum && team1Num > 0 && team2Num > 0)
-        //{
-        //    RpcChangeText("Game Starting");
-        //    _startGameCoroutine = startingGame();
-        //    StartCoroutine(_startGameCoroutine);
-        //}
-        //else
-        //{
-        //    RpcChangeText("Select Character");
-        //}
-        GameStart();
+        int team1Num = 0;
+        int team2Num = 0;
+        for (int i = 0; i < selectedCharacter.Length; i++)
+        {
+            if (i < 3 && selectedCharacter[i])
+                team1Num++;
+            if (i > 2 && selectedCharacter[i])
+                team2Num++;
+        }
+        int totalNum = team1Num + team2Num;
+        if (totalNum == 1)
+            RpcChangeText("Need more players");
+        else if (totalNum > 1 && (team1Num == 0 || team2Num == 0))
+            RpcChangeText("Need players on both team");
+        else if (TotalConnectionCount > totalNum)
+            RpcChangeText("Everybody needs to select a character!");
+        else if (TotalConnectionCount == totalNum && team1Num > 0 && team2Num > 0)
+        {
+            RpcChangeText("Game Starting");
+            _startGameCoroutine = startingGame();
+            StartCoroutine(_startGameCoroutine);
+        }
+        else
+        {
+            RpcChangeText("Select Character");
+        }
+        // GameStart();
     }
 
     IEnumerator startingGame()

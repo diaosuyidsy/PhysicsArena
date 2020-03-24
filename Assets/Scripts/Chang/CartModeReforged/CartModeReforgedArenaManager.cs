@@ -166,7 +166,14 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
         if (!Occupiable(CheckPointList[TargetWayPointIndex]))
         {
+            CurrentOccupyProgress = 0;
+            OccupyCounter.GetComponent<Image>().fillAmount = 0;
             CurrentState = CartState.Moving;
+            return;
+        }
+
+        if(CurrentSide == CartSide.Neutral)
+        {
             return;
         }
 
@@ -219,7 +226,7 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
     private bool Occupiable(GameObject Checkpoint)
     {
-        return !Checkpoint.GetComponent<Checkpoint>().Occupied && (CurrentSide == CartSide.Team1 && Checkpoint.GetComponent<Checkpoint>().Side == CheckpointSide.Team2 || CurrentSide == CartSide.Team2 && Checkpoint.GetComponent<Checkpoint>().Side == CheckpointSide.Team1);
+        return !Checkpoint.GetComponent<Checkpoint>().Occupied && (CurrentSide != CartSide.Team2 && Checkpoint.GetComponent<Checkpoint>().Side == CheckpointSide.Team2 || CurrentSide != CartSide.Team1 && Checkpoint.GetComponent<Checkpoint>().Side == CheckpointSide.Team1);
     }
 
     private void CartMove()

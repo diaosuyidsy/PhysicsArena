@@ -60,8 +60,8 @@ public static class NetworkServices
         }
     }
 
-    private static StatisticsManager _statisticsmanager;
-    public static StatisticsManager StatisticsManager
+    private static NetworkStatisticManager _statisticsmanager;
+    public static NetworkStatisticManager StatisticsManager
     {
         get
         {

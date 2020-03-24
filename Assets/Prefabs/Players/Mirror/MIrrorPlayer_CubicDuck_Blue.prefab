@@ -99,7 +99,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
-  syncInterval: 0.1
+  syncInterval: 0
   CharacterDataStore: {fileID: 11400000, guid: 7d14baa331efc614583f4c28a2e6c1aa, type: 2}
   Chest: {fileID: 2058091730240385036}
   Head: {fileID: 5807033359035810727}
@@ -123,7 +123,6 @@ MonoBehaviour:
   BlockUIVFXHolder: {fileID: 8566860558929932766}
   BlockShield: {fileID: 7062120869660395739}
   NamePlate: {fileID: 7632062592454182063}
-  PlayerNumber: 0
   HandObject: {fileID: 0}
   EquipmentObject: {fileID: 0}
   MeleeVFXHolder: {fileID: 0}
@@ -146,6 +145,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 122b56e9004dce54ea167e94b06ce126, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
 --- !u!1 &7632062592454182063
 GameObject:
   m_ObjectHideFlags: 0
@@ -435,6 +436,11 @@ PrefabInstance:
     - target: {fileID: 2040752910071275732, guid: c3a9823089c243046bfb58105832471b,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7505028664957459438, guid: c3a9823089c243046bfb58105832471b,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents:

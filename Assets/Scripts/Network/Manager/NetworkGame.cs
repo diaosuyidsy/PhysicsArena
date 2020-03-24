@@ -22,7 +22,7 @@ public class NetworkGame : NetworkBehaviour
         // NetworkServices.GameFeelManager = new NetworkGameFeelManager(GameFeelData);
         NetworkServices.VisualEffectManager = new NetworkVFXManager(VFXData, this);
         // NetworkServices.WeaponGenerationManager = new WeaponGenerationManager(GameMapData);
-        // NetworkServices.StatisticsManager = new StatisticsManager();
+        NetworkServices.StatisticsManager = new NetworkStatisticManager();
         // NetworkServices.TinylyticsManager = new TinylyticsHandler();
         // NetworkServices.GameStateManager = new NetworkGameStateManager(GameMapData, ConfigData, gameObject);
         // switch (GameMapData.GameMapMode)
@@ -96,8 +96,8 @@ public class NetworkGame : NetworkBehaviour
         NetworkServices.VisualEffectManager.Destory();
         NetworkServices.VisualEffectManager = null;
 
-        // NetworkServices.StatisticsManager.Destory();
-        // NetworkServices.StatisticsManager = null;
+        NetworkServices.StatisticsManager.Destory();
+        NetworkServices.StatisticsManager = null;
 
         // NetworkServices.TinylyticsManager.Destory();
         // NetworkServices.TinylyticsManager = null;

@@ -27,7 +27,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     public ShieldController BlockShield;
     public GameObject NamePlate;
 
-    public int PlayerNumber;
+    public int PlayerNumber => (int)GetComponent<NetworkIdentity>().netId;
 
     [HideInInspector] public GameObject HandObject;
     [HideInInspector] public GameObject EquipmentObject;
@@ -44,6 +44,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private Player _player;
     private Rigidbody _rb;
     private float _distToGround;
+    [SyncVar(hook = nameof(SetStamina))]
     private float _currentStamina;
     private float _lastTimeUseStamina;
     // private float _lastTimeUSeStaminaUnimportant;
@@ -111,7 +112,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     {
         _movementFSM = new FSM<PlayerControllerMirror>(this);
         _actionFSM = new FSM<PlayerControllerMirror>(this);
-        _player = ReInput.players.GetPlayer(PlayerNumber);
+        _player = ReInput.players.GetPlayer(0);
         _rb = GetComponent<Rigidbody>();
         _distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
         _freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
@@ -133,12 +134,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         }
         if (transform.parent == null)
             transform.parent = GameObject.Find("Players").transform;
-    }
-
-    public void Init(int controllernumber)
-    {
-        PlayerNumber = controllernumber;
-        _player = ReInput.players.GetPlayer(controllernumber);
     }
 
     // Update is called once per frame
@@ -234,7 +229,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPlayerHit(GameObject sender, GameObject receiver, Vector3 force, bool isABlock)
     {
-        EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, 0, 1f, isABlock));
+        EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, 1f, isABlock));
     }
 
     [Command]
@@ -258,7 +253,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerObjectDropped(GameObject player, GameObject handObject)
     {
-        EventManager.Instance.TriggerEvent(new ObjectDropped(player, 0, handObject));
+        EventManager.Instance.TriggerEvent(new ObjectDropped(player, PlayerNumber, handObject));
     }
 
     [Command]
@@ -269,7 +264,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPlayerJump(GameObject player, string groundTag)
     {
-        EventManager.Instance.TriggerEvent(new PlayerJump(player, player.GetComponent<PlayerControllerMirror>().OnDeathHidden[1], 0, groundTag));
+        EventManager.Instance.TriggerEvent(new PlayerJump(player, player.GetComponent<PlayerControllerMirror>().OnDeathHidden[1], PlayerNumber, groundTag));
     }
 
     [Command]
@@ -280,7 +275,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPlayerLand(GameObject player, string groundTag)
     {
-        EventManager.Instance.TriggerEvent(new PlayerLand(player, player.GetComponent<PlayerControllerMirror>().OnDeathHidden[1], 0, groundTag));
+        EventManager.Instance.TriggerEvent(new PlayerLand(player, player.GetComponent<PlayerControllerMirror>().OnDeathHidden[1], PlayerNumber, groundTag));
     }
     //TODO: Trigger Player Stunned, need to sync var stuntimer
     //TODO: Trigger Player Unstunned
@@ -304,7 +299,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerObjectPickedUp(GameObject player, GameObject _object)
     {
-        EventManager.Instance.TriggerEvent(new ObjectPickedUp(player, 0, _object));
+        EventManager.Instance.TriggerEvent(new ObjectPickedUp(player, PlayerNumber, _object));
     }
 
     [Command]
@@ -315,7 +310,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPunchStart(GameObject player)
     {
-        EventManager.Instance.TriggerEvent(new PunchStart(player, 0, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
+        EventManager.Instance.TriggerEvent(new PunchStart(player, PlayerNumber, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
     }
 
     [Command]
@@ -326,7 +321,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPunchHolding(GameObject player)
     {
-        EventManager.Instance.TriggerEvent(new PunchHolding(player, 0, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
+        EventManager.Instance.TriggerEvent(new PunchHolding(player, PlayerNumber, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
     }
 
     [Command]
@@ -337,7 +332,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPunchDone(GameObject player)
     {
-        EventManager.Instance.TriggerEvent(new PunchDone(player, 0, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
+        EventManager.Instance.TriggerEvent(new PunchDone(player, PlayerNumber, player.GetComponent<PlayerControllerMirror>().RightHand.transform));
     }
 
     [Command]
@@ -348,7 +343,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPunchReleased(GameObject player)
     {
-        EventManager.Instance.TriggerEvent(new PunchReleased(player, 0));
+        EventManager.Instance.TriggerEvent(new PunchReleased(player, PlayerNumber));
     }
 
     [Command]
@@ -359,7 +354,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerBlockStart(GameObject player)
     {
-        EventManager.Instance.TriggerEvent(new BlockStart(player, 0));
+        BlockShield.SetShield(true);
+        EventManager.Instance.TriggerEvent(new BlockStart(player, PlayerNumber));
     }
 
     [Command]
@@ -370,7 +366,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerBlockEnd(GameObject player)
     {
-        EventManager.Instance.TriggerEvent(new BlockEnd(player, 0));
+        BlockShield.SetShield(false);
+        EventManager.Instance.TriggerEvent(new BlockEnd(player, PlayerNumber));
     }
 
     [Command]
@@ -415,6 +412,17 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void CmdSetBlock(bool block)
     {
         _isBlocking = block;
+    }
+
+    [Command]
+    private void CmdSetStamina(float stamina)
+    {
+        _currentStamina = stamina;
+    }
+
+    private void SetStamina(float oldStamina, float newStamina)
+    {
+        BlockShield.SetEnergy(newStamina / CharacterDataStore.MaxStamina);
     }
     #endregion
 
@@ -735,12 +743,13 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             _lastTimeUseStamina = Time.timeSinceLevelLoad;
         }
         BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
-
+        CmdSetStamina(_currentStamina);
         // BlockUIVFXHolder.SetActive(true);
         // Vector2 _nextStaminaUISize = _staminaUISize;
         // _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
         // BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
     }
+
     #endregion
 
     #region Movment States

@@ -30,7 +30,7 @@ public class WeaponGenerator : MonoBehaviour
 
     }
 
-    public void GenerateWeapon(GameObject WeaponPrefab)
+    public GameObject GenerateWeapon(GameObject WeaponPrefab)
     {
 
         GameObject Weapon = Instantiate(WeaponPrefab);
@@ -44,7 +44,16 @@ public class WeaponGenerator : MonoBehaviour
         Weapon.transform.position = transform.position + new Vector3(XZOffset.x, 6.5f, XZOffset.y);
 
         Weapon.GetComponent<Rigidbody>().velocity = Vector3.zero;
-        Weapon.GetComponent<WeaponBase>().OnSpawn();
+        if (Weapon.GetComponent<WeaponBase>())
+        {
+            Weapon.GetComponent<WeaponBase>().OnSpawn();
+        }
+        if (Weapon.GetComponent<NetworkWeaponBase>())
+        {
+            Weapon.GetComponent<NetworkWeaponBase>().OnSpawn();
+        }
+
+        return Weapon;
 
     }
 

@@ -22155,6 +22155,7 @@ GameObject:
   - component: {fileID: 881600388}
   - component: {fileID: 881600392}
   - component: {fileID: 881600387}
+  - component: {fileID: 881600393}
   m_Layer: 0
   m_Name: NetworkGameManager
   m_TagString: Untagged
@@ -22285,6 +22286,25 @@ MonoBehaviour:
   OccupyCounter: {fileID: 906003995}
   Team1ScoreText: {fileID: 929890854}
   Team2ScoreText: {fileID: 681748931}
+--- !u!114 &881600393
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 881600386}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16e341743b605cb469893f8222d81cb7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
+  WeaponGenerators_2Player: {fileID: 897772366}
+  WeaponGenerators_MorePlayer: {fileID: 897772366}
+  AvailableWeaponList:
+  - {fileID: 6028309074441318310, guid: c5537c7724a833243851adc257010016, type: 3}
+  WeaponQuantityList: 04000000
 --- !u!1 &897772366
 GameObject:
   m_ObjectHideFlags: 0
@@ -146473,7 +146493,7 @@ Transform:
   m_GameObject: {fileID: 1406545831380407777}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 17.5, y: 0, z: -17.5}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
+  m_LocalScale: {x: 0.55, y: 0.55, z: 0.55}
   m_Children:
   - {fileID: 1075986201}
   - {fileID: 1400381843}

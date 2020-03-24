@@ -93,7 +93,8 @@ public class NetworkRtFist : NetworkWeaponBase
             else
             {
                 // Charged
-                RpcFistGunCharged(gameObject, Owner, transform.position);
+                if (isServer)
+                    RpcFistGunCharged(gameObject, Owner, transform.position);
                 Destroy(_fistDup);
                 _fistDup = null;
                 // _fist.gameObject.SetActive(true);

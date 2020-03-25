@@ -120,7 +120,7 @@ MonoBehaviour:
   - {fileID: 2058091730745428854}
   - {fileID: 2058091729168473016}
   - {fileID: 1135808638625046613}
-  BlockUIVFXHolder: {fileID: 8566860558929932766}
+  BlockUIVFXHolder: {fileID: 0}
   BlockShield: {fileID: 7062120869660395739}
   NamePlate: {fileID: 7632062592454182063}
   HandObject: {fileID: 0}
@@ -180,7 +180,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 1397696075363323865}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -381,6 +381,11 @@ PrefabInstance:
     - target: {fileID: 689603609705083798, guid: c3a9823089c243046bfb58105832471b,
         type: 3}
       propertyPath: m_IsKinematic
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 689603609705083798, guid: c3a9823089c243046bfb58105832471b,
+        type: 3}
+      propertyPath: m_CollisionDetection
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2040752910071275732, guid: c3a9823089c243046bfb58105832471b,
@@ -515,12 +520,6 @@ GameObject:
 --- !u!1 &2058091730745428854 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1420999340467004539, guid: c3a9823089c243046bfb58105832471b,
-    type: 3}
-  m_PrefabInstance: {fileID: 1096530685538709261}
-  m_PrefabAsset: {fileID: 0}
---- !u!1 &8566860558929932766 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 8778697181860929235, guid: c3a9823089c243046bfb58105832471b,
     type: 3}
   m_PrefabInstance: {fileID: 1096530685538709261}
   m_PrefabAsset: {fileID: 0}

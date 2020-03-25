@@ -52,7 +52,18 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     /// Clean up after the weapon is despawned
     /// Return it to it's initial state
     /// </summary>
-    protected abstract void _onWeaponDespawn();
+    protected virtual void _onWeaponDespawn()
+    {
+        gameObject.SetActive(false);
+        RpcOnWeaponDespawn();
+    }
+
+    [ClientRpc]
+    protected virtual void RpcOnWeaponDespawn()
+    {
+        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+        gameObject.SetActive(false);
+    }
 
     protected void _onWeaponUsedOnce()
     {

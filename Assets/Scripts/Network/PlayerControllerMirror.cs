@@ -163,8 +163,10 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         if (!isLocalPlayer) return;
         if (other.CompareTag("DeathZone") || other.CompareTag("DeathModeTrapZone"))
         {
-            ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
-            ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
+            if (_movementFSM.CurrentState != null)
+                ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
+            if (_actionFSM.CurrentState != null)
+                ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
             CmdTriggerPlayerDeath(gameObject, other.gameObject);
             // EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
         }
@@ -173,7 +175,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void OnCollisionEnter(Collision other)
     {
         if (!isLocalPlayer) return;
-        ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
+        if (_movementFSM.CurrentState != null)
+            ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
     }
 
     #region Networking Function
@@ -418,6 +421,18 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void CmdSetStamina(float stamina)
     {
         _currentStamina = stamina;
+    }
+
+    [Command]
+    private void CmdTriggerPunchInterruptted()
+    {
+        RpcTriggerPunchInterruptted();
+    }
+
+    [ClientRpc]
+    private void RpcTriggerPunchInterruptted()
+    {
+        EventManager.Instance.TriggerEvent(new PunchInterruptted(gameObject, PlayerNumber));
     }
 
     private void SetStamina(float oldStamina, float newStamina)
@@ -1614,7 +1629,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.OnEnter();
             Context._dropHandObject();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
-            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            Context.CmdTriggerPunchInterruptted();
+            // EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
 
         public override void Update()

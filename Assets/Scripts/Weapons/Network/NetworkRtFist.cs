@@ -24,7 +24,6 @@ public class NetworkRtFist : NetworkWeaponBase
     }
     [SyncVar]
     private Vector3 _maxDistance;
-    [SyncVar]
     private float _chargeTimer;
 
     protected override void Awake()
@@ -164,6 +163,7 @@ public class NetworkRtFist : NetworkWeaponBase
     [ClientRpc]
     private void RpcSwitchToRecharge(bool maintainSpeed)
     {
+        _chargeTimer = Time.time;
         _fist.DOScale(0f, _fistGunData.ReloadTime).SetEase(_fistGunData.ReloadEase).From().OnPlay(() => _fist.gameObject.SetActive(true));
         EventManager.Instance.TriggerEvent(new FistGunStartCharging(gameObject, _fireOwner, _fireOwner.GetComponent<PlayerControllerMirror>().PlayerNumber));
         _fistDup.GetComponent<Rigidbody>().isKinematic = false;

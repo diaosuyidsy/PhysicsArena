@@ -462,7 +462,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             CmdTriggerPlayerHit(sender, gameObject, force, !_blockable);
             _setVelocity(Vector3.zero);
             // EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerControllerMirror>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
-            OnImpact(force, ForceMode.VelocityChange, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
+            OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
         }
     }
 

@@ -15,13 +15,13 @@ public class ShieldController : MonoBehaviour
     {
         Animator.SetBool("ShieldOpen", open);
         Shield.SetActive(open);
-        if (!open)
-        {
-            GameObject afterImage = Instantiate(Shield, Shield.transform.parent);
-            afterImage.transform.parent = null;
-            afterImage.SetActive(true);
-            Destroy(afterImage, 0.3f);
-        }
+        // if (!open)
+        // {
+        //     GameObject afterImage = Instantiate(Shield, Shield.transform.parent);
+        //     afterImage.transform.parent = null;
+        //     afterImage.SetActive(true);
+        //     Destroy(afterImage, 0.3f);
+        // }
     }
 
     public void SetEnergy(float Energy)

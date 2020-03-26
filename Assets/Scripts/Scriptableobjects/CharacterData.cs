@@ -24,7 +24,7 @@ public class CharacterData : ScriptableObject
     public float MaxStamina = 1.5f;
     public float StaminaRegenInterval = 3f;
     public float StaminaRegenRate = 1f;
-    public float BlockUILingerDuration = 0.2f;
+    public float BlockLingerDuration = 0.2f;
     public float BlockStaminaDrain = 1f;
     public float BlockMultiplier = 2f;
     public float BlockAngle = 90f;
@@ -69,8 +69,8 @@ public class CharacterData : ScriptableObject
     public float PickUpCD = 0f;
     public LayerMask PickUpLayer;
     public float DropRecoveryTime = 0.2f;
-	public Vector3 HitStopViberation = new Vector3(1f, 0.1f, 1f);
-	public int HitStopViberato = 90;
-	public float HitStopRandomness = 90f;
-	public Ease HitStopViberationEase = Ease.OutBack;
+    public Vector3 HitStopViberation = new Vector3(1f, 0.1f, 1f);
+    public int HitStopViberato = 90;
+    public float HitStopRandomness = 90f;
+    public Ease HitStopViberationEase = Ease.OutBack;
 }

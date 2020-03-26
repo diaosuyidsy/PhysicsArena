@@ -1757,9 +1757,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
     private class BlockingState : ActionState
     {
-        private float _timer;
         private bool _pushedOnce;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        private float _blockPutDownTimer;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1768,14 +1768,17 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context.CmdSetBlock(true);
             Context._animator.SetBool("Blocking", true);
             Context.BlockShield.SetShield(true);
-            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
             _pushedOnce = false;
         }
 
         public override void Update()
         {
             base.Update();
-            if (!(_B || _LeftTrigger) && _timer < Time.timeSinceLevelLoad)
+            if (_BUp || _LeftTriggerUp)
+            {
+                _blockPutDownTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.BlockLingerDuration;
+            }
+            if (!(_B || _LeftTrigger) && _blockPutDownTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleActionState>();
                 return;

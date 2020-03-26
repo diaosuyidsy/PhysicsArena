@@ -226,6 +226,7 @@ public class NetworkRtHook : NetworkWeaponBase
     [Command]
     private void CmdHookHit(GameObject hit)
     {
+        print("Command Hook Hit");
         Hooked = hit.transform.gameObject;
         EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit,
         hit.GetComponent<PlayerControllerMirror>().PlayerNumber));

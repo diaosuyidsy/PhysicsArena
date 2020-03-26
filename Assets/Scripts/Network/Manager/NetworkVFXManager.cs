@@ -304,7 +304,7 @@ public class NetworkVFXManager
 
     private void _onFistGunHit(FistGunHit ev)
     {
-        /*if (VFXDataStore.FistGunHitVFX != null)
+        if (VFXDataStore.FistGunHitVFX != null)
         {
             foreach (GameObject VFX in VFXDataStore.FistGunHitVFX)
             {
@@ -316,7 +316,7 @@ public class NetworkVFXManager
                 Vector3 hittedRotation = ev.Fist.transform.eulerAngles + VFX.transform.eulerAngles;
                 _instantiateVFX(VFX, hittedPos, Quaternion.Euler(hittedRotation.x, hittedRotation.y, hittedRotation.z));
             }
-        }*/
+        }
     }
 
     private void _onBazookaLaunched(BazookaFired ev)

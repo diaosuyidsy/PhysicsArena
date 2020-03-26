@@ -163,8 +163,10 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         if (!isLocalPlayer) return;
         if (other.CompareTag("DeathZone") || other.CompareTag("DeathModeTrapZone"))
         {
-            ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
-            ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
+            if (_movementFSM.CurrentState != null)
+                ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
+            if (_actionFSM.CurrentState != null)
+                ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
             CmdTriggerPlayerDeath(gameObject, other.gameObject);
             // EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
         }
@@ -173,7 +175,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void OnCollisionEnter(Collision other)
     {
         if (!isLocalPlayer) return;
-        ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
+        if (_movementFSM.CurrentState != null)
+            ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
     }
 
     #region Networking Function
@@ -420,9 +423,28 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         _currentStamina = stamina;
     }
 
+    [Command]
+    private void CmdTriggerPunchInterruptted()
+    {
+        RpcTriggerPunchInterruptted();
+    }
+
+    [ClientRpc]
+    private void RpcTriggerPunchInterruptted()
+    {
+        EventManager.Instance.TriggerEvent(new PunchInterruptted(gameObject, PlayerNumber));
+    }
+
     private void SetStamina(float oldStamina, float newStamina)
     {
         BlockShield.SetEnergy(newStamina / CharacterDataStore.MaxStamina);
+    }
+
+    [Command]
+    private void CmdTurnHandObject(GameObject handObject, Vector3 eulerAngles)
+    {
+        if (handObject != null)
+            handObject.transform.eulerAngles = eulerAngles;
     }
     #endregion
 
@@ -701,6 +723,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             transform.LookAt(target.transform);
             if (HandObject != null)
             {
+                CmdTurnHandObject(HandObject, transform.eulerAngles + new Vector3(0f, 90f, 0f));
                 HandObject.transform.eulerAngles = transform.eulerAngles + new Vector3(0f, 90f, 0f);
             }
         }
@@ -1614,7 +1637,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             base.OnEnter();
             Context._dropHandObject();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
-            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            Context.CmdTriggerPunchInterruptted();
+            // EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
 
         public override void Update()
@@ -1733,9 +1757,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
     private class BlockingState : ActionState
     {
-        private float _timer;
         private bool _pushedOnce;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        private float _blockPutDownTimer;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1744,14 +1768,17 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context.CmdSetBlock(true);
             Context._animator.SetBool("Blocking", true);
             Context.BlockShield.SetShield(true);
-            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
             _pushedOnce = false;
         }
 
         public override void Update()
         {
             base.Update();
-            if (!(_B || _LeftTrigger) && _timer < Time.timeSinceLevelLoad)
+            if (_BUp || _LeftTriggerUp)
+            {
+                _blockPutDownTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.BlockLingerDuration;
+            }
+            if (!(_B || _LeftTrigger) && _blockPutDownTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleActionState>();
                 return;

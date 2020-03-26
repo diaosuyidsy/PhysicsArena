@@ -33,16 +33,20 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     public float CartRadius;
     public GameObject CartDotline;
 
+    public GameObject LevelupTimerCounter;
+
     public GameObject OccupyCanvas;
     public GameObject OccupyCounter;
 
-    public GameObject Team1ScoreText;
-    public GameObject Team2ScoreText;
+    public GameObject Team1SpeedLevelText;
+    public GameObject Team2SpeedLevelText;
+    public GameObject Team1SpeedLevelPlusText;
+    public GameObject Team2SpeedLevelPlusText;
 
-    private int Team1Score;
-    private int Team2Score;
-
-    private int OccupiedCheckpoints;
+    private int Team1SpeedLevel;
+    private int Team2SpeedLevel;
+    private int Team1SpeedLevelPlus;
+    private int Team2SpeedLevelPlus;
 
 
     private List<GameObject> CheckPointList;
@@ -58,11 +62,16 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     private bool GameStart;
     private bool GameEnd;
 
+    private float SpeedLevelTimer;
+
     // Start is called before the first frame update
     void Start()
     {
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
+
+        Team1SpeedLevelPlus = Team2SpeedLevelPlus = 1;
+        SetUI();
 
         TargetWayPointIndex = -1;
         CurrentSide = LastSide = CartSide.Neutral;
@@ -83,6 +92,8 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     {
         OccupyCanvas.transform.position = new Vector3(Cart.transform.position.x, 0.1f, Cart.transform.position.z);
 
+        ManageSpeed();
+
         DetectCartSide();
         SetDotline();
         if(CurrentState == CartState.Moving)
@@ -94,6 +105,36 @@ public class CartModeReforgedArenaManager : MonoBehaviour
             CartOccupy();
         }
 
+    }
+
+    private void ManageSpeed()
+    {
+        if (GameEnd || !GameStart)
+        {
+            return;
+        }
+
+        SpeedLevelTimer += Time.deltaTime;
+        if(SpeedLevelTimer >= Data.SpeedUpTime)
+        {
+            Team1SpeedLevel += Team1SpeedLevelPlus;
+            Team2SpeedLevel += Team2SpeedLevelPlus;
+            SpeedLevelTimer = 0;
+
+            if (Team1SpeedLevel > Data.MaxLevel)
+            {
+                Team1SpeedLevel = Data.MaxLevel;
+            }
+
+            if (Team2SpeedLevel > Data.MaxLevel)
+            {
+                Team2SpeedLevel = Data.MaxLevel;
+            }
+
+            SetUI();
+        }
+
+        LevelupTimerCounter.GetComponent<Image>().fillAmount = SpeedLevelTimer / Data.SpeedUpTime;
     }
 
     private void DetectCartSide()
@@ -119,20 +160,16 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         {
             LastSide = CurrentSide;
         }
-        if (Team1Count>0 && Team2Count > 0)
-        {
-            CurrentSide = CartSide.Neutral;
-            CurrentSpeed = 0;
-        }
-        else if (Team1Count > 0)
+
+        if (Team1Count > Team2Count)
         {
             CurrentSide = CartSide.Team1;
-            CurrentSpeed = Data.BaseCartSpeed + Data.CartSpeedBonusPerCheckpoint * OccupiedCheckpoints;
+            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel];
         }
-        else if (Team2Count > 0)
+        else if (Team2Count > Team1Count)
         {
             CurrentSide = CartSide.Team2;
-            CurrentSpeed = Data.BaseCartSpeed + Data.CartSpeedBonusPerCheckpoint * OccupiedCheckpoints;
+            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel];
         }
         else
         {
@@ -166,7 +203,6 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
         if (!Occupiable(CheckPointList[TargetWayPointIndex]))
         {
-            CurrentOccupyProgress = 0;
             OccupyCounter.GetComponent<Image>().fillAmount = 0;
             CurrentState = CartState.Moving;
             return;
@@ -174,16 +210,30 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
         if(CurrentSide == CartSide.Neutral)
         {
+            CurrentOccupyProgress -= Data.RecoverSpeed * Time.deltaTime;
+            if (CurrentOccupyProgress < 0)
+            {
+                CurrentOccupyProgress = 0;
+            }
+            OccupyCounter.GetComponent<Image>().fillAmount = CurrentOccupyProgress;
             return;
         }
+        
+        if(CurrentSide == CartSide.Team1)
+        {
+            CurrentOccupyProgress += Data.OccupySpeedWithCheckpoint[Team1SpeedLevel] * Time.deltaTime;
+            OccupyCounter.GetComponent<Image>().fillAmount = CurrentOccupyProgress;
+        }
+        else
+        {
+            CurrentOccupyProgress += Data.OccupySpeedWithCheckpoint[Team2SpeedLevel] * Time.deltaTime;
+            OccupyCounter.GetComponent<Image>().fillAmount = CurrentOccupyProgress;
+        }
 
-        CurrentOccupyProgress += Data.CheckpointOccupySpeed * Time.deltaTime;
-        OccupyCounter.GetComponent<Image>().fillAmount = CurrentOccupyProgress;
+
 
         if (CurrentOccupyProgress >= 1)
         {
-            OccupiedCheckpoints++;
-
             CurrentOccupyProgress = 0;
             CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Occupied = true;
             CheckPointList[TargetWayPointIndex].GetComponent<MeshRenderer>().enabled = false;
@@ -192,35 +242,56 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
             if(CurrentSide == CartSide.Team1)
             {
-                GameObject Text = GameObject.Instantiate(CheckpointScoreTextPrefab);
-                Text.transform.position = CheckPointList[TargetWayPointIndex].transform.position;
-                Text.GetComponent<TextMesh>().text = "+" + CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score.ToString();
-                Text.GetComponent<TextMesh>().color = FeelData.Team1DotlineColor;
+                Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
 
-                GainScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, true);
+                GenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, true);
+
                 TargetWayPointIndex++;
                 if(TargetWayPointIndex >= CheckPointList.Count)
                 {
+                    GameEnd = true;
+                    EventManager.Instance.TriggerEvent(new GameEnd(1, Cart.transform, GameWinType.CartWin));
                     TargetWayPointIndex = CheckPointList.Count - 1;
+
+                    return;
                 }
             }
             else
             {
-                GameObject Text = GameObject.Instantiate(CheckpointScoreTextPrefab);
-                Text.transform.position = CheckPointList[TargetWayPointIndex].transform.position;
-                Text.GetComponent<TextMesh>().text = "+" + CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score.ToString();
-                Text.GetComponent<TextMesh>().color = FeelData.Team2DotlineColor;
+                Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
 
-                GainScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, false);
+                GenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, false);
+
                 TargetWayPointIndex--;
                 if(TargetWayPointIndex < 0)
                 {
+                    GameEnd = true;
+                    EventManager.Instance.TriggerEvent(new GameEnd(2, Cart.transform, GameWinType.CartWin));
                     TargetWayPointIndex = 0;
+
+                    return;
                 }
             }
 
             CurrentState = CartState.Moving;
-            
+
+            SetUI();
+
+        }
+    }
+
+    private void GenerateCheckpointScore(int Amount, Vector3 Pos, bool Team1)
+    {
+        GameObject Text = GameObject.Instantiate(CheckpointScoreTextPrefab);
+        Text.transform.position = Pos;
+        Text.GetComponent<TextMesh>().text = "+" + Amount.ToString();
+        if (Team1)
+        {
+            Text.GetComponent<TextMesh>().color = FeelData.Team1DotlineColor;
+        }
+        else
+        {
+            Text.GetComponent<TextMesh>().color = FeelData.Team2DotlineColor;
         }
     }
 
@@ -324,8 +395,11 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
     private void SetUI()
     {
-        Team1ScoreText.GetComponent<TextMeshProUGUI>().text = Team1Score.ToString();
-        Team2ScoreText.GetComponent<TextMeshProUGUI>().text = Team2Score.ToString();
+        Team1SpeedLevelText.GetComponent<TextMeshProUGUI>().text = Team1SpeedLevel.ToString();
+        Team2SpeedLevelText.GetComponent<TextMeshProUGUI>().text = Team2SpeedLevel.ToString();
+
+        Team1SpeedLevelPlusText.GetComponent<TextMeshProUGUI>().text = "+" + Team1SpeedLevelPlus.ToString();
+        Team2SpeedLevelPlusText.GetComponent<TextMeshProUGUI>().text = "+" + Team2SpeedLevelPlus.ToString();
     }
 
    
@@ -351,40 +425,8 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         {
             return;
         }
-
-        if (e.Player.tag.Contains("1"))
-        {
-            GainScore(Data.KillScore, false);
-        }
-        else
-        {
-            GainScore(Data.KillScore, true);
-        }
     }
 
-    private void GainScore(int Amount, bool Team1)
-    {
-        if (Team1)
-        {
-            Team1Score += Amount;
-            if(Team1Score >= Data.WinScore)
-            {
-                GameEnd = true;
-                EventManager.Instance.TriggerEvent(new GameEnd(1, Cart.transform, GameWinType.CartWin));
-            }
-        }
-        else
-        {
-            Team2Score += Amount;
-            if(Team2Score >= Data.WinScore)
-            {
-                GameEnd = true;
-                EventManager.Instance.TriggerEvent(new GameEnd(2, Cart.transform, GameWinType.CartWin));
-            }
-        }
-
-        SetUI();
-    }
 
     private void OnGameStart(GameStart e)
     {

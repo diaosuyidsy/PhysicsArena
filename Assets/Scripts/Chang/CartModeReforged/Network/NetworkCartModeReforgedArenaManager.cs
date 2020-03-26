@@ -32,19 +32,24 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
     public float CartRadius;
     public GameObject CartDotline;
 
+    public GameObject LevelUpTimerCounter;
+
     public GameObject OccupyCanvas;
     public GameObject OccupyCounter;
 
-    public GameObject Team1ScoreText;
-    public GameObject Team2ScoreText;
+    public GameObject Team1SpeedLevelText;
+    public GameObject Team2SpeedLevelText;
+    public GameObject Team1SpeedLevelPlusText;
+    public GameObject Team2SpeedLevelPlusText;
 
-    [SyncVar(hook = nameof(SetTeam1Score))]
-    private int Team1Score;
-    [SyncVar(hook = nameof(SetTeam2Score))]
-    private int Team2Score;
-
-    [SyncVar]
-    private int OccupiedCheckpoints;
+    [SyncVar(hook = nameof(SetTeam1SpeedLevel))]
+    private int Team1SpeedLevel;
+    [SyncVar(hook = nameof(SetTeam2SpeedLevel))]
+    private int Team2SpeedLevel;
+    [SyncVar(hook = nameof(SetTeam1SpeedLevelPlus))]
+    private int Team1SpeedLevelPlus;
+    [SyncVar(hook = nameof(SetTeam2SpeedLevelPlus))]
+    private int Team2SpeedLevelPlus;
 
 
     private List<GameObject> CheckPointList;
@@ -67,11 +72,16 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
     private bool GameStart;
     private bool GameEnd;
 
+    [SyncVar(hook = nameof(SetLevelUpTimerCounter))]
+    private float SpeedLevelTimer;
+
     // Start is called before the first frame update
     void Start()
     {
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
+
+        Team1SpeedLevelPlus = Team2SpeedLevelPlus = 1;
 
         TargetWayPointIndex = -1;
         CurrentSide = LastSide = CartSide.Neutral;
@@ -97,6 +107,8 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
 
         OccupyCanvas.transform.position = new Vector3(Cart.transform.position.x, 0.1f, Cart.transform.position.z);
 
+        ManageSpeed();
+
         DetectCartSide();
         if (CurrentState == CartState.Moving)
         {
@@ -107,6 +119,37 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
             CartOccupy();
         }
 
+    }
+
+    private void SetLevelUpTimerCounter(float oldValue,float newValue)
+    {
+        LevelUpTimerCounter.GetComponent<Image>().fillAmount = newValue / Data.SpeedUpTime;
+    }
+
+    private void ManageSpeed()
+    {
+        if (GameEnd || !GameStart)
+        {
+            return;
+        }
+
+        SpeedLevelTimer += Time.deltaTime;
+        if (SpeedLevelTimer >= Data.SpeedUpTime)
+        {
+            Team1SpeedLevel += Team1SpeedLevelPlus;
+            Team2SpeedLevel += Team2SpeedLevelPlus;
+            SpeedLevelTimer = 0;
+
+            if (Team1SpeedLevel > Data.MaxLevel)
+            {
+                Team1SpeedLevel = Data.MaxLevel;
+            }
+
+            if (Team2SpeedLevel > Data.MaxLevel)
+            {
+                Team2SpeedLevel = Data.MaxLevel;
+            }
+        }
     }
 
     private void DetectCartSide()
@@ -132,20 +175,16 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
         {
             LastSide = CurrentSide;
         }
-        if (Team1Count > 0 && Team2Count > 0)
-        {
-            CurrentSide = CartSide.Neutral;
-            CurrentSpeed = 0;
-        }
-        else if (Team1Count > 0)
+
+        if (Team1Count > Team2Count)
         {
             CurrentSide = CartSide.Team1;
-            CurrentSpeed = Data.BaseCartSpeed + Data.CartSpeedBonusPerCheckpoint * OccupiedCheckpoints;
+            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel];
         }
-        else if (Team2Count > 0)
+        else if (Team2Count > Team1Count)
         {
             CurrentSide = CartSide.Team2;
-            CurrentSpeed = Data.BaseCartSpeed + Data.CartSpeedBonusPerCheckpoint * OccupiedCheckpoints;
+            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel];
         }
         else
         {
@@ -179,22 +218,32 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
 
         if (!Occupiable(CheckPointList[TargetWayPointIndex]))
         {
-            CurrentOccupyProgress = 0;
+
             CurrentState = CartState.Moving;
             return;
         }
 
         if(CurrentSide == CartSide.Neutral)
         {
+            CurrentOccupyProgress -= Data.RecoverSpeed * Time.deltaTime;
+            if (CurrentOccupyProgress < 0)
+            {
+                CurrentOccupyProgress = 0;
+            }
             return;
         }
 
-        CurrentOccupyProgress += Data.CheckpointOccupySpeed * Time.deltaTime;
+        if (CurrentSide == CartSide.Team1)
+        {
+            CurrentOccupyProgress += Data.OccupySpeedWithCheckpoint[Team1SpeedLevel] * Time.deltaTime;
+        }
+        else
+        {
+            CurrentOccupyProgress += Data.OccupySpeedWithCheckpoint[Team2SpeedLevel] * Time.deltaTime;
+        }
 
         if (CurrentOccupyProgress >= 1)
         {
-            OccupiedCheckpoints++;
-
             CurrentOccupyProgress = 0;
             CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Occupied = true;
             CheckPointList[TargetWayPointIndex].GetComponent<MeshRenderer>().enabled = false;
@@ -205,24 +254,34 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
 
             if (CurrentSide == CartSide.Team1)
             {
+                Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
                 RpcGenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, true);
 
-                GainScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, true);
                 TargetWayPointIndex++;
                 if (TargetWayPointIndex >= CheckPointList.Count)
                 {
+                    GameEnd = true;
+                    EventManager.Instance.TriggerEvent(new GameEnd(1, Cart.transform, GameWinType.CartWin));
                     TargetWayPointIndex = CheckPointList.Count - 1;
+
+                    return;
                 }
             }
             else
             {
+                Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
                 RpcGenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, false);
 
-                GainScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, false);
                 TargetWayPointIndex--;
                 if (TargetWayPointIndex < 0)
                 {
+                    GameEnd = true;
+                    EventManager.Instance.TriggerEvent(new GameEnd(2, Cart.transform, GameWinType.CartWin));
                     TargetWayPointIndex = 0;
+
+                    return;
                 }
             }
 
@@ -351,14 +410,24 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
     }
 
 
-    private void SetTeam1Score(int oldValue,int newValue)
+    private void SetTeam1SpeedLevel(int oldValue,int newValue)
     {
-        Team1ScoreText.GetComponent<TextMeshProUGUI>().text = newValue.ToString();
+        Team1SpeedLevelText.GetComponent<TextMeshProUGUI>().text = newValue.ToString();
     }
 
-    private void SetTeam2Score(int oldValue,int newValue)
+    private void SetTeam2SpeedLevel(int oldValue,int newValue)
     {
-        Team2ScoreText.GetComponent<TextMeshProUGUI>().text = newValue.ToString();
+        Team2SpeedLevelText.GetComponent<TextMeshProUGUI>().text = newValue.ToString();
+    }
+
+    private void SetTeam1SpeedLevelPlus(int oldValue, int newValue)
+    {
+        Team1SpeedLevelPlusText.GetComponent<TextMeshProUGUI>().text = "+" + newValue.ToString();
+    }
+
+    private void SetTeam2SpeedLevelPlus(int oldValue,int newValue)
+    {
+        Team2SpeedLevelPlusText.GetComponent<TextMeshProUGUI>().text = "+" + newValue.ToString();
     }
 
     private void SetOccupyCircle(float oldValue, float newValue)
@@ -392,37 +461,6 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
         if (GameEnd || !GameStart)
         {
             return;
-        }
-
-        if (e.Player.tag.Contains("1"))
-        {
-            GainScore(Data.KillScore, false);
-        }
-        else
-        {
-            GainScore(Data.KillScore, true);
-        }
-    }
-
-    private void GainScore(int Amount, bool Team1)
-    {
-        if (Team1)
-        {
-            Team1Score += Amount;
-            if (Team1Score >= Data.WinScore)
-            {
-                GameEnd = true;
-                EventManager.Instance.TriggerEvent(new GameEnd(1, Cart.transform, GameWinType.CartWin));
-            }
-        }
-        else
-        {
-            Team2Score += Amount;
-            if (Team2Score >= Data.WinScore)
-            {
-                GameEnd = true;
-                EventManager.Instance.TriggerEvent(new GameEnd(2, Cart.transform, GameWinType.CartWin));
-            }
         }
     }
 

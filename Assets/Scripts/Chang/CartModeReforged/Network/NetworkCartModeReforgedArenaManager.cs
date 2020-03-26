@@ -176,12 +176,17 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
             LastSide = CurrentSide;
         }
 
-        if (Team1Count > Team2Count)
+        if (Team1Count > 0 && Team2Count > 0)
+        {
+            CurrentSide = CartSide.Neutral;
+            CurrentSpeed = 0;
+        }
+        else if (Team1Count > 0)
         {
             CurrentSide = CartSide.Team1;
             CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel];
         }
-        else if (Team2Count > Team1Count)
+        else if (Team2Count > 0)
         {
             CurrentSide = CartSide.Team2;
             CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel];

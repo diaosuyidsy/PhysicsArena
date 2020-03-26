@@ -4,8 +4,29 @@ using UnityEngine;
 
 public class CanonFeelData : MonoBehaviour
 {
-    public float MaxPipeAngle;
-    public float PipeRotateSpeed;
+    public float MinShootDisShape;
+    public float MaxShootDisShape;
+    public float MinPercentage;
+    public float MaxPercentage;
+
+    public float MinLinearLimit;
+    public float MaxLinearLimit;
+    public float MinPadDis;
+    public float MaxPadDis;
+    public float MinJoint0AngularYZ;
+    public float MaxJoint0AngularYZ;
+    public float MinJoint1AngularYZ;
+    public float MaxJoint1AngularYZ;
+    public float MinJointRotation;
+    public float MaxJointRotation;
+    public float MinAmmoPos;
+    public float MaxAmmoPos;
+
+    public float AimingPercentageFollowSpeed;
+    public float ShootPercentageFollowSpeed;
+    public float PercentageIgnoreError;
+
+    public float RotateSpeed;
 
     public float CabelStartEmission;
     public float CabelEndEmission;
@@ -14,19 +35,12 @@ public class CanonFeelData : MonoBehaviour
     public Color RedCabelColor;
     public Color BlueCabelColor;
 
-    public Vector3 PipeEndStartLocalPos;
-    public float PipeEndFireTime;
-    public float PipeEndRecoverTime;
-    public float PipeEndShakeDis;
-
     public float MarkAppearTime;
     public Color MarkDefaultColor;
     public Color MarkAlertColor;
+    public Color MarkFallColor;
 
-    public GameObject BombPrefab;
-    public float BombInvisibleHeight;
-    public float BombRiseTime;
-    public float BombFallTime;
+    public float BombVerticalSpeedPercentage;
 
 
     // Start is called before the first frame update

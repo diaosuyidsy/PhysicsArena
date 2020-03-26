@@ -57,7 +57,7 @@ public class Basket : MonoBehaviour
         CheckScoreText();
     }
 
-    private void CheckScoreText()
+    private void CheckScoreText() //Score text pop up
     {
         Color color = ScoreText.GetComponent<TextMeshProUGUI>().color;
         switch (TextState)
@@ -93,7 +93,7 @@ public class Basket : MonoBehaviour
         }
     }
 
-    private void CheckCharacter()
+    private void CheckCharacter() //Add/remove bagel holder to camera
     {
 
         Collider[] AllHits = Physics.OverlapSphere(transform.position, DetectRadius);
@@ -125,7 +125,7 @@ public class Basket : MonoBehaviour
 
     }
 
-    private void CheckBagel()
+    private void CheckBagel()// Suck Bagel
     {
         if (Bagel == null)
         {

@@ -18,6 +18,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     public bool CanBePickedUp;
     protected bool _followHand;
     protected float _pickUpTimer;
+    protected bool _ownerIsLocalPlayer => Owner == null ? false : Owner.GetComponent<NetworkIdentity>().isLocalPlayer;
     // protected FSM<WeaponBase> WeaponBaseFSM;
 
     protected virtual void Awake()

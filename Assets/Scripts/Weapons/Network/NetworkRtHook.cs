@@ -196,18 +196,19 @@ public class NetworkRtHook : NetworkWeaponBase
                                 _hookGunData.HookDistance,
                                 _hookGunData.HookableLayer ^ (1 << Context.gameObject.layer)))
             {
-                if (hit.transform.GetComponent<IHittableNetwork>() != null)
+                if (Context._ownerIsLocalPlayer && hit.transform.GetComponent<IHittableNetwork>() != null)
                 {
                     // Decide if he blocked
                     if (hit.transform.GetComponent<IHittableNetwork>().CanBlock(-Context._hook.transform.right))
                     {
-                        Context.RpcHookBlocked(hit.transform.gameObject);
+                        Context.CmdHookBlocked(hit.transform.gameObject);
                         EventManager.Instance.TriggerEvent(new HookBlocked(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hit.transform.gameObject, hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber, Context._hook));
                         TransitionTo<HookBrokenState>();
                         return;
                     }
                     Context.Hooked = hit.transform.gameObject;
                     // Context.RpcHookHit(hit.transform.gameObject);
+                    Context.CmdHookHit(hit.transform.gameObject);
                     EventManager.Instance.TriggerEvent(new HookHit(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, Context._hook, hit.transform.gameObject,
                     hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber));
                     Context.Hooked.GetComponent<IHittableNetwork>().OnImpact(Context.Owner, ImpactType.HookGun);
@@ -222,9 +223,10 @@ public class NetworkRtHook : NetworkWeaponBase
         }
     }
 
-    [ClientRpc]
-    private void RpcHookHit(GameObject hit)
+    [Command]
+    private void CmdHookHit(GameObject hit)
     {
+        Hooked = hit.transform.gameObject;
         EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit,
         hit.GetComponent<PlayerControllerMirror>().PlayerNumber));
         hit.GetComponent<IHittableNetwork>().OnImpact(Owner, ImpactType.HookGun);
@@ -236,8 +238,31 @@ public class NetworkRtHook : NetworkWeaponBase
     }
 
     [ClientRpc]
+    private void RpcHookHit(GameObject hit)
+    {
+        if (_ownerIsLocalPlayer) return;
+        EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit,
+        hit.GetComponent<PlayerControllerMirror>().PlayerNumber));
+        hit.GetComponent<IHittableNetwork>().OnImpact(Owner, ImpactType.HookGun);
+        foreach (var rb in hit.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+        }
+        _hookGunFSM.TransitionTo<HookOnTargetState>();
+    }
+
+    [Command]
+    private void CmdHookBlocked(GameObject hookblocker)
+    {
+        EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hookblocker, hookblocker.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook));
+        _hookGunFSM.TransitionTo<HookBrokenState>();
+        RpcHookBlocked(hookblocker);
+    }
+
+    [ClientRpc]
     private void RpcHookBlocked(GameObject hookblocker)
     {
+        if (_ownerIsLocalPlayer) return;
         EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hookblocker, hookblocker.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook));
         _hookGunFSM.TransitionTo<HookBrokenState>();
     }

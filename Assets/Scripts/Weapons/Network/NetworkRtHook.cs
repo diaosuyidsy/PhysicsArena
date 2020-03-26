@@ -127,7 +127,8 @@ public class NetworkRtHook : NetworkWeaponBase
             Context._hook.transform.localScale = Context._hookinitlocalScale;
             Context._hook.transform.localEulerAngles = Vector3.zero;
             Context._hook.transform.localPosition = Context._hookinitlocalPos;
-            Context._released = false;
+            if (Context.isServer)
+                Context._released = false;
         }
     }
 
@@ -138,13 +139,14 @@ public class NetworkRtHook : NetworkWeaponBase
         {
             base.OnEnter();
             _hookOutTimer = 0f;
+            Context._hook.transform.parent = null;
         }
 
         public override void Update()
         {
             base.Update();
             _hookOutTimer += Time.deltaTime;
-            Context._hook.transform.Translate(-Context._hook.transform.right * Time.deltaTime * _hookGunData.HookSpeed, Space.Self);
+            Context._hook.transform.Translate(-Context._hook.transform.right * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
             if (_hookOutTimer >= _hookGunData.HookOutDuration)
             {
                 TransitionTo<HookFlyingInState>();

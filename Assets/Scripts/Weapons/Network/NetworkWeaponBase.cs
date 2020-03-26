@@ -31,7 +31,6 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         // WeaponBaseFSM.Update();
         if (Owner != null && _followHand)
         {
-            GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0f;
             Vector3 targetposition = (Owner.GetComponent<PlayerControllerMirror>().LeftHand.transform.position
             + Owner.GetComponent<PlayerControllerMirror>().RightHand.transform.position) / 2f;
             transform.position = targetposition;
@@ -126,6 +125,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     public virtual void OnDrop()
     {
         GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
+        GetComponent<Smooth.SmoothSyncMirror>().rotationLerpSpeed = 0.85f;
         RpcOnDrop(Owner);
         _hitGroundOnce = false;
         CanBePickedUp = false;
@@ -141,6 +141,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     public void RpcOnDrop(GameObject owner)
     {
         GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
+        GetComponent<Smooth.SmoothSyncMirror>().rotationLerpSpeed = 0.85f;
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
         GetComponent<Rigidbody>().AddForce(owner.transform.right * WeaponDataBase.DropForce.x +
@@ -153,12 +154,16 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         Owner = owner;
         gameObject.layer = owner.layer;
         GetComponent<Rigidbody>().isKinematic = true;
+        GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0f;
+        GetComponent<Smooth.SmoothSyncMirror>().rotationLerpSpeed = 0f;
         RpcOnPickUp(owner);
     }
 
     [ClientRpc]
     public void RpcOnPickUp(GameObject owner)
     {
+        GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0f;
+        GetComponent<Smooth.SmoothSyncMirror>().rotationLerpSpeed = 0f;
         GetComponent<Rigidbody>().isKinematic = true;
         gameObject.layer = owner.layer;
     }

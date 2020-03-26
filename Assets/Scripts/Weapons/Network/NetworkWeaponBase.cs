@@ -58,7 +58,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     }
 
     [ClientRpc]
-    protected virtual void RpcOnWeaponDespawn()
+    private void RpcOnWeaponDespawn()
     {
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         gameObject.SetActive(false);

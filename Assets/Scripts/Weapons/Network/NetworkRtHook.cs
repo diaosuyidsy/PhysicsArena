@@ -115,6 +115,11 @@ public class NetworkRtHook : NetworkWeaponBase
             base.Init();
             _hookGunData = Context.WeaponDataBase as HookGunData;
         }
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            print(GetType().Name);
+        }
     }
 
     private class HookInState : HookGunState
@@ -168,6 +173,7 @@ public class NetworkRtHook : NetworkWeaponBase
             {
                 if (hit.transform.GetComponent<IHittableNetwork>() != null)
                 {
+                    print(hit.transform.name);
                     // Decide if he blocked
                     if (hit.transform.GetComponent<IHittableNetwork>().CanBlock(-Context._hook.transform.right))
                     {
@@ -176,6 +182,7 @@ public class NetworkRtHook : NetworkWeaponBase
                         TransitionTo<HookBrokenState>();
                         return;
                     }
+                    print(hit.transform.name);
                     Context.Hooked = hit.transform.gameObject;
                     Context.RpcHookHit(hit.transform.gameObject);
                     EventManager.Instance.TriggerEvent(new HookHit(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, Context._hook, hit.transform.gameObject,
@@ -239,9 +246,12 @@ public class NetworkRtHook : NetworkWeaponBase
             base.Update();
             // Whatever we do, retract the hook
             Vector3 nextpos = (Context.transform.position - Context._hook.transform.position).normalized;
-            Vector3 vec = Context.transform.right;
-            Vector3 finalVec1 = nextpos - vec;
-            nextpos = (nextpos + finalVec1 * 10f).normalized;
+            if (Context.Hooked != null)
+            {
+                Vector3 vec = Context.transform.right;
+                Vector3 finalVec1 = nextpos - vec;
+                nextpos = (nextpos + finalVec1 * 10f).normalized;
+            }
             Context._hook.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
 
             // if hooked and not released
@@ -294,7 +304,8 @@ public class NetworkRtHook : NetworkWeaponBase
         public override void OnExit()
         {
             base.OnExit();
-            Context._onWeaponUsedOnce();
+            if (Context.isServer)
+                Context._onWeaponUsedOnce();
         }
     }
 

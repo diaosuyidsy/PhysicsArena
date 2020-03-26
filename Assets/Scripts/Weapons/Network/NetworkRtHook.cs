@@ -207,7 +207,7 @@ public class NetworkRtHook : NetworkWeaponBase
                         return;
                     }
                     Context.Hooked = hit.transform.gameObject;
-                    // Context.RpcHookHit(hit.transform.gameObject);
+                    // Context.RpcHookHit(hit.transform.gameObject
                     Context.CmdHookHit(hit.transform.gameObject);
                     EventManager.Instance.TriggerEvent(new HookHit(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, Context._hook, hit.transform.gameObject,
                     hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber));

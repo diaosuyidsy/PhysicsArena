@@ -40,9 +40,13 @@ public class NetworkMenuPlayerController : NetworkBehaviour
     public void CmdFetchInfo()
     {
         GameObject playerslots = GameObject.Find("PlayerSlots");
+        GameObject spectatorSlots = GameObject.Find("SpectatorSlots");
         bool[] colliderEnabled = new bool[6];
         bool[] headImageEnabled = new bool[6];
         string[] names = new string[6];
+        bool[] spectatorColliderEnabled = new bool[6];
+        bool[] spectatorHeadImageEnabled = new bool[6];
+        string[] spectatorNames = new string[6];
         for (int i = 0; i < playerslots.transform.childCount; i++)
         {
             Transform holder = playerslots.transform.GetChild(i);
@@ -50,19 +54,34 @@ public class NetworkMenuPlayerController : NetworkBehaviour
             headImageEnabled[i] = holder.GetChild(1).GetChild(0).gameObject.activeSelf;
             names[i] = holder.GetChild(0).GetComponentInChildren<TextMeshPro>().text;
         }
-        TargetFetchInfo(GetComponent<NetworkIdentity>().connectionToClient, colliderEnabled, headImageEnabled, names);
+        for (int i = 0; i < spectatorSlots.transform.childCount; i++)
+        {
+            Transform holder = spectatorSlots.transform.GetChild(i);
+            spectatorColliderEnabled[i] = holder.GetComponent<BoxCollider>().enabled;
+            spectatorHeadImageEnabled[i] = holder.GetChild(1).GetChild(0).gameObject.activeSelf;
+            spectatorNames[i] = holder.GetChild(0).GetComponentInChildren<TextMeshPro>().text;
+        }
+        TargetFetchInfo(GetComponent<NetworkIdentity>().connectionToClient, colliderEnabled, headImageEnabled, names, spectatorColliderEnabled, spectatorHeadImageEnabled, spectatorNames);
     }
 
     [TargetRpc]
-    public void TargetFetchInfo(NetworkConnection conn, bool[] colliderEnabled, bool[] headImageEnabled, string[] names)
+    public void TargetFetchInfo(NetworkConnection conn, bool[] colliderEnabled, bool[] headImageEnabled, string[] names, bool[] spectatorColliderEnabled, bool[] spectatorHeadImageEnabled, string[] spectatorNames)
     {
         GameObject playerslots = GameObject.Find("PlayerSlots");
+        GameObject spectatorSlots = GameObject.Find("SpectatorSlots");
         for (int i = 0; i < playerslots.transform.childCount; i++)
         {
             Transform holder = playerslots.transform.GetChild(i);
             holder.GetComponent<BoxCollider>().enabled = colliderEnabled[i];
             holder.GetChild(1).GetChild(0).gameObject.SetActive(headImageEnabled[i]);
             holder.GetChild(0).GetComponentInChildren<TextMeshPro>().text = names[i];
+        }
+        for (int i = 0; i < spectatorSlots.transform.childCount; i++)
+        {
+            Transform holder = spectatorSlots.transform.GetChild(i);
+            holder.GetComponent<BoxCollider>().enabled = spectatorColliderEnabled[i];
+            holder.GetChild(1).GetChild(0).gameObject.SetActive(spectatorHeadImageEnabled[i]);
+            holder.GetChild(0).GetComponentInChildren<TextMeshPro>().text = spectatorNames[i];
         }
         _abstractPlayerFSM = new FSM<NetworkMenuPlayerController>(this);
         _abstractPlayerFSM.TransitionTo<PointerState>();
@@ -108,7 +127,7 @@ public class NetworkMenuPlayerController : NetworkBehaviour
         selectedSpot.GetComponent<BoxCollider>().enabled = true;
         selectedSpot.transform.GetChild(0).GetComponentInChildren<TextMeshPro>().text = "";
         selectedSpot.transform.GetChild(1).GetChild(0).gameObject.SetActive(false);
-        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), false, "", false);
+        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), false, "", selectedSpot.name.ToLower().Contains("spec"));
         RpcUnselect(selectedSpot);
     }
 

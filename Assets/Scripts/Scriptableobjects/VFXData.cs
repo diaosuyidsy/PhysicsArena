@@ -63,6 +63,9 @@ public class VFXData : ScriptableObject
     public GameObject DuckRightFootStepVFX;
     public GameObject[] ChickenFootVFX;
     public GameObject[] DuckFootVFX;
+    public GameObject[] FistGunHitVFX;
+    public GameObject[] HookGunFireVFX;
+    public GameObject[] HookGunHitVFX;
     public LayerMask HitBlockedLayer;
 
 }

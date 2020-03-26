@@ -28,6 +28,7 @@ public class NetworkManagerBirfia : NetworkManager
         else
         {
             if (conn.identity != null) return;
+            if (PlayerSelection[conn.connectionId] == -1) return;
             Transform startPos = GetStartPosition();
             GameObject player = Instantiate(PlayerPrefabs[PlayerSelection[conn.connectionId]], startPos.position, startPos.rotation);
             player.GetComponent<PlayerControllerMirror>().PlayerName = PlayerNames[conn.connectionId];

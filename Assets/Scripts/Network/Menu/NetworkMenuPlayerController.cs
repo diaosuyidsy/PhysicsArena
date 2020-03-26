@@ -69,7 +69,7 @@ public class NetworkMenuPlayerController : NetworkBehaviour
     }
 
     [Command]
-    public void CmdSelectGameObject(GameObject selectedSpot, string Name)
+    public void CmdSelectGameObject(GameObject selectedSpot, string Name, bool isSpectator)
     {
         if (!selectedSpot.GetComponent<BoxCollider>().enabled)
         {
@@ -82,7 +82,7 @@ public class NetworkMenuPlayerController : NetworkBehaviour
         selectedSpot.transform.GetChild(0).GetComponentInChildren<TextMeshPro>().color = Color.black;
         selectedSpot.transform.GetChild(1).GetChild(0).GetComponent<SpriteRenderer>().color = Color.white;
         // Tell Game State About Selection
-        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), true, Name);
+        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), true, Name, isSpectator);
         RpcSelectGameObject(selectedSpot, Name);
     }
 
@@ -108,7 +108,7 @@ public class NetworkMenuPlayerController : NetworkBehaviour
         selectedSpot.GetComponent<BoxCollider>().enabled = true;
         selectedSpot.transform.GetChild(0).GetComponentInChildren<TextMeshPro>().text = "";
         selectedSpot.transform.GetChild(1).GetChild(0).gameObject.SetActive(false);
-        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), false, "");
+        NetworkMenuGameState.instance.ConfirmSelection(GetComponent<NetworkIdentity>().connectionToClient, selectedSpot.transform.GetSiblingIndex(), false, "", false);
         RpcUnselect(selectedSpot);
     }
 
@@ -231,7 +231,7 @@ public class NetworkMenuPlayerController : NetworkBehaviour
         {
             base.OnEnter();
             Context.Pointer.SetActive(false);
-            Context.CmdSelectGameObject(Context._selectedPlayerSpot, Context.Name);
+            Context.CmdSelectGameObject(Context._selectedPlayerSpot, Context.Name, Context._selectedPlayerSpot.name.ToLower().Contains("spec"));
         }
 
         public override void Update()

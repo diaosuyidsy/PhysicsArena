@@ -18,20 +18,25 @@ public class NetworkMenuGameState : NetworkBehaviour
     }
     public static NetworkMenuGameState instance;
     private bool[] selectedCharacter;
+    private bool[] selectedSpectator;
     private IEnumerator _startGameCoroutine;
 
     private void Awake()
     {
         instance = this;
         selectedCharacter = new bool[6];
+        selectedSpectator = new bool[6];
     }
 
-    public void ConfirmSelection(NetworkConnection connection, int selectedCharacterIndex, bool select, string name)
+    public void ConfirmSelection(NetworkConnection connection, int selectedCharacterIndex, bool select, string name, bool isSpectator)
     {
-        selectedCharacter[selectedCharacterIndex] = select;
+        if (!isSpectator)
+            selectedCharacter[selectedCharacterIndex] = select;
+        else
+            selectedSpectator[selectedCharacterIndex] = select;
         if (select)
         {
-            (NetworkManager.singleton as NetworkManagerBirfia).PlayerSelection.Add(connection.connectionId, selectedCharacterIndex);
+            (NetworkManager.singleton as NetworkManagerBirfia).PlayerSelection.Add(connection.connectionId, isSpectator ? -1 : selectedCharacterIndex);
             (NetworkManager.singleton as NetworkManagerBirfia).PlayerNames.Add(connection.connectionId, name);
             (NetworkManager.singleton as NetworkManagerBirfia).PlayerReady.Add(connection.connectionId, false);
         }
@@ -53,14 +58,20 @@ public class NetworkMenuGameState : NetworkBehaviour
             if (i > 2 && selectedCharacter[i])
                 team2Num++;
         }
+        int totalSpectatorNum = 0;
+        for (int i = 0; i < selectedSpectator.Length; i++)
+        {
+            if (selectedSpectator[i])
+                totalSpectatorNum++;
+        }
         int totalNum = team1Num + team2Num;
         if (totalNum == 1)
             RpcChangeText("Need more players");
         else if (totalNum > 1 && (team1Num == 0 || team2Num == 0))
             RpcChangeText("Need players on both team");
-        else if (TotalConnectionCount > totalNum)
+        else if (TotalConnectionCount > totalNum + totalSpectatorNum)
             RpcChangeText("Everybody needs to select a character!");
-        else if (TotalConnectionCount == totalNum && team1Num > 0 && team2Num > 0)
+        else if (TotalConnectionCount == totalNum + totalSpectatorNum && team1Num > 0 && team2Num > 0)
         {
             RpcChangeText("Game Starting");
             _startGameCoroutine = startingGame();

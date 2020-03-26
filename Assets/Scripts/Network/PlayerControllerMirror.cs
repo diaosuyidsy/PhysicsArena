@@ -439,6 +439,13 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     {
         BlockShield.SetEnergy(newStamina / CharacterDataStore.MaxStamina);
     }
+
+    [Command]
+    private void CmdTurnHandObject(GameObject handObject, Vector3 eulerAngles)
+    {
+        if (handObject != null)
+            handObject.transform.eulerAngles = eulerAngles;
+    }
     #endregion
 
     public bool CanBeBlockPushed()
@@ -716,6 +723,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             transform.LookAt(target.transform);
             if (HandObject != null)
             {
+                CmdTurnHandObject(HandObject, transform.eulerAngles + new Vector3(0f, 90f, 0f));
                 HandObject.transform.eulerAngles = transform.eulerAngles + new Vector3(0f, 90f, 0f);
             }
         }

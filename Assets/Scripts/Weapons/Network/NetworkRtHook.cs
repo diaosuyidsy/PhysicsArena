@@ -236,6 +236,7 @@ public class NetworkRtHook : NetworkWeaponBase
             rb.isKinematic = true;
         }
         _hookGunFSM.TransitionTo<HookOnTargetState>();
+        RpcHookHit(hit);
     }
 
     [ClientRpc]

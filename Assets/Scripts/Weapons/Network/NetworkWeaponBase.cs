@@ -126,7 +126,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     public virtual void OnDrop()
     {
         GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
-        RpcOnDrop();
+        RpcOnDrop(Owner);
         _hitGroundOnce = false;
         CanBePickedUp = false;
         GetComponent<Rigidbody>().isKinematic = false;
@@ -138,14 +138,14 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcOnDrop()
+    public void RpcOnDrop(GameObject owner)
     {
-        GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
+        // GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
-        Owner.transform.up * WeaponDataBase.DropForce.y +
-        Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
+        GetComponent<Rigidbody>().AddForce(owner.transform.right * WeaponDataBase.DropForce.x +
+        owner.transform.up * WeaponDataBase.DropForce.y +
+        owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
     }
 
     public virtual void OnPickUp(GameObject owner)

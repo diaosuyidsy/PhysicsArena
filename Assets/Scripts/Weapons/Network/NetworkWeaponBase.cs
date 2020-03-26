@@ -140,7 +140,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     [ClientRpc]
     public void RpcOnDrop(GameObject owner)
     {
-        // GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
+        GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
         GetComponent<Rigidbody>().AddForce(owner.transform.right * WeaponDataBase.DropForce.x +

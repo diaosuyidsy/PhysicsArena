@@ -151,13 +151,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
         TargetPercentage = Mathf.Lerp(0, Context.FeelData.MaxPercentage, Dis / Context.FeelData.MaxShootDisShape);
 
-        //TargetPercentage = (Dis - Context.FeelData.MinShootDisShape) / (Context.FeelData.MaxShootDisShape - Context.FeelData.MinShootDisShape);
-        //TargetPercentage = Mathf.Lerp(Context.FeelData.MinPercentage, Context.FeelData.MaxPercentage,TargetPercentage);
-
         SetCanon(TargetPercentage, TargetAngle,Context.FeelData.AimingPercentageFollowSpeed);
-
-
-        Context.Info.Bomb.transform.localPosition = new Vector3(0, 0, Mathf.Lerp(Context.FeelData.MinAmmoPos, Context.FeelData.MaxAmmoPos, Context.Info.CurrentPercentage));
     }
 
     protected void FireSetCanon() // Set the shape and transform of canon object and ammo 
@@ -184,8 +178,8 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         SoftJointLimit JointLimit = new SoftJointLimit();
         JointLimit.limit = Mathf.Lerp(Context.FeelData.MinLinearLimit, Context.FeelData.MaxLinearLimit, Context.Info.CurrentPercentage);
 
-        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
-        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+        Context.Info.LJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+        Context.Info.RJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
 
         Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
         Context.Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
@@ -424,7 +418,8 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
             if (LockPlayer())
             {
                 Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
-                Context.Info.Bomb.transform.parent = Context.Info.CameraFocus.transform;
+                Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
+                Context.Info.Bomb.transform.localPosition = Vector3.back * Context.FeelData.AmmoOffset;
 
                 AimingSetCanon();
 

@@ -369,6 +369,10 @@ public class NetworkRtHook : NetworkWeaponBase
             base.OnEnter();
             GameObject hookDup = Instantiate(Context._hook, Context._hook.transform.position, Context._hook.transform.rotation);
             Destroy(hookDup, _hookGunData.HookBlockReloadTime);
+            Context._hook.transform.parent = Context.transform;
+            Context._hook.transform.localScale = Context._hookinitlocalScale;
+            Context._hook.transform.localEulerAngles = Vector3.zero;
+            Context._hook.transform.localPosition = Context._hookinitlocalPos;
             Context._hook.SetActive(false);
             hookDup.GetComponent<Rigidbody>().isKinematic = false;
             hookDup.GetComponent<Rigidbody>().useGravity = true;

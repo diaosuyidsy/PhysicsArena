@@ -277,8 +277,6 @@ public class NetworkRtHook : NetworkWeaponBase
         public override void OnEnter()
         {
             base.OnEnter();
-            if (Context._ownerIsLocalPlayer)
-                Context.Hooked.GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0f;
             _hookStopTimer = Time.time + _hookGunData.HookedTime;
         }
 
@@ -330,8 +328,6 @@ public class NetworkRtHook : NetworkWeaponBase
                 force = (force + finalVec * 10f).normalized;
 
                 Context.Hooked.GetComponent<IHittableNetwork>().OnImpact(force * _hookGunData.HookAwayForce, ForceMode.Impulse, Context.Owner, ImpactType.HookGun);
-                if (Context._ownerIsLocalPlayer)
-                    Context.Hooked.GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
                 Context.Hooked = null;
             }
 
@@ -345,8 +341,6 @@ public class NetworkRtHook : NetworkWeaponBase
                     {
                         rb.isKinematic = false;
                     }
-                    if (Context._ownerIsLocalPlayer)
-                        Context.Hooked.GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
                     Context.Hooked = null;
                 }
             }

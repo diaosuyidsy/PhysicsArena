@@ -135,6 +135,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
         Owner.transform.up * WeaponDataBase.DropForce.y +
         Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
+        GetComponent<NetworkIdentity>().RemoveClientAuthority();
         Owner = null;
     }
 
@@ -157,6 +158,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         GetComponent<Rigidbody>().isKinematic = true;
         GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0f;
         GetComponent<Smooth.SmoothSyncMirror>().rotationLerpSpeed = 0f;
+        GetComponent<NetworkIdentity>().AssignClientAuthority(Owner.GetComponent<NetworkIdentity>().connectionToClient);
         RpcOnPickUp(owner);
     }
 

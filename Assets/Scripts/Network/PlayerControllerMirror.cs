@@ -44,9 +44,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private Player _player;
     private Rigidbody _rb;
     private float _distToGround;
-    [SyncVar(hook = nameof(SetStamina))]
     private float _currentStamina;
-    [SyncVar]
+    [SyncVar(hook = nameof(SetStamina))]
+    private float _networkStamina;
     private float _lastTimeUseStamina;
     // private float _lastTimeUSeStaminaUnimportant;
     private Vector2 _staminaUISize;
@@ -421,7 +421,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [Command]
     private void CmdSetStamina(float stamina)
     {
-        _currentStamina = stamina;
+        _networkStamina = stamina;
     }
 
     [Command]
@@ -448,11 +448,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             handObject.transform.eulerAngles = eulerAngles;
     }
 
-    [Command]
-    private void CmdDrainStamina(float drain)
-    {
-        _drainStamina(drain);
-    }
     #endregion
 
     public bool CanBeBlockPushed()
@@ -772,8 +767,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             _lastTimeUseStamina = Time.timeSinceLevelLoad;
         }
-        BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
-        // CmdSetStamina(_currentStamina);
+        // BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
+        CmdSetStamina(_currentStamina);
         // BlockUIVFXHolder.SetActive(true);
         // Vector2 _nextStaminaUISize = _staminaUISize;
         // _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
@@ -1790,8 +1785,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 TransitionTo<IdleActionState>();
                 return;
             }
-            Context.CmdDrainStamina(Time.deltaTime * Context.CharacterDataStore.BlockStaminaDrain);
-            // Context._drainStamina(Time.deltaTime * Context.CharacterDataStore.BlockStaminaDrain);
+            Context._drainStamina(Time.deltaTime * Context.CharacterDataStore.BlockStaminaDrain);
 
             if (Context._currentStamina <= 0f)
             {

@@ -46,6 +46,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private float _distToGround;
     [SyncVar(hook = nameof(SetStamina))]
     private float _currentStamina;
+    [SyncVar]
     private float _lastTimeUseStamina;
     // private float _lastTimeUSeStaminaUnimportant;
     private Vector2 _staminaUISize;

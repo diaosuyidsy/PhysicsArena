@@ -229,7 +229,6 @@ public class NetworkRtHook : NetworkWeaponBase
     [Command]
     private void CmdHookHit(GameObject hit)
     {
-        print("Command Hook Hit");
         RpcHookHit(hit);
         Hooked = hit.transform.gameObject;
         EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit,
@@ -278,6 +277,8 @@ public class NetworkRtHook : NetworkWeaponBase
         public override void OnEnter()
         {
             base.OnEnter();
+            if (Context._ownerIsLocalPlayer)
+                Context.Hooked.GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0f;
             _hookStopTimer = Time.time + _hookGunData.HookedTime;
         }
 
@@ -359,6 +360,8 @@ public class NetworkRtHook : NetworkWeaponBase
             base.OnExit();
             if (Context.isServer)
                 Context._onWeaponUsedOnce();
+            if (Context._ownerIsLocalPlayer)
+                Context.Hooked.GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
         }
     }
 

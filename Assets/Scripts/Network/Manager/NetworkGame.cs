@@ -86,13 +86,14 @@ public class NetworkGame : NetworkBehaviour
         }
     }
 
-    public override void OnNetworkDestroy()
+    public void OnDestroy()
     {
         // NetworkServices.AudioManager.Destroy();
         // NetworkServices.AudioManager = null;
 
         // NetworkServices.GameFeelManager.Destory();
         // NetworkServices.GameFeelManager = null;
+        print("On Destroy Network Game");
         if (!isServer)
         {
             NetworkServices.VisualEffectManager.Destory();

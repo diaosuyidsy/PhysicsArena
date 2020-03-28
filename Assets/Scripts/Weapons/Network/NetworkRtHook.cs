@@ -330,6 +330,8 @@ public class NetworkRtHook : NetworkWeaponBase
                 force = (force + finalVec * 10f).normalized;
 
                 Context.Hooked.GetComponent<IHittableNetwork>().OnImpact(force * _hookGunData.HookAwayForce, ForceMode.Impulse, Context.Owner, ImpactType.HookGun);
+                if (Context._ownerIsLocalPlayer)
+                    Context.Hooked.GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
                 Context.Hooked = null;
             }
 
@@ -343,6 +345,8 @@ public class NetworkRtHook : NetworkWeaponBase
                     {
                         rb.isKinematic = false;
                     }
+                    if (Context._ownerIsLocalPlayer)
+                        Context.Hooked.GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
                     Context.Hooked = null;
                 }
             }
@@ -360,8 +364,6 @@ public class NetworkRtHook : NetworkWeaponBase
             base.OnExit();
             if (Context.isServer)
                 Context._onWeaponUsedOnce();
-            if (Context._ownerIsLocalPlayer)
-                Context.Hooked.GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
         }
     }
 

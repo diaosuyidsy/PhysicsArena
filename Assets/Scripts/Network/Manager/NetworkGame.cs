@@ -18,7 +18,7 @@ public class NetworkGame : NetworkBehaviour
     public void Awake()
     {
         NetworkServices.Config = new Config(ConfigData, GameMapData, CharacterData);
-        // NetworkServices.AudioManager = new NetworkAudioManager(AudioData);
+        NetworkServices.AudioManager = new NetworkAudioManager(AudioData);
         // NetworkServices.GameFeelManager = new NetworkGameFeelManager(GameFeelData);
         if (!isServer)
             NetworkServices.VisualEffectManager = new NetworkVFXManager(VFXData, this);
@@ -86,13 +86,14 @@ public class NetworkGame : NetworkBehaviour
         }
     }
 
-    public override void OnNetworkDestroy()
+    public void OnDestroy()
     {
-        // NetworkServices.AudioManager.Destroy();
-        // NetworkServices.AudioManager = null;
+        NetworkServices.AudioManager.Destroy();
+        NetworkServices.AudioManager = null;
 
         // NetworkServices.GameFeelManager.Destory();
         // NetworkServices.GameFeelManager = null;
+        print("On Destroy Network Game");
         if (!isServer)
         {
             NetworkServices.VisualEffectManager.Destory();

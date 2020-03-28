@@ -17,6 +17,14 @@ public class NetworkManagerBirfia : NetworkManager
     public override void ServerChangeScene(string newSceneName)
     {
         base.ServerChangeScene(newSceneName);
+        if (newSceneName == "OnlineMenu")
+        {
+            PlayerSelection.Clear();
+            foreach (int readyKey in PlayerReady.Keys.ToList())
+            {
+                PlayerReady[readyKey] = false;
+            }
+        }
     }
 
     public override void OnServerAddPlayer(NetworkConnection conn)

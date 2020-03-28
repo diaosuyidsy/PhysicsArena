@@ -9,7 +9,7 @@ public class NetworkAudioManager
     public NetworkAudioManager(AudioData _data)
     {
         AudioDataStore = _data;
-        OnEnable();
+        // OnEnable();
     }
 
     /// <summary>
@@ -305,6 +305,6 @@ public class NetworkAudioManager
 
     public void Destroy()
     {
-        OnDisable();
+        // OnDisable();
     }
 }

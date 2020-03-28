@@ -107,31 +107,31 @@ public class NetworkRtHook : NetworkWeaponBase
         _hookGunFSM.TransitionTo<HookInState>();
     }
 
-    // public void HookOnHit(GameObject hit)
-    // {
-    //     if (!isServer) return;
-    //     if (_hookGunFSM.CurrentState == null) return;
-    //     if (!_hookGunFSM.CurrentState.GetType().Equals(typeof(HookFlyingOutState))) return;
-    //     // Decide if he blocked
-    //     if (hit.transform.GetComponent<IHittableNetwork>().CanBlock(-_hook.transform.right))
-    //     {
-    //         RpcHookBlocked(hit);
-    //         EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hit, hit.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook));
-    //         _hookGunFSM.TransitionTo<HookBrokenState>();
-    //         return;
-    //     }
-    //     Hooked = hit.transform.gameObject;
-    //     RpcHookHit(hit);
-    //     EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit.transform.gameObject,
-    //     hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber));
-    //     Hooked.GetComponent<IHittableNetwork>().OnImpact(Owner, ImpactType.HookGun);
-    //     foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
-    //     {
-    //         rb.isKinematic = true;
-    //     }
-    //     _hookGunFSM.TransitionTo<HookOnTargetState>();
-    //     return;
-    // }
+    [Command]
+    public void CmdHookOnHit(GameObject hit)
+    {
+        if (_hookGunFSM.CurrentState == null) return;
+        if (!_hookGunFSM.CurrentState.GetType().Equals(typeof(HookFlyingOutState))) return;
+        // Decide if he blocked
+        if (hit.transform.GetComponent<IHittableNetwork>().CanBlock(-_hook.transform.right))
+        {
+            RpcHookBlocked(hit);
+            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hit, hit.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook));
+            _hookGunFSM.TransitionTo<HookBrokenState>();
+            return;
+        }
+        Hooked = hit.transform.gameObject;
+        RpcHookHit(hit);
+        EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit.transform.gameObject,
+        hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber));
+        Hooked.GetComponent<IHittableNetwork>().OnImpact(Owner, ImpactType.HookGun);
+        foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+        }
+        _hookGunFSM.TransitionTo<HookOnTargetState>();
+        return;
+    }
 
     private abstract class HookGunState : FSM<NetworkRtHook>.State
     {
@@ -165,12 +165,14 @@ public class NetworkRtHook : NetworkWeaponBase
 
     private class HookFlyingOutState : HookGunState
     {
+        private Vector3 _lastFramePosition;
         private float _hookOutTimer;
         public override void OnEnter()
         {
             base.OnEnter();
             _hookOutTimer = 0f;
             Context._hook.transform.parent = null;
+            _lastFramePosition = Context._hook.transform.position;
         }
 
         public override void Update()
@@ -184,6 +186,7 @@ public class NetworkRtHook : NetworkWeaponBase
                 return;
             }
             _checkHook();
+            _lastFramePosition = Context._hook.transform.position;
         }
 
         private void _checkHook()
@@ -194,7 +197,8 @@ public class NetworkRtHook : NetworkWeaponBase
                                 -Context._hook.transform.right,
                                 out hit,
                                 _hookGunData.HookDistance,
-                                _hookGunData.HookableLayer ^ (1 << Context.gameObject.layer)))
+                                _hookGunData.HookableLayer ^ (1 << Context.gameObject.layer)) ||
+                Physics.Linecast(_lastFramePosition, Context._hook.transform.position, out hit, _hookGunData.HookableLayer ^ (1 << Context.gameObject.layer)))
             {
                 if (Context._ownerIsLocalPlayer && hit.transform.GetComponent<IHittableNetwork>() != null)
                 {

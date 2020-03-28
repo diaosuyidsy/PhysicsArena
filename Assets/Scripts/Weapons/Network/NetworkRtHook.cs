@@ -216,11 +216,6 @@ public class NetworkRtHook : NetworkWeaponBase
                         rb.isKinematic = true;
                     }
                     TransitionTo<HookOnTargetState>();
-
-                    // Context.CmdHookHit(hit.transform.gameObject);
-                    // EventManager.Instance.TriggerEvent(new HookHit(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, Context._hook, hit.transform.gameObject,
-                    // hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber));
-
                     return;
                 }
             }

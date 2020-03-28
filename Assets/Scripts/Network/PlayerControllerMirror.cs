@@ -446,6 +446,12 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         if (handObject != null)
             handObject.transform.eulerAngles = eulerAngles;
     }
+
+    [Command]
+    private void CmdDrainStamina(float drain)
+    {
+        _drainStamina(drain);
+    }
     #endregion
 
     public bool CanBeBlockPushed()
@@ -766,7 +772,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             _lastTimeUseStamina = Time.timeSinceLevelLoad;
         }
         BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
-        CmdSetStamina(_currentStamina);
+        // CmdSetStamina(_currentStamina);
         // BlockUIVFXHolder.SetActive(true);
         // Vector2 _nextStaminaUISize = _staminaUISize;
         // _nextStaminaUISize.x *= _currentStamina / CharacterDataStore.MaxStamina;
@@ -1783,7 +1789,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 TransitionTo<IdleActionState>();
                 return;
             }
-            Context._drainStamina(Time.deltaTime * Context.CharacterDataStore.BlockStaminaDrain);
+            Context.CmdDrainStamina(Time.deltaTime * Context.CharacterDataStore.BlockStaminaDrain);
+            // Context._drainStamina(Time.deltaTime * Context.CharacterDataStore.BlockStaminaDrain);
 
             if (Context._currentStamina <= 0f)
             {

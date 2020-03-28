@@ -36,9 +36,12 @@ public class NetworkMenuGameState : NetworkBehaviour
             selectedSpectator[selectedCharacterIndex] = select;
         if (select)
         {
-            (NetworkManager.singleton as NetworkManagerBirfia).PlayerSelection.Add(connection.connectionId, isSpectator ? 6 : selectedCharacterIndex);
-            (NetworkManager.singleton as NetworkManagerBirfia).PlayerNames.Add(connection.connectionId, name);
-            (NetworkManager.singleton as NetworkManagerBirfia).PlayerReady.Add(connection.connectionId, false);
+            if (!(NetworkManager.singleton as NetworkManagerBirfia).PlayerSelection.ContainsKey(connection.connectionId))
+                (NetworkManager.singleton as NetworkManagerBirfia).PlayerSelection.Add(connection.connectionId, isSpectator ? 6 : selectedCharacterIndex);
+            if (!(NetworkManager.singleton as NetworkManagerBirfia).PlayerNames.ContainsKey(connection.connectionId))
+                (NetworkManager.singleton as NetworkManagerBirfia).PlayerNames.Add(connection.connectionId, name);
+            if (!(NetworkManager.singleton as NetworkManagerBirfia).PlayerReady.ContainsKey(connection.connectionId))
+                (NetworkManager.singleton as NetworkManagerBirfia).PlayerReady.Add(connection.connectionId, false);
         }
         else
         {

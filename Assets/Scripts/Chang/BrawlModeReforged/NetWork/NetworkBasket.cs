@@ -1,10 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
+using Mirror;
 
-public class Basket : MonoBehaviour
+public class NetworkBasket : NetworkBehaviour
 {
     private enum ScoreTextState
     {
@@ -51,6 +51,12 @@ public class Basket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (!isServer)
+        {
+            return;
+        }
+
+        RpcCheckScoreText();
 
         CheckCharacter();
         CheckBagel();
@@ -93,18 +99,57 @@ public class Basket : MonoBehaviour
         }
     }
 
+    [ClientRpc]
+    private void RpcCheckScoreText()
+    {
+        Color color = ScoreText.GetComponent<TextMeshProUGUI>().color;
+        switch (TextState)
+        {
+            case ScoreTextState.Appear:
+                ScoreTextTimer += Time.deltaTime;
+                ScoreText.GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, Mathf.Lerp(ScoreTextStartAlpha, ScoreTextEndAlpha, ScoreTextTimer / ScoreTextAppearTime));
+                ScoreText.transform.localScale = Vector3.Lerp(Vector3.one * ScoreTextStartScale, Vector3.one * ScoreTextEndScale, ScoreTextTimer / ScoreTextAppearTime);
+                if (ScoreTextTimer >= ScoreTextAppearTime)
+                {
+                    TextState = ScoreTextState.Show;
+                    ScoreTextTimer = 0;
+                }
+                break;
+            case ScoreTextState.Disappear:
+                ScoreTextTimer += Time.deltaTime;
+                ScoreText.GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, Mathf.Lerp(ScoreTextEndAlpha, 0, ScoreTextTimer / ScoreTextDisappearTime));
+                if (ScoreTextTimer >= ScoreTextDisappearTime)
+                {
+                    ScoreText.GetComponent<TextMeshProUGUI>().enabled = false;
+                    TextState = ScoreTextState.Hide;
+                    ScoreTextTimer = 0;
+                }
+                break;
+            case ScoreTextState.Show:
+                ScoreTextTimer += Time.deltaTime;
+                if (ScoreTextTimer >= ScoreTextShowTime)
+                {
+                    TextState = ScoreTextState.Disappear;
+                    ScoreTextTimer = 0;
+                }
+                break;
+        }
+    }
+
     private void CheckCharacter() //Add/remove bagel holder to camera
     {
 
         Collider[] AllHits = Physics.OverlapSphere(transform.position, DetectRadius);
         for (int i = 0; i < AllHits.Length; i++)
         {
-            if (AllHits[i].gameObject.CompareTag("Team2Resource") && AllHits[i].gameObject.GetComponent<Bagel>().Hold)
+            if (AllHits[i].gameObject.CompareTag("Team2Resource") && AllHits[i].gameObject.GetComponent<NetworkBagel>().Hold)
             {
                 InCameraTimer = 0;
 
                 if (!InCamera)
                 {
+                    RpcCameraAddRemove(true);
+
                     InCamera = true;
                     Services.GameStateManager.CameraTargets.Add(transform);
                 }
@@ -118,11 +163,27 @@ public class Basket : MonoBehaviour
 
             if (InCameraTimer >= InCameraTime)
             {
+                RpcCameraAddRemove(false);
+
                 InCamera = false;
                 Services.GameStateManager.CameraTargets.Remove(transform);
             }
         }
+    }
 
+    [ClientRpc]
+    private void RpcCameraAddRemove(bool Add)
+    {
+        if (Add)
+        {
+            InCamera = true;
+            Services.GameStateManager.CameraTargets.Add(transform);
+        }
+        else
+        {
+            InCamera = false;
+            Services.GameStateManager.CameraTargets.Remove(transform);
+        }
     }
 
     private void CheckBagel()// Suck Bagel
@@ -132,11 +193,14 @@ public class Basket : MonoBehaviour
             Collider[] AllHits = Physics.OverlapSphere(transform.position, SuckRadius);
             for (int i = 0; i < AllHits.Length; i++)
             {
-                if (AllHits[i].gameObject.CompareTag("Team2Resource") && !AllHits[i].gameObject.GetComponent<Bagel>().Hold)
+                if (AllHits[i].gameObject.CompareTag("Team2Resource") && !AllHits[i].gameObject.GetComponent<NetworkBagel>().Hold)
                 {
                     Bagel = AllHits[i].gameObject;
                     Bagel.GetComponent<BoxCollider>().enabled = false;
-                    AllHits[i].gameObject.GetComponent<Bagel>().OnSucked();
+                    AllHits[i].gameObject.GetComponent<NetworkBagel>().OnSucked();
+
+                    RpcSuckBagel(AllHits[i].gameObject);
+
                     break;
                 }
             }
@@ -153,9 +217,31 @@ public class Basket : MonoBehaviour
 
                 EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
                 Destroy(Bagel);
+
+                RpcSendBagel();
             }
         }
     }
+
+    [ClientRpc]
+    private void RpcSendBagel()
+    {
+        ScoreTextTimer = 0;
+        ScoreText.GetComponent<TextMeshProUGUI>().enabled = true;
+        TextState = ScoreTextState.Appear;
+
+        EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
+        Destroy(Bagel);
+    }
+
+    [ClientRpc]
+    private void RpcSuckBagel(GameObject Obj)
+    {
+        Bagel = Obj;
+        Bagel.GetComponent<BoxCollider>().enabled = false;
+        Obj.gameObject.GetComponent<NetworkBagel>().OnSucked();
+    }
+
 
     private bool SameTeam(GameObject Player)
     {
@@ -164,18 +250,29 @@ public class Basket : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (!isServer)
+        {
+            return;
+        }
+
         if (other.GetComponentInParent<PlayerController>() || other.GetComponent<PlayerController>())
         {
             if (other.GetComponentInParent<PlayerController>() && SameTeam(other.GetComponentInParent<PlayerController>().gameObject))
             {
                 other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().ForceDropHandObject();
+                RpcDrop(other.GetComponentInParent<PlayerController>().gameObject);
             }
             else if (other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
             {
                 other.GetComponent<PlayerController>().ForceDropHandObject();
+                RpcDrop(other.gameObject);
             }
         }
+    }
 
-
+    [ClientRpc]
+    private void RpcDrop(GameObject Player)
+    {
+        Player.GetComponent<PlayerController>().ForceDropHandObject();
     }
 }

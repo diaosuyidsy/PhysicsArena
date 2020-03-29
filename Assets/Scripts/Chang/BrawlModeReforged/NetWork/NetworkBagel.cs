@@ -1,12 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class Bagel : WeaponBase
+public class NetworkBagel : NetworkWeaponBase
 {
     public VFXData Data;
 
-    public GameObject Entity;
+    //public GameObject Entity;
     public Color Default;
     public Color Blue;
     public Color Red;
@@ -23,18 +24,20 @@ public class Bagel : WeaponBase
         base.Awake();
         _hitGroundOnce = true;
 
-        Team1Basket = BrawlModeReforgedArenaManager.Team1Basket;
-        Team2Basket = BrawlModeReforgedArenaManager.Team2Basket;
+        Team1Basket = NetworkBrawlModeReforgedArenaManager.Team1Basket;
+        Team2Basket = NetworkBrawlModeReforgedArenaManager.Team2Basket;
     }
 
     protected override void Update()
     {
         base.Update();
-        SetGuide();
+
+        RpcSetGuide();
         
     }
 
-    private void SetGuide()
+    [ClientRpc]
+    private void RpcSetGuide()
     {
         if (Hold) // Show guide UI
         {
@@ -60,20 +63,42 @@ public class Bagel : WeaponBase
         }
     }
 
+
     public override void OnPickUp(GameObject owner)
     {
         base.OnPickUp(owner);
 
+        RpcOnPickUp(owner);
+
         Hold = true;
+
+        RpcSetHold(true);
     }
 
     public override void OnDrop()
     {
+        RpcOnDrop(Owner);
+
         base.OnDrop();
 
         Hold = false;
         Destroy(Guide);
 
+        RpcSetHold(false);
+        RpcDestroyGuide();
+
+    }
+
+    [ClientRpc]
+    private void RpcSetHold(bool b)
+    {
+        Hold = b;
+    }
+
+    [ClientRpc]
+    private void RpcDestroyGuide()
+    {
+        Destroy(Guide);
     }
 
     public override void Fire(bool buttondown)
@@ -99,6 +124,7 @@ public class Bagel : WeaponBase
 
     protected override void OnTriggerEnter(Collider other)
     {
+
         if (other.CompareTag("DeathZone"))
         {
             _hitGroundOnce = false;

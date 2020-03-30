@@ -30,10 +30,6 @@ public class NetworkBagel : NetworkWeaponBase
 
     protected override void Update()
     {
-        if (!isServer)
-        {
-            return;
-        }
 
         base.Update();
 

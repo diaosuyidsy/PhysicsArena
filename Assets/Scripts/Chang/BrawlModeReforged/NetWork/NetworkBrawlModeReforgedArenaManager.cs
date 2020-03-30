@@ -116,6 +116,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
             Context.Info.LockedPlayer = AvailablePlayer[index];
 
             NetworkServer.Spawn(Mark);
+            Context.RpcSetMark(Mark);
 
             return true;
         }
@@ -140,7 +141,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
         TargetPercentage = Mathf.Lerp(0, Context.FeelData.MaxPercentage, Dis / Context.FeelData.MaxShootDisShape);
 
         SetCanon(TargetPercentage, TargetAngle, Context.FeelData.AimingPercentageFollowSpeed);
-        RpcSetCanon(TargetPercentage, TargetAngle, Context.FeelData.AimingPercentageFollowSpeed);
+        Context.RpcSetCanon(TargetPercentage, TargetAngle, Context.FeelData.AimingPercentageFollowSpeed);
     }
 
     protected void FireSetCanon() // Set the shape and transform of canon object and ammo 
@@ -151,7 +152,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
         TargetAngle = Vector3.SignedAngle(Offset, Vector3.back, Vector3.up);
 
         SetCanon(0, TargetAngle, Context.FeelData.ShootPercentageFollowSpeed);
-        RpcSetCanon(0, TargetAngle, Context.FeelData.ShootPercentageFollowSpeed);
+        Context.RpcSetCanon(0, TargetAngle, Context.FeelData.ShootPercentageFollowSpeed);
     }
 
     protected void SetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed) // Set Canon transform and shape
@@ -208,88 +209,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
         }
     }
 
-    [ClientRpc]
-    protected void RpcSetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed)
-    {
-        Context.Info.CurrentPercentage = Mathf.Lerp(Context.Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed * Time.deltaTime);
-        if (Mathf.Abs(Context.Info.CurrentPercentage - TargetPercentage) <= Context.FeelData.PercentageIgnoreError)
-        {
-            Context.Info.CurrentPercentage = TargetPercentage;
-        }
 
-        Context.Info.Pad.transform.localPosition = Vector3.forward * Mathf.Lerp(Context.FeelData.MinPadDis, Context.FeelData.MaxPadDis, Context.Info.CurrentPercentage);
-
-        SoftJointLimit JointLimit = new SoftJointLimit();
-        JointLimit.limit = Mathf.Lerp(Context.FeelData.MinLinearLimit, Context.FeelData.MaxLinearLimit, Context.Info.CurrentPercentage);
-
-        Context.Info.LJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
-        Context.Info.RJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
-
-        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
-        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
-
-        JointDrive Joint1Drive = new JointDrive();
-        Joint1Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint1AngularYZ, Context.FeelData.MaxJoint1AngularYZ, Context.Info.CurrentPercentage);
-        Joint1Drive.maximumForce = float.PositiveInfinity;
-
-        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
-        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
-
-        JointDrive Joint0Drive = new JointDrive();
-        Joint0Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint0AngularYZ, Context.FeelData.MaxJoint0AngularYZ, Context.Info.CurrentPercentage);
-        Joint0Drive.maximumForce = float.PositiveInfinity;
-
-        Context.Info.LJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
-        Context.Info.RJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
-
-        if (Mathf.Abs(TargetAngle - Context.Info.CurrentAngle) <= Context.FeelData.RotateSpeed * Time.deltaTime)
-        {
-            Context.Info.Entity.transform.Rotate(Vector3.down * (TargetAngle - Context.Info.CurrentAngle), Space.Self);
-            Context.Info.CurrentAngle = TargetAngle;
-        }
-        else
-        {
-            if (TargetAngle > Context.Info.CurrentAngle)
-            {
-                Context.Info.Entity.transform.Rotate(Vector3.down * Context.FeelData.RotateSpeed * Time.deltaTime, Space.Self);
-                Context.Info.CurrentAngle += Context.FeelData.RotateSpeed * Time.deltaTime;
-            }
-            else
-            {
-                Context.Info.Entity.transform.Rotate(Vector3.up * Context.FeelData.RotateSpeed * Time.deltaTime, Space.Self);
-                Context.Info.CurrentAngle -= Context.FeelData.RotateSpeed * Time.deltaTime;
-            }
-        }
-    }
-
-    [ClientRpc]
-    protected void RpcCameraAddRemove(bool Add)
-    {
-
-        if (Add)
-        {
-            if (!Context.Info.CameraFollowed)
-            {
-                Context.Info.CameraFollowed = true;
-                EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.CameraFocus, 1));
-            }
-        }
-        else
-        {
-            if (Context.Info.CameraFollowed)
-            {
-                Context.Info.CameraFollowed = false;
-                EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.CameraFocus));
-            }
-
-        }
-    }
-
-    [ClientRpc]
-    protected void RpcSetMarkColor(Color color)
-    {
-        Context.Info.Mark.GetComponent<SpriteRenderer>().color = color;
-    }
 }
 
 public class NetworkCanonIdle : NetworkCanonAction
@@ -297,8 +217,8 @@ public class NetworkCanonIdle : NetworkCanonAction
     public override void Update()
     {
         base.Update();
-        SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
-        RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        //SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        //Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
         CheckDelivery();
     }
 
@@ -313,7 +233,7 @@ public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
         base.OnEnter();
         Timer = 0;
 
-        RpcCameraAddRemove(true);
+        Context.RpcCameraAddRemove(true);
 
     }
 
@@ -323,6 +243,8 @@ public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
         base.Update();
         Timer += Time.deltaTime;
         SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+
         SetCabel();
         CheckTimer();
 
@@ -344,30 +266,30 @@ public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
                 if (Context.Info.LastSide == CanonSide.Red)
                 {
                     CabelChange(Context.Team1Cabel, false, true);
-                    RpcCabelChange(Context.Team1Cabel, false, true);
+                    Context.RpcCabelChange(Context.Team1Cabel, false, true,Timer);
                 }
                 else
                 {
                     CabelChange(Context.Team2Cabel, false, false);
-                    RpcCabelChange(Context.Team2Cabel, false, false);
+                    Context.RpcCabelChange(Context.Team2Cabel, false, false, Timer);
                 }
                 break;
             case CanonSide.Red:
                 CabelChange(Context.Team1Cabel, true, true);
-                RpcCabelChange(Context.Team1Cabel, true, true);
+                Context.RpcCabelChange(Context.Team1Cabel, true, true, Timer);
                 if (Context.Info.LastSide == CanonSide.Blue)
                 {
                     CabelChange(Context.Team2Cabel, false, false);
-                    RpcCabelChange(Context.Team2Cabel, false, false);
+                    Context.RpcCabelChange(Context.Team2Cabel, false, false, Timer);
                 }
                 break;
             case CanonSide.Blue:
                 CabelChange(Context.Team2Cabel, true, false);
-                RpcCabelChange(Context.Team2Cabel, true, false);
+                Context.RpcCabelChange(Context.Team2Cabel, true, false, Timer);
                 if (Context.Info.LastSide == CanonSide.Red)
                 {
                     CabelChange(Context.Team1Cabel, false, true);
-                    RpcCabelChange(Context.Team1Cabel, false, true);
+                    Context.RpcCabelChange(Context.Team1Cabel, false, true, Timer);
                 }
                 break;
         }
@@ -408,39 +330,7 @@ public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
         }
     }
 
-    [ClientRpc]
-    private void RpcCabelChange(GameObject Cabel, bool Shine, bool Team1)
-    {
-        foreach (Transform child in Cabel.transform)
-        {
-            Material mat = child.GetComponent<Renderer>().material;
-            mat.EnableKeyword("_EMISSION");
 
-            Color color;
-
-            float Emission;
-
-            if (Shine)
-            {
-                Emission = Mathf.Lerp(Context.FeelData.CabelStartEmission, Context.FeelData.CabelEndEmission, Timer / Context.FeelData.CabelShineTime);
-            }
-            else
-            {
-                Emission = Mathf.Lerp(Context.FeelData.CabelEndEmission, Context.FeelData.CabelStartEmission, Timer / Context.FeelData.CabelShineTime);
-            }
-
-            if (Team1)
-            {
-                color = Context.FeelData.RedCabelColor;
-            }
-            else
-            {
-                color = Context.FeelData.BlueCabelColor;
-            }
-
-            mat.SetColor("_EmissionColor", color * Emission);
-        }
-    }
 
 }
 
@@ -454,7 +344,7 @@ public class NetworkCanonCooldown : NetworkCanonAction
         base.OnEnter();
         Timer = 0;
 
-        RpcCameraAddRemove(false);
+        Context.RpcCameraAddRemove(false);
     }
 
     public override void Update()
@@ -462,7 +352,7 @@ public class NetworkCanonCooldown : NetworkCanonAction
         base.Update();
 
         SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
-        RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
 
         if (CheckDelivery())
         {
@@ -493,7 +383,7 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
         Timer = 0;
         PlayerLocked = false;
 
-        RpcCameraAddRemove(true);
+        Context.RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -515,7 +405,7 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
             Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
             Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime);
 
-            RpcSetMarkColor(new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime));
+            Context.RpcSetMarkColor(new Vector3(color.r, color.g, color.b), Timer / Context.FeelData.MarkAppearTime);
 
             if (Context.Info.LockedPlayer == null)
             {
@@ -528,15 +418,18 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
         else
         {
             SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
-            RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+            Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
 
             if (LockPlayer())
             {
-                Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
+                GameObject Bomb = GameObject.Instantiate(Context.BombPrefab);
+
+                Context.Info.Bomb = Bomb;
                 Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
                 Context.Info.Bomb.transform.localPosition = Vector3.back * Context.FeelData.AmmoOffset;
 
-                NetworkServer.Spawn(Context.Info.Bomb);
+                NetworkServer.Spawn(Bomb);
+                Context.RpcSetAmmo(Bomb);
 
                 AimingSetCanon();
 
@@ -564,9 +457,9 @@ public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follow
         base.OnEnter();
         Timer = 0;
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkAlertColor;
-        RpcSetMarkColor(Context.FeelData.MarkAlertColor);
+        Context.RpcSetMarkColor(new Vector3(Context.FeelData.MarkAlertColor.r, Context.FeelData.MarkAlertColor.g, Context.FeelData.MarkAlertColor.b), Context.FeelData.MarkAlertColor.a);
 
-        RpcCameraAddRemove(true);
+        Context.RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -624,9 +517,9 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
 
 
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkFallColor;
-        RpcSetMarkColor(Context.FeelData.MarkFallColor);
+        Context.RpcSetMarkColor(new Vector3(Context.FeelData.MarkFallColor.r, Context.FeelData.MarkFallColor.g, Context.FeelData.MarkFallColor.b), Context.FeelData.MarkFallColor.a);
 
-        RpcCameraAddRemove(true);
+        Context.RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -849,6 +742,8 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Info = new CanonInfo(CanonEntity, CanonPad, CanonLJoint, CanonRJoint, CanonLJoint0, CanonRJoint0, CameraFocus);
+
         CanonFSM = new FSM<NetworkBrawlModeReforgedArenaManager>(this);
         CanonFSM.TransitionTo<NetworkCanonIdle>();
 
@@ -864,7 +759,7 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         Team1Basket = Basket1;
         Team2Basket = Basket2;
 
-        Info = new CanonInfo(CanonEntity, CanonPad, CanonLJoint, CanonRJoint, CanonLJoint0, CanonRJoint0, CameraFocus);
+
 
         if (isServer)
         {
@@ -968,6 +863,136 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         if (Bagel == null)
         {
             GenerateBagel();
+        }
+    }
+
+    [ClientRpc]
+    public void RpcSetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed)
+    {
+        Info.CurrentPercentage = Mathf.Lerp(Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed * Time.deltaTime);
+        if (Mathf.Abs(Info.CurrentPercentage - TargetPercentage) <= FeelData.PercentageIgnoreError)
+        {
+            Info.CurrentPercentage = TargetPercentage;
+        }
+
+        Info.Pad.transform.localPosition = Vector3.forward * Mathf.Lerp(FeelData.MinPadDis, FeelData.MaxPadDis, Info.CurrentPercentage);
+
+        SoftJointLimit JointLimit = new SoftJointLimit();
+        JointLimit.limit = Mathf.Lerp(FeelData.MinLinearLimit, FeelData.MaxLinearLimit, Info.CurrentPercentage);
+
+        Info.LJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+        Info.RJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+
+        Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(FeelData.MinJointRotation, FeelData.MaxJointRotation, Info.CurrentPercentage), 0, 1);
+        Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(FeelData.MinJointRotation, FeelData.MaxJointRotation, Info.CurrentPercentage), 0, 1);
+
+        JointDrive Joint1Drive = new JointDrive();
+        Joint1Drive.positionSpring = Mathf.Lerp(FeelData.MinJoint1AngularYZ, FeelData.MaxJoint1AngularYZ, Info.CurrentPercentage);
+        Joint1Drive.maximumForce = float.PositiveInfinity;
+
+        Info.LeftJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+        Info.RightJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+
+        JointDrive Joint0Drive = new JointDrive();
+        Joint0Drive.positionSpring = Mathf.Lerp(FeelData.MinJoint0AngularYZ, FeelData.MaxJoint0AngularYZ, Info.CurrentPercentage);
+        Joint0Drive.maximumForce = float.PositiveInfinity;
+
+        Info.LJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
+        Info.RJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
+
+        if (Mathf.Abs(TargetAngle - Info.CurrentAngle) <= FeelData.RotateSpeed * Time.deltaTime)
+        {
+            Info.Entity.transform.Rotate(Vector3.down * (TargetAngle - Info.CurrentAngle), Space.Self);
+            Info.CurrentAngle = TargetAngle;
+        }
+        else
+        {
+            if (TargetAngle > Info.CurrentAngle)
+            {
+                Info.Entity.transform.Rotate(Vector3.down * FeelData.RotateSpeed * Time.deltaTime, Space.Self);
+                Info.CurrentAngle += FeelData.RotateSpeed * Time.deltaTime;
+            }
+            else
+            {
+                Info.Entity.transform.Rotate(Vector3.up * FeelData.RotateSpeed * Time.deltaTime, Space.Self);
+                Info.CurrentAngle -= FeelData.RotateSpeed * Time.deltaTime;
+            }
+        }
+    }
+
+    [ClientRpc]
+    public void RpcCameraAddRemove(bool Add)
+    {
+
+        if (Add)
+        {
+            if (!Info.CameraFollowed)
+            {
+                Info.CameraFollowed = true;
+                EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Info.CameraFocus, 1));
+            }
+        }
+        else
+        {
+            if (Info.CameraFollowed)
+            {
+                Info.CameraFollowed = false;
+                EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Info.CameraFocus));
+            }
+
+        }
+    }
+
+    [ClientRpc]
+    public void RpcSetMark(GameObject obj)
+    {
+        Info.Mark = obj;
+    }
+
+    [ClientRpc]
+    public void RpcSetAmmo(GameObject obj)
+    {
+        Info.Bomb = obj;
+        Info.Bomb.transform.parent = CanonPad.transform;
+    }
+
+    [ClientRpc]
+    public void RpcSetMarkColor(Vector3 color, float alpha)
+    {
+        Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.x, color.y, color.z, alpha);
+    }
+
+    [ClientRpc]
+    public void RpcCabelChange(GameObject Cabel, bool Shine, bool Team1,float Timer)
+    {
+        foreach (Transform child in Cabel.transform)
+        {
+            Material mat = child.GetComponent<Renderer>().material;
+            mat.EnableKeyword("_EMISSION");
+
+            Color color;
+
+            float Emission;
+
+            if (Shine)
+            {
+                Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / FeelData.CabelShineTime);
+            }
+            else
+            {
+                Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, Timer / FeelData.CabelShineTime);
+            }
+
+            if (Team1)
+            {
+                color = FeelData.RedCabelColor;
+            }
+            else
+            {
+                color = FeelData.BlueCabelColor;
+            }
+
+            mat.SetColor("_EmissionColor", color * Emission);
         }
     }
 }

@@ -623,19 +623,22 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
                     Offset.z = Mathf.Cos(angle);
                 }
 
-                Player.GetComponent<IHittable>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
+                Player.GetComponent<PlayerControllerMirror>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
+
+                //Player.GetComponent<IHittable>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
             }
         }
 
         Context.Info.LockedPlayer = null;
 
         GameObject VFX = GameObject.Instantiate(Context.ExplosionVFX, Context.Info.Mark.transform.position, Context.ExplosionVFX.transform.rotation);
+        NetworkServer.UnSpawn(Context.Info.Bomb);
+        NetworkServer.UnSpawn(Context.Info.Mark);
         GameObject.Destroy(Context.Info.Bomb);
         GameObject.Destroy(Context.Info.Mark);
 
         NetworkServer.Spawn(VFX);
-        NetworkServer.UnSpawn(Context.Info.Bomb);
-        NetworkServer.UnSpawn(Context.Info.Mark);
+
 
     }
 }
@@ -953,6 +956,7 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     public void RpcSetAmmo(GameObject obj)
     {
         Info.Bomb = obj;
+        Info.Bomb.transform.localScale = Vector3.one * 0.5f;
         Info.Bomb.transform.parent = CanonPad.transform;
     }
 

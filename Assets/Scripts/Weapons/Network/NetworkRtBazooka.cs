@@ -95,7 +95,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
             }
             else _throwMark.gameObject.SetActive(false);
             _throwMark.position = _throwMarkNewPos;
-            transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
+            // transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
 
             /// Detect Hits
             RaycastHit hit;

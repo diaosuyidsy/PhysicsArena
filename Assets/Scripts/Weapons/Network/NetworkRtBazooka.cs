@@ -213,7 +213,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
         transform.GetComponent<Rigidbody>().isKinematic = false;
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         _hitGroundOnce = false;
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     private void _resetThrowMark()

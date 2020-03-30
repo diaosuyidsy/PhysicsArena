@@ -292,6 +292,27 @@ public class ComicMenu : MonoBehaviour
         }
     }
 
+    private Tween _getComicTween(Transform holderTransform)
+    {
+        Sequence result = DOTween.Sequence();
+        for (int i = 0; i < holderTransform.childCount; i++)
+        {
+            Transform child = holderTransform.GetChild(i);
+            if (child.name.ToLower().Contains("mask")) continue;
+            if (child.name.ToLower().Contains("cover"))
+            {
+                child.gameObject.SetActive(true);
+                child.GetComponent<Animator>().SetBool("Play", true);
+                result.AppendInterval(0.5f);
+            }
+            if (child.name.ToLower().Contains("speech"))
+            {
+                result.Append(child.GetComponent<DOTweenAnimation>().tween);
+            }
+        }
+        return result;
+    }
+
     private class MapToFirstMenuTransition : MenuState
     {
         public override void OnEnter()

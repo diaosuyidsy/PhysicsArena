@@ -30,14 +30,18 @@ public class NetworkBagel : NetworkWeaponBase
 
     protected override void Update()
     {
+        if (!isServer)
+        {
+            return;
+        }
+
         base.Update();
 
-        RpcSetGuide();
+        //SetGuide();
         
     }
 
-    [ClientRpc]
-    private void RpcSetGuide()
+    private void SetGuide()
     {
         if (Hold) // Show guide UI
         {
@@ -45,11 +49,21 @@ public class NetworkBagel : NetworkWeaponBase
             {
                 GameObject FoodGuideVFX = Owner.tag.Contains("1") ? Data.ChickenFoodGuideVFX : Data.DuckFoodGuideVFX;
 
-                PlayerController pc = Owner.GetComponent<PlayerController>();
+                PlayerControllerMirror pc = Owner.GetComponent<PlayerControllerMirror>();
+
+                Debug.Log(pc);
+
                 Guide = GameObject.Instantiate(FoodGuideVFX, pc.PlayerFeet, false);
+
+                NetworkServer.Spawn(Guide);
+
+                RpcActivateVFXHolder();
+
                 pc.FoodTraverseVFXHolder = Guide;
                 pc.FoodTraverseVFXHolder.transform.rotation = FoodGuideVFX.transform.rotation;
                 pc.FoodTraverseVFXHolder.SetActive(true);
+
+                
             }
             else
             {
@@ -59,16 +73,37 @@ public class NetworkBagel : NetworkWeaponBase
                 Team2BasketOffset.y = 0;
 
                 Guide.transform.forward = Owner.tag.Contains("1") ? Team1BasketOffset : Team2BasketOffset;
+
+                RpcSetGuideTransform();
             }
         }
     }
 
+    [ClientRpc]
+    private void RpcActivateVFXHolder()
+    {
+        GameObject FoodGuideVFX = Owner.tag.Contains("1") ? Data.ChickenFoodGuideVFX : Data.DuckFoodGuideVFX;
+
+        PlayerControllerMirror pc = Owner.GetComponent<PlayerControllerMirror>();
+        pc.FoodTraverseVFXHolder = Guide;
+        pc.FoodTraverseVFXHolder.transform.rotation = FoodGuideVFX.transform.rotation;
+        pc.FoodTraverseVFXHolder.SetActive(true);
+    }
+
+    [ClientRpc]
+    private void RpcSetGuideTransform()
+    {
+        Vector3 Team1BasketOffset = Team1Basket.transform.position - Guide.transform.position;
+        Vector3 Team2BasketOffset = Team2Basket.transform.position - Guide.transform.position;
+        Team1BasketOffset.y = 0;
+        Team2BasketOffset.y = 0;
+
+        Guide.transform.forward = Owner.tag.Contains("1") ? Team1BasketOffset : Team2BasketOffset;
+    }
 
     public override void OnPickUp(GameObject owner)
     {
         base.OnPickUp(owner);
-
-        RpcOnPickUp(owner);
 
         Hold = true;
 
@@ -77,15 +112,13 @@ public class NetworkBagel : NetworkWeaponBase
 
     public override void OnDrop()
     {
-        RpcOnDrop(Owner);
-
         base.OnDrop();
 
         Hold = false;
         Destroy(Guide);
+        NetworkServer.UnSpawn(Guide);
 
         RpcSetHold(false);
-        RpcDestroyGuide();
 
     }
 
@@ -95,17 +128,11 @@ public class NetworkBagel : NetworkWeaponBase
         Hold = b;
     }
 
-    [ClientRpc]
-    private void RpcDestroyGuide()
-    {
-        Destroy(Guide);
-    }
-
     public override void Fire(bool buttondown)
     {
         if (buttondown)
         {
-            Owner.GetComponent<PlayerController>().ForceDropHandObject();
+            Owner.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
         }
     }
 
@@ -124,12 +151,21 @@ public class NetworkBagel : NetworkWeaponBase
 
     protected override void OnTriggerEnter(Collider other)
     {
+        if (!isServer)
+        {
+            return;
+        }
 
         if (other.CompareTag("DeathZone"))
         {
             _hitGroundOnce = false;
             EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
             EventManager.Instance.TriggerEvent(new BagelDespawn());
+
+            NetworkServer.UnSpawn(gameObject);
+            Destroy(gameObject);
+
+
             return;
         }
     }

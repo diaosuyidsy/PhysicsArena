@@ -84,7 +84,7 @@ public class NetworkMenuGameState : NetworkBehaviour
         {
             RpcChangeText("Select Character");
         }
-        // GameStart();
+        //GameStart();
     }
 
     IEnumerator startingGame()

@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5817157548318111675}
   - component: {fileID: 5794569704200998093}
   - component: {fileID: 5783126998796661541}
-  - component: {fileID: 5812035999268780062}
   - component: {fileID: -3427187056085358231}
   - component: {fileID: -2225247994964439083}
   - component: {fileID: 7716885992278155117}
@@ -67,26 +66,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.6000109, y: 0.22441274, z: 0.6106739}
   m_Center: {x: 0.00009202957, y: 0.10234612, z: -0.06602955}
---- !u!114 &5812035999268780062
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5812035999268780057}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9c485f5e8bc1164a920144ce525da09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WeaponDataBase: {fileID: 11400000, guid: e68950b442d2ba04aa46774f7a020950, type: 2}
-  CanBePickedUp: 1
-  Data: {fileID: 11400000, guid: 02308cdd234d4104a9b5ba42b61b1914, type: 2}
-  Entity: {fileID: 5812035999268780057}
-  Default: {r: 0.7169812, g: 0.7169812, b: 0.7169812, a: 1}
-  Blue: {r: 0.11681202, g: 0.50922894, b: 0.7075472, a: 1}
-  Red: {r: 0.6320754, g: 0.11627804, b: 0.11627804, a: 1}
-  Hold: 0
 --- !u!114 &-3427187056085358231
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -99,7 +78,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sceneId: 4204541480
+  sceneId: 1195214655
   serverOnly: 0
   m_AssetId: 
 --- !u!114 &-2225247994964439083
@@ -115,12 +94,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   syncMode: 0
-  syncInterval: 0.1
+  syncInterval: 0
   WeaponDataBase: {fileID: 11400000, guid: e68950b442d2ba04aa46774f7a020950, type: 2}
   Owner: {fileID: 0}
   CanBePickedUp: 0
   Data: {fileID: 11400000, guid: de5e8acf986bee241b1401b8c29bb792, type: 2}
-  Entity: {fileID: 0}
   Default: {r: 0.7176471, g: 0.7176471, b: 0.7176471, a: 1}
   Blue: {r: 0.11764706, g: 0.50980395, b: 0.7058824, a: 1}
   Red: {r: 0.6313726, g: 0.11764706, b: 0.11764706, a: 1}
@@ -140,7 +118,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0.1
   interpolationBackTime: 0.03
-  extrapolationMode: 1
+  extrapolationMode: 0
   useExtrapolationTimeLimit: 1
   extrapolationTimeLimit: 5
   useExtrapolationDistanceLimit: 0
@@ -163,8 +141,8 @@ MonoBehaviour:
   syncPosition: 0
   syncRotation: 0
   syncScale: 7
-  syncVelocity: 0
-  syncAngularVelocity: 0
+  syncVelocity: 7
+  syncAngularVelocity: 7
   isPositionCompressed: 0
   isRotationCompressed: 0
   isScaleCompressed: 0

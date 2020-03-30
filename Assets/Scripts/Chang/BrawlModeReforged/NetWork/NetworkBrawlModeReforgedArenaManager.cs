@@ -16,7 +16,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
     {
         if (Context.DeliveryEvent != null)
         {
-            if (Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team1Basket && Context.Info.CurrentSide != CanonSide.Red)
+            if (Context.DeliveryEvent.Basket == NetworkBrawlModeReforgedArenaManager.Team1Basket && Context.Info.CurrentSide != CanonSide.Red)
             {
                 Context.Info.LastSide = Context.Info.CurrentSide;
                 Context.Info.CurrentSide = CanonSide.Red;
@@ -29,7 +29,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
 
                 return true;
             }
-            else if (Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team2Basket && Context.Info.CurrentSide != CanonSide.Blue)
+            else if (Context.DeliveryEvent.Basket == NetworkBrawlModeReforgedArenaManager.Team2Basket && Context.Info.CurrentSide != CanonSide.Blue)
             {
                 Context.Info.LastSide = Context.Info.CurrentSide;
                 Context.Info.CurrentSide = CanonSide.Blue;
@@ -88,7 +88,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
 
         foreach (Transform child in Context.Players.transform)
         {
-            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Context.Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentSide == CanonSide.Red))
+            if (child.GetComponent<PlayerControllerMirror>().enabled && (child.tag.Contains("1") && Context.Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentSide == CanonSide.Red))
             {
                 RaycastHit hit;
                 if (Physics.Raycast(child.position, Vector3.down, out hit, 5, Context.GroundLayer))
@@ -115,7 +115,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
             Context.Info.Mark = Mark;
             Context.Info.LockedPlayer = AvailablePlayer[index];
 
-            RpcGenerateMark(AvailablePoint[index]);
+            NetworkServer.Spawn(Mark);
 
             return true;
         }
@@ -123,14 +123,6 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
         {
             return false;
         }
-    }
-
-    [ClientRpc]
-    private void RpcGenerateMark(Vector3 Pos)
-    {
-        GameObject Mark = GameObject.Instantiate(Context.MarkPrefab);
-        Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkDefaultColor;
-        Mark.transform.position = Pos + Vector3.up * 0.01f;
     }
 
     protected void AimingSetCanon() // Set the shape and transform of canon object and ammo 
@@ -271,25 +263,26 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
     }
 
     [ClientRpc]
-    protected void RpcCameraAddRemove(Transform transform,bool Add)
+    protected void RpcCameraAddRemove(bool Add)
     {
+
         if (Add)
         {
-            if (!Services.GameStateManager.CameraTargets.Contains(transform))
+            if (!Context.Info.CameraFollowed)
             {
-                Services.GameStateManager.CameraTargets.Add(transform);
+                Context.Info.CameraFollowed = true;
+                EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.CameraFocus, 1));
             }
         }
         else
         {
-            Services.GameStateManager.CameraTargets.Remove(transform);
-        }
-    }
+            if (Context.Info.CameraFollowed)
+            {
+                Context.Info.CameraFollowed = false;
+                EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.CameraFocus));
+            }
 
-    [ClientRpc]
-    protected void RpcDestroy(GameObject Obj)
-    {
-        GameObject.Destroy(Obj);
+        }
     }
 
     [ClientRpc]
@@ -320,12 +313,7 @@ public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
         base.OnEnter();
         Timer = 0;
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
-
-        RpcCameraAddRemove(Context.Info.CameraFocus.transform, true);
+        RpcCameraAddRemove(true);
 
     }
 
@@ -465,8 +453,8 @@ public class NetworkCanonCooldown : NetworkCanonAction
     {
         base.OnEnter();
         Timer = 0;
-        Services.GameStateManager.CameraTargets.Remove(Context.Info.CameraFocus.transform);
-        RpcCameraAddRemove(Context.Info.CameraFocus.transform, false);
+
+        RpcCameraAddRemove(false);
     }
 
     public override void Update()
@@ -505,12 +493,7 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
         Timer = 0;
         PlayerLocked = false;
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
-
-        RpcCameraAddRemove(Context.Info.CameraFocus.transform, true);
+        RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -520,7 +503,7 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
         if (CheckDelivery())
         {
             GameObject.Destroy(Context.Info.Mark);
-            RpcDestroy(Context.Info.Mark);
+            NetworkServer.UnSpawn(Context.Info.Mark);
             return;
         }
 
@@ -553,7 +536,7 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
                 Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
                 Context.Info.Bomb.transform.localPosition = Vector3.back * Context.FeelData.AmmoOffset;
 
-                RpcGenerateBomb();
+                NetworkServer.Spawn(Context.Info.Bomb);
 
                 AimingSetCanon();
 
@@ -570,14 +553,6 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
             TransitionTo<NetworkCanonFiring_Alert>();
         }
     }
-
-    [ClientRpc]
-    private void RpcGenerateBomb()
-    {
-        Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
-        Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
-        Context.Info.Bomb.transform.localPosition = Vector3.back * Context.FeelData.AmmoOffset;
-    }
 }
 
 public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follows target
@@ -591,12 +566,7 @@ public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follow
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkAlertColor;
         RpcSetMarkColor(Context.FeelData.MarkAlertColor);
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
-
-        RpcCameraAddRemove(Context.Info.CameraFocus.transform, true);
+        RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -616,7 +586,7 @@ public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follow
         if (CheckDelivery())
         {
             GameObject.Destroy(Context.Info.Mark);
-            RpcDestroy(Context.Info.Mark);
+            NetworkServer.UnSpawn(Context.Info.Mark);
             return;
         }
         CheckTimer();
@@ -656,12 +626,7 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkFallColor;
         RpcSetMarkColor(Context.FeelData.MarkFallColor);
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
-
-        RpcCameraAddRemove(Context.Info.CameraFocus.transform, true);
+        RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -738,13 +703,13 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
         {
             GameObject Player;
 
-            if (AllHits[i].collider.gameObject.GetComponent<PlayerController>())
+            if (AllHits[i].collider.gameObject.GetComponent<PlayerControllerMirror>())
             {
                 Player = AllHits[i].collider.gameObject;
             }
-            else if (AllHits[i].collider.gameObject.GetComponentInParent<PlayerController>())
+            else if (AllHits[i].collider.gameObject.GetComponentInParent<PlayerControllerMirror>())
             {
-                Player = AllHits[i].collider.gameObject.GetComponentInParent<PlayerController>().gameObject;
+                Player = AllHits[i].collider.gameObject.GetComponentInParent<PlayerControllerMirror>().gameObject;
             }
             else
             {
@@ -771,20 +736,14 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
 
         Context.Info.LockedPlayer = null;
 
-        GameObject.Instantiate(Context.ExplosionVFX, Context.Info.Mark.transform.position, Context.ExplosionVFX.transform.rotation);
+        GameObject VFX = GameObject.Instantiate(Context.ExplosionVFX, Context.Info.Mark.transform.position, Context.ExplosionVFX.transform.rotation);
         GameObject.Destroy(Context.Info.Bomb);
         GameObject.Destroy(Context.Info.Mark);
 
-        RpcGenerateVFX(Context.Info.Mark.transform.position);
-        
-        RpcDestroy(Context.Info.Bomb);
-        RpcDestroy(Context.Info.Mark);
-    }
+        NetworkServer.Spawn(VFX);
+        NetworkServer.UnSpawn(Context.Info.Bomb);
+        NetworkServer.UnSpawn(Context.Info.Mark);
 
-    [ClientRpc]
-    private void RpcGenerateVFX(Vector3 Pos)
-    {
-        GameObject.Instantiate(Context.ExplosionVFX, Pos, Context.ExplosionVFX.transform.rotation);
     }
 }
 
@@ -814,6 +773,8 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         public GameObject Mark;
         public GameObject LockedPlayer;
 
+        public bool CameraFollowed;
+
 
         public CanonInfo(GameObject entity, GameObject pad, GameObject LJoint, GameObject RJoint, GameObject L0, GameObject R0, GameObject Focus)
         {
@@ -832,6 +793,8 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
 
             Mark = null;
             LockedPlayer = null;
+
+            CameraFollowed = false;
 
         }
 
@@ -889,7 +852,7 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         CanonFSM = new FSM<NetworkBrawlModeReforgedArenaManager>(this);
         CanonFSM.TransitionTo<NetworkCanonIdle>();
 
-        if (Utility.GetPlayerNumber() <= 2)
+        if (Players.transform.childCount <= 2)
         {
             Data = Data_2Player;
         }
@@ -903,7 +866,10 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
 
         Info = new CanonInfo(CanonEntity, CanonPad, CanonLJoint, CanonRJoint, CanonLJoint0, CanonRJoint0, CameraFocus);
 
-        GenerateBagel();
+        if (isServer)
+        {
+            GenerateBagel();
+        }
 
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
         EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
@@ -929,22 +895,6 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     }
 
 
-    private int GetPlayerNumber()
-    {
-        int Count = 0;
-        for (int i = 0; i < Services.GameStateManager.CameraTargets.Count; i++)
-        {
-            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
-            {
-                Count++;
-            }
-        }
-
-        return Count;
-
-    }
-
-
 
     private void GenerateBagel()
     {
@@ -962,25 +912,8 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         }
 
         Bagel = GameObject.Instantiate(BagelPrefab, Pos, new Quaternion(0, 0, 0, 0));
-    }
 
-    [ClientRpc]
-    private void RpcGenerateBagel()
-    {
-        Vector3 Pos = Data.BagelGenerationPos;
-
-        NetworkBrawlModeReforgedObjectiveManager Manager = ObjectiveManager;
-
-        if (Manager.TeamAScore - Manager.TeamBScore >= Data.DeliveryPoint)
-        {
-            Pos = Data.BagelGenerationPosRight;
-        }
-        else if (Manager.TeamBScore - Manager.TeamAScore >= Data.DeliveryPoint)
-        {
-            Pos = Data.BagelGenerationPosLeft;
-        }
-
-        Bagel = GameObject.Instantiate(BagelPrefab, Pos, new Quaternion(0, 0, 0, 0));
+        NetworkServer.Spawn(Bagel);
     }
 
     private void OnBagelDespawn(BagelDespawn e)
@@ -990,11 +923,11 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
             return;
         }
         GenerateBagel();
-        RpcGenerateBagel();
     }
 
     private void OnBagelSent(BagelSent e)
     {
+
         if (!isServer)
         {
             return;
@@ -1035,7 +968,6 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         if (Bagel == null)
         {
             GenerateBagel();
-            RpcGenerateBagel();
         }
     }
 }

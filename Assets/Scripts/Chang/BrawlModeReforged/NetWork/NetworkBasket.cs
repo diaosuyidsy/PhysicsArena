@@ -151,7 +151,6 @@ public class NetworkBasket : NetworkBehaviour
                     RpcCameraAddRemove(true);
 
                     InCamera = true;
-                    Services.GameStateManager.CameraTargets.Add(transform);
                 }
                 return;
             }
@@ -166,7 +165,6 @@ public class NetworkBasket : NetworkBehaviour
                 RpcCameraAddRemove(false);
 
                 InCamera = false;
-                Services.GameStateManager.CameraTargets.Remove(transform);
             }
         }
     }
@@ -177,12 +175,12 @@ public class NetworkBasket : NetworkBehaviour
         if (Add)
         {
             InCamera = true;
-            Services.GameStateManager.CameraTargets.Add(transform);
+            EventManager.Instance.TriggerEvent(new OnAddCameraTargets(gameObject, 1));
         }
         else
         {
             InCamera = false;
-            Services.GameStateManager.CameraTargets.Remove(transform);
+            EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(gameObject));
         }
     }
 
@@ -216,6 +214,8 @@ public class NetworkBasket : NetworkBehaviour
                 TextState = ScoreTextState.Appear;
 
                 EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
+
+                NetworkServer.UnSpawn(Bagel);
                 Destroy(Bagel);
 
                 RpcSendBagel();
@@ -229,9 +229,6 @@ public class NetworkBasket : NetworkBehaviour
         ScoreTextTimer = 0;
         ScoreText.GetComponent<TextMeshProUGUI>().enabled = true;
         TextState = ScoreTextState.Appear;
-
-        EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
-        Destroy(Bagel);
     }
 
     [ClientRpc]
@@ -255,16 +252,16 @@ public class NetworkBasket : NetworkBehaviour
             return;
         }
 
-        if (other.GetComponentInParent<PlayerController>() || other.GetComponent<PlayerController>())
+        if (other.GetComponentInParent<PlayerControllerMirror>() || other.GetComponent<PlayerControllerMirror>())
         {
-            if (other.GetComponentInParent<PlayerController>() && SameTeam(other.GetComponentInParent<PlayerController>().gameObject))
+            if (other.GetComponentInParent<PlayerControllerMirror>() && SameTeam(other.GetComponentInParent<PlayerControllerMirror>().gameObject))
             {
-                other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().ForceDropHandObject();
-                RpcDrop(other.GetComponentInParent<PlayerController>().gameObject);
+                other.GetComponentInParent<PlayerControllerMirror>().gameObject.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
+                RpcDrop(other.GetComponentInParent<PlayerControllerMirror>().gameObject);
             }
-            else if (other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
+            else if (other.GetComponent<PlayerControllerMirror>() && SameTeam(other.gameObject))
             {
-                other.GetComponent<PlayerController>().ForceDropHandObject();
+                other.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
                 RpcDrop(other.gameObject);
             }
         }
@@ -273,6 +270,6 @@ public class NetworkBasket : NetworkBehaviour
     [ClientRpc]
     private void RpcDrop(GameObject Player)
     {
-        Player.GetComponent<PlayerController>().ForceDropHandObject();
+        Player.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
     }
 }

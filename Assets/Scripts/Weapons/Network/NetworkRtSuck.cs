@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using Mirror;
 
-public class rtSuck : WeaponBase
+public class NetworkRtSuck : NetworkWeaponBase
 {
     public GameObject suckBallEffect;
     public List<GameObject> suckBallExplodeEffects;
@@ -12,7 +13,6 @@ public class rtSuck : WeaponBase
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
     private Vector3 _suckBallInitialScale;
-    private float _matOpacity = 1;
     private Quaternion _ballEffectQuaternion;
 
 
@@ -22,9 +22,9 @@ public class rtSuck : WeaponBase
         Out,
         Suck,
     }
-
+    [SyncVar]
     private State _ballState;
-    private SuckBallController _sbc;
+    private NetworkSuckBallController _sbc;
     private SuckGunData _suckGunData;
 
     protected override void Awake()
@@ -33,7 +33,7 @@ public class rtSuck : WeaponBase
         _suckGunData = WeaponDataBase as SuckGunData;
         _ballState = State.In;
         _suckBall = transform.GetChild(0).gameObject;
-        _sbc = _suckBall.GetComponent<SuckBallController>();
+        _sbc = _suckBall.GetComponent<NetworkSuckBallController>();
         _suckBallInitialScale = new Vector3(_suckBall.transform.localScale.x, _suckBall.transform.localScale.y, _suckBall.transform.localScale.z);
         _ammo = _suckGunData.SuckGunMaxUseTimes;
         _ballEffectQuaternion = suckBallEffect.transform.rotation;
@@ -55,21 +55,12 @@ public class rtSuck : WeaponBase
                 _suckBall.transform.localEulerAngles = Vector3.zero;
                 _suckBall.transform.localScale = _suckBallInitialScale;
                 _suckBall.SetActive(false);
-                _ballState = State.In;
+                if (isServer)
+                    _ballState = State.In;
                 // Need a little clean up the line renderer and stuff
                 _sbc.CleanUpAll();
-                _ballState = State.In;
-                // StartCoroutine(sucking(0.5f));
             }
         }
-
-        /*if (_ballState == State.Suck)
-        {
-            _suckBall.GetComponent<SuckBallController>().MakeLineSicker();
-        }
-*/
-
-
     }
 
     public override void Fire(bool buttondown)
@@ -81,13 +72,13 @@ public class rtSuck : WeaponBase
             {
                 case State.In:
                     _ballState = State.Out;
+                    RpcShootOutBall();
                     _suckBall.SetActive(true);
                     suckBallEffect.transform.rotation = _ballEffectQuaternion;
                     suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Explode");
                     suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Create");
-                    _matOpacity = 1;
                     _suckBall.transform.parent = null;
-                    EventManager.Instance.TriggerEvent(new SuckGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
+                    EventManager.Instance.TriggerEvent(new SuckGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
                     break;
             }
         }
@@ -96,7 +87,7 @@ public class rtSuck : WeaponBase
             // If player released RT
             if (_ballState == State.Out)
             {
-
+                RpcReleaseRT();
                 suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Suck");
                 lineParticle.DORestart();
                 lineParticle.GetComponent<ParticleSystem>().Play();
@@ -109,20 +100,44 @@ public class rtSuck : WeaponBase
         }
     }
 
+    [ClientRpc]
+    private void RpcReleaseRT()
+    {
+        suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Suck");
+        lineParticle.DORestart();
+        lineParticle.GetComponent<ParticleSystem>().Play();
+        DistortionSphere.Play();
+    }
+
+    [ClientRpc]
+    private void RpcShootOutBall()
+    {
+        _suckBall.SetActive(true);
+        suckBallEffect.transform.rotation = _ballEffectQuaternion;
+        suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Explode");
+        suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Create");
+        _suckBall.transform.parent = null;
+        EventManager.Instance.TriggerEvent(new SuckGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
+    }
+
+    // This is only called on server
     IEnumerator sucking(float time)
     {
         List<GameObject> gos = _sbc.InRangePlayers;
-        EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerController>().PlayerNumber,
+        EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber,
             gos));
+        RpcSucking1();
         // First prototype: let's try adding a force to every object
         yield return new WaitForSeconds(time);
 
         foreach (GameObject go in gos)
         {
             Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * _suckGunData.SuckStrength;
-            go.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
+            // go.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
+            TargetSuckPlayer(go.GetComponent<NetworkIdentity>().connectionToClient, go, force, Owner);
         }
         yield return new WaitForSeconds(0.45f);
+        RpcSucking2();
         foreach (var suckBallExplodeEffect in suckBallExplodeEffects)
         {
             suckBallExplodeEffect.GetComponent<ParticleSystem>().Play();
@@ -130,8 +145,7 @@ public class rtSuck : WeaponBase
         suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Suck");
         suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Explode");
         yield return new WaitForSeconds(0.45f);
-        ////Second prototype
-        //yield return StartCoroutine(Congregate(time, gos));
+        RpcSucking3();
         // After time, disable the suckball and return it to the original position,
         // reset ballstate;
         _ballTraveledTime = 0f;
@@ -145,6 +159,46 @@ public class rtSuck : WeaponBase
         _sbc.CleanUpAll();
         _onWeaponUsedOnce();
     }
+    [TargetRpc]
+    private void TargetSuckPlayer(NetworkConnection connection, GameObject target, Vector3 force, GameObject owner)
+    {
+        target.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, owner, ImpactType.SuckGun);
+    }
+
+    [ClientRpc]
+    private void RpcSucking1()
+    {
+        List<GameObject> gos = _sbc.InRangePlayers;
+        EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber,
+            gos));
+    }
+
+    [ClientRpc]
+    private void RpcSucking2()
+    {
+        foreach (var suckBallExplodeEffect in suckBallExplodeEffects)
+        {
+            suckBallExplodeEffect.GetComponent<ParticleSystem>().Play();
+        }
+        suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Suck");
+        suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Explode");
+
+    }
+
+    [ClientRpc]
+    private void RpcSucking3()
+    {
+        // After time, disable the suckball and return it to the original position,
+        // reset ballstate;
+        _ballTraveledTime = 0f;
+        _suckBall.transform.parent = transform;
+        _suckBall.transform.localPosition = new Vector3(-0.468f, 0f);
+        _suckBall.transform.localEulerAngles = Vector3.zero;
+        _suckBall.transform.localScale = _suckBallInitialScale;
+        _suckBall.SetActive(false);
+        // Need a little clean up the line renderer and stuff
+        _sbc.CleanUpAll();
+    }
 
     public bool isSucking()
     {
@@ -153,6 +207,7 @@ public class rtSuck : WeaponBase
 
     protected override void _onWeaponDespawn()
     {
+        RpcSuckGunDespawn();
         _ballTraveledTime = 0f;
         _suckBall.transform.parent = transform;
         _suckBall.transform.localPosition = new Vector3(-0.468f, 0f);
@@ -164,12 +219,20 @@ public class rtSuck : WeaponBase
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         // Need a little clean up the line renderer and stuff
         _sbc.CleanUpAll();
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
-    //private void _addToSuckedTimes()
-    //{
-    //	int playernum = GetComponent<GunPositionControl>().Owner.GetComponent<PlayerController>().PlayerNumber;
-    //	GameManager.GM.SuckedPlayersTimes[playernum]++;
-    //}
+    [ClientRpc]
+    private void RpcSuckGunDespawn()
+    {
+        _ballTraveledTime = 0f;
+        _suckBall.transform.parent = transform;
+        _suckBall.transform.localPosition = new Vector3(-0.468f, 0f);
+        _suckBall.transform.localEulerAngles = Vector3.zero;
+        _suckBall.transform.localScale = _suckBallInitialScale;
+        _suckBall.SetActive(false);
+        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+        _sbc.CleanUpAll();
+
+    }
 }

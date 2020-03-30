@@ -3,20 +3,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SuckBallController : MonoBehaviour
+public class NetworkSuckBallController : MonoBehaviour
 {
     [HideInInspector]
     public List<GameObject> InRangePlayers;
 
     public GameObject lineEndPrefab;
-    private rtSuck _rts;
+    private NetworkRtSuck _rts;
     private string _opponentTeamTag = "";
     private List<GameObject> _lineEnds = new List<GameObject>();
     private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
 
     private void Awake()
     {
-        _rts = GetComponentInParent<rtSuck>();
+        _rts = GetComponentInParent<NetworkRtSuck>();
         InRangePlayers = new List<GameObject>();
     }
 

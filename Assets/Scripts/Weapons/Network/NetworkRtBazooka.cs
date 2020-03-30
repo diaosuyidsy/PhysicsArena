@@ -196,11 +196,11 @@ public class NetworkRtBazooka : NetworkWeaponBase
         _followHand = false;
     }
 
-    protected override void OnCollisionEnter(Collision other)
-    {
-        if (_bazookaState == BazookaStates.Out) return;
-        base.OnCollisionEnter(other);
-    }
+    // protected override void OnCollisionEnter(Collision other)
+    // {
+    //     if (_bazookaState == BazookaStates.Out) return;
+    //     base.OnCollisionEnter(other);
+    // }
 
     protected override void _onWeaponDespawn()
     {

@@ -422,10 +422,10 @@ public class ComicMenu : MonoBehaviour
             Sequence sequence = DOTween.Sequence();
             sequence.AppendInterval(_MenuData.InitialStopDuration);
             sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation1, _MenuData.CameraToCharacterMoveDuration1).SetEase(_MenuData.CameraMoveEase1));
-            // sequence.AppendInterval(_MenuData.CameraStopDuration1);
             sequence.Append(Context._getComicTween(Context.SelectionPageComic3.transform, Context.ComicMenuData.Comic3Duration));
             sequence.Append(Context._getComicTween(Context.SelectionPageComic4.transform, Context.ComicMenuData.Comic4Duration));
             sequence.Append(Context._getComicTween(Context.SelectionPageComic5.transform, Context.ComicMenuData.Comic5Duration));
+            sequence.AppendInterval(_MenuData.CameraStopDuration1);
             sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation2, _MenuData.CameraToCharacterMoveDuration2).SetEase(_MenuData.CameraMoveEase2));
             sequence.AppendCallback(() =>
             {

@@ -189,6 +189,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
     private void RpcFireLaunch()
     {
         EventManager.Instance.TriggerEvent(new BazookaFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
+        print("Rpc Launch");
         _lineRenderer.enabled = false;
         transform.GetComponent<Rigidbody>().isKinematic = false;
         transform.GetComponent<Rigidbody>().velocity = _startVelocity;
@@ -214,6 +215,20 @@ public class NetworkRtBazooka : NetworkWeaponBase
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         _hitGroundOnce = false;
         base._onWeaponDespawn();
+    }
+
+    [ClientRpc]
+    private void RpcBazookaDespawn()
+    {
+        _followHand = true;
+        if (BazookaTrailVFXHolder != null) BazookaTrailVFXHolder.SetActive(false);
+        _bazookaState = BazookaStates.Idle;
+        _lineRenderer.enabled = false;
+        _player = null;
+        _resetThrowMark();
+        transform.GetComponent<Rigidbody>().isKinematic = false;
+        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
+        _hitGroundOnce = false;
     }
 
     private void _resetThrowMark()

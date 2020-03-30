@@ -1435,7 +1435,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 Context._helpAim(wb.HelpAimAngle, wb.HelpAimDistance);
                 // Context.HandObject.GetComponent<NetworkWeaponBase>().Fire(true);
                 Context.CmdFire(Context.HandObject, true);
-                if (Context.HandObject.GetComponent<NetworkWeaponBase>().GetType().Equals(typeof(rtBazooka)))
+                if (Context.HandObject.GetComponent<NetworkWeaponBase>().GetType().Equals(typeof(NetworkRtBazooka)))
                 {
                     Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
                     TransitionTo<BazookaActionState>();

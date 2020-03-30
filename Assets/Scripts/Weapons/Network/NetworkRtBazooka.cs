@@ -98,6 +98,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
             // transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
 
             /// Detect Hits
+            if (!isServer) return;
             RaycastHit hit;
             if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, _bazookaData.HitExplodeLayer ^ (1 << Owner.layer)))
             {
@@ -118,6 +119,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
                     TargetBomb(_c.GetComponent<NetworkIdentity>().connectionToClient, _c.gameObject, _bazookaData.MaxAffectionForce * dir.normalized, Owner);
                     // ih.OnImpact(_bazookaData.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
                 }
+                RpcBomb();
                 EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, affectedPlayers));
                 Owner.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
                 _resetThrowMark();
@@ -129,7 +131,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
     [ClientRpc]
     private void RpcBomb()
     {
-        EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, null));
+        // EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, null));
         Owner.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
         _resetThrowMark();
     }

@@ -41,6 +41,10 @@ public class ComicMenuData : ScriptableObject
     public float CameraMapSelectionFOV = 10.5f;
     public float CameraToMapSelectionDuration = 0.5f;
     public Ease CameraToMapSelectionEase = Ease.OutQuad;
+    public float Comic1Duration = 1.8f;
+    public float Comic3Duration = 1.8f;
+    public float Comic4Duration = 1.8f;
+    public float Comic5Duration = 1.8f;
 
     [Header("Map to 1st Menu Transition Setting")]
     public Vector3Ease MapToFirstCameraPositionEase;

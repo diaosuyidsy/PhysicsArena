@@ -22,6 +22,10 @@ public class ComicMenu : MonoBehaviour
     public GameObject CharacterImageHolder;
     public Camera SceneCamera;
     public GameObject IndicationBars;
+    public GameObject SelectionPageComic1;
+    public GameObject SelectionPageComic3;
+    public GameObject SelectionPageComic4;
+    public GameObject SelectionPageComic5;
     public IndicationBarController IndicationBarController;
     public TextMeshPro LoadingTitle;
     public Image LoadingBarFillImage;
@@ -285,6 +289,7 @@ public class ComicMenu : MonoBehaviour
             .SetEase(_MenuData.CameraToMapSelectionEase));
             sequence.Join(_MainCamera.DOFieldOfView(_MenuData.CameraMapSelectionFOV, _MenuData.CameraToMapSelectionDuration)
             .SetEase(_MenuData.CameraToMapSelectionEase));
+            sequence.Append(Context._getComicTween(Context.SelectionPageComic1.transform, Context.ComicMenuData.Comic1Duration));
             sequence.AppendCallback(() =>
             {
                 TransitionTo<MapSelectionState>();
@@ -292,18 +297,21 @@ public class ComicMenu : MonoBehaviour
         }
     }
 
-    private Tween _getComicTween(Transform holderTransform)
+    private Tween _getComicTween(Transform holderTransform, float AnimationDuration)
     {
         Sequence result = DOTween.Sequence();
         for (int i = 0; i < holderTransform.childCount; i++)
         {
             Transform child = holderTransform.GetChild(i);
-            if (child.name.ToLower().Contains("mask")) continue;
             if (child.name.ToLower().Contains("cover"))
             {
-                child.gameObject.SetActive(true);
-                child.GetComponent<Animator>().SetBool("Play", true);
-                result.AppendInterval(0.5f);
+                result.AppendInterval(0.1f);
+                result.AppendCallback(() =>
+                {
+                    child.GetComponent<Animator>().SetBool("Play", true);
+
+                });
+                result.AppendInterval(AnimationDuration);
             }
             if (child.name.ToLower().Contains("speech"))
             {
@@ -414,7 +422,10 @@ public class ComicMenu : MonoBehaviour
             Sequence sequence = DOTween.Sequence();
             sequence.AppendInterval(_MenuData.InitialStopDuration);
             sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation1, _MenuData.CameraToCharacterMoveDuration1).SetEase(_MenuData.CameraMoveEase1));
-            sequence.AppendInterval(_MenuData.CameraStopDuration1);
+            // sequence.AppendInterval(_MenuData.CameraStopDuration1);
+            sequence.Append(Context._getComicTween(Context.SelectionPageComic3.transform, Context.ComicMenuData.Comic3Duration));
+            sequence.Append(Context._getComicTween(Context.SelectionPageComic4.transform, Context.ComicMenuData.Comic4Duration));
+            sequence.Append(Context._getComicTween(Context.SelectionPageComic5.transform, Context.ComicMenuData.Comic5Duration));
             sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation2, _MenuData.CameraToCharacterMoveDuration2).SetEase(_MenuData.CameraMoveEase2));
             sequence.AppendCallback(() =>
             {

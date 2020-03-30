@@ -211,9 +211,9 @@ public class NetworkVFXManager
     private void _onBazookaBombed(BazookaBombed bb)
     {
         _instantiateVFX(VFXDataStore.BazookaExplosionVFX, bb.BazookaGun.transform.position, VFXDataStore.BazookaExplosionVFX.transform.rotation);
-        if (bb.BazookaGun.GetComponent<rtBazooka>() != null &&
-            bb.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder != null)
-            bb.BazookaGun.GetComponent<rtBazooka>().BazookaTrailVFXHolder.SetActive(false);
+        if (bb.BazookaGun.GetComponent<NetworkRtBazooka>() != null &&
+            bb.BazookaGun.GetComponent<NetworkRtBazooka>().BazookaTrailVFXHolder != null)
+            bb.BazookaGun.GetComponent<NetworkRtBazooka>().BazookaTrailVFXHolder.SetActive(false);
     }
 
     private void _onPlayerStunned(PlayerStunned ps)
@@ -322,7 +322,7 @@ public class NetworkVFXManager
     private void _onBazookaLaunched(BazookaFired ev)
     {
         // GameObject.Instantiate(VFXDataStore.BazookaStartVFX, ev.FistPos, VFXDataStore.BazookaStartVFX.transform.rotation);
-        rtBazooka rb = ev.BazookaGun.GetComponent<rtBazooka>();
+        NetworkRtBazooka rb = ev.BazookaGun.GetComponent<NetworkRtBazooka>();
         if (rb.BazookaTrailVFXHolder == null)
         {
             rb.BazookaTrailVFXHolder = GameObject.Instantiate(VFXDataStore.BazookaTrailVFX, ev.BazookaGun.transform, false);

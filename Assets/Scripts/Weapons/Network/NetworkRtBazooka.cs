@@ -83,6 +83,10 @@ public class NetworkRtBazooka : NetworkWeaponBase
         else if (_bazookaState == BazookaStates.Out)
         {
             if (Owner == null) return;
+            if (_ownerIsLocalPlayer)
+            {
+                CmdSetAxis(ReInput.players.GetPlayer(0).GetAxis("Move Horizontal"), ReInput.players.GetPlayer(0).GetAxis("Move Vertical"));
+            }
             Vector3 movement = new Vector3(_HLAxis, 0f, -_VLAxis) * _bazookaData.MarkAirMoveSpeed * Time.deltaTime;
             transform.position += movement;
             Vector3 _throwMarkNewPos = _throwMark.position + movement;
@@ -98,7 +102,6 @@ public class NetworkRtBazooka : NetworkWeaponBase
             // transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
 
             /// Detect Hits
-            if (!isServer) return;
             RaycastHit hit;
             if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, _bazookaData.HitExplodeLayer ^ (1 << Owner.layer)))
             {
@@ -108,32 +111,28 @@ public class NetworkRtBazooka : NetworkWeaponBase
                 Collider[] hitColliders = Physics.OverlapSphere(transform.position,
                                                                     _bazookaData.MaxAffectionRange,
                                                                     _bazookaData.CanHitLayer);
-                foreach (Collider _c in hitColliders)
+                if (isServer)
                 {
-                    IHittableNetwork ih = _c.GetComponent<IHittableNetwork>();
-                    if (ih == null || Owner == _c.gameObject ||
-                    Physics.Linecast(_c.transform.position, transform.position, _bazookaData.CanHideLayer)) continue;
-                    affectedPlayers.Add(_c.gameObject);
-                    Vector3 dir = _c.transform.position - transform.position;
-                    dir.y = 0f;
-                    TargetBomb(_c.GetComponent<NetworkIdentity>().connectionToClient, _c.gameObject, _bazookaData.MaxAffectionForce * dir.normalized, Owner);
-                    // ih.OnImpact(_bazookaData.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
+                    foreach (Collider _c in hitColliders)
+                    {
+                        IHittableNetwork ih = _c.GetComponent<IHittableNetwork>();
+                        if (ih == null || Owner == _c.gameObject ||
+                        Physics.Linecast(_c.transform.position, transform.position, _bazookaData.CanHideLayer)) continue;
+                        affectedPlayers.Add(_c.gameObject);
+                        Vector3 dir = _c.transform.position - transform.position;
+                        dir.y = 0f;
+                        TargetBomb(_c.GetComponent<NetworkIdentity>().connectionToClient, _c.gameObject, _bazookaData.MaxAffectionForce * dir.normalized, Owner);
+                        // ih.OnImpact(_bazookaData.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
+                    }
                 }
-                RpcBomb();
+
                 EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, affectedPlayers));
                 Owner.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
                 _resetThrowMark();
-                _onWeaponUsedOnce();
+                if (isServer)
+                    _onWeaponUsedOnce();
             }
         }
-    }
-
-    [ClientRpc]
-    private void RpcBomb()
-    {
-        // EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, null));
-        Owner.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
-        _resetThrowMark();
     }
 
     [TargetRpc]
@@ -242,7 +241,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
     {
         if (_ownerIsLocalPlayer)
         {
-            CmdSetAxis(ReInput.players.GetPlayer(0).GetAxis("Move Horizontal"), ReInput.players.GetPlayer(0).GetAxis("Move Horizontal"));
+            CmdSetAxis(ReInput.players.GetPlayer(0).GetAxis("Move Horizontal"), ReInput.players.GetPlayer(0).GetAxis("Move Vertical"));
         }
         Vector3 newPosition = _shadowThrowMark.position + new Vector3(_HLAxis, 0f, -_VLAxis) * Time.deltaTime * _bazookaData.MarkMoveSpeed;
         RaycastHit hit;

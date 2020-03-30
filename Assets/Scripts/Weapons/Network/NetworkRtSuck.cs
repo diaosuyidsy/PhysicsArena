@@ -134,6 +134,7 @@ public class NetworkRtSuck : NetworkWeaponBase
         {
             Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * _suckGunData.SuckStrength;
             // go.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
+            print(go.name);
             TargetSuckPlayer(go.GetComponent<NetworkIdentity>().connectionToClient, go, force, Owner);
         }
         yield return new WaitForSeconds(0.45f);

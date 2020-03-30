@@ -544,6 +544,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
     public void OnImpact(Status status)
     {
+        if (!isLocalPlayer) return;
         if (status.GetType().Equals(typeof(StunEffect)))
         {
             if (status.Duration < _stunTimer - Time.time) return;
@@ -1180,7 +1181,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void Update()
         {
             base.Update();
-            Vector3 lookpos = Context.HandObject.GetComponent<rtBazooka>().BazookaShadowTransformPosition;
+            Vector3 lookpos = Context.HandObject.GetComponent<NetworkRtBazooka>().BazookaShadowTransformPosition;
             lookpos.y = Context.transform.position.y;
             Context.transform.LookAt(lookpos);
             if (_RightTriggerUp)

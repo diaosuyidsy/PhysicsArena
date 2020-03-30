@@ -124,9 +124,9 @@ public class NetworkRtSuck : NetworkWeaponBase
     IEnumerator sucking(float time)
     {
         List<GameObject> gos = _sbc.InRangePlayers;
-        EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber,
-            gos));
-        RpcSucking1();
+        // EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber,
+        //     gos));
+        // RpcSucking1();
         // First prototype: let's try adding a force to every object
         yield return new WaitForSeconds(time);
 

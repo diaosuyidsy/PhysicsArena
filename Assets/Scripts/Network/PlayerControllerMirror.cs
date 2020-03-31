@@ -44,8 +44,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private Player _player;
     private Rigidbody _rb;
     private float _distToGround;
-    [SyncVar(hook = nameof(SetStamina))]
     private float _currentStamina;
+    [SyncVar(hook = nameof(SetStamina))]
+    private float _networkStamina;
     private float _lastTimeUseStamina;
     // private float _lastTimeUSeStaminaUnimportant;
     private Vector2 _staminaUISize;
@@ -420,7 +421,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [Command]
     private void CmdSetStamina(float stamina)
     {
-        _currentStamina = stamina;
+        _networkStamina = stamina;
     }
 
     [Command]
@@ -446,6 +447,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         if (handObject != null)
             handObject.transform.eulerAngles = eulerAngles;
     }
+
     #endregion
 
     public bool CanBeBlockPushed()
@@ -542,6 +544,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
     public void OnImpact(Status status)
     {
+        if (!isLocalPlayer) return;
         if (status.GetType().Equals(typeof(StunEffect)))
         {
             if (status.Duration < _stunTimer - Time.time) return;
@@ -765,7 +768,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             _lastTimeUseStamina = Time.timeSinceLevelLoad;
         }
-        BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
+        // BlockShield.SetEnergy(_currentStamina / CharacterDataStore.MaxStamina);
         CmdSetStamina(_currentStamina);
         // BlockUIVFXHolder.SetActive(true);
         // Vector2 _nextStaminaUISize = _staminaUISize;
@@ -1178,7 +1181,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void Update()
         {
             base.Update();
-            Vector3 lookpos = Context.HandObject.GetComponent<rtBazooka>().BazookaShadowTransformPosition;
+            Vector3 lookpos = Context.HandObject.GetComponent<NetworkRtBazooka>().BazookaShadowTransformPosition;
             lookpos.y = Context.transform.position.y;
             Context.transform.LookAt(lookpos);
             if (_RightTriggerUp)
@@ -1432,7 +1435,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 Context._helpAim(wb.HelpAimAngle, wb.HelpAimDistance);
                 // Context.HandObject.GetComponent<NetworkWeaponBase>().Fire(true);
                 Context.CmdFire(Context.HandObject, true);
-                if (Context.HandObject.GetComponent<NetworkWeaponBase>().GetType().Equals(typeof(rtBazooka)))
+                if (Context.HandObject.GetComponent<NetworkWeaponBase>().GetType().Equals(typeof(NetworkRtBazooka)))
                 {
                     Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
                     TransitionTo<BazookaActionState>();

@@ -51,7 +51,7 @@ public class Basket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Canvas.transform.LookAt(Camera.main.transform,Vector3.down);
+
         CheckCharacter();
         CheckBagel();
         CheckScoreText();

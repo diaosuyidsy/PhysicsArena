@@ -30,6 +30,12 @@ public class Bagel : WeaponBase
     protected override void Update()
     {
         base.Update();
+        SetGuide();
+        
+    }
+
+    private void SetGuide()
+    {
         if (Hold) // Show guide UI
         {
             if (Guide == null)
@@ -51,8 +57,6 @@ public class Bagel : WeaponBase
 
                 Guide.transform.forward = Owner.tag.Contains("1") ? Team1BasketOffset : Team2BasketOffset;
             }
-
-
         }
     }
 
@@ -66,9 +70,6 @@ public class Bagel : WeaponBase
     public override void OnDrop()
     {
         base.OnDrop();
-
-        Material mat = Entity.GetComponent<Renderer>().material;
-        mat.EnableKeyword("_EMISSION");
 
         Hold = false;
         Destroy(Guide);

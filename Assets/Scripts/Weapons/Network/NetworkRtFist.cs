@@ -192,10 +192,10 @@ public class NetworkRtFist : NetworkWeaponBase
     [ClientRpc]
     private void RpcTriggerFistGunBlocked(GameObject fistgun, GameObject fistgunUser, GameObject hitted)
     {
-        _maxDistance = hitted.transform.position + hitted.transform.forward * _fistGunData.MaxFlyDistance;
-        _fireOwner = hitted.gameObject;
+        // _maxDistance = hitted.transform.position + hitted.transform.forward * _fistGunData.MaxFlyDistance;
+        // _fireOwner = hitted.gameObject;
         _fistDup.transform.rotation = Quaternion.LookRotation(hitted.transform.right, _fistDup.transform.up);
-        // EventManager.Instance.TriggerEvent(new FistGunBlocked(fistgun, fistgunUser, fistgunUser.GetComponent<PlayerControllerMirror>().PlayerNumber, _fistDup, hitted, hitted.GetComponent<PlayerControllerMirror>().PlayerNumber));
+        EventManager.Instance.TriggerEvent(new FistGunBlocked(fistgun, fistgunUser, fistgunUser.GetComponent<PlayerControllerMirror>().PlayerNumber, _fistDup, hitted, hitted.GetComponent<PlayerControllerMirror>().PlayerNumber));
     }
 
     [ClientRpc]

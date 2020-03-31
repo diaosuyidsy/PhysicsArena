@@ -131,9 +131,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
                 _resetThrowMark();
                 if (isServer)
                 {
-                    print("Before On weapon used once");
                     _onWeaponUsedOnce();
-
                 }
             }
         }
@@ -192,7 +190,6 @@ public class NetworkRtBazooka : NetworkWeaponBase
     private void RpcFireLaunch()
     {
         EventManager.Instance.TriggerEvent(new BazookaFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
-        print("Rpc Launch");
         _bazookaState = BazookaStates.Out;
         _lineRenderer.enabled = false;
         transform.GetComponent<Rigidbody>().isKinematic = false;
@@ -209,6 +206,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
 
     protected override void _onWeaponDespawn()
     {
+        RpcBazookaDespawn();
         _followHand = true;
         if (BazookaTrailVFXHolder != null) BazookaTrailVFXHolder.SetActive(false);
         _bazookaState = BazookaStates.Idle;

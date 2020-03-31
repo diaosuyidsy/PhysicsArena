@@ -256,13 +256,11 @@ public class NetworkBasket : NetworkBehaviour
         {
             if (other.GetComponentInParent<PlayerControllerMirror>() && SameTeam(other.GetComponentInParent<PlayerControllerMirror>().gameObject))
             {
-                print("ServerDrop1");
                 other.GetComponentInParent<PlayerControllerMirror>().gameObject.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
                 RpcDrop(other.GetComponentInParent<PlayerControllerMirror>().gameObject);
             }
             else if (other.GetComponent<PlayerControllerMirror>() && SameTeam(other.gameObject))
             {
-                print("ServerDrop2");
                 other.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
                 RpcDrop(other.gameObject);
             }
@@ -272,7 +270,6 @@ public class NetworkBasket : NetworkBehaviour
     [ClientRpc]
     private void RpcDrop(GameObject Player)
     {
-        print("RpcDrop");
         Player.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
     }
 }

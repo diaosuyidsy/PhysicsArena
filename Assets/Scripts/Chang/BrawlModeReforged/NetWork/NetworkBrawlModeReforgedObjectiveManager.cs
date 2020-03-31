@@ -133,27 +133,13 @@ public class NetworkBrawlModeReforgedObjectiveManager : NetworkBehaviour
             return;
         }
 
-        if (e.ImpactObject.name.Contains("Canon"))
+        if (e.Player.tag.Contains("1"))
         {
-            if (e.Player.tag.Contains("1"))
-            {
-                TeamBScore += Data.BagelKillPoint;
-            }
-            else
-            {
-                TeamAScore += Data.BagelKillPoint;
-            }
+            TeamBScore += Data.NormalKillPoint;
         }
         else
         {
-            if (e.Player.tag.Contains("1"))
-            {
-                TeamBScore += Data.NormalKillPoint;
-            }
-            else
-            {
-                TeamAScore += Data.NormalKillPoint;
-            }
+            TeamAScore += Data.NormalKillPoint;
         }
     }
 

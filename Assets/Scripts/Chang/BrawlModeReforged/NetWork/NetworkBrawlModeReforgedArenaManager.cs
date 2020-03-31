@@ -1,24 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using Mirror;
 
-public enum CanonState
-{
-    Unactivated,
-    Cooldown,
-    Swtiching,
-    Firing
-}
 
-public enum CanonSide
-{
-    Neutral,
-    Red,
-    Blue
-}
-
-public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
+public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaManager>.State
 {
     public override void OnEnter()
     {
@@ -30,7 +16,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
     {
         if (Context.DeliveryEvent != null)
         {
-            if (Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team1Basket && Context.Info.CurrentSide != CanonSide.Red)
+            if (Context.DeliveryEvent.Basket == NetworkBrawlModeReforgedArenaManager.Team1Basket && Context.Info.CurrentSide != CanonSide.Red)
             {
                 Context.Info.LastSide = Context.Info.CurrentSide;
                 Context.Info.CurrentSide = CanonSide.Red;
@@ -39,11 +25,11 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
                 Context.DeliveryEvent = null;
 
 
-                TransitionTo<CanonSwtich>();
+                TransitionTo<NetworkCanonSwtich>();
 
                 return true;
             }
-            else if (Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team2Basket && Context.Info.CurrentSide != CanonSide.Blue)
+            else if (Context.DeliveryEvent.Basket == NetworkBrawlModeReforgedArenaManager.Team2Basket && Context.Info.CurrentSide != CanonSide.Blue)
             {
                 Context.Info.LastSide = Context.Info.CurrentSide;
                 Context.Info.CurrentSide = CanonSide.Blue;
@@ -51,7 +37,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
                 Context.DeliveryEvent = null;
 
-                TransitionTo<CanonSwtich>();
+                TransitionTo<NetworkCanonSwtich>();
 
                 return true;
             }
@@ -102,7 +88,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
         foreach (Transform child in Context.Players.transform)
         {
-            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Context.Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentSide == CanonSide.Red))
+            if (child.GetComponent<PlayerControllerMirror>().enabled && (child.tag.Contains("1") && Context.Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentSide == CanonSide.Red))
             {
                 RaycastHit hit;
                 if (Physics.Raycast(child.position, Vector3.down, out hit, 5, Context.GroundLayer))
@@ -129,6 +115,9 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             Context.Info.Mark = Mark;
             Context.Info.LockedPlayer = AvailablePlayer[index];
 
+            NetworkServer.Spawn(Mark);
+            Context.RpcSetMark(Mark);
+
             return true;
         }
         else
@@ -151,7 +140,8 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
         TargetPercentage = Mathf.Lerp(0, Context.FeelData.MaxPercentage, Dis / Context.FeelData.MaxShootDisShape);
 
-        SetCanon(TargetPercentage, TargetAngle,Context.FeelData.AimingPercentageFollowSpeed);
+        SetCanon(TargetPercentage, TargetAngle, Context.FeelData.AimingPercentageFollowSpeed);
+        Context.RpcSetCanon(TargetPercentage, TargetAngle, Context.FeelData.AimingPercentageFollowSpeed);
     }
 
     protected void FireSetCanon() // Set the shape and transform of canon object and ammo 
@@ -161,13 +151,14 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         float TargetAngle;
         TargetAngle = Vector3.SignedAngle(Offset, Vector3.back, Vector3.up);
 
-        SetCanon(0, TargetAngle,Context.FeelData.ShootPercentageFollowSpeed);
+        SetCanon(0, TargetAngle, Context.FeelData.ShootPercentageFollowSpeed);
+        Context.RpcSetCanon(0, TargetAngle, Context.FeelData.ShootPercentageFollowSpeed);
     }
 
     protected void SetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed) // Set Canon transform and shape
     {
 
-        Context.Info.CurrentPercentage = Mathf.Lerp(Context.Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed*Time.deltaTime);
+        Context.Info.CurrentPercentage = Mathf.Lerp(Context.Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed * Time.deltaTime);
         if (Mathf.Abs(Context.Info.CurrentPercentage - TargetPercentage) <= Context.FeelData.PercentageIgnoreError)
         {
             Context.Info.CurrentPercentage = TargetPercentage;
@@ -212,25 +203,28 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             }
             else
             {
-                Context.Info.Entity.transform.Rotate(Vector3.up * Context.FeelData.RotateSpeed*Time.deltaTime, Space.Self);
+                Context.Info.Entity.transform.Rotate(Vector3.up * Context.FeelData.RotateSpeed * Time.deltaTime, Space.Self);
                 Context.Info.CurrentAngle -= Context.FeelData.RotateSpeed * Time.deltaTime;
             }
         }
     }
+
+
 }
 
-public class CanonIdle: CanonAction
+public class NetworkCanonIdle : NetworkCanonAction
 {
     public override void Update()
     {
         base.Update();
-        SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        //SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        //Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
         CheckDelivery();
     }
 
 }
 
-public class CanonSwtich : CanonAction // Canon switches side
+public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
 {
     private float Timer;
 
@@ -239,10 +233,7 @@ public class CanonSwtich : CanonAction // Canon switches side
         base.OnEnter();
         Timer = 0;
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
+        Context.RpcCameraAddRemove(true);
 
     }
 
@@ -251,7 +242,9 @@ public class CanonSwtich : CanonAction // Canon switches side
     {
         base.Update();
         Timer += Time.deltaTime;
-        SetCanon(0,0, Context.FeelData.AimingPercentageFollowSpeed);
+        SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+
         SetCabel();
         CheckTimer();
 
@@ -261,7 +254,7 @@ public class CanonSwtich : CanonAction // Canon switches side
     {
         if (Timer >= Context.Data.CanonSwitchTime)
         {
-            TransitionTo<CanonFiring_Normal>();
+            TransitionTo<NetworkCanonFiring_Normal>();
         }
     }
 
@@ -270,34 +263,40 @@ public class CanonSwtich : CanonAction // Canon switches side
         switch (Context.Info.CurrentSide)
         {
             case CanonSide.Neutral:
-                if(Context.Info.LastSide == CanonSide.Red)
+                if (Context.Info.LastSide == CanonSide.Red)
                 {
                     CabelChange(Context.Team1Cabel, false, true);
+                    Context.RpcCabelChange(Context.Team1Cabel, false, true,Timer);
                 }
                 else
                 {
                     CabelChange(Context.Team2Cabel, false, false);
+                    Context.RpcCabelChange(Context.Team2Cabel, false, false, Timer);
                 }
                 break;
             case CanonSide.Red:
                 CabelChange(Context.Team1Cabel, true, true);
+                Context.RpcCabelChange(Context.Team1Cabel, true, true, Timer);
                 if (Context.Info.LastSide == CanonSide.Blue)
                 {
                     CabelChange(Context.Team2Cabel, false, false);
+                    Context.RpcCabelChange(Context.Team2Cabel, false, false, Timer);
                 }
                 break;
             case CanonSide.Blue:
                 CabelChange(Context.Team2Cabel, true, false);
+                Context.RpcCabelChange(Context.Team2Cabel, true, false, Timer);
                 if (Context.Info.LastSide == CanonSide.Red)
                 {
                     CabelChange(Context.Team1Cabel, false, true);
+                    Context.RpcCabelChange(Context.Team1Cabel, false, true, Timer);
                 }
                 break;
         }
     }
 
 
-    private void CabelChange(GameObject Cabel,bool Shine,bool Team1)
+    private void CabelChange(GameObject Cabel, bool Shine, bool Team1)
     {
 
         foreach (Transform child in Cabel.transform)
@@ -331,10 +330,12 @@ public class CanonSwtich : CanonAction // Canon switches side
         }
     }
 
+
+
 }
 
 
-public class CanonCooldown : CanonAction
+public class NetworkCanonCooldown : NetworkCanonAction
 {
     private float Timer;
 
@@ -342,14 +343,16 @@ public class CanonCooldown : CanonAction
     {
         base.OnEnter();
         Timer = 0;
-        Services.GameStateManager.CameraTargets.Remove(Context.Info.CameraFocus.transform);
+
+        Context.RpcCameraAddRemove(false);
     }
 
     public override void Update()
     {
         base.Update();
 
-        SetCanon(0,0, Context.FeelData.AimingPercentageFollowSpeed);
+        SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
 
         if (CheckDelivery())
         {
@@ -364,12 +367,12 @@ public class CanonCooldown : CanonAction
         Timer += Time.deltaTime;
         if (Timer >= Context.Data.CanonCooldown)
         {
-            TransitionTo<CanonFiring_Normal>();
+            TransitionTo<NetworkCanonFiring_Normal>();
         }
     }
 }
 
-public class CanonFiring_Normal : CanonAction // Lock and follow player (white mark)
+public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow player (white mark)
 {
     private float Timer;
     private bool PlayerLocked;
@@ -380,10 +383,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         Timer = 0;
         PlayerLocked = false;
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
+        Context.RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -393,6 +393,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         if (CheckDelivery())
         {
             GameObject.Destroy(Context.Info.Mark);
+            NetworkServer.UnSpawn(Context.Info.Mark);
             return;
         }
 
@@ -404,9 +405,11 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
             Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
             Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime);
 
-            if(Context.Info.LockedPlayer == null)
+            Context.RpcSetMarkColor(new Vector3(color.r, color.g, color.b), Timer / Context.FeelData.MarkAppearTime);
+
+            if (Context.Info.LockedPlayer == null)
             {
-                TransitionTo<CanonFiring_Fall>();
+                TransitionTo<NetworkCanonFiring_Fall>();
                 return;
             }
 
@@ -415,20 +418,24 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         else
         {
             SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+            Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+
             if (LockPlayer())
             {
-                Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
+                GameObject Bomb = GameObject.Instantiate(Context.BombPrefab);
+
+                Context.Info.Bomb = Bomb;
                 Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
                 Context.Info.Bomb.transform.localPosition = Vector3.back * Context.FeelData.AmmoOffset;
+
+                NetworkServer.Spawn(Bomb);
+                Context.RpcSetAmmo(Bomb);
 
                 AimingSetCanon();
 
                 PlayerLocked = true;
             }
         }
-
-
-
     }
 
     private void CheckTimer()
@@ -436,12 +443,12 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         Timer += Time.deltaTime;
         if (Timer >= Context.Data.CanonFireTime)
         {
-            TransitionTo<CanonFiring_Alert>();
+            TransitionTo<NetworkCanonFiring_Alert>();
         }
     }
 }
 
-public class CanonFiring_Alert : CanonAction // Purple mark follows target
+public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follows target
 {
     private float Timer;
 
@@ -450,11 +457,9 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
         base.OnEnter();
         Timer = 0;
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkAlertColor;
+        Context.RpcSetMarkColor(new Vector3(Context.FeelData.MarkAlertColor.r, Context.FeelData.MarkAlertColor.g, Context.FeelData.MarkAlertColor.b), Context.FeelData.MarkAlertColor.a);
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
+        Context.RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -466,14 +471,15 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
 
         if (Context.Info.LockedPlayer == null)
         {
-            
-            TransitionTo<CanonFiring_Fall>();
+
+            TransitionTo<NetworkCanonFiring_Fall>();
             return;
         }
 
         if (CheckDelivery())
         {
             GameObject.Destroy(Context.Info.Mark);
+            NetworkServer.UnSpawn(Context.Info.Mark);
             return;
         }
         CheckTimer();
@@ -484,12 +490,12 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
         Timer += Time.deltaTime;
         if (Timer >= Context.Data.CanonFireAlertTime)
         {
-            TransitionTo<CanonFiring_Fall>();
+            TransitionTo<NetworkCanonFiring_Fall>();
         }
     }
 }
 
-public class CanonFiring_Fall : CanonAction // Shoot ammo
+public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
 {
     private float Timer;
     private float HorizontalSpeed;
@@ -505,17 +511,15 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         Timer = 0;
         InfoGot = false;
 
-
+        
 
         GetBombFlyInfo();
 
 
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkFallColor;
+        Context.RpcSetMarkColor(new Vector3(Context.FeelData.MarkFallColor.r, Context.FeelData.MarkFallColor.g, Context.FeelData.MarkFallColor.b), Context.FeelData.MarkFallColor.a);
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
+        Context.RpcCameraAddRemove(true);
     }
 
     public override void Update()
@@ -523,9 +527,12 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         base.Update();
 
         FireSetCanon();
-        if(Context.Info.CurrentPercentage == 0)
+        if (Context.Info.CurrentPercentage == 0)
         {
             Context.Info.Bomb.transform.parent = null;
+
+            Context.RpcAmmoRelease();
+
             if (!InfoGot)
             {
                 InfoGot = true;
@@ -550,7 +557,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
                 return;
             }
 
-            TransitionTo<CanonCooldown>();
+            TransitionTo<NetworkCanonCooldown>();
         }
     }
 
@@ -567,7 +574,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         HorizontalDirection.Normalize();
 
         VerticalSpeed = Context.FeelData.BombVerticalSpeedPercentage * HorizontalSpeed;
-        VerticalSpeedAcceleration = 2 * ( Mathf.Abs(Offset.y) + VerticalSpeed * time) / Mathf.Pow(time, 2);
+        VerticalSpeedAcceleration = 2 * (Mathf.Abs(Offset.y) + VerticalSpeed * time) / Mathf.Pow(time, 2);
 
     }
 
@@ -588,17 +595,17 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         {
             GameObject Player;
 
-            if (AllHits[i].collider.gameObject.GetComponent<PlayerController>())
+            if (AllHits[i].collider.gameObject.GetComponent<PlayerControllerMirror>())
             {
                 Player = AllHits[i].collider.gameObject;
             }
-            else if (AllHits[i].collider.gameObject.GetComponentInParent<PlayerController>())
+            else if (AllHits[i].collider.gameObject.GetComponentInParent<PlayerControllerMirror>())
             {
-                Player = AllHits[i].collider.gameObject.GetComponentInParent<PlayerController>().gameObject;
+                Player = AllHits[i].collider.gameObject.GetComponentInParent<PlayerControllerMirror>().gameObject;
             }
             else
             {
-                Player = AllHits[i].collider.gameObject.GetComponent<WeaponBase>().Owner;
+                Player = AllHits[i].collider.gameObject.GetComponent<NetworkWeaponBase>().Owner;
             }
 
             if (!HitPlayer.Contains(Player))
@@ -615,19 +622,25 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
                     Offset.z = Mathf.Cos(angle);
                 }
 
-                Player.GetComponent<IHittable>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
+                Context.RpcGetImpact(Player, Offset);
             }
         }
 
         Context.Info.LockedPlayer = null;
 
-        GameObject.Instantiate(Context.ExplosionVFX, Context.Info.Mark.transform.position, Context.ExplosionVFX.transform.rotation);
+        GameObject VFX = GameObject.Instantiate(Context.ExplosionVFX, Context.Info.Mark.transform.position, Context.ExplosionVFX.transform.rotation);
+        NetworkServer.UnSpawn(Context.Info.Bomb);
+        NetworkServer.UnSpawn(Context.Info.Mark);
         GameObject.Destroy(Context.Info.Bomb);
         GameObject.Destroy(Context.Info.Mark);
+
+        NetworkServer.Spawn(VFX);
+
+
     }
 }
 
-public class BrawlModeReforgedArenaManager : MonoBehaviour
+public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
 {
     public class CanonInfo
     {
@@ -653,8 +666,10 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public GameObject Mark;
         public GameObject LockedPlayer;
 
+        public bool CameraFollowed;
 
-        public CanonInfo(GameObject entity, GameObject pad, GameObject LJoint, GameObject RJoint,GameObject L0, GameObject R0, GameObject Focus)
+
+        public CanonInfo(GameObject entity, GameObject pad, GameObject LJoint, GameObject RJoint, GameObject L0, GameObject R0, GameObject Focus)
         {
             Entity = entity;
             Pad = pad;
@@ -672,8 +687,10 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             Mark = null;
             LockedPlayer = null;
 
+            CameraFollowed = false;
+
         }
-        
+
     }
 
     public static GameObject Team1Basket;
@@ -684,6 +701,8 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public BrawlModeReforgedModeData Data_2Player;
     public BrawlModeReforgedModeData Data_MorePlayer;
+
+    public NetworkBrawlModeReforgedObjectiveManager ObjectiveManager;
 
     public CanonFeelData FeelData;
 
@@ -718,15 +737,17 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public BagelSent DeliveryEvent;
     private GameObject Bagel;
 
-    private FSM<BrawlModeReforgedArenaManager> CanonFSM;
+    private FSM<NetworkBrawlModeReforgedArenaManager> CanonFSM;
 
     // Start is called before the first frame update
     void Start()
     {
-        CanonFSM = new FSM<BrawlModeReforgedArenaManager>(this);
-        CanonFSM.TransitionTo<CanonIdle>();
+        Info = new CanonInfo(CanonEntity, CanonPad, CanonLJoint, CanonRJoint, CanonLJoint0, CanonRJoint0, CameraFocus);
 
-        if (Utility.GetPlayerNumber() <= 2)
+        CanonFSM = new FSM<NetworkBrawlModeReforgedArenaManager>(this);
+        CanonFSM.TransitionTo<NetworkCanonIdle>();
+
+        if (Players.transform.childCount <= 2)
         {
             Data = Data_2Player;
         }
@@ -738,9 +759,12 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         Team1Basket = Basket1;
         Team2Basket = Basket2;
 
-        Info = new CanonInfo(CanonEntity,CanonPad,CanonLJoint,CanonRJoint,CanonLJoint0,CanonRJoint0, CameraFocus);
 
-        GenerateBagel();
+
+        if (isServer)
+        {
+            GenerateBagel();
+        }
 
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
         EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
@@ -757,23 +781,12 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        CanonFSM.Update();
-    }
-
-
-    private int GetPlayerNumber()
-    {
-        int Count = 0;
-        for(int i=0;i < Services.GameStateManager.CameraTargets.Count; i++)
+        if (!isServer)
         {
-            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
-            {
-                Count++;
-            }
+            return;
         }
 
-        return Count;
-
+        CanonFSM.Update();
     }
 
 
@@ -782,31 +795,43 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     {
         Vector3 Pos = Data.BagelGenerationPos;
 
-        BrawlModeReforgedObjectiveManager Manager = (BrawlModeReforgedObjectiveManager)Services.GameObjectiveManager;
+        NetworkBrawlModeReforgedObjectiveManager Manager = ObjectiveManager;
 
         if (Manager.TeamAScore - Manager.TeamBScore >= Data.DeliveryPoint)
         {
             Pos = Data.BagelGenerationPosRight;
         }
-        else if(Manager.TeamBScore - Manager.TeamAScore >= Data.DeliveryPoint)
+        else if (Manager.TeamBScore - Manager.TeamAScore >= Data.DeliveryPoint)
         {
             Pos = Data.BagelGenerationPosLeft;
         }
 
         Bagel = GameObject.Instantiate(BagelPrefab, Pos, new Quaternion(0, 0, 0, 0));
+
+        NetworkServer.Spawn(Bagel);
     }
 
     private void OnBagelDespawn(BagelDespawn e)
     {
+        if (!isServer)
+        {
+            return;
+        }
         GenerateBagel();
     }
 
     private void OnBagelSent(BagelSent e)
     {
-        Bagel = null;
-        
 
-        if(e.Basket == Team1Basket)
+        if (!isServer)
+        {
+            return;
+        }
+
+        Bagel = null;
+
+
+        if (e.Basket == Team1Basket)
         {
             if (Info.CurrentSide != CanonSide.Red)
             {
@@ -823,11 +848,14 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         }
     }
 
-
-
     private void OnPlayerDied(PlayerDied e)
     {
-        if(e.Player == Info.LockedPlayer)
+        if (!isServer)
+        {
+            return;
+        }
+
+        if (e.Player == Info.LockedPlayer)
         {
             Info.LockedPlayer = null;
         }
@@ -836,5 +864,148 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             GenerateBagel();
         }
+    }
+
+    [ClientRpc]
+    public void RpcSetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed)
+    {
+        Info.CurrentPercentage = Mathf.Lerp(Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed * Time.deltaTime);
+        if (Mathf.Abs(Info.CurrentPercentage - TargetPercentage) <= FeelData.PercentageIgnoreError)
+        {
+            Info.CurrentPercentage = TargetPercentage;
+        }
+
+        Info.Pad.transform.localPosition = Vector3.forward * Mathf.Lerp(FeelData.MinPadDis, FeelData.MaxPadDis, Info.CurrentPercentage);
+
+        SoftJointLimit JointLimit = new SoftJointLimit();
+        JointLimit.limit = Mathf.Lerp(FeelData.MinLinearLimit, FeelData.MaxLinearLimit, Info.CurrentPercentage);
+
+        Info.LJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+        Info.RJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+
+        Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(FeelData.MinJointRotation, FeelData.MaxJointRotation, Info.CurrentPercentage), 0, 1);
+        Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(FeelData.MinJointRotation, FeelData.MaxJointRotation, Info.CurrentPercentage), 0, 1);
+
+        JointDrive Joint1Drive = new JointDrive();
+        Joint1Drive.positionSpring = Mathf.Lerp(FeelData.MinJoint1AngularYZ, FeelData.MaxJoint1AngularYZ, Info.CurrentPercentage);
+        Joint1Drive.maximumForce = float.PositiveInfinity;
+
+        Info.LeftJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+        Info.RightJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+
+        JointDrive Joint0Drive = new JointDrive();
+        Joint0Drive.positionSpring = Mathf.Lerp(FeelData.MinJoint0AngularYZ, FeelData.MaxJoint0AngularYZ, Info.CurrentPercentage);
+        Joint0Drive.maximumForce = float.PositiveInfinity;
+
+        Info.LJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
+        Info.RJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
+
+        if (Mathf.Abs(TargetAngle - Info.CurrentAngle) <= FeelData.RotateSpeed * Time.deltaTime)
+        {
+            Info.Entity.transform.Rotate(Vector3.down * (TargetAngle - Info.CurrentAngle), Space.Self);
+            Info.CurrentAngle = TargetAngle;
+        }
+        else
+        {
+            if (TargetAngle > Info.CurrentAngle)
+            {
+                Info.Entity.transform.Rotate(Vector3.down * FeelData.RotateSpeed * Time.deltaTime, Space.Self);
+                Info.CurrentAngle += FeelData.RotateSpeed * Time.deltaTime;
+            }
+            else
+            {
+                Info.Entity.transform.Rotate(Vector3.up * FeelData.RotateSpeed * Time.deltaTime, Space.Self);
+                Info.CurrentAngle -= FeelData.RotateSpeed * Time.deltaTime;
+            }
+        }
+    }
+
+    [ClientRpc]
+    public void RpcCameraAddRemove(bool Add)
+    {
+
+        if (Add)
+        {
+            if (!Info.CameraFollowed)
+            {
+                Info.CameraFollowed = true;
+                EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Info.CameraFocus, 1));
+            }
+        }
+        else
+        {
+            if (Info.CameraFollowed)
+            {
+                Info.CameraFollowed = false;
+                EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Info.CameraFocus));
+            }
+
+        }
+    }
+
+    [ClientRpc]
+    public void RpcSetMark(GameObject obj)
+    {
+        Info.Mark = obj;
+    }
+
+    [ClientRpc]
+    public void RpcSetAmmo(GameObject obj)
+    {
+        Info.Bomb = obj;
+        Info.Bomb.transform.localScale = Vector3.one * 0.5f;
+        //Info.Bomb.transform.parent = CanonPad.transform;
+    }
+
+    [ClientRpc]
+    public void RpcAmmoRelease()
+    {
+        Info.Bomb.transform.parent = null;
+    }
+
+    [ClientRpc]
+    public void RpcSetMarkColor(Vector3 color, float alpha)
+    {
+        Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.x, color.y, color.z, alpha);
+    }
+
+    [ClientRpc]
+    public void RpcCabelChange(GameObject Cabel, bool Shine, bool Team1,float Timer)
+    {
+        foreach (Transform child in Cabel.transform)
+        {
+            Material mat = child.GetComponent<Renderer>().material;
+            mat.EnableKeyword("_EMISSION");
+
+            Color color;
+
+            float Emission;
+
+            if (Shine)
+            {
+                Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / FeelData.CabelShineTime);
+            }
+            else
+            {
+                Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, Timer / FeelData.CabelShineTime);
+            }
+
+            if (Team1)
+            {
+                color = FeelData.RedCabelColor;
+            }
+            else
+            {
+                color = FeelData.BlueCabelColor;
+            }
+
+            mat.SetColor("_EmissionColor", color * Emission);
+        }
+    }
+
+    [ClientRpc]
+    public void RpcGetImpact(GameObject Player, Vector3 Offset)
+    {
+        Player.GetComponent<IHittableNetwork>().OnImpact(Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
     }
 }

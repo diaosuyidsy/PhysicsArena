@@ -6,7 +6,6 @@ public class CanonFeelData : MonoBehaviour
 {
     public float MinShootDisShape;
     public float MaxShootDisShape;
-    public float MinPercentage;
     public float MaxPercentage;
 
     public float MinLinearLimit;
@@ -21,6 +20,7 @@ public class CanonFeelData : MonoBehaviour
     public float MaxJointRotation;
     public float MinAmmoPos;
     public float MaxAmmoPos;
+    public float AmmoOffset;
 
     public float AimingPercentageFollowSpeed;
     public float ShootPercentageFollowSpeed;

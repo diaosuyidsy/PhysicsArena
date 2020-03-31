@@ -36,7 +36,7 @@ public class NetworkBagel : NetworkWeaponBase
         {
             SetGuide();
         }
-        
+
     }
 
     private void SetGuide()
@@ -57,7 +57,7 @@ public class NetworkBagel : NetworkWeaponBase
 
                 NetworkServer.Spawn(Guide);
 
-                RpcActivateVFXHolder(Owner,Guide);
+                RpcActivateVFXHolder(Owner, Guide);
             }
             else
             {
@@ -77,7 +77,7 @@ public class NetworkBagel : NetworkWeaponBase
 
 
     [ClientRpc]
-    private void RpcActivateVFXHolder(GameObject Owner,GameObject Guide)
+    private void RpcActivateVFXHolder(GameObject Owner, GameObject Guide)
     {
         GameObject FoodGuideVFX = Owner.tag.Contains("1") ? Data.ChickenFoodGuideVFX : Data.DuckFoodGuideVFX;
 
@@ -159,6 +159,7 @@ public class NetworkBagel : NetworkWeaponBase
     public void OnSucked()
     {
         gameObject.layer = 2;
+        GetComponent<NetworkIdentity>().RemoveClientAuthority();
         GetComponent<BoxCollider>().enabled = false;
         GetComponent<Rigidbody>().useGravity = false;
         GetComponent<Rigidbody>().velocity = Vector3.zero;

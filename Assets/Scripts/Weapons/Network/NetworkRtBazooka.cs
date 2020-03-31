@@ -102,6 +102,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
             transform.rotation = Quaternion.LookRotation(GetComponent<Rigidbody>().velocity);
 
             /// Detect Hits
+            if (!_ownerIsLocalPlayer) return;
             RaycastHit hit;
             if (Physics.SphereCast(transform.position, 0.5f, transform.forward, out hit, 0.5f, _bazookaData.HitExplodeLayer ^ (1 << Owner.layer)))
             {
@@ -111,30 +112,47 @@ public class NetworkRtBazooka : NetworkWeaponBase
                 Collider[] hitColliders = Physics.OverlapSphere(transform.position,
                                                                     _bazookaData.MaxAffectionRange,
                                                                     _bazookaData.CanHitLayer);
-                if (isServer)
+                foreach (Collider _c in hitColliders)
                 {
-                    foreach (Collider _c in hitColliders)
-                    {
-                        IHittableNetwork ih = _c.GetComponent<IHittableNetwork>();
-                        if (ih == null || Owner == _c.gameObject ||
-                        Physics.Linecast(_c.transform.position, transform.position, _bazookaData.CanHideLayer)) continue;
-                        affectedPlayers.Add(_c.gameObject);
-                        Vector3 dir = _c.transform.position - transform.position;
-                        dir.y = 0f;
-                        TargetBomb(_c.GetComponent<NetworkIdentity>().connectionToClient, _c.gameObject, _bazookaData.MaxAffectionForce * dir.normalized, Owner);
-                        // ih.OnImpact(_bazookaData.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
-                    }
+                    IHittableNetwork ih = _c.GetComponent<IHittableNetwork>();
+                    if (ih == null || Owner == _c.gameObject ||
+                    Physics.Linecast(_c.transform.position, transform.position, _bazookaData.CanHideLayer)) continue;
+                    affectedPlayers.Add(_c.gameObject);
+                    Vector3 dir = _c.transform.position - transform.position;
+                    dir.y = 0f;
+                    Vector3 force = _bazookaData.MaxAffectionForce * dir.normalized;
+                    CmdBomb(_c.gameObject, force, Owner);
+                    // ih.OnImpact(_bazookaData.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
                 }
 
                 EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, affectedPlayers));
                 Owner.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
                 _resetThrowMark();
-                if (isServer)
-                {
-                    _onWeaponUsedOnce();
-                }
+                CmdReset();
+                // _onWeaponUsedOnce();
             }
         }
+    }
+
+    [Command]
+    private void CmdReset()
+    {
+        _resetThrowMark();
+        RpcReset();
+        _onWeaponUsedOnce();
+
+    }
+
+    [ClientRpc]
+    private void RpcReset()
+    {
+        _resetThrowMark();
+    }
+
+    [Command]
+    private void CmdBomb(GameObject target, Vector3 force, GameObject owner)
+    {
+        TargetBomb(target.GetComponent<NetworkIdentity>().connectionToClient, target, force, owner);
     }
 
     [TargetRpc]

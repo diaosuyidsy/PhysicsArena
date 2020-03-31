@@ -505,7 +505,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         Timer = 0;
         InfoGot = false;
 
-        Context.Info.Bomb.transform.parent = null;
+
 
         GetBombFlyInfo();
 
@@ -525,17 +525,13 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         FireSetCanon();
         if(Context.Info.CurrentPercentage == 0)
         {
+            Context.Info.Bomb.transform.parent = null;
             if (!InfoGot)
             {
                 InfoGot = true;
                 GetBombFlyInfo();
             }
             BombFly();
-        }
-        else
-        {
-            Context.Info.Bomb.transform.position = (Context.CanonFinalLJoint.transform.position + Context.CanonFinalRJoint.transform.position) / 2;
-            Context.Info.Bomb.transform.position -= Context.Info.CameraFocus.transform.forward * 1.5f;
         }
 
 

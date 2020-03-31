@@ -511,7 +511,7 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
         Timer = 0;
         InfoGot = false;
 
-        Context.Info.Bomb.transform.parent = null;
+        
 
         GetBombFlyInfo();
 
@@ -529,17 +529,16 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
         FireSetCanon();
         if (Context.Info.CurrentPercentage == 0)
         {
+            Context.Info.Bomb.transform.parent = null;
+
+            Context.RpcAmmoRelease();
+
             if (!InfoGot)
             {
                 InfoGot = true;
                 GetBombFlyInfo();
             }
             BombFly();
-        }
-        else
-        {
-            Context.Info.Bomb.transform.position = (Context.CanonFinalLJoint.transform.position + Context.CanonFinalRJoint.transform.position) / 2;
-            Context.Info.Bomb.transform.position -= Context.Info.CameraFocus.transform.forward * 1.5f;
         }
 
 
@@ -623,9 +622,7 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
                     Offset.z = Mathf.Cos(angle);
                 }
 
-                Player.GetComponent<PlayerControllerMirror>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
-
-                //Player.GetComponent<IHittable>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
+                Context.RpcGetImpact(Player, Offset);
             }
         }
 
@@ -957,7 +954,13 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     {
         Info.Bomb = obj;
         Info.Bomb.transform.localScale = Vector3.one * 0.5f;
-        Info.Bomb.transform.parent = CanonPad.transform;
+        //Info.Bomb.transform.parent = CanonPad.transform;
+    }
+
+    [ClientRpc]
+    public void RpcAmmoRelease()
+    {
+        Info.Bomb.transform.parent = null;
     }
 
     [ClientRpc]
@@ -998,5 +1001,11 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
 
             mat.SetColor("_EmissionColor", color * Emission);
         }
+    }
+
+    [ClientRpc]
+    public void RpcGetImpact(GameObject Player, Vector3 Offset)
+    {
+        Player.GetComponent<IHittableNetwork>().OnImpact(Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
     }
 }

@@ -130,7 +130,11 @@ public class NetworkRtBazooka : NetworkWeaponBase
                 Owner.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
                 _resetThrowMark();
                 if (isServer)
+                {
+                    print("Before On weapon used once");
                     _onWeaponUsedOnce();
+
+                }
             }
         }
     }
@@ -155,7 +159,6 @@ public class NetworkRtBazooka : NetworkWeaponBase
             RpcFireAim();
             _player = ReInput.players.GetPlayer(0);
             _throwMark.gameObject.SetActive(true);
-            // EventManager.Instance.TriggerEvent(new OnAddCameraTargets(_throwMark.gameObject, 1));
             _shadowThrowMark.gameObject.SetActive(true);
             _throwMark.parent = null;
             _shadowThrowMark.parent = null;
@@ -196,11 +199,12 @@ public class NetworkRtBazooka : NetworkWeaponBase
         _followHand = false;
     }
 
-    // protected override void OnCollisionEnter(Collision other)
-    // {
-    //     if (_bazookaState == BazookaStates.Out) return;
-    //     base.OnCollisionEnter(other);
-    // }
+    protected override void OnCollisionEnter(Collision other)
+    {
+        // if (_bazookaState == BazookaStates.Out) return;
+        base.OnCollisionEnter(other);
+        print(_ammo);
+    }
 
     protected override void _onWeaponDespawn()
     {
@@ -288,7 +292,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
         var points = _getTrajectoryPoints(transform.position, _startVelocity, _bazookaData.TrajectoryLineStep, _bazookaData.TrajectoryLineTime);
         if (_lineRenderer)
         {
-            if (!_lineRenderer.enabled) _lineRenderer.enabled = true;
+            // if (!_lineRenderer.enabled) _lineRenderer.enabled = true;
             _lineRenderer.positionCount = points.Count;
             _lineRenderer.SetPositions(points.ToArray());
         }

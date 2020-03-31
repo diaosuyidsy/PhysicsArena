@@ -159,7 +159,8 @@ public class NetworkBagel : NetworkWeaponBase
     public void OnSucked()
     {
         gameObject.layer = 2;
-        GetComponent<NetworkIdentity>().RemoveClientAuthority();
+        if (isServer)
+            GetComponent<NetworkIdentity>().RemoveClientAuthority();
         GetComponent<BoxCollider>().enabled = false;
         GetComponent<Rigidbody>().useGravity = false;
         GetComponent<Rigidbody>().velocity = Vector3.zero;

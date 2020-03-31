@@ -193,18 +193,19 @@ public class NetworkRtBazooka : NetworkWeaponBase
     {
         EventManager.Instance.TriggerEvent(new BazookaFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
         print("Rpc Launch");
+        _bazookaState = BazookaStates.Out;
         _lineRenderer.enabled = false;
         transform.GetComponent<Rigidbody>().isKinematic = false;
         transform.GetComponent<Rigidbody>().velocity = _startVelocity;
         _followHand = false;
     }
 
-    protected override void OnCollisionEnter(Collision other)
-    {
-        // if (_bazookaState == BazookaStates.Out) return;
-        base.OnCollisionEnter(other);
-        print(_ammo);
-    }
+    // protected override void OnCollisionEnter(Collision other)
+    // {
+    //     // if (_bazookaState == BazookaStates.Out) return;
+    //     base.OnCollisionEnter(other);
+    //     print(_ammo);
+    // }
 
     protected override void _onWeaponDespawn()
     {
@@ -292,7 +293,7 @@ public class NetworkRtBazooka : NetworkWeaponBase
         var points = _getTrajectoryPoints(transform.position, _startVelocity, _bazookaData.TrajectoryLineStep, _bazookaData.TrajectoryLineTime);
         if (_lineRenderer)
         {
-            // if (!_lineRenderer.enabled) _lineRenderer.enabled = true;
+            if (!_lineRenderer.enabled) _lineRenderer.enabled = true;
             _lineRenderer.positionCount = points.Count;
             _lineRenderer.SetPositions(points.ToArray());
         }

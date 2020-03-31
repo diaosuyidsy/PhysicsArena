@@ -107,32 +107,6 @@ public class NetworkRtHook : NetworkWeaponBase
         _hookGunFSM.TransitionTo<HookInState>();
     }
 
-    [Command]
-    public void CmdHookOnHit(GameObject hit)
-    {
-        if (_hookGunFSM.CurrentState == null) return;
-        if (!_hookGunFSM.CurrentState.GetType().Equals(typeof(HookFlyingOutState))) return;
-        // Decide if he blocked
-        if (hit.transform.GetComponent<IHittableNetwork>().CanBlock(-_hook.transform.right))
-        {
-            RpcHookBlocked(hit);
-            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hit, hit.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook));
-            _hookGunFSM.TransitionTo<HookBrokenState>();
-            return;
-        }
-        Hooked = hit.transform.gameObject;
-        RpcHookHit(hit);
-        EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit.transform.gameObject,
-        hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber));
-        Hooked.GetComponent<IHittableNetwork>().OnImpact(Owner, ImpactType.HookGun);
-        foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
-        {
-            rb.isKinematic = true;
-        }
-        _hookGunFSM.TransitionTo<HookOnTargetState>();
-        return;
-    }
-
     private abstract class HookGunState : FSM<NetworkRtHook>.State
     {
         protected HookGunData _hookGunData;
@@ -140,11 +114,6 @@ public class NetworkRtHook : NetworkWeaponBase
         {
             base.Init();
             _hookGunData = Context.WeaponDataBase as HookGunData;
-        }
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            print(GetType().Name);
         }
     }
 
@@ -244,9 +213,9 @@ public class NetworkRtHook : NetworkWeaponBase
     [ClientRpc]
     private void RpcHookHit(GameObject hit)
     {
-        if (_ownerIsLocalPlayer) return;
         EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit,
         hit.GetComponent<PlayerControllerMirror>().PlayerNumber));
+        if (_ownerIsLocalPlayer) return;
         hit.GetComponent<IHittableNetwork>().OnImpact(Owner, ImpactType.HookGun);
         foreach (var rb in hit.GetComponentsInChildren<Rigidbody>())
         {

@@ -54,6 +54,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     /// </summary>
     protected virtual void _onWeaponDespawn()
     {
+        GetComponent<NetworkIdentity>().RemoveClientAuthority();
         gameObject.SetActive(false);
         RpcOnWeaponDespawn();
     }
@@ -100,6 +101,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         {
             if (!_hitGroundOnce)
             {
+                GetComponent<NetworkIdentity>().RemoveClientAuthority();
                 gameObject.layer = LayerMask.NameToLayer("Pickup");
                 RpcHitGround();
                 CanBePickedUp = true;
@@ -135,7 +137,6 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
         Owner.transform.up * WeaponDataBase.DropForce.y +
         Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
-        GetComponent<NetworkIdentity>().RemoveClientAuthority();
         Owner = null;
     }
 

@@ -53,8 +53,8 @@ public class NetworkSpotWeaponGeneratorManager : NetworkBehaviour
         }*/
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
-        EventManager.Instance.AddHandler<WeaponHitDeathTrigger>(OnWeaponFall);
-        EventManager.Instance.AddHandler<WeaponUsedUp>(OnWeaponUsedUp);
+        EventManager.Instance.AddHandler<ObjectDespawned>(OnWeaponDespawn);
+
 
         CurrentMaxWeaponNumber = WeaponGeneratorList.Count;
         InitPrefabBag();
@@ -65,8 +65,7 @@ public class NetworkSpotWeaponGeneratorManager : NetworkBehaviour
     private void OnDestroy()
     {
         EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
-        EventManager.Instance.RemoveHandler<WeaponHitDeathTrigger>(OnWeaponFall);
-        EventManager.Instance.RemoveHandler<WeaponUsedUp>(OnWeaponUsedUp);
+        EventManager.Instance.RemoveHandler<ObjectDespawned>(OnWeaponDespawn);
     }
 
     // Update is called once per frame
@@ -153,14 +152,13 @@ public class NetworkSpotWeaponGeneratorManager : NetworkBehaviour
 
     }
 
-    private void OnWeaponFall(WeaponHitDeathTrigger e)
+    private void OnWeaponDespawn(ObjectDespawned e)
     {
-        CurrentWeaponCount--;
-    }
+        if(e.Obj.CompareTag("Weapon_OnHead") || e.Obj.CompareTag("Weapon_OnChest"))
+        {
+            CurrentWeaponCount--;
+        }
 
-    private void OnWeaponUsedUp(WeaponUsedUp e)
-    {
-        CurrentWeaponCount--;
     }
 
     private void OnGameStart(GameStart e)

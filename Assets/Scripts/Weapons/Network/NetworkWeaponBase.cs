@@ -16,6 +16,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     protected bool _hitGroundOnce;
     [SyncVar]
     public bool CanBePickedUp;
+    public bool TransitAuthorityOnPickUp = true;
     protected bool _followHand;
     protected float _pickUpTimer;
     protected bool _ownerIsLocalPlayer => Owner == null ? false : Owner.GetComponent<NetworkIdentity>().isLocalPlayer;
@@ -159,7 +160,8 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
         GetComponent<Rigidbody>().isKinematic = true;
         GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0f;
         GetComponent<Smooth.SmoothSyncMirror>().rotationLerpSpeed = 0f;
-        GetComponent<NetworkIdentity>().AssignClientAuthority(Owner.GetComponent<NetworkIdentity>().connectionToClient);
+        if (TransitAuthorityOnPickUp)
+            GetComponent<NetworkIdentity>().AssignClientAuthority(Owner.GetComponent<NetworkIdentity>().connectionToClient);
         RpcOnPickUp(owner);
     }
 

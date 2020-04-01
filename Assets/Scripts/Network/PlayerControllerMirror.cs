@@ -1441,6 +1441,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context._animator.SetFloat("ClockFistTime", 1f / Context.CharacterDataStore.ClockFistTime);
             Context._animator.SetBool("PunchHolding", true);
             // EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            Context._permaSlow++;
+            Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.FistHoldSpeedMultiplier;
+            Context._rotationSpeedMultiplier = Context.CharacterDataStore.FistHoldRotationMutiplier;
             Context.CmdTriggerPunchStart(Context.gameObject);
             _holding = false;
             _startHoldingTime = Time.time;
@@ -1449,6 +1452,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void Update()
         {
             base.Update();
+            // Start Holding the Punch
             if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
                 _holding = true;
@@ -1456,16 +1460,22 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 Context.CmdTriggerPunchHolding(Context.gameObject);
             }
 
+            // If holding the punch and let go of right trigger
+            // Release Punch
             if (_RightTriggerUp && _holding)
             {
                 TransitionTo<PunchReleasingState>();
                 return;
             }
+
+            // If not hold right trigger when it's time to hold, then punch
             if (_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime && !_RightTrigger)
             {
                 TransitionTo<PunchReleasingState>();
                 return;
             }
+
+            // Transition to Block
             if (_holding && (_BDown || _LeftTriggerDown))
             {
                 // EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
@@ -1479,6 +1489,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             base.OnExit();
             Context._animator.SetBool("PunchHolding", false);
+            Context._permaSlow--;
+            Context._permaSlowWalkSpeedMultiplier = 1f;
+            Context._rotationSpeedMultiplier = 1f;
         }
     }
 

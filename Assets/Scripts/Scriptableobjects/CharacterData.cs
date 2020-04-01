@@ -43,6 +43,8 @@ public class CharacterData : ScriptableObject
     [Tooltip("Self Push Force adjust how much yourself will be launched forward when punching")]
     public float SelfPushForce = 200f;
     public float IdleSelfPushForce = 65f;
+    public float FistHoldSpeedMultiplier = 0.5f;
+    public float FistHoldRotationMutiplier = 1.5f;
     [Tooltip("MeleeCharge Threshold must be over this to take effect")]
     public float MeleeChargeThreshold = 0.75f;
     [Tooltip("The Radius of punching")]

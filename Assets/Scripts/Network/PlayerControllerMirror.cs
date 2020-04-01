@@ -833,16 +833,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 return;
             }
 
-            if (_jump && Context._isGrounded() &&
-            Context._jumpTimer < Time.timeSinceLevelLoad &&
-            Context.EquipmentObject != null &&
-            Context.EquipmentObject.GetComponent<rtJet>() != null &&
-            Context._canDrainStamina(Context.EquipmentObject.GetComponent<rtJet>().m_JetData.JumpStaminaDrain))
-            {
-                Context.EquipmentObject.GetComponent<EquipmentBase>().OnUse();
-                TransitionTo<JetPackState>();
-                return;
-            }
             else if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<JumpState>();
@@ -930,16 +920,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             if (_HLAxisRaw == 0f && _VLAxisRaw == 0f)
             {
                 TransitionTo<IdleState>();
-                return;
-            }
-            if (_jump && Context._isGrounded() &&
-            Context._jumpTimer < Time.timeSinceLevelLoad &&
-            Context.EquipmentObject != null &&
-            Context.EquipmentObject.GetComponent<rtJet>() != null &&
-            Context._canDrainStamina(Context.EquipmentObject.GetComponent<rtJet>().m_JetData.JumpStaminaDrain))
-            {
-                Context.EquipmentObject.GetComponent<EquipmentBase>().OnUse();
-                TransitionTo<JetPackState>();
                 return;
             }
             else if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad)
@@ -1077,73 +1057,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         }
     }
 
-    private class JetPackState : ControllableMovementState
-    {
-        private JetData _jetData;
-        private float _InAirJumpTimer;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _jetData = Context.EquipmentObject.GetComponent<EquipmentBase>().EquipmentDataBase as JetData;
-            Context._rb.AddForce(_jetData.JumpForce * Vector3.up, ForceMode.Impulse);
-            Context._drainStamina(_jetData.JumpStaminaDrain);
-            _InAirJumpTimer = Time.timeSinceLevelLoad + _jetData.InAirJumpCD;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_jump && _InAirJumpTimer < Time.timeSinceLevelLoad && Context._canDrainStamina(_jetData.InAirStaminaDrain))
-            {
-                _InAirJumpTimer = Time.timeSinceLevelLoad + _jetData.InAirJumpCD;
-                Context._drainStamina(_jetData.InAirStaminaDrain);
-                Context._rb.AddForce(_jetData.InAirForce.y * Vector3.up + _jetData.InAirForce.z * Context.transform.forward, ForceMode.VelocityChange);
-            }
-        }
-
-        public override void OnCollisionEnter(Collision other)
-        {
-            if (Context.CharacterDataStore.JumpMask == (Context.CharacterDataStore.JumpMask | (1 << other.gameObject.layer)))
-            {
-                TransitionTo<IdleState>();
-                EventManager.Instance.TriggerEvent(new PlayerLand(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
-            }
-        }
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-            Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context._walkSpeed;
-            Vector3 velocityChange = targetVelocity - Context._rb.velocity;
-            velocityChange.x = Mathf.Clamp(velocityChange.x, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
-            velocityChange.z = Mathf.Clamp(velocityChange.z, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
-            velocityChange.y = 0f;
-            Context._rb.AddForce(_jetData.FloatAuxilaryForce * Vector3.up, ForceMode.Acceleration);
-            Context._rb.AddForce(velocityChange, ForceMode.VelocityChange);
-
-            if (_HLAxis != 0f && _VLAxis != 0f)
-            {
-                Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
-                Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
-                Context.transform.rotation = tr;
-            }
-        }
-    }
-
-    private class ButtStrikeMovementState : MovementState
-    {
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Context._animator.SetBool("IdleDowner", true);
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context._animator.SetBool("IdleDowner", false);
-        }
-    }
     private class StunMovementState : MovementState
     {
         public override void OnEnter()

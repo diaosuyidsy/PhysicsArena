@@ -56,6 +56,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     protected virtual void _onWeaponDespawn()
     {
         GetComponent<NetworkIdentity>().RemoveClientAuthority();
+        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         gameObject.SetActive(false);
         RpcOnWeaponDespawn();
     }

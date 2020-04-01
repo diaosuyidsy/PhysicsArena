@@ -154,7 +154,8 @@ public class NetworkSpotWeaponGeneratorManager : NetworkBehaviour
 
     private void OnWeaponDespawn(ObjectDespawned e)
     {
-        if(e.Obj.CompareTag("Weapon_OnHead") || e.Obj.CompareTag("Weapon_OnChest"))
+        if (!isServer) return;
+        if (e.Obj.CompareTag("Weapon_OnHead") || e.Obj.CompareTag("Weapon_OnChest"))
         {
             CurrentWeaponCount--;
         }

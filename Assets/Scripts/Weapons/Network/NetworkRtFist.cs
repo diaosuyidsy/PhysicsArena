@@ -222,7 +222,10 @@ public class NetworkRtFist : NetworkWeaponBase
         _fistDup.transform.parent = null;
         _fistDup.GetComponent<Collider>().isTrigger = false;
         _fist.gameObject.SetActive(false);
-        owner.GetComponent<PlayerControllerMirror>().OnImpact(-owner.transform.forward * _fistGunData.BackfireHitForce, ForceMode.VelocityChange, owner, ImpactType.FistGun);
+        if (!owner.GetComponent<PlayerControllerMirror>().IsIdle)
+            owner.GetComponent<PlayerControllerMirror>().OnImpact(-owner.transform.forward * _fistGunData.BackfireHitForce, ForceMode.VelocityChange, owner, ImpactType.FistGun);
+        else
+            owner.GetComponent<PlayerControllerMirror>().OnImpact(-owner.transform.forward * _fistGunData.IdleBackfireHitForce, ForceMode.VelocityChange, owner, ImpactType.FistGun);
     }
 
     [ClientRpc]

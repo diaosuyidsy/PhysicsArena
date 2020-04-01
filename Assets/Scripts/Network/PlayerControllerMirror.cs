@@ -105,6 +105,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     #region Network Variables
     [SyncVar]
     private bool _isBlocking;
+    [SyncVar]
+    public bool IsIdle;
+
     [SyncVar(hook = nameof(OnChangeName))]
     public string PlayerName;
     #endregion
@@ -245,7 +248,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPlayerDeath(GameObject player, GameObject impactObject)
     {
-        //TODO: Need to correctly record who killed player
         EventManager.Instance.TriggerEvent(new PlayerDied(player, PlayerNumber, new ImpactMarker(player, 0f, ImpactType.Melee), impactObject));
     }
 
@@ -416,6 +418,12 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void CmdSetBlock(bool block)
     {
         _isBlocking = block;
+    }
+
+    [Command]
+    private void CmdSetIdle(bool idle)
+    {
+        IsIdle = idle;
     }
 
     [Command]
@@ -822,6 +830,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             base.OnEnter();
             Context._animator.SetBool("IdleDowner", true);
+            Context.CmdSetIdle(true);
         }
 
         public override void Update()
@@ -852,6 +861,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void OnExit()
         {
             base.OnExit();
+            Context.CmdSetIdle(false);
             Context._animator.SetBool("IdleDowner", false);
         }
     }

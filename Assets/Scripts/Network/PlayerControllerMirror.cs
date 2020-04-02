@@ -1517,13 +1517,13 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context._animator.SetBool("PunchReleased", true);
             _time = Time.time;
             _hitOnce = false;
+            Context._helpAim(Context.CharacterDataStore.PunchHelpAimAngle, Context.CharacterDataStore.PunchHelpAimDistance);
             if (Context._movementFSM.CurrentState.GetType().Equals(typeof(IdleState)))
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             // EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context.CmdTriggerPunchReleased(Context.gameObject);
-            Context._helpAim(Context.CharacterDataStore.PunchHelpAimAngle, Context.CharacterDataStore.PunchHelpAimDistance);
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
         }
 

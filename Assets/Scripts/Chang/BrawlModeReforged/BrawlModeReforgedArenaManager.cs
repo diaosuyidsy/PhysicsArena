@@ -392,6 +392,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
 
         if (CheckDelivery())
         {
+            GameObject.Destroy(Context.Info.Bomb);
             GameObject.Destroy(Context.Info.Mark);
             return;
         }
@@ -473,6 +474,7 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
 
         if (CheckDelivery())
         {
+            GameObject.Destroy(Context.Info.Bomb);
             GameObject.Destroy(Context.Info.Mark);
             return;
         }

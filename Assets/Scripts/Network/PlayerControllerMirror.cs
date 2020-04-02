@@ -1538,8 +1538,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
                 else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
                 print("forward: " + Context.transform.forward);
-                // - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance
-                if (!_hitOnce && Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
+
+                if (!_hitOnce && Physics.SphereCast(Context.transform.position - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
                 {
                     print(hit.transform.name);
                     if (hit.transform.GetComponentInParent<IHittableNetwork>() == null) return;

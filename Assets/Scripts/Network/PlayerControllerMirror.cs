@@ -1523,6 +1523,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
             // EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context.CmdTriggerPunchReleased(Context.gameObject);
+            Context._helpAim(Context.CharacterDataStore.PunchHelpAimAngle, Context.CharacterDataStore.PunchHelpAimDistance);
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
         }
 

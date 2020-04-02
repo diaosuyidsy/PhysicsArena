@@ -46,6 +46,8 @@ public class CharacterData : ScriptableObject
     public float FistHoldSpeedMultiplier = 0.5f;
     public float FistHoldRotationMutiplier = 1.5f;
     public float PunchBackwardCastDistance = 0.3f;
+    public float PunchHelpAimDistance = 4f;
+    public float PunchHelpAimAngle = 60f;
     [Tooltip("MeleeCharge Threshold must be over this to take effect")]
     public float MeleeChargeThreshold = 0.75f;
     [Tooltip("The Radius of punching")]

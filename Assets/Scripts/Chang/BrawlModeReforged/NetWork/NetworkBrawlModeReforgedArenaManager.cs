@@ -392,8 +392,12 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
 
         if (CheckDelivery())
         {
-            GameObject.Destroy(Context.Info.Mark);
+            NetworkServer.UnSpawn(Context.Info.Bomb);
+            GameObject.Destroy(Context.Info.Bomb);
+
             NetworkServer.UnSpawn(Context.Info.Mark);
+            GameObject.Destroy(Context.Info.Mark);
+
             return;
         }
 
@@ -478,8 +482,12 @@ public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follow
 
         if (CheckDelivery())
         {
-            GameObject.Destroy(Context.Info.Mark);
+            NetworkServer.UnSpawn(Context.Info.Bomb);
+            GameObject.Destroy(Context.Info.Bomb);
+
             NetworkServer.UnSpawn(Context.Info.Mark);
+            GameObject.Destroy(Context.Info.Mark);
+
             return;
         }
         CheckTimer();

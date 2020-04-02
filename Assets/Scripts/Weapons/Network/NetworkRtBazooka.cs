@@ -233,7 +233,6 @@ public class NetworkRtBazooka : NetworkWeaponBase
         _resetThrowMark();
         _ammo = _bazookaData.MaxAmmo;
         transform.GetComponent<Rigidbody>().isKinematic = false;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         _hitGroundOnce = false;
         base._onWeaponDespawn();
     }
@@ -248,7 +247,6 @@ public class NetworkRtBazooka : NetworkWeaponBase
         _player = null;
         _resetThrowMark();
         transform.GetComponent<Rigidbody>().isKinematic = false;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         _hitGroundOnce = false;
     }
 

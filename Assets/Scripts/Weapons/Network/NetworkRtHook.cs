@@ -11,6 +11,7 @@ public class NetworkRtHook : NetworkWeaponBase
     public override float HelpAimDistance { get { return _hookGunData.HelpAimDistance; } }
     [HideInInspector]
     public HookGunData _hookGunData;
+    public bool IsHooking { get { return _hookGunFSM.CurrentState.GetType().Equals(typeof(HookFlyingOutState)); } }
     private GameObject _hook;
     private Vector3 _hookinitlocalPos;
     private Vector3 _hookinitlocalScale;
@@ -107,6 +108,27 @@ public class NetworkRtHook : NetworkWeaponBase
         _hookGunFSM.TransitionTo<HookInState>();
     }
 
+    // Only called on authority client
+    public void HookOnHit(GameObject hit)
+    {
+        if (hit.transform.GetComponent<IHittableNetwork>().CanBlock(-_hook.transform.right))
+        {
+            CmdHookBlocked(hit.transform.gameObject);
+            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hit, hit.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook));
+            _hookGunFSM.TransitionTo<HookBrokenState>();
+            return;
+        }
+
+        Hooked = hit;
+        CmdHookHit(hit);
+        hit.GetComponent<IHittableNetwork>().OnImpact(Owner, ImpactType.HookGun);
+        foreach (var rb in hit.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = true;
+        }
+        _hookGunFSM.TransitionTo<HookOnTargetState>();
+    }
+
     private abstract class HookGunState : FSM<NetworkRtHook>.State
     {
         protected HookGunData _hookGunData;
@@ -154,7 +176,7 @@ public class NetworkRtHook : NetworkWeaponBase
                 TransitionTo<HookFlyingInState>();
                 return;
             }
-            _checkHook();
+            // _checkHook();
             _lastFramePosition = Context._hook.transform.position;
         }
 
@@ -199,7 +221,7 @@ public class NetworkRtHook : NetworkWeaponBase
     private void CmdHookHit(GameObject hit)
     {
         RpcHookHit(hit);
-        Hooked = hit.transform.gameObject;
+        Hooked = hit;
         EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, _hook, hit,
         hit.GetComponent<PlayerControllerMirror>().PlayerNumber));
         hit.GetComponent<IHittableNetwork>().OnImpact(Owner, ImpactType.HookGun);
@@ -284,17 +306,17 @@ public class NetworkRtHook : NetworkWeaponBase
 
             // if hooked and released the trigger,
             // Slingshot them out
-            if (Context.Hooked != null && Context._released)
+            if (Context.Hooked != null && Context._released && Context._ownerIsLocalPlayer)
             {
-                foreach (var rb in Context.Hooked.GetComponentsInChildren<Rigidbody>())
-                {
-                    rb.isKinematic = false;
-                }
-
                 Vector3 force = (Context.transform.position - Context._hook.transform.position).normalized;
                 Vector3 vec2 = Context.transform.right;
                 Vector3 finalVec = force - vec2;
                 force = (force + finalVec * 10f).normalized;
+                Context.CmdHookSlingOut(Context.Hooked, force);
+                foreach (var rb in Context.Hooked.GetComponentsInChildren<Rigidbody>())
+                {
+                    rb.isKinematic = false;
+                }
 
                 Context.Hooked.GetComponent<IHittableNetwork>().OnImpact(force * _hookGunData.HookAwayForce, ForceMode.Impulse, Context.Owner, ImpactType.HookGun);
                 Context.Hooked = null;
@@ -302,10 +324,11 @@ public class NetworkRtHook : NetworkWeaponBase
 
             // If it's almost in, then get rid of the hooked player first
             // to make sure no hardcore collision happens
-            if (Vector3.Distance(Context._hook.transform.position, Context.transform.position) <= 0.6f)
+            if (Context._ownerIsLocalPlayer && Vector3.Distance(Context._hook.transform.position, Context.transform.position) <= 0.6f)
             {
                 if (Context.Hooked != null)
                 {
+                    Context.CmdHookReleaseTarget(Context.Hooked);
                     foreach (var rb in Context.Hooked.GetComponentsInChildren<Rigidbody>())
                     {
                         rb.isKinematic = false;
@@ -327,6 +350,47 @@ public class NetworkRtHook : NetworkWeaponBase
             base.OnExit();
             if (Context.isServer)
                 Context._onWeaponUsedOnce();
+        }
+    }
+
+    [Command]
+    private void CmdHookSlingOut(GameObject target, Vector3 force)
+    {
+        RpcHookSlighOut(target, force);
+        foreach (var rb in target.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = false;
+        }
+        Hooked = null;
+    }
+
+    [ClientRpc]
+    private void RpcHookSlighOut(GameObject target, Vector3 force)
+    {
+        foreach (var rb in target.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = false;
+        }
+        target.GetComponent<IHittableNetwork>().OnImpact(force * _hookGunData.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
+    }
+
+    [Command]
+    private void CmdHookReleaseTarget(GameObject target)
+    {
+        RpcHookReleaseTarget(target);
+        foreach (var rb in target.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = false;
+        }
+        Hooked = null;
+    }
+
+    [ClientRpc]
+    private void RpcHookReleaseTarget(GameObject target)
+    {
+        foreach (var rb in target.GetComponentsInChildren<Rigidbody>())
+        {
+            rb.isKinematic = false;
         }
     }
 

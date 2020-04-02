@@ -105,6 +105,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     #region Network Variables
     [SyncVar]
     private bool _isBlocking;
+    [SyncVar]
+    public bool IsIdle;
+
     [SyncVar(hook = nameof(OnChangeName))]
     public string PlayerName;
     #endregion
@@ -245,7 +248,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [ClientRpc]
     private void RpcTriggerPlayerDeath(GameObject player, GameObject impactObject)
     {
-        //TODO: Need to correctly record who killed player
         EventManager.Instance.TriggerEvent(new PlayerDied(player, PlayerNumber, new ImpactMarker(player, 0f, ImpactType.Melee), impactObject));
     }
 
@@ -416,6 +418,12 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private void CmdSetBlock(bool block)
     {
         _isBlocking = block;
+    }
+
+    [Command]
+    private void CmdSetIdle(bool idle)
+    {
+        IsIdle = idle;
     }
 
     [Command]
@@ -822,6 +830,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             base.OnEnter();
             Context._animator.SetBool("IdleDowner", true);
+            Context.CmdSetIdle(true);
         }
 
         public override void Update()
@@ -833,16 +842,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 return;
             }
 
-            if (_jump && Context._isGrounded() &&
-            Context._jumpTimer < Time.timeSinceLevelLoad &&
-            Context.EquipmentObject != null &&
-            Context.EquipmentObject.GetComponent<rtJet>() != null &&
-            Context._canDrainStamina(Context.EquipmentObject.GetComponent<rtJet>().m_JetData.JumpStaminaDrain))
-            {
-                Context.EquipmentObject.GetComponent<EquipmentBase>().OnUse();
-                TransitionTo<JetPackState>();
-                return;
-            }
             else if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<JumpState>();
@@ -862,6 +861,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void OnExit()
         {
             base.OnExit();
+            Context.CmdSetIdle(false);
             Context._animator.SetBool("IdleDowner", false);
         }
     }
@@ -930,16 +930,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             if (_HLAxisRaw == 0f && _VLAxisRaw == 0f)
             {
                 TransitionTo<IdleState>();
-                return;
-            }
-            if (_jump && Context._isGrounded() &&
-            Context._jumpTimer < Time.timeSinceLevelLoad &&
-            Context.EquipmentObject != null &&
-            Context.EquipmentObject.GetComponent<rtJet>() != null &&
-            Context._canDrainStamina(Context.EquipmentObject.GetComponent<rtJet>().m_JetData.JumpStaminaDrain))
-            {
-                Context.EquipmentObject.GetComponent<EquipmentBase>().OnUse();
-                TransitionTo<JetPackState>();
                 return;
             }
             else if (_jump && Context._isGrounded() && Context._jumpTimer < Time.timeSinceLevelLoad)
@@ -1077,73 +1067,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         }
     }
 
-    private class JetPackState : ControllableMovementState
-    {
-        private JetData _jetData;
-        private float _InAirJumpTimer;
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            _jetData = Context.EquipmentObject.GetComponent<EquipmentBase>().EquipmentDataBase as JetData;
-            Context._rb.AddForce(_jetData.JumpForce * Vector3.up, ForceMode.Impulse);
-            Context._drainStamina(_jetData.JumpStaminaDrain);
-            _InAirJumpTimer = Time.timeSinceLevelLoad + _jetData.InAirJumpCD;
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_jump && _InAirJumpTimer < Time.timeSinceLevelLoad && Context._canDrainStamina(_jetData.InAirStaminaDrain))
-            {
-                _InAirJumpTimer = Time.timeSinceLevelLoad + _jetData.InAirJumpCD;
-                Context._drainStamina(_jetData.InAirStaminaDrain);
-                Context._rb.AddForce(_jetData.InAirForce.y * Vector3.up + _jetData.InAirForce.z * Context.transform.forward, ForceMode.VelocityChange);
-            }
-        }
-
-        public override void OnCollisionEnter(Collision other)
-        {
-            if (Context.CharacterDataStore.JumpMask == (Context.CharacterDataStore.JumpMask | (1 << other.gameObject.layer)))
-            {
-                TransitionTo<IdleState>();
-                EventManager.Instance.TriggerEvent(new PlayerLand(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
-            }
-        }
-        public override void FixedUpdate()
-        {
-            base.FixedUpdate();
-            Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context._walkSpeed;
-            Vector3 velocityChange = targetVelocity - Context._rb.velocity;
-            velocityChange.x = Mathf.Clamp(velocityChange.x, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
-            velocityChange.z = Mathf.Clamp(velocityChange.z, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
-            velocityChange.y = 0f;
-            Context._rb.AddForce(_jetData.FloatAuxilaryForce * Vector3.up, ForceMode.Acceleration);
-            Context._rb.AddForce(velocityChange, ForceMode.VelocityChange);
-
-            if (_HLAxis != 0f && _VLAxis != 0f)
-            {
-                Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
-                Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-                Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed);
-                Context.transform.rotation = tr;
-            }
-        }
-    }
-
-    private class ButtStrikeMovementState : MovementState
-    {
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Context._animator.SetBool("IdleDowner", true);
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context._animator.SetBool("IdleDowner", false);
-        }
-    }
     private class StunMovementState : MovementState
     {
         public override void OnEnter()
@@ -1528,6 +1451,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context._animator.SetFloat("ClockFistTime", 1f / Context.CharacterDataStore.ClockFistTime);
             Context._animator.SetBool("PunchHolding", true);
             // EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            Context._permaSlow++;
+            Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.FistHoldSpeedMultiplier;
+            Context._rotationSpeedMultiplier = Context.CharacterDataStore.FistHoldRotationMutiplier;
             Context.CmdTriggerPunchStart(Context.gameObject);
             _holding = false;
             _startHoldingTime = Time.time;
@@ -1536,6 +1462,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void Update()
         {
             base.Update();
+            // Start Holding the Punch
             if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
                 _holding = true;
@@ -1543,16 +1470,22 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 Context.CmdTriggerPunchHolding(Context.gameObject);
             }
 
+            // If holding the punch and let go of right trigger
+            // Release Punch
             if (_RightTriggerUp && _holding)
             {
                 TransitionTo<PunchReleasingState>();
                 return;
             }
+
+            // If not hold right trigger when it's time to hold, then punch
             if (_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime && !_RightTrigger)
             {
                 TransitionTo<PunchReleasingState>();
                 return;
             }
+
+            // Transition to Block
             if (_holding && (_BDown || _LeftTriggerDown))
             {
                 // EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
@@ -1566,6 +1499,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             base.OnExit();
             Context._animator.SetBool("PunchHolding", false);
+            Context._permaSlow--;
+            Context._permaSlowWalkSpeedMultiplier = 1f;
+            Context._rotationSpeedMultiplier = 1f;
         }
     }
 
@@ -1581,6 +1517,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context._animator.SetBool("PunchReleased", true);
             _time = Time.time;
             _hitOnce = false;
+            Context._helpAim(Context.CharacterDataStore.PunchHelpAimAngle, Context.CharacterDataStore.PunchHelpAimDistance);
             if (Context._movementFSM.CurrentState.GetType().Equals(typeof(IdleState)))
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else
@@ -1600,7 +1537,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 int layermask = 0;
                 if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
                 else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
-                if (!_hitOnce && Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
+                if (!_hitOnce && Physics.SphereCast(Context.transform.position - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
                 {
                     if (hit.transform.GetComponentInParent<IHittableNetwork>() == null) return;
                     _hitOnce = true;

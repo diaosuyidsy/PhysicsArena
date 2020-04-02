@@ -70,6 +70,7 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
 
+        Team1SpeedLevel = Team2SpeedLevel = 1;
         Team1SpeedLevelPlus = Team2SpeedLevelPlus = 1;
         SetUI();
 
@@ -169,12 +170,12 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         else if (Team1Count > 0)
         {
             CurrentSide = CartSide.Team1;
-            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel];
+            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel-1];
         }
         else if(Team2Count > 0)
         {
             CurrentSide = CartSide.Team2;
-            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel];
+            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel-1];
         }
         else
         {
@@ -226,12 +227,12 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         
         if(CurrentSide == CartSide.Team1)
         {
-            CurrentOccupyProgress += Data.OccupySpeedWithCheckpoint[Team1SpeedLevel] * Time.deltaTime;
+            CurrentOccupyProgress += Data.OccupySpeedWithCheckpoint[Team1SpeedLevel-1] * Time.deltaTime;
             OccupyCounter.GetComponent<Image>().fillAmount = CurrentOccupyProgress;
         }
         else
         {
-            CurrentOccupyProgress += Data.OccupySpeedWithCheckpoint[Team2SpeedLevel] * Time.deltaTime;
+            CurrentOccupyProgress += Data.OccupySpeedWithCheckpoint[Team2SpeedLevel-1] * Time.deltaTime;
             OccupyCounter.GetComponent<Image>().fillAmount = CurrentOccupyProgress;
         }
 

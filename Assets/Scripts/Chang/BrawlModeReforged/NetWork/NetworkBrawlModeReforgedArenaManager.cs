@@ -217,8 +217,8 @@ public class NetworkCanonIdle : NetworkCanonAction
     public override void Update()
     {
         base.Update();
-        //SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
-        //Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
         CheckDelivery();
     }
 

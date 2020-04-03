@@ -30,7 +30,13 @@ public class Bagel : WeaponBase
     protected override void Update()
     {
         base.Update();
-        if (Hold)
+        SetGuide();
+        
+    }
+
+    private void SetGuide()
+    {
+        if (Hold) // Show guide UI
         {
             if (Guide == null)
             {
@@ -51,8 +57,6 @@ public class Bagel : WeaponBase
 
                 Guide.transform.forward = Owner.tag.Contains("1") ? Team1BasketOffset : Team2BasketOffset;
             }
-
-
         }
     }
 
@@ -60,33 +64,12 @@ public class Bagel : WeaponBase
     {
         base.OnPickUp(owner);
 
-        Material mat = Entity.GetComponent<Renderer>().material;
-        mat.EnableKeyword("_EMISSION");
-
-
-        if (owner.tag.Contains("1"))
-        {
-            //mat.SetColor("_Color", Red);
-            //mat.SetColor("_EmissionColor", Red * 0.5f);
-        }
-        else
-        {
-            //mat.SetColor("_Color", Blue);
-            //mat.SetColor("_EmissionColor", Blue * 0.5f);
-        }
-
         Hold = true;
     }
 
     public override void OnDrop()
     {
         base.OnDrop();
-
-        Material mat = Entity.GetComponent<Renderer>().material;
-        mat.EnableKeyword("_EMISSION");
-
-        //mat.SetColor("_Color", Default);
-        //mat.SetColor("_EmissionColor", Default * 0.5f);
 
         Hold = false;
         Destroy(Guide);
@@ -123,10 +106,5 @@ public class Bagel : WeaponBase
             EventManager.Instance.TriggerEvent(new BagelDespawn());
             return;
         }
-        /*if (other.tag.Contains("Collector"))
-        {
-            EventManager.Instance.TriggerEvent(new BagelSent(other.transform.parent.gameObject));
-            Destroy(gameObject);
-        }*/
     }
 }

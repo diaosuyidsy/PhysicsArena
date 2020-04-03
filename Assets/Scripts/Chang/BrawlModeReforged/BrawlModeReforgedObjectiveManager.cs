@@ -136,27 +136,13 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             return;
         }
 
-        if (e.ImpactObject.name.Contains ("Canon"))
+        if (e.Player.tag.Contains("1"))
         {
-            if (e.Player.tag.Contains ("1"))
-            {
-                TeamBScore += ModeData.BagelKillPoint;
-            }
-            else
-            {
-                TeamAScore += ModeData.BagelKillPoint;
-            }
+            TeamBScore += ModeData.NormalKillPoint;
         }
         else
         {
-            if (e.Player.tag.Contains ("1"))
-            {
-                TeamBScore += ModeData.NormalKillPoint;
-            }
-            else
-            {
-                TeamAScore += ModeData.NormalKillPoint;
-            }
+            TeamAScore += ModeData.NormalKillPoint;
         }
 
         RefreshScore ();

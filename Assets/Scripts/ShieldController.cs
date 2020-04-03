@@ -15,6 +15,13 @@ public class ShieldController : MonoBehaviour
     {
         Animator.SetBool("ShieldOpen", open);
         Shield.SetActive(open);
+        // if (!open)
+        // {
+        //     GameObject afterImage = Instantiate(Shield, Shield.transform.parent);
+        //     afterImage.transform.parent = null;
+        //     afterImage.SetActive(true);
+        //     Destroy(afterImage, 0.3f);
+        // }
     }
 
     public void SetEnergy(float Energy)
@@ -26,10 +33,13 @@ public class ShieldController : MonoBehaviour
         if (Energy == 0f)
         {
             Shield.SetActive(false);
-            _instantiatedShieldCrack = Instantiate(ShieldCrack, transform.parent, true);
-            _instantiatedShieldCrack.SetActive(true);
-            _instantiatedShieldCrack.transform.parent = null;
-            StartCoroutine(increaseShieldCraftDistance(0.5f));
+            if (_instantiatedShieldCrack == null)
+            {
+                _instantiatedShieldCrack = Instantiate(ShieldCrack, transform.parent, true);
+                _instantiatedShieldCrack.SetActive(true);
+                _instantiatedShieldCrack.transform.parent = null;
+                StartCoroutine(increaseShieldCraftDistance(0.5f));
+            }
         }
     }
 

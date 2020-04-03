@@ -10,6 +10,7 @@ public class FistGunData : WeaponDataBase
     public int MaxAmmo = 15;
     public float FistHitForce = 900f;
     public float BackfireHitForce = 300f;
+    public float IdleBackfireHitForce = 20f;
     public float MaxFlyDistance = 10f;
     public float ReloadTime = 2f;
     public AnimationCurve ReloadEase;

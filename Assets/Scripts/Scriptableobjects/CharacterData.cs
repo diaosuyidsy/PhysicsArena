@@ -24,7 +24,7 @@ public class CharacterData : ScriptableObject
     public float MaxStamina = 1.5f;
     public float StaminaRegenInterval = 3f;
     public float StaminaRegenRate = 1f;
-    public float BlockUILingerDuration = 0.2f;
+    public float BlockLingerDuration = 0.2f;
     public float BlockStaminaDrain = 1f;
     public float BlockMultiplier = 2f;
     public float BlockAngle = 90f;
@@ -43,6 +43,11 @@ public class CharacterData : ScriptableObject
     [Tooltip("Self Push Force adjust how much yourself will be launched forward when punching")]
     public float SelfPushForce = 200f;
     public float IdleSelfPushForce = 65f;
+    public float FistHoldSpeedMultiplier = 0.5f;
+    public float FistHoldRotationMutiplier = 1.5f;
+    public float PunchBackwardCastDistance = 0.3f;
+    public float PunchHelpAimDistance = 4f;
+    public float PunchHelpAimAngle = 60f;
     [Tooltip("MeleeCharge Threshold must be over this to take effect")]
     public float MeleeChargeThreshold = 0.75f;
     [Tooltip("The Radius of punching")]
@@ -69,8 +74,8 @@ public class CharacterData : ScriptableObject
     public float PickUpCD = 0f;
     public LayerMask PickUpLayer;
     public float DropRecoveryTime = 0.2f;
-	public Vector3 HitStopViberation = new Vector3(1f, 0.1f, 1f);
-	public int HitStopViberato = 90;
-	public float HitStopRandomness = 90f;
-	public Ease HitStopViberationEase = Ease.OutBack;
+    public Vector3 HitStopViberation = new Vector3(1f, 0.1f, 1f);
+    public int HitStopViberato = 90;
+    public float HitStopRandomness = 90f;
+    public Ease HitStopViberationEase = Ease.OutBack;
 }

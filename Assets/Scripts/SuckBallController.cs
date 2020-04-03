@@ -8,11 +8,9 @@ public class SuckBallController : MonoBehaviour
     [HideInInspector]
     public List<GameObject> InRangePlayers;
 
-    public GameObject RTText;
     public GameObject lineEndPrefab;
     private rtSuck _rts;
     private string _opponentTeamTag = "";
-    private int _tutorialTimes = 6;
     private List<GameObject> _lineEnds = new List<GameObject>();
     private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
 
@@ -36,27 +34,23 @@ public class SuckBallController : MonoBehaviour
         {
             /*GameObject lrContainer = new GameObject("LineRenderer");
             lrContainer.transform.parent = transform;*/
-            
+
             // Add a linerenderer to the in range players and configure the linerenderer properly
             if (go.GetComponent<LineRenderer>() != null) return;
             LineRenderer lr = go.AddComponent<LineRenderer>();
             //lr.material = new Material(Shader.Find("Sprites/Default"));
             lr.material = new Material(Shader.Find("SuckGunLine"));
             //lr.widthMultiplier = 0.18f;
-            lr.widthCurve = AnimationCurve.Linear(0,0.05f,1,0.1f);
+            lr.widthCurve = AnimationCurve.Linear(0, 0.05f, 1, 0.1f);
             lr.positionCount = 2;
             lr.numCapVertices = 90;
             lr.useWorldSpace = true;
             lr.startColor = Color.yellow;
             lr.sortingOrder = -1;
-            if (_tutorialTimes-- > 0)
-            {
-                RTText.SetActive(true);
-            }
             // Add the gameobject to the list of InRangePlayers
             InRangePlayers.Add(go);
 
-            GameObject lineEnd = GameObject.Instantiate(lineEndPrefab,transform);
+            GameObject lineEnd = GameObject.Instantiate(lineEndPrefab, transform);
             //lineEnd.transform.localScale = Vector3.one * 0.5f;
             lineEnd.SetActive(true);
             _lineEnds.Add(lineEnd);
@@ -71,21 +65,6 @@ public class SuckBallController : MonoBehaviour
             lr.widthMultiplier += 2f * Time.deltaTime;
         }
     }
-
-    /*private void OnTriggerStay(Collider other)
-    {
-        if (other.tag.Contains(_opponentTeamTag) && other.GetType() == typeof(CapsuleCollider))
-        {
-            LineRenderer lr = other.GetComponent<LineRenderer>();
-            lr.SetPosition(0, other.transform.position);
-            lr.SetPosition(1, transform.position);
-            Vector3 dir = other.transform.position - transform.position;
-            Transform lineCone = other.transform.Find("LineCone");
-            lineCone.position = transform.position;
-            lineCone.forward = dir;
-        }
-    }
-*/
 
     private void Update()
     {
@@ -102,10 +81,10 @@ public class SuckBallController : MonoBehaviour
             }
             else
             {
-                _lineRenderers[i].widthMultiplier= 1/ Vector3.Distance(playerPos,ballPos) * 2.5f;
+                _lineRenderers[i].widthMultiplier = 1 / Vector3.Distance(playerPos, ballPos) * 2.5f;
             }
 
-            Vector3 dir = playerPos- ballPos;
+            Vector3 dir = playerPos - ballPos;
             _lineEnds[i].transform.position = ballPos;
             _lineEnds[i].transform.forward = dir;
         }
@@ -123,8 +102,7 @@ public class SuckBallController : MonoBehaviour
                 _lineEnds.Remove(_lineEnds[0]);
                 Destroy(lineEnd);
             }
-            
-            RTText.SetActive(false);
+
             // Delete the gameobject from the list in range players
             foreach (GameObject go in InRangePlayers)
             {

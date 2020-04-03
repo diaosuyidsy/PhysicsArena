@@ -95,6 +95,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private int _playerBodiesLayer;
     private Vector3 _storedVelocity;
     private int _hitStopFrames;
+    public bool IsIdle { get { return _movementFSM.CurrentState.GetType().Equals(typeof(IdleState)); } }
     #endregion
 
     private void Awake()
@@ -213,28 +214,28 @@ public class PlayerController : MonoBehaviour, IHittable
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
-			_hitStopFrames = CharacterDataStore.HitStopFramesSmall;
+            _hitStopFrames = CharacterDataStore.HitStopFramesSmall;
             if (force.magnitude > CharacterDataStore.HitBigThreshold)
             {
                 _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
-				_hitStopFrames = CharacterDataStore.HitStopFramesBig;
-			}
-			if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
+                _hitStopFrames = CharacterDataStore.HitStopFramesBig;
+            }
+            if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
-				if(impactType == ImpactType.Melee || impactType == ImpactType.Block)
-					_movementFSM.TransitionTo<PunchHittedStopMovementState>();
-				else
-					_movementFSM.TransitionTo<HitUncontrollableState>();
-			}
+                if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+                    _movementFSM.TransitionTo<PunchHittedStopMovementState>();
+                else
+                    _movementFSM.TransitionTo<HitUncontrollableState>();
+            }
 
-			if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
+            if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
             {
-				if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
-					_actionFSM.TransitionTo<PunchHittedStopActionState>();
-				else
-					_actionFSM.TransitionTo<HitUnControllableActionState>();
-			}
-		}
+                if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+                    _actionFSM.TransitionTo<PunchHittedStopActionState>();
+                else
+                    _actionFSM.TransitionTo<HitUnControllableActionState>();
+            }
+        }
     }
 
     public void OnImpact(GameObject enforcer, ImpactType impactType)
@@ -482,14 +483,14 @@ public class PlayerController : MonoBehaviour, IHittable
         // BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size = _nextStaminaUISize;
     }
 
-	public GameObject GetGameObject()
-	{
-		return gameObject;
-	}
-	#endregion
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+    #endregion
 
-	#region Movment States
-	private class MovementState : FSM<PlayerController>.State
+    #region Movment States
+    private class MovementState : FSM<PlayerController>.State
     {
         protected float _HLAxis { get { return Context._player.GetAxis("Move Horizontal"); } }
         protected float _VLAxis { get { return Context._player.GetAxis("Move Vertical"); } }
@@ -749,22 +750,22 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         private int _counter;
         private int _firstPhysicsFrame;
-		private Tweener _shakeTween;
+        private Tweener _shakeTween;
 
-		public override void OnEnter()
+        public override void OnEnter()
         {
             base.OnEnter();
             _counter = 0;
             _firstPhysicsFrame = 2;
-		}
+        }
 
         public override void Update()
         {
             base.Update();
             if (_firstPhysicsFrame > 0) return;
-			if(_shakeTween == null || !_shakeTween.IsPlaying()) _shakeTween = Context.transform.DOShakePosition(Time.unscaledDeltaTime * Context._hitStopFrames, Context.CharacterDataStore.HitStopViberation, Context.CharacterDataStore.HitStopViberato,
-	   Context.CharacterDataStore.HitStopRandomness).SetEase(Context.CharacterDataStore.HitStopViberationEase);
-			_counter++;
+            if (_shakeTween == null || !_shakeTween.IsPlaying()) _shakeTween = Context.transform.DOShakePosition(Time.unscaledDeltaTime * Context._hitStopFrames, Context.CharacterDataStore.HitStopViberation, Context.CharacterDataStore.HitStopViberato,
+        Context.CharacterDataStore.HitStopRandomness).SetEase(Context.CharacterDataStore.HitStopViberationEase);
+            _counter++;
             if (_counter > Context._hitStopFrames)
             {
                 TransitionTo<HitUncontrollableState>();
@@ -778,12 +779,12 @@ public class PlayerController : MonoBehaviour, IHittable
             _firstPhysicsFrame--;
         }
 
-		public override void OnExit()
-		{
-			base.OnExit();
-			_shakeTween.Kill();
-		}
-	}
+        public override void OnExit()
+        {
+            base.OnExit();
+            _shakeTween.Kill();
+        }
+    }
 
     private class JetPackState : ControllableMovementState
     {
@@ -1182,7 +1183,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class DroppingState : ActionState
     {
-    	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
 
         public override void OnEnter()
         {
@@ -1243,6 +1244,9 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             Context._animator.SetFloat("ClockFistTime", 1f / Context.CharacterDataStore.ClockFistTime);
             Context._animator.SetBool("PunchHolding", true);
+            Context._permaSlow++;
+            Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.FistHoldSpeedMultiplier;
+            Context._rotationSpeedMultiplier = Context.CharacterDataStore.FistHoldRotationMutiplier;
             EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             _holding = false;
             _startHoldingTime = Time.time;
@@ -1279,6 +1283,9 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.OnExit();
             Context._animator.SetBool("PunchHolding", false);
+            Context._permaSlow--;
+            Context._permaSlowWalkSpeedMultiplier = 1f;
+            Context._rotationSpeedMultiplier = 1f;
         }
     }
 
@@ -1294,6 +1301,7 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("PunchReleased", true);
             _time = Time.time;
             _hitOnce = false;
+            Context._helpAim(Context.CharacterDataStore.PunchHelpAimAngle, Context.CharacterDataStore.PunchHelpAimDistance);
             if (Context._movementFSM.CurrentState.GetType().Equals(typeof(IdleState)))
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else
@@ -1312,7 +1320,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 int layermask = 0;
                 if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
                 else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
-                if (!_hitOnce && Physics.SphereCast(Context.transform.position, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
+                if (!_hitOnce && Physics.SphereCast(Context.transform.position - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
                 {
                     if (hit.transform.GetComponentInParent<IHittable>() == null) return;
                     _hitOnce = true;
@@ -1324,7 +1332,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
-					Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
+                    Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
                     //TransitionTo<PunchHitStopActionState>();
                     //Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
                     return;
@@ -1349,7 +1357,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private class HitUnControllableActionState : ActionState
     {
         private float _timer;
-     	public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
 
         public override void OnEnter()
         {
@@ -1475,21 +1483,26 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class BlockingState : ActionState
     {
-        private float _timer;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        private float _blockPutDownTimer;
+
         public override void OnEnter()
         {
             base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             Context._animator.SetBool("Blocking", true);
             Context.BlockShield.SetShield(true);
-            _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.MinBlockUpTime;
         }
 
         public override void Update()
         {
             base.Update();
-            if (!(_B || _LeftTrigger) && _timer < Time.timeSinceLevelLoad)
+            if (_BUp || _LeftTriggerUp)
+            {
+                _blockPutDownTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.BlockLingerDuration;
+            }
+
+            if (!(_B || _LeftTrigger) && _blockPutDownTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleActionState>();
                 return;

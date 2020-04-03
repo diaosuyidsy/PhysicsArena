@@ -549,7 +549,7 @@ public class FistGunStartCharging : FistGunEvent
 
 public class FistGunCharged : FistGunEvent
 {
-    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, Vector3 fistPos) : base(fistGun, fistGunOwner, fistGunOwner == null ? -1 : fistGunOwner.GetComponent<PlayerController>().PlayerNumber)
+    public FistGunCharged(GameObject fistGun, GameObject fistGunOwner, Vector3 fistPos) : base(fistGun, fistGunOwner, 0)
     {
         FistPos = fistPos;
     }
@@ -646,3 +646,35 @@ public class OnScore : GameEvent
     }
 }
 #endregion
+
+public class OnAddCameraTargets : GameEvent
+{
+    public GameObject Target;
+    public int Weight;
+
+    public OnAddCameraTargets(GameObject target, int weight)
+    {
+        Target = target;
+        Weight = weight;
+    }
+}
+
+public class OnRemoveCameraTargets : GameEvent
+{
+    public GameObject Target;
+
+    public OnRemoveCameraTargets(GameObject target)
+    {
+        Target = target;
+    }
+}
+
+public class ButtonPressed : GameEvent
+{
+    public string ButtonName;
+
+    public ButtonPressed(string buttonName)
+    {
+        ButtonName = buttonName;
+    }
+}

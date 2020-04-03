@@ -12,8 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77f59a2ecbe94604094d30020f1b14bd, type: 3}
   m_Name: CharacterData
   m_EditorClassIdentifier: 
-  WalkSpeed: 5
-  MaxVelocityChange: 5
+  WalkSpeed: 6
+  MaxVelocityChange: 12
   InAirSpeedMultiplier: 0.1
   FacingCliffMultiplier: 1
   PickupSpeed: 2
@@ -22,37 +22,42 @@ MonoBehaviour:
   JumpMask:
     serializedVersion: 2
     m_Bits: 286720
-  MinRotationSpeed: 10
+  MinRotationSpeed: 16
   FrontIsCliff: 0.2
   CliffPreventionForce: 100
   CliffPreventionTimer: 0.4
   MaxStamina: 1.5
   StaminaRegenInterval: 3
   StaminaRegenRate: 1
-  BlockUILingerDuration: 0.4
+  BlockLingerDuration: 0.3
   BlockStaminaDrain: 1
   BlockMultiplier: 2
-  BlockAngle: 90
+  BlockAngle: 60
   BlockSpeedMultiplier: 1
   MinBlockUpTime: 0.3
   BlockPushForce: 30
   ClockFistTime: 0.3
   FistReleaseTime: 0.3
-  PunchActivateTime: 0.2
-  SelfPushForce: 50
-  IdleSelfPushForce: 65
+  PunchActivateTime: 0.25
+  SelfPushForce: 75
+  IdleSelfPushForce: 75
+  FistHoldSpeedMultiplier: 0.6
+  FistHoldRotationMutiplier: 2
+  PunchBackwardCastDistance: 0.3
+  PunchHelpAimDistance: 3
+  PunchHelpAimAngle: 90
   MeleeChargeThreshold: 0.75
   PunchRadius: 0.3
-  PunchDistance: 0.05
+  PunchDistance: 0.4
   PunchForce: 800
   MeleeHoldTime: Infinity
-  HitUncontrollableTimeSmall: 0.25
+  HitUncontrollableTimeSmall: 0.4
   HitStopFramesSmall: 6
   HitSmallThreshold: 500
-  HitUncontrollableTimeBig: 0.4
+  HitUncontrollableTimeBig: 0.6
   HitBigThreshold: 900
   HitStopFramesBig: 12
-  PunchReleaseRotationMultiplier: 0.5
+  PunchReleaseRotationMultiplier: 0.3
   PunchResetVelocityBeforeHitDuration: 0.5
   CanHitLayer:
     serializedVersion: 2

@@ -14,13 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   GameMapMode: 2
   Team1RespawnPoints:
-  - {x: 9.5, y: 0.573, z: -16.5}
-  - {x: 9.5, y: 0.573, z: -17.5}
-  - {x: 9.5, y: 0.573, z: -18.5}
+  - {x: 10.5, y: 0.573, z: -20}
+  - {x: 10.5, y: 0.573, z: -20.5}
+  - {x: 10.5, y: 0.573, z: -21}
   Team2RespawnPoints:
-  - {x: 25.5, y: 0.573, z: -16.5}
-  - {x: 25.5, y: 0.573, z: -17.5}
-  - {x: 25.5, y: 0.573, z: -18.5}
+  - {x: 24.5, y: 0.573, z: -14}
+  - {x: 24.5, y: 0.573, z: -14.5}
+  - {x: 24.5, y: 0.573, z: -15}
   RespawnTime: 3
   InvincibleTime: 1
   TutorialImageMoveInDuration: 0.5
@@ -29,13 +29,13 @@ MonoBehaviour:
   HoldAMoveInDelay: 0.2
   FillASpeed: 2
   ChickenLandingPosition:
-  - {x: 9.5, y: 20, z: -16.5}
-  - {x: 9.5, y: 20, z: -17.5}
-  - {x: 9.5, y: 20, z: -18.5}
+  - {x: 10.5, y: 20, z: -20}
+  - {x: 10.5, y: 20, z: -20.5}
+  - {x: 10.5, y: 20, z: -21}
   DuckLandingPostion:
-  - {x: 25.5, y: 20, z: -16.5}
-  - {x: 25.5, y: 20, z: -17.5}
-  - {x: 25.5, y: 20, z: -18.5}
+  - {x: 24.5, y: 20, z: -14}
+  - {x: 24.5, y: 20, z: -14.5}
+  - {x: 24.5, y: 20, z: -15}
   BirdsFlyDownDuration: 1
   BirdsFlyDownDelay:
   - 0
@@ -45,7 +45,7 @@ MonoBehaviour:
   - 0.4
   - 2
   BirdsFlyDownEase: 11
-  CameraMoveToPosition: {x: 17.5, y: 30, z: -17.5}
+  CameraMoveToPosition: {x: 17.5, y: 15, z: -17.5}
   CameraMoveDuration: 2
   CameraMoveDelay: 0
   CameraTargetFOV: 15
@@ -73,7 +73,7 @@ MonoBehaviour:
   MaxAmountWeaponAtOnetime: 0
   WeaponsInformation:
   - WeaponName: SuckGun
-    WeaponSetNumber: 0
+    WeaponSetNumber: 1
     WeaponPrefab: {fileID: 4836811480432223405, guid: 72c3811b922351f46a96df8c012db16c,
       type: 3}
   - WeaponName: HookGun

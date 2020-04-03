@@ -102,7 +102,6 @@ public class rtSuck : WeaponBase
                 lineParticle.GetComponent<ParticleSystem>().Play();
                 DistortionSphere.Play();
 
-                _sbc.RTText.SetActive(false);
                 _ballState = State.Suck;
                 StartCoroutine(sucking(0.1f));
 

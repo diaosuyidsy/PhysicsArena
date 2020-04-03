@@ -20,245 +20,13 @@ public enum CanonSide
 
 public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 {
-
-}
-
-public class CanonIdle: CanonAction
-{
-    public override void Update()
-    {
-        base.Update();
-        CheckDelivery();
-    }
-
-    private void CheckDelivery()
-    {
-        if (Context.DeliveryEvent != null)
-        {
-            Context.Info.LastSide = Context.Info.CurrentSide;
-
-            if(Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team1Basket)
-            {
-                Context.Info.CurrentSide = CanonSide.Red;
-            }
-            else
-            {
-                Context.Info.CurrentSide = CanonSide.Blue;
-            }
-
-            TransitionTo<CanonSwtich>();
-
-            Context.DeliveryEvent = null;
-
-            return;
-        }
-    }
-}
-
-public class CanonSwtich : CanonAction
-{
-    private float Timer;
-
-    private Material RedCabelMat;
-    private Material BlueCabelMat;
-
     public override void OnEnter()
     {
         base.OnEnter();
-
-
+        Debug.Log(this.GetType().Name);
     }
 
-
-    public override void Update()
-    {
-        base.Update();
-
-        SetCanonPipe(Context.FeelData.MaxPipeAngle, Context.FeelData.PipeRotateSpeed);
-    }
-
-
-    /*private void CabelChange(GameObject Cabel,bool Shine)
-    {
-        foreach (Transform child in Cabel.transform)
-        {
-            Material mat = child.GetComponent<Renderer>().material;
-            mat.EnableKeyword("_EMISSION");
-
-            float Emission;
-
-            if (Shine)
-            {
-                Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / FeelData.CabelShineTime);
-            }
-            else
-            {
-                Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, Timer / FeelData.CabelShineTime);
-            }
-
-
-            mat.SetColor("_EmissionColor", color * Emission);
-        }
-    }*/
-
-    private void SetCabel(GameObject RedCabel, GameObject BlueCabel)
-    {
-
-
-        Timer += Time.deltaTime;
-
-        switch (Context.Info.CurrentSide)
-        {
-            case CanonSide.Neutral:
-                switch (Context.Info.LastSide)
-                {
-                    case CanonSide.Red:
-
-
-                        break;
-                    case CanonSide.Blue:
-                        break;
-                }
-                break;
-            case CanonSide.Red:
-                break;
-            case CanonSide.Blue:
-                break;
-        }
-    }
-
-    private void SetCanonPipe(float MaxPipeAngle, float PipeRotateSpeed)
-    {
-        switch (Context.Info.CurrentSide)
-        {
-            case CanonSide.Neutral:
-
-                switch (Context.Info.LastSide)
-                {
-                    case CanonSide.Blue:
-                        if (Context.Info.PipeAngle < 0)
-                        {
-                            Context.Info.PipeAngle += PipeRotateSpeed * Time.deltaTime;
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
-                        }
-                        else
-                        {
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -Context.Info.PipeAngle, 0));
-                            Context.Info.PipeAngle = 0;
-
-                            TransitionTo<CanonIdle>();
-                        }
-                        break;
-                    case CanonSide.Red:
-
-                        if (Context.Info.PipeAngle > 0)
-                        {
-                            Context.Info.PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
-                        }
-                        else
-                        {
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -Context.Info.PipeAngle, 0));
-                            Context.Info.PipeAngle = 0;
-
-                            TransitionTo<CanonIdle>();
-                        }
-                        break;
-                }
-                break;
-            case CanonSide.Blue:
-                switch (Context.Info.LastSide)
-                {
-                    case CanonSide.Neutral:
-
-                        if (Context.Info.PipeAngle > -MaxPipeAngle)
-                        {
-                            Context.Info.PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
-                        }
-                        else
-                        {
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - Context.Info.PipeAngle, 0));
-                            Context.Info.PipeAngle = -MaxPipeAngle;
-
-                            TransitionTo<CanonFiring_Normal>();
-                        }
-                        break;
-                    case CanonSide.Red:
-                        if (Context.Info.PipeAngle > -MaxPipeAngle)
-                        {
-                            Context.Info.PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
-                        }
-                        else
-                        {
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - Context.Info.PipeAngle, 0));
-                            Context.Info.PipeAngle = -MaxPipeAngle;
-
-                            TransitionTo<CanonFiring_Normal>();
-                        }
-                        break;
-                }
-                break;
-            case CanonSide.Red:
-                switch (Context.Info.LastSide)
-                {
-                    case CanonSide.Neutral:
-
-                        if (Context.Info.PipeAngle < MaxPipeAngle)
-                        {
-                            Context.Info.PipeAngle += PipeRotateSpeed * Time.deltaTime;
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
-                        }
-                        else
-                        {
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - Context.Info.PipeAngle, 0));
-                            Context.Info.PipeAngle = MaxPipeAngle;
-
-                            TransitionTo<CanonFiring_Normal>();
-                        }
-                        break;
-                    case CanonSide.Blue:
-
-                        if (Context.Info.PipeAngle < MaxPipeAngle)
-                        {
-                            Context.Info.PipeAngle += PipeRotateSpeed * Time.deltaTime;
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
-                        }
-                        else
-                        {
-                            Context.Info.Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - Context.Info.PipeAngle, 0));
-                            Context.Info.PipeAngle = MaxPipeAngle;
-
-                            TransitionTo<CanonFiring_Normal>();
-                        }
-                        break;
-                }
-                break;
-        }
-    }
-}
-
-public class CanonCooldown : CanonAction
-{
-    private float Timer;
-
-    public override void OnEnter()
-    {
-        base.OnEnter();
-        Timer = 0;
-    }
-
-    public override void Update()
-    {
-        base.Update();
-
-        CheckDelivery();
-        CheckTimer();
-
-    }
-
-    private void CheckDelivery()
+    protected bool CheckDelivery() // Check if there is an available delivery for switch
     {
         if (Context.DeliveryEvent != null)
         {
@@ -266,600 +34,78 @@ public class CanonCooldown : CanonAction
             {
                 Context.Info.LastSide = Context.Info.CurrentSide;
                 Context.Info.CurrentSide = CanonSide.Red;
+                Context.Info.LockedPlayer = null;
+
+                Context.DeliveryEvent = null;
+
 
                 TransitionTo<CanonSwtich>();
-                return;
+
+                return true;
             }
             else if (Context.DeliveryEvent.Basket == BrawlModeReforgedArenaManager.Team2Basket && Context.Info.CurrentSide != CanonSide.Blue)
             {
                 Context.Info.LastSide = Context.Info.CurrentSide;
                 Context.Info.CurrentSide = CanonSide.Blue;
+                Context.Info.LockedPlayer = null;
+
+                Context.DeliveryEvent = null;
 
                 TransitionTo<CanonSwtich>();
-                return;
-            }
 
-            Context.DeliveryEvent = null;
-        }
-    }
-
-    private void CheckTimer()
-    {
-        Timer += Time.deltaTime;
-        if (Timer >= Context.Data.CanonCooldown)
-        {
-            TransitionTo<CanonFiring_Normal>();
-        }
-    }
-}
-
-public class CanonFiring_Normal : CanonAction
-{
-
-}
-
-public class CanonFiring_Alert : CanonAction
-{
-
-}
-
-public class BrawlModeReforgedArenaManager : MonoBehaviour
-{
-    public class CanonInfo
-    {
-        public GameObject Pipe;
-
-        public CanonState State;
-        public CanonSide CurrentSide;
-        public CanonSide LastSide;
-        public float Timer;
-        public int FireCount;
-
-        public GameObject Rocket;
-        public GameObject Mark;
-        public GameObject LockedPlayer;
-
-        public float PipeAngle;
-
-        public bool ReadyToFire;
-
-        public Vector3 MarkDirection;
-
-
-        public CanonInfo(GameObject pipe)
-        {
-            Pipe = pipe;
-            State = CanonState.Unactivated;
-            CurrentSide = LastSide = CanonSide.Neutral;
-
-            FireCount = 0;
-            Timer = 0;
-
-            Mark = null;
-            LockedPlayer = null;
-
-            PipeAngle = 0;
-
-            ReadyToFire = false;
-        }
-
-        public void TransitionTo(CanonState state)
-        {
-            State = state;
-            Timer = 0;
-
-            switch (State)
-            {
-                case CanonState.Unactivated:
-                    FireCount = 0;
-                    break;
-                case CanonState.Cooldown:
-                    break;
-                case CanonState.Swtiching:
-                    break;
-                case CanonState.Firing:
-                    break;
+                return true;
             }
         }
 
-
-
-        public void SetCanon(float MaxPipeAngle, float PipeRotateSpeed)
-        {
-            ReadyToFire = false;
-
-            switch (CurrentSide)
-            {
-                case CanonSide.Neutral:
-
-                    switch (LastSide)
-                    {
-                        case CanonSide.Neutral:
-                            Pipe.transform.Rotate(new Vector3(0, -PipeAngle, 0));
-
-                            PipeAngle = 0;
-                            break;
-                        case CanonSide.Blue:
-                            if (PipeAngle < 0)
-                            {
-                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
-                            }
-                            else
-                            {
-                                Pipe.transform.Rotate(new Vector3(0, -PipeAngle, 0));
-                                PipeAngle = 0;
-                            }
-                            break;
-                        case CanonSide.Red:
-
-                            if (PipeAngle > 0)
-                            {
-                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
-                            }
-                            else
-                            {
-                                Pipe.transform.Rotate(new Vector3(0, -PipeAngle, 0));
-                                PipeAngle = 0;
-                            }
-                            break;
-                    }
-                    break;
-                case CanonSide.Blue:
-                    switch (LastSide)
-                    {
-                        case CanonSide.Neutral:
-
-                            if(PipeAngle > -MaxPipeAngle)
-                            {
-                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
-                            }
-                            else
-                            {
-                                Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
-                                PipeAngle = -MaxPipeAngle;
-
-                                ReadyToFire = true;
-                            }
-                            break;
-                        case CanonSide.Blue:
-                            Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
-
-                            PipeAngle = -MaxPipeAngle;
-
-                            ReadyToFire = true;
-                            break;
-                        case CanonSide.Red:
-                            if (PipeAngle > -MaxPipeAngle)
-                            {
-                                PipeAngle += -PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, -PipeRotateSpeed * Time.deltaTime, 0));
-                            }
-                            else
-                            {
-                                Pipe.transform.Rotate(new Vector3(0, -MaxPipeAngle - PipeAngle, 0));
-                                PipeAngle = -MaxPipeAngle;
-
-                                ReadyToFire = true;
-                            }
-                            break;
-                    }
-                    break;
-                case CanonSide.Red:
-                    switch (LastSide)
-                    {
-                        case CanonSide.Neutral:
-
-                            if (PipeAngle < MaxPipeAngle)
-                            {
-                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
-                            }
-                            else
-                            {
-                                Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
-                                PipeAngle = MaxPipeAngle;
-
-                                ReadyToFire = true;
-                            }
-                            break;
-                        case CanonSide.Blue:
-
-                            if (PipeAngle < MaxPipeAngle)
-                            {
-                                PipeAngle += PipeRotateSpeed * Time.deltaTime;
-                                Pipe.transform.Rotate(new Vector3(0, PipeRotateSpeed * Time.deltaTime, 0));
-                            }
-                            else
-                            {
-                                Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
-                                PipeAngle = MaxPipeAngle;
-
-                                ReadyToFire = true;
-                            }
-                            break;
-                        case CanonSide.Red:
-                            Pipe.transform.Rotate(new Vector3(0, MaxPipeAngle - PipeAngle, 0));
-
-                            PipeAngle = MaxPipeAngle;
-
-                            ReadyToFire = true;
-                            break;
-                    }
-                    break;
-            }
-        }
+        return false;
     }
 
-    public static GameObject Team1Basket;
-    public static GameObject Team2Basket;
-
-    public BrawlModeReforgedModeData Data_2Player;
-    public BrawlModeReforgedModeData Data_MorePlayer;
-
-    public CanonFeelData FeelData;
-
-    public GameObject CanonObject;
-    public GameObject PipeObject;
-    public GameObject PipeEndObject;
-    public GameObject CameraPoint;
-
-    public GameObject Team1Cabel;
-    public GameObject Team2Cabel;
-
-    public LayerMask PlayerLayer;
-    public LayerMask GroundLayer;
-    public GameObject Players;
-
-    public GameObject BagelPrefab;
-    public GameObject MarkPrefab;
-    public GameObject ExplosionVFX;
-
-    public BrawlModeReforgedModeData Data;
-
-    public CanonInfo Info;
-
-    public BagelSent DeliveryEvent;
-    private GameObject Bagel;
-
-    // Start is called before the first frame update
-    void Start()
+    protected void MarkFollow(bool Normal) // Bomb area follows target
     {
-        if (Utility.GetPlayerNumber() <= 2)
-        {
-            Data = Data_2Player;
-        }
-        else
-        {
-            Data = Data_MorePlayer;
-        }
-
-        Team1Basket = CanonObject.transform.Find("LForceField").gameObject;
-        Team2Basket = CanonObject.transform.Find("RForceField").gameObject;
-
-
-        Info = new CanonInfo(PipeObject);
-
-        GenerateBagel();
-
-        EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
-        EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
-        EventManager.Instance.AddHandler<BagelDespawn>(OnBagelDespawn);
-    }
-
-    private void OnDestroy()
-    {
-        EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
-        EventManager.Instance.RemoveHandler<BagelSent>(OnBagelSent);
-        EventManager.Instance.RemoveHandler<BagelDespawn>(OnBagelDespawn);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        CheckCanon();
-    }
-
-
-    private int GetPlayerNumber()
-    {
-        int Count = 0;
-        for(int i=0;i < Services.GameStateManager.CameraTargets.Count; i++)
-        {
-            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
-            {
-                Count++;
-            }
-        }
-
-        return Count;
-
-    }
-
-    private void CheckCanon()
-    {
-        Info.SetCanon(FeelData.MaxPipeAngle, FeelData.PipeRotateSpeed);
-        switch (Info.State)
-        {
-            case CanonState.Swtiching:
-                if (Info.ReadyToFire && LockPlayer(Info))
-                {
-                    StopAllCoroutines();
-                    Destroy(Info.Rocket);
-                    StartCoroutine(CanonFire());
-
-                    Info.TransitionTo(CanonState.Firing);
-                }
-                break;
-            case CanonState.Firing:
-                CanonFiring(Info);
-                break;
-            case CanonState.Cooldown:
-                CanonCooldown(Info);
-                break;
-        }
-    }
-
-    private void CanonCooldown(CanonInfo Info)
-    {
-        Info.Timer += Time.deltaTime;
-
-        if(Info.Timer >= Data.CanonCooldown)
-        {
-            if (LockPlayer(Info))
-            {
-                StopAllCoroutines();
-                Destroy(Info.Rocket);
-                StartCoroutine(CanonFire());
-
-                Info.TransitionTo(CanonState.Firing);
-            }
-            else
-            {
-                Destroy(Info.Mark);
-            }
-        }
-        else if(Info.Timer >= Data.CanonCooldown - 2)
-        {
-            if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
-            {
-                Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
-            }
-        }
-
-    }
-
-    private IEnumerator CanonFire()
-    {
-        float Timer = 0;
-
-        Services.GameStateManager.CameraTargets.Remove(CameraPoint.transform);
-
-        PipeEndObject.transform.localPosition = FeelData.PipeEndStartLocalPos;
-
-        StartCoroutine(RocketFire());
-
-
-
-        while(Timer < FeelData.PipeEndFireTime)
-        {
-            Timer += Time.deltaTime;
-            PipeEndObject.transform.localPosition = Vector3.Lerp(FeelData.PipeEndStartLocalPos, FeelData.PipeEndStartLocalPos + Vector3.down * FeelData.PipeEndShakeDis, Timer / FeelData.PipeEndFireTime);
-            yield return null;
-        }
-
-        Timer = 0;
-
-        while (Timer < FeelData.PipeEndRecoverTime)
-        {
-            Timer += Time.deltaTime;
-            PipeEndObject.transform.localPosition = Vector3.Lerp(FeelData.PipeEndStartLocalPos + Vector3.down * FeelData.PipeEndShakeDis, FeelData.PipeEndStartLocalPos, Timer / FeelData.PipeEndRecoverTime);
-            yield return null;
-        }
-    }
-
-    private IEnumerator CabelChange(GameObject Cabel,Color color,bool Shine)
-    {
-        foreach (Transform child in Cabel.transform)
-        {
-            Material mat = child.GetComponent<Renderer>().material;
-            mat.EnableKeyword("_EMISSION");
-            mat.SetColor("_EmissionColor", color * FeelData.CabelStartEmission);
-        }
-
-
-        float Timer = 0;
-
-        while (Timer < FeelData.CabelShineTime)
-        {
-            Timer += Time.deltaTime;
-            foreach (Transform child in Cabel.transform)
-            {
-                Material mat = child.GetComponent<Renderer>().material;
-                mat.EnableKeyword("_EMISSION");
-
-                float Emission;
-
-                if (Shine)
-                {
-                    Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / FeelData.CabelShineTime);
-                }
-                else
-                {
-                    Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, Timer / FeelData.CabelShineTime);
-                }
-
-
-                mat.SetColor("_EmissionColor", color * Emission);
-            }
-            yield return null;
-        }
-
-        /*while(Timer < FeelData.CabelShineTime / 2)
-        {
-            Timer += Time.deltaTime;
-            foreach (Transform child in Cabel.transform)
-            {
-                Material mat = child.GetComponent<Renderer>().material;
-                mat.EnableKeyword("_EMISSION");
-
-                float Emission = Mathf.Lerp(FeelData.CabelStartEmission, FeelData.CabelEndEmission, Timer / (FeelData.CabelShineTime / 2));
-
-                mat.SetColor("_EmissionColor", color * Emission);
-            }
-            yield return null;
-        }
-
-        while (Timer < FeelData.CabelShineTime)
-        {
-            Timer += Time.deltaTime;
-            foreach (Transform child in Cabel.transform)
-            {
-                Material mat = child.GetComponent<Renderer>().material;
-                mat.EnableKeyword("_EMISSION");
-
-                float Emission = Mathf.Lerp(FeelData.CabelEndEmission, FeelData.CabelStartEmission, (Timer - FeelData.CabelShineTime / 2) / (FeelData.CabelShineTime / 2));
-
-                mat.SetColor("_EmissionColor", color * Emission);
-            }
-            yield return null;
-        }*/
-    }
-
-    private IEnumerator RocketFire()
-    {
-        Info.Rocket = GameObject.Instantiate(FeelData.BombPrefab);
-        Info.Rocket.transform.position = PipeEndObject.transform.position;
-
-        float Timer = 0;
-
-        Vector3 Start = Info.Rocket.transform.position;
-
-        Vector3 Target = Info.Rocket.transform.position + (FeelData.BombInvisibleHeight - Info.Rocket.transform.position.y) / Info.Rocket.transform.up.y * Info.Rocket.transform.up;
-
-        while (Timer < FeelData.BombRiseTime)
-        {
-            Timer += Time.deltaTime;
-
-            Info.Rocket.transform.position = Vector3.Lerp(Start, Target, Timer / FeelData.BombRiseTime);
-
-            yield return null;
-        }
-    }
-
-    private void CanonFiring(CanonInfo Info)
-    {
-        Info.Timer += Time.deltaTime;
-        if(Info.Timer >= Data.CanonFireTime)
-        {
-            BombFall(Info);
-            Info.FireCount++;
-            if (Info.FireCount >= Data.MaxCanonFireCount)
-            {
-                Info.TransitionTo(CanonState.Unactivated);
-                StopAllCoroutines();
-                if(Info.CurrentSide == CanonSide.Red)
-                {
-                    StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor, false));
-                }
-                else
-                {
-                    StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, false));
-                }
-
-                Info.LastSide = Info.CurrentSide;
-                Info.CurrentSide = CanonSide.Neutral;
-            }
-            else
-            {
-                Info.TransitionTo(CanonState.Cooldown);
-            }
-
-            return;
-        }
-        else if(Info.Timer >= Data.CanonFireTime - FeelData.BombFallTime)
-        {
-            Info.Rocket.transform.up = Vector3.down;
-            Info.Rocket.transform.position += Vector3.down * (FeelData.BombInvisibleHeight - Info.Mark.transform.position.y)/FeelData.BombFallTime*Time.deltaTime;
-            //MarkFollow(Info,false);
-            //MarkDash(Info);
-            Info.Mark.GetComponent<SpriteRenderer>().color = Color.red;
-
-        }
-        else if(Info.Timer >= Data.CanonFireTime - Data.CanonFireAlertTime)
-        {
-            Info.Mark.GetComponent<SpriteRenderer>().color = FeelData.MarkAlertColor;
-            MarkFollow(Info,false);
-            //MarkDash(Info);
-        }
-        else
-        {
-            Info.Mark.GetComponent<SpriteRenderer>().color = new Color(FeelData.MarkDefaultColor.r, FeelData.MarkDefaultColor.g, FeelData.MarkDefaultColor.b, Info.Timer / FeelData.MarkAppearTime);
-            MarkFollow(Info,true);
-        }
-
-
-    }
-
-    private void MarkDash(CanonInfo Info)
-    {
-        Info.Mark.transform.position += Data.AlertFollowSpeed * Time.deltaTime * Info.MarkDirection;
-
-
-    }
-
-    private void MarkFollow(CanonInfo Info, bool Normal)
-    {
-        if(Info.LockedPlayer == null)
+        if (Context.Info.LockedPlayer == null)
         {
             return;
         }
 
-        Vector3 Offset = Info.LockedPlayer.transform.position - Info.Mark.transform.position;
+        Vector3 Offset = Context.Info.LockedPlayer.transform.position - Context.Info.Mark.transform.position;
         Offset.y = 0;
 
         float FollowSpeed;
         if (Normal)
         {
-            FollowSpeed = Data.NormalFollowSpeed;
+            FollowSpeed = Context.Data.NormalFollowSpeed;
         }
         else
         {
-            FollowSpeed = Data.AlertFollowSpeed;
+            FollowSpeed = Context.Data.AlertFollowSpeed;
         }
 
         float Dis = Offset.magnitude;
 
         if (Dis >= 0.01f)
         {
-            if (Dis >= FollowSpeed* Time.deltaTime)
+            if (Dis >= FollowSpeed * Time.deltaTime)
             {
-                Info.Mark.transform.position += FollowSpeed * Time.deltaTime * Offset.normalized;
+                Context.Info.Mark.transform.position += FollowSpeed * Time.deltaTime * Offset.normalized;
             }
             else
             {
-                Info.Mark.transform.position += Dis * Offset.normalized;
+                Context.Info.Mark.transform.position += Dis * Offset.normalized;
             }
         }
-
-        Info.MarkDirection = Offset.normalized;
-
-        Info.Rocket.transform.position = new Vector3(Info.Mark.transform.position.x, Info.Rocket.transform.position.y, Info.Mark.transform.position.z);
     }
 
-    private bool LockPlayer(CanonInfo Info)
+    protected bool LockPlayer() // Try to lock a target for bomb
     {
         List<GameObject> AvailablePlayer = new List<GameObject>();
         List<Vector3> AvailablePoint = new List<Vector3>();
 
-        foreach (Transform child in Players.transform)
+        foreach (Transform child in Context.Players.transform)
         {
-            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Info.CurrentSide == CanonSide.Red))
+            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Context.Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentSide == CanonSide.Red))
             {
                 RaycastHit hit;
-                if (Physics.Raycast(child.position, Vector3.down, out hit, 5, GroundLayer))
+                if (Physics.Raycast(child.position, Vector3.down, out hit, 5, Context.GroundLayer))
                 {
                     if (hit.collider != null)
                     {
@@ -876,12 +122,12 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             int index = Random.Range(0, AvailablePlayer.Count);
 
-            GameObject Mark = GameObject.Instantiate(MarkPrefab);
-            Mark.GetComponent<SpriteRenderer>().color = FeelData.MarkDefaultColor;
+            GameObject Mark = GameObject.Instantiate(Context.MarkPrefab);
+            Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkDefaultColor;
             Mark.transform.position = AvailablePoint[index] + Vector3.up * 0.01f;
 
-            Info.Mark = Mark;
-            Info.LockedPlayer = AvailablePlayer[index];
+            Context.Info.Mark = Mark;
+            Context.Info.LockedPlayer = AvailablePlayer[index];
 
             return true;
         }
@@ -891,10 +137,452 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         }
     }
 
-    private void BombFall(CanonInfo Info)
+    protected void AimingSetCanon() // Set the shape and transform of canon object and ammo 
+    {
+        Vector3 Offset = Context.Info.Mark.transform.position - Context.Info.Entity.transform.position;
+        Offset.y = 0;
+
+        float TargetPercentage;
+        float TargetAngle;
+
+        TargetAngle = Vector3.SignedAngle(Offset, Vector3.back, Vector3.up);
+
+        float Dis = Mathf.Clamp(Offset.magnitude, Context.FeelData.MinShootDisShape, Context.FeelData.MaxShootDisShape);
+
+        TargetPercentage = Mathf.Lerp(0, Context.FeelData.MaxPercentage, Dis / Context.FeelData.MaxShootDisShape);
+
+        SetCanon(TargetPercentage, TargetAngle,Context.FeelData.AimingPercentageFollowSpeed);
+    }
+
+    protected void FireSetCanon() // Set the shape and transform of canon object and ammo 
+    {
+        Vector3 Offset = Context.Info.Mark.transform.position - Context.Info.Entity.transform.position;
+        Offset.y = 0;
+        float TargetAngle;
+        TargetAngle = Vector3.SignedAngle(Offset, Vector3.back, Vector3.up);
+
+        SetCanon(0, TargetAngle,Context.FeelData.ShootPercentageFollowSpeed);
+    }
+
+    protected void SetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed) // Set Canon transform and shape
     {
 
-        RaycastHit[] AllHits = Physics.SphereCastAll(Info.Mark.transform.position, Data.CanonRadius, Vector3.up, 0, PlayerLayer);
+        Context.Info.CurrentPercentage = Mathf.Lerp(Context.Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed*Time.deltaTime);
+        if (Mathf.Abs(Context.Info.CurrentPercentage - TargetPercentage) <= Context.FeelData.PercentageIgnoreError)
+        {
+            Context.Info.CurrentPercentage = TargetPercentage;
+        }
+
+        Context.Info.Pad.transform.localPosition = Vector3.forward * Mathf.Lerp(Context.FeelData.MinPadDis, Context.FeelData.MaxPadDis, Context.Info.CurrentPercentage);
+
+        SoftJointLimit JointLimit = new SoftJointLimit();
+        JointLimit.limit = Mathf.Lerp(Context.FeelData.MinLinearLimit, Context.FeelData.MaxLinearLimit, Context.Info.CurrentPercentage);
+
+        Context.Info.LJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+        Context.Info.RJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
+
+        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
+        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
+
+        JointDrive Joint1Drive = new JointDrive();
+        Joint1Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint1AngularYZ, Context.FeelData.MaxJoint1AngularYZ, Context.Info.CurrentPercentage);
+        Joint1Drive.maximumForce = float.PositiveInfinity;
+
+        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+
+        JointDrive Joint0Drive = new JointDrive();
+        Joint0Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint0AngularYZ, Context.FeelData.MaxJoint0AngularYZ, Context.Info.CurrentPercentage);
+        Joint0Drive.maximumForce = float.PositiveInfinity;
+
+        Context.Info.LJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
+        Context.Info.RJoint0.GetComponent<ConfigurableJoint>().angularYZDrive = Joint0Drive;
+
+        if (Mathf.Abs(TargetAngle - Context.Info.CurrentAngle) <= Context.FeelData.RotateSpeed * Time.deltaTime)
+        {
+            Context.Info.Entity.transform.Rotate(Vector3.down * (TargetAngle - Context.Info.CurrentAngle), Space.Self);
+            Context.Info.CurrentAngle = TargetAngle;
+        }
+        else
+        {
+            if (TargetAngle > Context.Info.CurrentAngle)
+            {
+                Context.Info.Entity.transform.Rotate(Vector3.down * Context.FeelData.RotateSpeed * Time.deltaTime, Space.Self);
+                Context.Info.CurrentAngle += Context.FeelData.RotateSpeed * Time.deltaTime;
+            }
+            else
+            {
+                Context.Info.Entity.transform.Rotate(Vector3.up * Context.FeelData.RotateSpeed*Time.deltaTime, Space.Self);
+                Context.Info.CurrentAngle -= Context.FeelData.RotateSpeed * Time.deltaTime;
+            }
+        }
+    }
+}
+
+public class CanonIdle: CanonAction
+{
+    public override void Update()
+    {
+        base.Update();
+        SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        CheckDelivery();
+    }
+
+}
+
+public class CanonSwtich : CanonAction // Canon switches side
+{
+    private float Timer;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Timer = 0;
+
+        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
+        {
+            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
+        }
+
+    }
+
+
+    public override void Update()
+    {
+        base.Update();
+        Timer += Time.deltaTime;
+        SetCanon(0,0, Context.FeelData.AimingPercentageFollowSpeed);
+        SetCabel();
+        CheckTimer();
+
+    }
+
+    private void CheckTimer()
+    {
+        if (Timer >= Context.Data.CanonSwitchTime)
+        {
+            TransitionTo<CanonFiring_Normal>();
+        }
+    }
+
+    private void SetCabel() // Set cabel appearance
+    {
+        switch (Context.Info.CurrentSide)
+        {
+            case CanonSide.Neutral:
+                if(Context.Info.LastSide == CanonSide.Red)
+                {
+                    CabelChange(Context.Team1Cabel, false, true);
+                }
+                else
+                {
+                    CabelChange(Context.Team2Cabel, false, false);
+                }
+                break;
+            case CanonSide.Red:
+                CabelChange(Context.Team1Cabel, true, true);
+                if (Context.Info.LastSide == CanonSide.Blue)
+                {
+                    CabelChange(Context.Team2Cabel, false, false);
+                }
+                break;
+            case CanonSide.Blue:
+                CabelChange(Context.Team2Cabel, true, false);
+                if (Context.Info.LastSide == CanonSide.Red)
+                {
+                    CabelChange(Context.Team1Cabel, false, true);
+                }
+                break;
+        }
+    }
+
+
+    private void CabelChange(GameObject Cabel,bool Shine,bool Team1)
+    {
+
+        foreach (Transform child in Cabel.transform)
+        {
+            Material mat = child.GetComponent<Renderer>().material;
+            mat.EnableKeyword("_EMISSION");
+
+            Color color;
+
+            float Emission;
+
+            if (Shine)
+            {
+                Emission = Mathf.Lerp(Context.FeelData.CabelStartEmission, Context.FeelData.CabelEndEmission, Timer / Context.FeelData.CabelShineTime);
+            }
+            else
+            {
+                Emission = Mathf.Lerp(Context.FeelData.CabelEndEmission, Context.FeelData.CabelStartEmission, Timer / Context.FeelData.CabelShineTime);
+            }
+
+            if (Team1)
+            {
+                color = Context.FeelData.RedCabelColor;
+            }
+            else
+            {
+                color = Context.FeelData.BlueCabelColor;
+            }
+
+            mat.SetColor("_EmissionColor", color * Emission);
+        }
+    }
+
+}
+
+
+public class CanonCooldown : CanonAction
+{
+    private float Timer;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Timer = 0;
+        Services.GameStateManager.CameraTargets.Remove(Context.Info.CameraFocus.transform);
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        SetCanon(0,0, Context.FeelData.AimingPercentageFollowSpeed);
+
+        if (CheckDelivery())
+        {
+            return;
+        }
+        CheckTimer();
+
+    }
+
+    private void CheckTimer()
+    {
+        Timer += Time.deltaTime;
+        if (Timer >= Context.Data.CanonCooldown)
+        {
+            TransitionTo<CanonFiring_Normal>();
+        }
+    }
+}
+
+public class CanonFiring_Normal : CanonAction // Lock and follow player (white mark)
+{
+    private float Timer;
+    private bool PlayerLocked;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Timer = 0;
+        PlayerLocked = false;
+
+        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
+        {
+            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
+        }
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        if (CheckDelivery())
+        {
+            GameObject.Destroy(Context.Info.Bomb);
+            GameObject.Destroy(Context.Info.Mark);
+            return;
+        }
+
+        if (PlayerLocked)
+        {
+            AimingSetCanon();
+            MarkFollow(true);
+
+            Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
+            Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime);
+
+            if(Context.Info.LockedPlayer == null)
+            {
+                TransitionTo<CanonFiring_Fall>();
+                return;
+            }
+
+            CheckTimer();
+        }
+        else
+        {
+            SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+            if (LockPlayer())
+            {
+                Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
+                Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
+                Context.Info.Bomb.transform.localPosition = Vector3.back * Context.FeelData.AmmoOffset;
+
+                AimingSetCanon();
+
+                PlayerLocked = true;
+            }
+        }
+
+
+
+    }
+
+    private void CheckTimer()
+    {
+        Timer += Time.deltaTime;
+        if (Timer >= Context.Data.CanonFireTime)
+        {
+            TransitionTo<CanonFiring_Alert>();
+        }
+    }
+}
+
+public class CanonFiring_Alert : CanonAction // Purple mark follows target
+{
+    private float Timer;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Timer = 0;
+        Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkAlertColor;
+
+        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
+        {
+            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
+        }
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        AimingSetCanon();
+        MarkFollow(false);
+
+        if (Context.Info.LockedPlayer == null)
+        {
+            
+            TransitionTo<CanonFiring_Fall>();
+            return;
+        }
+
+        if (CheckDelivery())
+        {
+            GameObject.Destroy(Context.Info.Bomb);
+            GameObject.Destroy(Context.Info.Mark);
+            return;
+        }
+        CheckTimer();
+    }
+
+    private void CheckTimer()
+    {
+        Timer += Time.deltaTime;
+        if (Timer >= Context.Data.CanonFireAlertTime)
+        {
+            TransitionTo<CanonFiring_Fall>();
+        }
+    }
+}
+
+public class CanonFiring_Fall : CanonAction // Shoot ammo
+{
+    private float Timer;
+    private float HorizontalSpeed;
+    private Vector3 HorizontalDirection;
+    private float VerticalSpeed;
+    private float VerticalSpeedAcceleration;
+
+    private bool InfoGot;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Timer = 0;
+        InfoGot = false;
+
+
+
+        GetBombFlyInfo();
+
+
+        Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkFallColor;
+
+        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
+        {
+            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
+        }
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        FireSetCanon();
+        if(Context.Info.CurrentPercentage == 0)
+        {
+            Context.Info.Bomb.transform.parent = null;
+            if (!InfoGot)
+            {
+                InfoGot = true;
+                GetBombFlyInfo();
+            }
+            BombFly();
+        }
+
+
+        CheckTimer();
+    }
+
+    private void CheckTimer()
+    {
+        Timer += Time.deltaTime;
+        if (Timer >= Context.Data.CanonFireFinalTime)
+        {
+            BombFall();
+
+            if (CheckDelivery())
+            {
+                return;
+            }
+
+            TransitionTo<CanonCooldown>();
+        }
+    }
+
+    private void GetBombFlyInfo() // Calculate how ammo should fly
+    {
+        float time = Context.Data.CanonFireFinalTime - Timer;
+
+        Vector3 Offset = Context.Info.Mark.transform.position - Context.Info.Bomb.transform.position;
+
+        HorizontalDirection = Offset;
+        HorizontalDirection.y = 0;
+
+        HorizontalSpeed = HorizontalDirection.magnitude / time;
+        HorizontalDirection.Normalize();
+
+        VerticalSpeed = Context.FeelData.BombVerticalSpeedPercentage * HorizontalSpeed;
+        VerticalSpeedAcceleration = 2 * ( Mathf.Abs(Offset.y) + VerticalSpeed * time) / Mathf.Pow(time, 2);
+
+    }
+
+    private void BombFly()
+    {
+        Context.Info.Bomb.transform.position += HorizontalDirection * HorizontalSpeed * Time.deltaTime + Vector3.up * VerticalSpeed * Time.deltaTime;
+        VerticalSpeed -= VerticalSpeedAcceleration * Time.deltaTime;
+    }
+
+    private void BombFall() //Impact
+    {
+
+        RaycastHit[] AllHits = Physics.SphereCastAll(Context.Info.Mark.transform.position, Context.Data.CanonRadius, Vector3.up, 0, Context.PlayerLayer);
 
         List<GameObject> HitPlayer = new List<GameObject>();
 
@@ -918,7 +606,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             if (!HitPlayer.Contains(Player))
             {
                 HitPlayer.Add(Player);
-                Vector3 Offset = Player.transform.position - Info.Mark.transform.position;
+                Vector3 Offset = Player.transform.position - Context.Info.Mark.transform.position;
                 Offset.y = 0;
 
                 if (Mathf.Abs(Offset.x) < 0.01f && Mathf.Abs(Offset.z) < 0.01f)
@@ -929,14 +617,168 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
                     Offset.z = Mathf.Cos(angle);
                 }
 
-                Player.GetComponent<IHittable>().OnImpact(Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
+                Player.GetComponent<IHittable>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
             }
         }
 
-        GameObject.Instantiate(ExplosionVFX, Info.Mark.transform.position, ExplosionVFX.transform.rotation);
-        Destroy(Info.Rocket);
-        Destroy(Info.Mark);
+        Context.Info.LockedPlayer = null;
+
+        GameObject.Instantiate(Context.ExplosionVFX, Context.Info.Mark.transform.position, Context.ExplosionVFX.transform.rotation);
+        GameObject.Destroy(Context.Info.Bomb);
+        GameObject.Destroy(Context.Info.Mark);
     }
+}
+
+public class BrawlModeReforgedArenaManager : MonoBehaviour
+{
+    public class CanonInfo
+    {
+        public GameObject Entity;
+        public GameObject Pad;
+        public GameObject LeftJoint; //Joint1
+        public GameObject RightJoint; //Joint1
+        public GameObject CameraFocus;
+
+        public GameObject LJoint0;
+        public GameObject RJoint0;
+
+        public float CurrentPercentage;
+        public float CurrentAngle;
+
+        public CanonSide CurrentSide;
+        public CanonSide LastSide;
+        public float Timer;
+        public int FireCount;
+
+        public GameObject Bomb;
+
+        public GameObject Mark;
+        public GameObject LockedPlayer;
+
+
+        public CanonInfo(GameObject entity, GameObject pad, GameObject LJoint, GameObject RJoint,GameObject L0, GameObject R0, GameObject Focus)
+        {
+            Entity = entity;
+            Pad = pad;
+            LeftJoint = LJoint;
+            RightJoint = RJoint;
+            CameraFocus = Focus;
+            LJoint0 = L0;
+            RJoint0 = R0;
+
+            CurrentSide = LastSide = CanonSide.Neutral;
+
+            FireCount = 0;
+            Timer = 0;
+
+            Mark = null;
+            LockedPlayer = null;
+
+        }
+        
+    }
+
+    public static GameObject Team1Basket;
+    public static GameObject Team2Basket;
+
+    public GameObject Basket1;
+    public GameObject Basket2;
+
+    public BrawlModeReforgedModeData Data_2Player;
+    public BrawlModeReforgedModeData Data_MorePlayer;
+
+    public CanonFeelData FeelData;
+
+    public GameObject CanonEntity;
+    public GameObject CanonPad;
+    public GameObject CanonLJoint;
+    public GameObject CanonRJoint;
+
+    public GameObject CanonFinalLJoint;
+    public GameObject CanonFinalRJoint;
+    public GameObject CanonLJoint0;
+    public GameObject CanonRJoint0;
+
+    public GameObject CameraFocus;
+
+    public GameObject Team1Cabel;
+    public GameObject Team2Cabel;
+
+    public LayerMask PlayerLayer;
+    public LayerMask GroundLayer;
+    public GameObject Players;
+
+    public GameObject BagelPrefab;
+    public GameObject MarkPrefab;
+    public GameObject BombPrefab;
+    public GameObject ExplosionVFX;
+
+    public BrawlModeReforgedModeData Data;
+
+    public CanonInfo Info;
+
+    public BagelSent DeliveryEvent;
+    private GameObject Bagel;
+
+    private FSM<BrawlModeReforgedArenaManager> CanonFSM;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        CanonFSM = new FSM<BrawlModeReforgedArenaManager>(this);
+        CanonFSM.TransitionTo<CanonIdle>();
+
+        if (Utility.GetPlayerNumber() <= 2)
+        {
+            Data = Data_2Player;
+        }
+        else
+        {
+            Data = Data_MorePlayer;
+        }
+
+        Team1Basket = Basket1;
+        Team2Basket = Basket2;
+
+        Info = new CanonInfo(CanonEntity,CanonPad,CanonLJoint,CanonRJoint,CanonLJoint0,CanonRJoint0, CameraFocus);
+
+        GenerateBagel();
+
+        EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
+        EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
+        EventManager.Instance.AddHandler<BagelDespawn>(OnBagelDespawn);
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
+        EventManager.Instance.RemoveHandler<BagelSent>(OnBagelSent);
+        EventManager.Instance.RemoveHandler<BagelDespawn>(OnBagelDespawn);
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        CanonFSM.Update();
+    }
+
+
+    private int GetPlayerNumber()
+    {
+        int Count = 0;
+        for(int i=0;i < Services.GameStateManager.CameraTargets.Count; i++)
+        {
+            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
+            {
+                Count++;
+            }
+        }
+
+        return Count;
+
+    }
+
+
 
     private void GenerateBagel()
     {
@@ -952,18 +794,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         {
             Pos = Data.BagelGenerationPosLeft;
         }
-        /*switch (Info.CurrentSide)
-        {
-            case CanonSide.Neutral:
-                Pos = BagelGenerationPos;
-                break;
-            case CanonSide.Blue:
-                Pos = BagelGenerationPosLeft;
-                break;
-            case CanonSide.Red:
-                Pos = BagelGenerationPosRight;
-                break;
-        }*/
 
         Bagel = GameObject.Instantiate(BagelPrefab, Pos, new Quaternion(0, 0, 0, 0));
     }
@@ -976,56 +806,20 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     private void OnBagelSent(BagelSent e)
     {
         Bagel = null;
+        
 
         if(e.Basket == Team1Basket)
         {
             if (Info.CurrentSide != CanonSide.Red)
             {
-                Info.LastSide = Info.CurrentSide;
-                Info.CurrentSide = CanonSide.Red;
-
-                Info.LockedPlayer = null;
-                Destroy(Info.Mark);
-
-                StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor,true));
-
-                if (Info.LastSide != CanonSide.Neutral)
-                {
-                    StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, false));
-                }
-                if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
-                {
-                    Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
-                }
-
-
-                Info.TransitionTo(CanonState.Swtiching);
-
+                DeliveryEvent = e;
             }
         }
         else
         {
             if (Info.CurrentSide != CanonSide.Blue)
             {
-                Info.LastSide = Info.CurrentSide;
-                Info.CurrentSide = CanonSide.Blue;
-
-                Info.LockedPlayer = null;
-                Destroy(Info.Mark);
-
-                if(Info.LastSide != CanonSide.Neutral)
-                {
-                    StartCoroutine(CabelChange(Team1Cabel, FeelData.RedCabelColor, false));
-                }
-
-                StartCoroutine(CabelChange(Team2Cabel, FeelData.BlueCabelColor, true));
-
-                if (!Services.GameStateManager.CameraTargets.Contains(CameraPoint.transform))
-                {
-                    Services.GameStateManager.CameraTargets.Add(CameraPoint.transform);
-                }
-
-                Info.TransitionTo(CanonState.Swtiching);
+                DeliveryEvent = e;
 
             }
         }
@@ -1035,7 +829,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private void OnPlayerDied(PlayerDied e)
     {
-        if(e.Player == Info.LockedPlayer && Info.State == CanonState.Firing)
+        if(e.Player == Info.LockedPlayer)
         {
             Info.LockedPlayer = null;
         }

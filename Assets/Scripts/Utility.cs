@@ -4,6 +4,7 @@ using UnityEngine;
 using System;
 using CharTween;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public static class Utility
 {
@@ -106,6 +107,7 @@ public static class Utility
     {
         float time = 0f;
         float mass = 0f;
+        if (ev.Hitted.GetComponent<CapsuleCollider>() == null) return false;
         float frictionCoeffcient = ev.Hitted.GetComponent<CapsuleCollider>().material.dynamicFriction;
         foreach (Rigidbody rb in ev.Hitted.GetComponentsInChildren<Rigidbody>(true))
         {
@@ -136,6 +138,54 @@ public static class Utility
         }
         return true;
     }
+
+    public static int GetColorIndexFromPlayer(GameObject player)
+    {
+        int layer = player.layer;
+        switch (layer)
+        {
+            case 16:
+                return 0;
+            case 12:
+                return 1;
+            case 15:
+                return 2;
+            case 9:
+                return 3;
+            case 11:
+                return 4;
+            case 10:
+                return 5;
+        }
+        Debug.Assert(false, "Should not be here at all");
+        return 0;
+    }
+
+    public static string GetNextSceneName()
+    {
+        var nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
+
+        if (nextSceneIndex < SceneManager.sceneCountInBuildSettings)
+        {
+            return GetSceneNameByBuildIndex(nextSceneIndex);
+        }
+
+        return string.Empty;
+    }
+
+    public static string GetSceneNameByBuildIndex(int buildIndex)
+    {
+        return GetSceneNameFromScenePath(SceneUtility.GetScenePathByBuildIndex(buildIndex));
+    }
+
+    private static string GetSceneNameFromScenePath(string scenePath)
+    {
+        // Unity's asset paths always use '/' as a path separator
+        var sceneNameStart = scenePath.LastIndexOf("/", StringComparison.Ordinal) + 1;
+        var sceneNameEnd = scenePath.LastIndexOf(".", StringComparison.Ordinal);
+        var sceneNameLength = sceneNameEnd - sceneNameStart;
+        return scenePath.Substring(sceneNameStart, sceneNameLength);
+    }
 }
 
 public class PunchMessage
@@ -161,6 +211,7 @@ public class PunchMessage
 public class StatsTuple
 {
     public int Index;
+    // NetID in Networking Context
     public int RewiredID;
     public float RawData;
     public float WeightData;
@@ -346,6 +397,7 @@ public interface IAimable
 
 public interface IHittable
 {
+    GameObject GetGameObject();
     bool CanBeBlockPushed();
     /// <summary>
     /// Can Block The attack or not
@@ -380,4 +432,54 @@ public interface IHittable
     /// </summary>
     /// <param name="status"></param>
     void OnImpact(Status status);
+}
+
+public interface IHittableNetwork
+{
+    /// <summary>
+    /// Can Block The attack or not
+    /// </summary>
+    /// <param name="forwardAngle"></param>
+    /// <returns></returns>
+    bool CanBlock(Vector3 forwardAngle);
+    /// <summary>
+    /// A method to call when hitting a blockable object
+    /// </summary>
+    /// <param name="force"></param>
+    /// <param name="_meleeCharge"></param>
+    /// <param name="sender"></param>
+    /// <param name="_blockable"></param>
+    void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable);
+    /// <summary>
+    /// A method to call when directly dealing impact with no blocking possiblity
+    /// </summary>
+    /// <param name="force"></param>
+    /// <param name="forcemode"></param>
+    /// <param name="enforcer"></param>
+    /// <param name="impactType"></param>
+    void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType);
+    void OnImpact(Vector3 force, ForceMode forceMode);
+    /// <summary>
+    /// A method simply mark the object with the enforcer
+    /// </summary>
+    /// <param name="enforcer"></param>
+    /// <param name="impactType"></param>
+    void OnImpact(GameObject enforcer, ImpactType impactType);
+    /// <summary>
+    /// A impact method with status effect
+    /// </summary>
+    /// <param name="status"></param>
+    void OnImpact(Status status);
+}
+
+public class CameraTargets
+{
+    public GameObject Target;
+    public int Weight;
+
+    public CameraTargets(GameObject target, int weight = 1)
+    {
+        Target = target;
+        Weight = weight;
+    }
 }

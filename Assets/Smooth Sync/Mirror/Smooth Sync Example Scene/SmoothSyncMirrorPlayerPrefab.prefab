@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: 2368718}
   - component: {fileID: 135000011604345350}
   - component: {fileID: 114825199638907928}
-  - component: {fileID: 3492260954896452359}
+  - component: {fileID: 8897150087856726433}
   m_Layer: 0
   m_Name: SmoothSyncMirrorPlayerPrefab
   m_TagString: Untagged
@@ -51,6 +51,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad225009ad414e1428332cab226f38fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
   syncInterval: 0.1
   interpolationBackTime: 0.1
   extrapolationMode: 1
@@ -71,7 +72,7 @@ MonoBehaviour:
   positionLerpSpeed: 0.85
   rotationLerpSpeed: 0.85
   scaleLerpSpeed: 0.85
-  timeCorrectionSpeed: 0.1
+  timeCorrectionSpeed: 0.5
   snapTimeThreshold: 3
   syncPosition: 0
   syncRotation: 0
@@ -86,6 +87,7 @@ MonoBehaviour:
   isSmoothingAuthorityChanges: 0
   whenToUpdateTransform: 0
   sendRate: 30
+  networkChannel: 1
   childObjectToSync: {fileID: 0}
   setVelocityInsteadOfPositionOnNonOwners: 0
   maxPositionDifferenceForVelocitySyncing: 10
@@ -104,6 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ad225009ad414e1428332cab226f38fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
   syncInterval: 0.1
   interpolationBackTime: 0.1
   extrapolationMode: 1
@@ -124,7 +127,7 @@ MonoBehaviour:
   positionLerpSpeed: 0.85
   rotationLerpSpeed: 0.85
   scaleLerpSpeed: 0.85
-  timeCorrectionSpeed: 0.1
+  timeCorrectionSpeed: 0.5
   snapTimeThreshold: 3
   syncPosition: 0
   syncRotation: 0
@@ -139,6 +142,7 @@ MonoBehaviour:
   isSmoothingAuthorityChanges: 0
   whenToUpdateTransform: 0
   sendRate: 30
+  networkChannel: 1
   childObjectToSync: {fileID: 159602}
   setVelocityInsteadOfPositionOnNonOwners: 0
   maxPositionDifferenceForVelocitySyncing: 10
@@ -157,6 +161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 567c05d68d2fa87478c3ff04da097de2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
   syncInterval: 0.1
   transformMovementSpeed: 30
   rigidbodyMovementForce: 500
@@ -231,11 +236,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b91ecbcc199f4492b9a91e820070131, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sceneId: 3699314760
   serverOnly: 0
-  localPlayerAuthority: 1
   m_AssetId: 
-  m_SceneId: 3747968957
---- !u!54 &3492260954896452359
+--- !u!54 &8897150087856726433
 Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}

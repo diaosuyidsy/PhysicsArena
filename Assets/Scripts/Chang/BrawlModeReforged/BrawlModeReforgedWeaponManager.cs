@@ -47,7 +47,7 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<WeaponGeneratorSwtich>(OnGeneratorSwtich);
-        EventManager.Instance.AddHandler<ObjectDespawned>(OnObjectDespawned);
+        EventManager.Instance.AddHandler<ObjectDespawned>(OnWeaponDespawn);
 
         CurrentMaxWeaponNumber = WeaponGeneratorList.Count;
         InitPrefabBag();
@@ -59,7 +59,7 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
     {
         EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
         EventManager.Instance.RemoveHandler<WeaponGeneratorSwtich>(OnGeneratorSwtich);
-        EventManager.Instance.RemoveHandler<ObjectDespawned>(OnObjectDespawned);
+        EventManager.Instance.RemoveHandler<ObjectDespawned>(OnWeaponDespawn);
     }
 
     // Update is called once per frame
@@ -82,9 +82,11 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
 
             while (Valid > 0)
             {
+
+
                 int Ran = Random.Range(0, AvailableGenerators.Count);
 
-                if (BagIndex >= WeaponPrefabBag.Count)
+                if(BagIndex >= WeaponPrefabBag.Count)
                 {
                     ShuffleBag();
                 }
@@ -137,22 +139,12 @@ public class BrawlModeReforgedWeaponManager : MonoBehaviour
 
     }
 
-    private void OnObjectDespawned(ObjectDespawned e)
+    private void OnWeaponDespawn(ObjectDespawned e)
     {
-        if(e.Obj.GetComponent<WeaponBase>() && (e.Obj.CompareTag("Weapon_OnChest") || e.Obj.CompareTag("Weapon_OnHead")))
+        if (e.Obj.CompareTag("Weapon_OnHead") || e.Obj.CompareTag("Weapon_OnChest"))
         {
             CurrentWeaponCount--;
         }
-    }
-
-    private void OnWeaponFall(WeaponHitDeathTrigger e)
-    {
-        CurrentWeaponCount--;
-    }
-
-    private void OnWeaponUsedUp(WeaponUsedUp e)
-    {
-        CurrentWeaponCount--;
     }
 
     private void OnGeneratorSwtich(WeaponGeneratorSwtich e)

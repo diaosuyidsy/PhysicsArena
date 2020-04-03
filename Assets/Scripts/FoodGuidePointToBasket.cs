@@ -10,11 +10,11 @@ public class FoodGuidePointToBasket : MonoBehaviour
     {
         if (Team == TeamNum.Team1)
         {
-            _targetBasket = BrawlModeReforgedArenaManager.Team1Basket.transform;
+            _targetBasket = GameObject.Find("LForceField").transform;
         }
         else
         {
-            _targetBasket = BrawlModeReforgedArenaManager.Team2Basket.transform;
+            _targetBasket = GameObject.Find("RForceField").transform;
         }
 
         /*if (Team == TeamNum.Team1)

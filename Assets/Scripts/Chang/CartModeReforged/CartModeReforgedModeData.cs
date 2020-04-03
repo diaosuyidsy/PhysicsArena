@@ -5,12 +5,13 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "CartModeReforgedModeData", menuName = "ScriptableObjects/CartModeReforgedModeData", order = 1)]
 public class CartModeReforgedModeData : ModeSepcificData
 {
-    public int LevelUpExp;
-    public int CheckPointExp;
-    public int CheckPointExpTimeInterval;
-    public int KillExp;
-    public int KillExpBonusPerLevelDif;
-    public float BaseCartSpeed;
-    public float CartSpeedBonusPerLevel;
+    public float RecoverSpeed;
+
+    public int MaxLevel;
+    public float SpeedUpTime;
+
+
+    public List<float> CartSpeedWithCheckpoint;
+    public List<float> OccupySpeedWithCheckpoint;
 
 }

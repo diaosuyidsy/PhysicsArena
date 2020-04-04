@@ -217,6 +217,11 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             }
         }
     }
+
+    protected void SetBombRotation()
+    {
+        Context.Info.Bomb.transform.forward = Context.Info.Mark.transform.position - Context.Info.Bomb.transform.position;
+    }
 }
 
 public class CanonIdle: CanonAction
@@ -405,13 +410,9 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
             Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
             Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime);
 
-            if(Context.Info.LockedPlayer == null)
-            {
-                TransitionTo<CanonFiring_Fall>();
-                return;
-            }
-
             CheckTimer();
+
+            SetBombRotation();
         }
         else
         {
@@ -464,13 +465,7 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
 
         AimingSetCanon();
         MarkFollow(false);
-
-        if (Context.Info.LockedPlayer == null)
-        {
-            
-            TransitionTo<CanonFiring_Fall>();
-            return;
-        }
+        SetBombRotation();
 
         if (CheckDelivery())
         {
@@ -534,6 +529,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
                 GetBombFlyInfo();
             }
             BombFly();
+            SetBombRotation();
         }
 
 

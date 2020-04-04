@@ -217,8 +217,8 @@ public class NetworkCanonIdle : NetworkCanonAction
     public override void Update()
     {
         base.Update();
-        //SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
-        //Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
+        Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
         CheckDelivery();
     }
 
@@ -411,12 +411,6 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
 
             Context.RpcSetMarkColor(new Vector3(color.r, color.g, color.b), Timer / Context.FeelData.MarkAppearTime);
 
-            if (Context.Info.LockedPlayer == null)
-            {
-                TransitionTo<NetworkCanonFiring_Fall>();
-                return;
-            }
-
             CheckTimer();
         }
         else
@@ -472,13 +466,6 @@ public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follow
 
         AimingSetCanon();
         MarkFollow(false);
-
-        if (Context.Info.LockedPlayer == null)
-        {
-
-            TransitionTo<NetworkCanonFiring_Fall>();
-            return;
-        }
 
         if (CheckDelivery())
         {

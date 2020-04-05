@@ -1414,7 +1414,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void Update()
         {
             base.Update();
-            if (_LeftTriggerUp || _BUp)
+            if (!_LeftTrigger && !_B)
             {
                 TransitionTo<DroppedRecoveryState>();
                 return;

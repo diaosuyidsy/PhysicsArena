@@ -1322,14 +1322,23 @@ public class PlayerController : MonoBehaviour, IHittable
                 else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
                 {
-                    if (hit.transform.GetComponentInParent<IHittable>() == null) return;
+                    GameObject target = null;
+                    if (hit.transform.GetComponent<WeaponBase>() != null)
+                    {
+                        target = hit.transform.GetComponent<WeaponBase>().Owner;
+                    }
+                    else if (hit.transform.GetComponentInParent<IHittable>() != null)
+                    {
+                        target = hit.transform.gameObject;
+                    }
+                    else return;
                     _hitOnce = true;
-                    foreach (var rb in hit.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>(true))
+                    foreach (var rb in target.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>(true))
                     {
                         rb.velocity = Vector3.zero;
                     }
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
-                    hit.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
+                    target.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
                     Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;

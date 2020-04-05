@@ -13,6 +13,7 @@ public class NetworkHookControl : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (_rth == null) return;
         if (!_rth.hasAuthority) return;
         if (!_rth.IsHooking) return;
         if (_rth._hookGunData.HookableLayer != (_rth._hookGunData.HookableLayer | (1 << other.gameObject.layer))

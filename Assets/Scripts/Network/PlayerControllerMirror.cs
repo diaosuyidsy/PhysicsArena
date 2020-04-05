@@ -50,7 +50,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private float _lastTimeUseStamina;
     // private float _lastTimeUSeStaminaUnimportant;
     private Vector2 _staminaUISize;
-    private float _sideStepTimer;
     private float _jumpTimer;
     private Vector3 _freezeBody;
     private ImpactMarker _impactMarker;
@@ -98,8 +97,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private Rigidbody[] _allPlayerRBs;
     private IEnumerator _deadInvincible;
     private int _playerBodiesLayer;
-    private Vector3 _storedVelocity;
     private int _hitStopFrames;
+    private bool _customDrop;
+    private Vector3 _customDropForce;
     #endregion
 
     #region Network Variables
@@ -403,9 +403,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     }
 
     [Command]
-    private void CmdDropObject(GameObject _object)
+    private void CmdDropObject(GameObject _object, bool customDrop, Vector3 force)
     {
-        _object.GetComponent<NetworkWeaponBase>().OnDrop();
+        _object.GetComponent<NetworkWeaponBase>().OnDrop(customDrop, force);
     }
 
     [Command]
@@ -596,8 +596,18 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     public void ForceDropHandObject()
     {
         if (!isLocalPlayer) return;
+        _customDrop = false;
         if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
-            _actionFSM.TransitionTo<DroppedRecoveryState>();
+            _actionFSM.TransitionTo<DroppingState>();
+    }
+
+    public void ForceDropHandObject(Vector3 force)
+    {
+        if (!isLocalPlayer) return;
+        _customDrop = true;
+        _customDropForce = force;
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+            _actionFSM.TransitionTo<DroppingState>();
     }
 
     /// <summary>
@@ -680,13 +690,10 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     {
         if (HandObject == null) return;
         // Drop the thing
-        // HandObject.GetComponent<NetworkWeaponBase>().OnDrop();
-        CmdDropObject(HandObject);
-
+        CmdDropObject(HandObject, _customDrop, _customDropForce);
+        _customDrop = false;
         CmdTriggerObjectDropped(gameObject, HandObject);
-        // EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
         // Return the body to normal position
-        // _resetBodyAnimation();
         // Nullify the holder
         HandObject = null;
     }

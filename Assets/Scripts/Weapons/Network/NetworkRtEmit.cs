@@ -116,9 +116,9 @@ public class NetworkRtEmit : NetworkWeaponBase
         gameObject.SetActive(false);
     }
 
-    public override void OnDrop()
+    public override void OnDrop(bool customForce, Vector3 force)
     {
-        base.OnDrop();
+        base.OnDrop(customForce, force);
         Fire(false);
         GunUI.SetActive(false);
     }

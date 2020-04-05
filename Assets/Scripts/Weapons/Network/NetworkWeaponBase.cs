@@ -166,6 +166,7 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
 
     public virtual void OnPickUp(GameObject owner)
     {
+        CanBePickedUp = false;
         Owner = owner;
         gameObject.layer = owner.layer;
         GetComponent<Rigidbody>().isKinematic = true;

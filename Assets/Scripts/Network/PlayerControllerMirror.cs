@@ -399,7 +399,20 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [Command]
     private void CmdPickUpObject(GameObject _object, GameObject owner)
     {
-        _object.GetComponent<NetworkWeaponBase>().OnPickUp(owner);
+        if (_object.GetComponent<NetworkWeaponBase>().CanBePickedUp)
+        {
+            _object.GetComponent<NetworkWeaponBase>().OnPickUp(owner);
+            TargetPickUpObject(GetComponent<NetworkIdentity>().connectionToClient, _object, owner);
+        }
+    }
+
+    [TargetRpc]
+    private void TargetPickUpObject(NetworkConnection connection, GameObject _object, GameObject owner)
+    {
+        HandObject = _object;
+        CmdTriggerObjectPickedUp(gameObject, _object);
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)))
+            _actionFSM.TransitionTo<HoldingState>();
     }
 
     [Command]
@@ -1304,15 +1317,15 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
                 if (Context.HandObject == null && hit.collider.GetComponent<NetworkWeaponBase>() != null && hit.collider.GetComponent<NetworkWeaponBase>().CanBePickedUp)
                 {
-                    Context.CmdTriggerObjectPickedUp(Context.gameObject, hit.collider.gameObject);
+                    // Context.CmdTriggerObjectPickedUp(Context.gameObject, hit.collider.gameObject);
                     // EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
                     // Tell other necessary components that it has taken something
-                    Context.HandObject = hit.collider.gameObject;
+                    // Context.HandObject = hit.collider.gameObject;
 
                     // Tell the collected weapon who picked it up
                     Context.CmdPickUpObject(hit.collider.gameObject, Context.gameObject);
                     // hit.collider.GetComponent<NetworkWeaponBase>().OnPickUp(Context.gameObject);
-                    TransitionTo<HoldingState>();
+                    // TransitionTo<HoldingState>();
                     return;
                 }
             }

@@ -256,20 +256,20 @@ public class NetworkBasket : NetworkBehaviour
         {
             if (other.GetComponentInParent<PlayerControllerMirror>() && SameTeam(other.GetComponentInParent<PlayerControllerMirror>().gameObject))
             {
-                other.GetComponentInParent<PlayerControllerMirror>().gameObject.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
-                RpcDrop(other.GetComponentInParent<PlayerControllerMirror>().gameObject);
+                other.GetComponentInParent<PlayerControllerMirror>().gameObject.GetComponent<PlayerControllerMirror>().ForceDropHandObject(Vector3.zero);
+                RpcDrop(other.GetComponentInParent<PlayerControllerMirror>().gameObject, Vector3.zero);
             }
             else if (other.GetComponent<PlayerControllerMirror>() && SameTeam(other.gameObject))
             {
-                other.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
-                RpcDrop(other.gameObject);
+                other.GetComponent<PlayerControllerMirror>().ForceDropHandObject(Vector3.zero);
+                RpcDrop(other.gameObject, Vector3.zero);
             }
         }
     }
 
     [ClientRpc]
-    private void RpcDrop(GameObject Player)
+    private void RpcDrop(GameObject Player, Vector3 force)
     {
-        Player.GetComponent<PlayerControllerMirror>().ForceDropHandObject();
+        Player.GetComponent<PlayerControllerMirror>().ForceDropHandObject(force);
     }
 }

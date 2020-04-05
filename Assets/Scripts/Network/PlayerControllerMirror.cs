@@ -1559,13 +1559,22 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
                 {
-                    if (hit.transform.GetComponentInParent<IHittableNetwork>() == null) return;
+                    GameObject target = null;
+                    if (hit.transform.GetComponent<NetworkWeaponBase>() != null)
+                    {
+                        target = hit.transform.GetComponent<NetworkWeaponBase>().Owner;
+                    }
+                    else if (hit.transform.GetComponentInParent<IHittableNetwork>() != null)
+                    {
+                        target = hit.transform.gameObject;
+                    }
+                    else return;
                     _hitOnce = true;
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
                     Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
-                    Context.CmdHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force, true, Context.gameObject);
+                    Context.CmdHit(target.transform.GetComponentInParent<NetworkIdentity>().gameObject, force, true, Context.gameObject);
                     // TransitionTo<PunchHitStopActionState>();
                     // Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
                 }

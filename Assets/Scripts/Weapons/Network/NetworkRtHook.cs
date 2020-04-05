@@ -269,6 +269,11 @@ public class NetworkRtHook : NetworkWeaponBase
         {
             base.OnEnter();
             _hookStopTimer = Time.time + _hookGunData.HookedTime;
+            if (Context.isServer)
+            {
+                double rtt = NetworkTime.rtt;
+                _hookStopTimer -= (float)rtt;
+            }
         }
 
         public override void Update()

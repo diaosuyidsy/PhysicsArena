@@ -6,8 +6,7 @@ using Mirror;
 
 public class NetworkRtEmit : NetworkWeaponBase
 {
-    public ObiEmitter WaterBall;
-    public ObiParticleRenderer ParticleRenderer;
+    public WaterGunLine WaterGunLine;
     public GameObject WaterUI;
     public GameObject GunUI;
     public override float HelpAimAngle { get { return _waterGunData.HelpAimAngle; } }
@@ -42,7 +41,6 @@ public class NetworkRtEmit : NetworkWeaponBase
                 if (_shootCD >= _waterGunData.ShootMaxCD)
                 {
                     _waterSpeed = 0f;
-                    WaterBall.speed = 0f;
                     _waterGunState = State.Empty;
                     return;
                 }
@@ -64,7 +62,6 @@ public class NetworkRtEmit : NetworkWeaponBase
         {
             _waterGunState = State.Shooting;
             GunUI.SetActive(true);
-            WaterBall.speed = _waterGunData.Speed;
             _waterSpeed = _waterGunData.Speed;
             Owner.GetComponent<Rigidbody>().AddForce(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.Impulse);
             EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
@@ -72,7 +69,6 @@ public class NetworkRtEmit : NetworkWeaponBase
         else
         {
             _waterGunState = State.Empty;
-            WaterBall.speed = 0f;
             _waterSpeed = 0f;
             _shootCD = 0f;
         }
@@ -108,7 +104,6 @@ public class NetworkRtEmit : NetworkWeaponBase
     protected override void _onWeaponDespawn()
     {
         _shootCD = 0f;
-        WaterBall.speed = 0f;
         _waterSpeed = 0f;
         _ammo = _waterGunData.MaxAmmo;
         ChangeAmmoUI();
@@ -125,7 +120,6 @@ public class NetworkRtEmit : NetworkWeaponBase
 
     public void OnChangeWaterSpeed(float oldWaterSpeed, float newWaterSpeed)
     {
-        WaterBall.speed = newWaterSpeed;
     }
 
     [TargetRpc]

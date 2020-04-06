@@ -46,10 +46,13 @@ public class NetworkRtEmit : NetworkWeaponBase
                     _waterGunState = State.Empty;
                     return;
                 }
+                if (_ownerIsLocalPlayer)
+                {
+                    _detectPlayer();
+                }
                 // Statistics: Here we are using raycast for players hit
                 if (isServer)
                 {
-                    _detectPlayer();
                     _onWeaponUsedOnce();
                 }
                 // If we changed ammo, then need to change UI as well
@@ -97,12 +100,15 @@ public class NetworkRtEmit : NetworkWeaponBase
                 !hit.transform.GetComponentInParent<IHittableNetwork>().CanBlock(Owner.transform.forward))
             {
                 GameObject receiver = hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
-                TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
+                print("Hit");
+                // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
+                CmdHit(receiver, Owner, true);
             }
             else if (hit.transform.GetComponentInParent<IHittableNetwork>() != null)
             {
                 GameObject receiver = hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
-                TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
+                // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, false);
+                CmdHit(receiver, Owner, false);
             }
         }
     }
@@ -140,6 +146,12 @@ public class NetworkRtEmit : NetworkWeaponBase
 
     public void OnChangeWaterSpeed(float oldWaterSpeed, float newWaterSpeed)
     {
+    }
+
+    [Command]
+    private void CmdHit(GameObject receiver, GameObject owner, bool withForce)
+    {
+        TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, owner, withForce);
     }
 
     [TargetRpc]

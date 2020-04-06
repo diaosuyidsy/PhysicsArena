@@ -34,10 +34,10 @@ public class WeaponGenerator : MonoBehaviour
     {
 
         GameObject Weapon = Instantiate(WeaponPrefab);
-        if (Weapon.name.Contains("Water"))
-        {
-            Camera.main.GetComponent<Obi.ObiBaseFluidRenderer>().particleRenderers.Add(Weapon.GetComponent<rtEmit>().ParticleRenderer);
-        }
+        // if (Weapon.name.Contains("Water"))
+        // {
+        //     Camera.main.GetComponent<Obi.ObiBaseFluidRenderer>().particleRenderers.Add(Weapon.GetComponent<rtEmit>().ParticleRenderer);
+        // }
 
         Vector2 XZOffset = Random.insideUnitCircle * GenerationRadius;
 
@@ -62,9 +62,9 @@ public class WeaponGenerator : MonoBehaviour
     {
         RaycastHit[] AllHits = Physics.SphereCastAll(transform.position + DetectOffset, DetectRadius, Vector3.up, DetectDis, WeaponLayer);
 
-        for(int i = 0; i < AllHits.Length; i++)
+        for (int i = 0; i < AllHits.Length; i++)
         {
-            if(AllHits[i].collider.gameObject.CompareTag("Weapon_OnChest")|| AllHits[i].collider.gameObject.CompareTag("Weapon_OnHead"))
+            if (AllHits[i].collider.gameObject.CompareTag("Weapon_OnChest") || AllHits[i].collider.gameObject.CompareTag("Weapon_OnHead"))
             {
                 return true;
             }

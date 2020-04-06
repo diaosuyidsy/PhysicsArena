@@ -167,7 +167,6 @@ GameObject:
   - component: {fileID: 6939282583501119844}
   - component: {fileID: 6939281078528149378}
   - component: {fileID: 7020378553027347528}
-  - component: {fileID: 6933540087621981422}
   - component: {fileID: -6592427505723460661}
   - component: {fileID: -3633704830680079066}
   - component: {fileID: 147808151164390756}
@@ -261,24 +260,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &6933540087621981422
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7037211732015215638}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 28d13ba1960244cb8b2693eeb76f1302, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WeaponDataBase: {fileID: 11400000, guid: 14ab812a9932c064687aaa5e03d0b845, type: 2}
-  CanBePickedUp: 0
-  WaterBall: {fileID: 0}
-  ParticleRenderer: {fileID: 0}
-  WaterUI: {fileID: 7038471040567890960}
-  GunUI: {fileID: 7037511332641611882}
 --- !u!114 &-6592427505723460661
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,6 +293,7 @@ MonoBehaviour:
   Owner: {fileID: 0}
   CanBePickedUp: 0
   TransitAuthorityOnPickUp: 1
+  WaterGunLine: {fileID: 6060660337049894882}
   WaterUI: {fileID: 7038471040567890960}
   GunUI: {fileID: 7037511332641611882}
 --- !u!114 &147808151164390756
@@ -1000,3 +982,15 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 6674157498656021281}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &6060660337049894882 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 613778818985796803, guid: 880954adb8ef443418eb59bfab309549,
+    type: 3}
+  m_PrefabInstance: {fileID: 6674157498656021281}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13ac831c9018c2d49ac0368976e20c33, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

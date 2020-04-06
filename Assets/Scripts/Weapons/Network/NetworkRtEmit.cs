@@ -20,7 +20,7 @@ public class NetworkRtEmit : NetworkWeaponBase
         Empty,
         Shooting,
     }
-
+    [SyncVar]
     private State _waterGunState;
 
     protected override void Awake()
@@ -40,13 +40,18 @@ public class NetworkRtEmit : NetworkWeaponBase
                 _shootCD += Time.deltaTime;
                 if (_shootCD >= _waterGunData.ShootMaxCD)
                 {
+                    _shootCD = 0f;
                     _waterSpeed = 0f;
+                    WaterGunLine.OnFire(false);
                     _waterGunState = State.Empty;
                     return;
                 }
                 // Statistics: Here we are using raycast for players hit
-                _detectPlayer();
-                _onWeaponUsedOnce();
+                if (isServer)
+                {
+                    _detectPlayer();
+                    _onWeaponUsedOnce();
+                }
                 // If we changed ammo, then need to change UI as well
                 ChangeAmmoUI();
                 break;
@@ -61,17 +66,24 @@ public class NetworkRtEmit : NetworkWeaponBase
         if (buttondown)
         {
             _waterGunState = State.Shooting;
-            GunUI.SetActive(true);
             _waterSpeed = _waterGunData.Speed;
-            Owner.GetComponent<Rigidbody>().AddForce(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.Impulse);
+            RpcOnFire();
+            WaterGunLine.OnFire(true);
+            GunUI.SetActive(true);
+            Owner.GetComponent<IHittableNetwork>().OnImpact(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.VelocityChange, Owner, ImpactType.WaterGun);
             EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
         }
-        else
-        {
-            _waterGunState = State.Empty;
-            _waterSpeed = 0f;
-            _shootCD = 0f;
-        }
+    }
+
+    [ClientRpc]
+    private void RpcOnFire()
+    {
+        // Backfire just to keep the speed 0
+        WaterGunLine.OnFire(true);
+        GunUI.SetActive(true);
+        Owner.GetComponent<IHittableNetwork>().OnImpact(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.VelocityChange, Owner, ImpactType.WaterGun);
+        EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
+
     }
 
     private void _detectPlayer()
@@ -114,7 +126,15 @@ public class NetworkRtEmit : NetworkWeaponBase
     public override void OnDrop(bool customForce, Vector3 force)
     {
         base.OnDrop(customForce, force);
-        Fire(false);
+        WaterGunLine.OnFire(false);
+        GunUI.SetActive(false);
+        RpcOnDrop();
+    }
+
+    [ClientRpc]
+    private void RpcOnDrop()
+    {
+        WaterGunLine.OnFire(false);
         GunUI.SetActive(false);
     }
 

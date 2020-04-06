@@ -104,7 +104,7 @@ public class WaterGunLine : MonoBehaviour
                 break;
             }
         }
-        
+
 
 
         //Emit Hit Particles 
@@ -138,10 +138,10 @@ public class WaterGunLine : MonoBehaviour
         GetComponent<Renderer>().material.SetFloat("_Distance", dist);
         GetComponent<Renderer>().material.SetVector("_Position", transform.position);
 
-        if (Input.GetMouseButton(0))
-        {
-            globalProgress = 0f;
-        }
+        // if (Input.GetMouseButton(0))
+        // {
+        //     globalProgress = 0f;
+        // }
 
         if (globalProgress <= 1f)
         {
@@ -166,5 +166,13 @@ public class WaterGunLine : MonoBehaviour
             hitPsArray[1].Emit(100);
         }*/
 
+    }
+
+    public void OnFire(bool fire)
+    {
+        if (fire)
+            globalProgress = 0f;
+        else
+            globalProgress = 1f;
     }
 }

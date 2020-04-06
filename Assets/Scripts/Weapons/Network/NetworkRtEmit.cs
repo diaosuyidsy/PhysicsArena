@@ -92,21 +92,30 @@ public class NetworkRtEmit : NetworkWeaponBase
     private void _detectPlayer()
     {
         // This layermask means we are only looking for Player1Body - Player6Body
-        LayerMask layermask = NetworkServices.Config.ConfigData.AllPlayerLayer;
+        LayerMask layermask = NetworkServices.Config.ConfigData.AllPlayerLayer ^ (1 << Owner.layer);
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
+        if (Physics.SphereCast(transform.position - Owner.transform.forward * _waterGunData.WaterBackCastDistance, _waterGunData.WaterCastRadius, Owner.transform.forward, out hit, _waterGunData.WaterCastDistance, layermask))
         {
-            if (hit.transform.GetComponentInParent<IHittableNetwork>() != null &&
-                !hit.transform.GetComponentInParent<IHittableNetwork>().CanBlock(Owner.transform.forward))
+            GameObject target = null;
+            if (hit.transform.GetComponentInParent<NetworkWeaponBase>() != null)
             {
-                GameObject receiver = hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
+                target = hit.transform.GetComponentInParent<NetworkWeaponBase>().Owner;
+            }
+            else if (hit.transform.GetComponentInParent<IHittableNetwork>() != null)
+            {
+                target = hit.transform.gameObject;
+            }
+            if (target == null) return;
+            if (!target.transform.GetComponentInParent<IHittableNetwork>().CanBlock(Owner.transform.forward))
+            {
+                GameObject receiver = target.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
                 print("Hit");
                 // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
                 CmdHit(receiver, Owner, true);
             }
-            else if (hit.transform.GetComponentInParent<IHittableNetwork>() != null)
+            else if (target.transform.GetComponentInParent<IHittableNetwork>() != null)
             {
-                GameObject receiver = hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
+                GameObject receiver = target.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
                 // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, false);
                 CmdHit(receiver, Owner, false);
             }

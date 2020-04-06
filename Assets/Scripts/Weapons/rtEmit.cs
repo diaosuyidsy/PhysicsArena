@@ -63,7 +63,6 @@ public class rtEmit : WeaponBase
             GunUI.SetActive(true);
             WaterBall.speed = _waterGunData.Speed;
             Owner.GetComponent<Rigidbody>().AddForce(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.Impulse);
-            Owner.GetComponent<Rigidbody>().AddForce(Owner.transform.up * _waterGunData.UpThrust, ForceMode.Impulse);
             EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
         }
         else

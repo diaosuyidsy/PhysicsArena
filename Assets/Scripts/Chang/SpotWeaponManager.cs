@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class BrawlModeReforgedWeaponManager : MonoBehaviour
+public class SpotWeaponManager : MonoBehaviour
 {
     public GameObject WeaponGenerators_2Player;
     public GameObject WeaponGenerators_MorePlayer;

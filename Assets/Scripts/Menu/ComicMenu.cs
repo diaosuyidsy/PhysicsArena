@@ -1231,10 +1231,12 @@ public class ComicMenu : MonoBehaviour
         {
             yield return null;
             float elapsedTime = 0f;
-            while (elapsedTime < 3f)
+            float maxElapsedTime = 4f;
+            float totalTime = 5f;
+            while (elapsedTime < maxElapsedTime)
             {
                 elapsedTime += Time.deltaTime;
-                Context.LoadingBarFillImage.fillAmount = elapsedTime / 6f;
+                Context.LoadingBarFillImage.fillAmount = elapsedTime / totalTime;
                 yield return null;
             }
             float loadingProgress = 0f;
@@ -1254,7 +1256,7 @@ public class ComicMenu : MonoBehaviour
                 }
                 else
                 {
-                    if (loadingProgress > 0.5f)
+                    if (loadingProgress > (maxElapsedTime / totalTime))
                         Context.LoadingBarFillImage.fillAmount = loadingProgress;
                 }
                 yield return null;

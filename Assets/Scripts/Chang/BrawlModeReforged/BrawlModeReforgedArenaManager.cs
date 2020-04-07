@@ -983,15 +983,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         if (Manager.TeamAScore - Manager.TeamBScore >= Data.DeliveryPoint)
         {
-            float Ran = Random.Range(0f, 1f);
+            float Ran = Random.Range(0.0f, 1.0f);
             Pos = Vector3.Lerp(Data.BagelGenerationPos, Data.BagelGenerationPosRight,Ran);
-            Pos = Data.BagelGenerationPosRight;
+            //Pos = Data.BagelGenerationPosRight;
         }
         else if(Manager.TeamBScore - Manager.TeamAScore >= Data.DeliveryPoint)
         {
-            float Ran = Random.Range(0f, 1f);
+            float Ran = Random.Range(0.0f, 1.0f);
             Pos = Vector3.Lerp(Data.BagelGenerationPos, Data.BagelGenerationPosLeft, Ran);
-            Pos = Data.BagelGenerationPosLeft;
+            //Pos = Data.BagelGenerationPosLeft;
         }
 
 

@@ -95,7 +95,19 @@ public class NetworkCabelSwtiching : NetworkCabelAction
                 GameObject.Destroy(Context.Info.Bomb);
 
                 Context.SetWrap();
-                Context.RpcSetWrap();
+                switch (Context.Info.CurrentSide)
+                {
+                    case CanonSide.Neutral:
+                        Context.RpcSetWrap(0);
+                        break;
+                    case CanonSide.Red:
+                        Context.RpcSetWrap(1);
+                        break;
+                    case CanonSide.Blue:
+                        Context.RpcSetWrap(2);
+                        break;
+                }
+                
             }
         }
     }
@@ -952,11 +964,7 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         Team2Basket = Basket2;
 
         SetWrap();
-
-        if (isServer)
-        {
-            RpcSetWrap();
-        }
+        RpcSetWrap(0);
 
         if (isServer)
         {
@@ -997,15 +1005,16 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
 
         if (Manager.TeamAScore - Manager.TeamBScore >= Data.DeliveryPoint)
         {
-            float Ran = Random.Range(0f, 1f);
+            float Ran = Random.Range(0.0f, 1.0f);
+
             Pos = Vector3.Lerp(Data.BagelGenerationPos, Data.BagelGenerationPosRight, Ran);
-            Pos = Data.BagelGenerationPosRight;
+            //Pos = Data.BagelGenerationPosRight;
         }
         else if (Manager.TeamBScore - Manager.TeamAScore >= Data.DeliveryPoint)
         {
-            float Ran = Random.Range(0f, 1f);
+            float Ran = Random.Range(0.0f, 1.0f);
             Pos = Vector3.Lerp(Data.BagelGenerationPos, Data.BagelGenerationPosLeft, Ran);
-            Pos = Data.BagelGenerationPosLeft;
+            //Pos = Data.BagelGenerationPosLeft;
         }
 
         Bagel = GameObject.Instantiate(BagelPrefab, Pos, new Quaternion(0, 0, 0, 0));
@@ -1236,18 +1245,18 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcSetWrap()
+    public void RpcSetWrap(int Side)
     {
         Material mat = FeelData.WrapNMat;
-        switch (Info.CurrentSide)
+        switch (Side)
         {
-            case CanonSide.Neutral:
+            case 0:
                 mat = FeelData.WrapNMat;
                 break;
-            case CanonSide.Red:
+            case 1:
                 mat = FeelData.WrapRedMat;
                 break;
-            case CanonSide.Blue:
+            case 2:
                 mat = FeelData.WrapBlueMat;
                 break;
         }

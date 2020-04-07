@@ -62,10 +62,7 @@ public class NetworkCabelSwtiching : NetworkCabelAction
         base.OnEnter();
         Timer = 0;
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
+        Context.RpcCameraAddRemove(true);
 
     }
 
@@ -955,7 +952,11 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         Team2Basket = Basket2;
 
         SetWrap();
-        RpcSetWrap();
+
+        if (isServer)
+        {
+            RpcSetWrap();
+        }
 
         if (isServer)
         {
@@ -1070,6 +1071,11 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     [ClientRpc]
     public void RpcSetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed)
     {
+        if(Info == null)
+        {
+            return;
+        }
+
         Info.CurrentPercentage = Mathf.Lerp(Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed * Time.deltaTime);
         if (Mathf.Abs(Info.CurrentPercentage - TargetPercentage) <= FeelData.PercentageIgnoreError)
         {

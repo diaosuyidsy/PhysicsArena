@@ -105,7 +105,10 @@ public class rtFist : WeaponBase
                 _fistDup.GetComponent<Collider>().isTrigger = false;
                 _fist.gameObject.SetActive(false);
                 /// Add Backfire force to player as well
-                Owner.GetComponent<Rigidbody>().AddForce(transform.right * _fistGunData.BackfireHitForce, ForceMode.VelocityChange);
+                if (!Owner.GetComponent<PlayerController>().IsIdle)
+                    Owner.GetComponent<PlayerController>().OnImpact(-Owner.transform.forward * _fistGunData.BackfireHitForce, ForceMode.VelocityChange, Owner, ImpactType.FistGun);
+                else
+                    Owner.GetComponent<PlayerController>().OnImpact(-Owner.transform.forward * _fistGunData.IdleBackfireHitForce, ForceMode.VelocityChange, Owner, ImpactType.FistGun);
                 EventManager.Instance.TriggerEvent(new FistGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _fistDup));
                 _fistGunState = FistGunState.Out;
             }

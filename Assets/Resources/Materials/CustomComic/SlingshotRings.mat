@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: SlingshotWrapN
+  m_Name: SlingshotRings
   m_Shader: {fileID: 4800000, guid: 03f07ed366daef04da6bce04d9f48994, type: 3}
   m_ShaderKeywords: _USE_SCREEN_SPACE_ON
   m_LightmapFlags: 4
@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 2800000, guid: db2d0d415f7e1a54db93fdc91d00ae1f, type: 3}
+        m_Texture: {fileID: 2800000, guid: 155f67fd8750f8e4e83c8efb1731f3a0, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HalftoneTexture:
@@ -33,7 +33,7 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _NormalMap:
         m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
+        m_Scale: {x: 2.55, y: 2.58}
         m_Offset: {x: 0, y: 0}
     - _TextureSample0:
         m_Texture: {fileID: 0}
@@ -48,11 +48,11 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _ASEOutlineWidth: 0.0008
+    - _ASEOutlineWidth: 0.0005
     - _BlinkPower: 1.8
     - _BlinkSpeed: 20
     - _Cutoff: 0.5
-    - _Gloss: 0.079
+    - _Gloss: 0.183
     - _HalftonePower: 0.61
     - _HalftoneRangeMax: -0.31
     - _HalftoneRangeMin: -1.21
@@ -60,22 +60,22 @@ Material:
     - _IsBlinking: 0
     - _LineHalftonePower: 0.6
     - _OutlineWidth: 0.055
-    - _RimOffset: 1
-    - _RimPower: 1
-    - _ShadeEdgeBlur: 0.14
-    - _ShadeEdgeOffset: 0
+    - _RimOffset: 0.49
+    - _RimPower: 0.523
+    - _ShadeEdgeBlur: 0.34
+    - _ShadeEdgeOffset: -0.06
     - _ShadeEdgeWidth: 0.095
-    - _ShadowOffset: 8
+    - _ShadowOffset: 10.1
     - _ShadowStrength: 1
-    - _SpecIntensity: 0.241
-    - _SpecTransition: 0.453
+    - _SpecIntensity: 0.395
+    - _SpecTransition: 0.198
     - _Use_Screen_Space: 1
     - __dirty: 0
     m_Colors:
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 0.509434, g: 0.5074961, b: 0.50222504, a: 0}
+    - _Color: {r: 0.36222854, g: 0.3965913, b: 0.41509432, a: 0}
     - _Color3: {r: 0.7607843, g: 0.5921568, b: 0.8862745, a: 1}
     - _OutlineColor: {r: 1, g: 1, b: 1, a: 0}
-    - _RimColor: {r: 0.7924528, g: 0.7924528, b: 0.7924528, a: 1}
+    - _RimColor: {r: 0.5566038, g: 0.5566038, b: 0.5566038, a: 1}
     - _ShadowColor: {r: 0.7411765, g: 0.6117647, b: 0.8784314, a: 1}
     - _SpecTint: {r: 1, g: 1, b: 1, a: 1}

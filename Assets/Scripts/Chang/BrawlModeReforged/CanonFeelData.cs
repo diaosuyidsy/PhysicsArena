@@ -40,6 +40,10 @@ public class CanonFeelData : MonoBehaviour
     public Color MarkAlertColor;
     public Color MarkFallColor;
 
+    public Material WrapRedMat;
+    public Material WrapBlueMat;
+    public Material WrapNMat;
+
     public float BombVerticalSpeedPercentage;
 
 

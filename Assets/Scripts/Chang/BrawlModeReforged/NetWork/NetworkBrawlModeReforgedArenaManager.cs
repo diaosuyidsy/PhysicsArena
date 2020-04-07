@@ -3,6 +3,176 @@ using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
 
+public abstract class NetworkCabelAction : FSM<NetworkBrawlModeReforgedArenaManager>.State
+{
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Debug.Log(this.GetType().Name);
+    }
+}
+
+public class NetworkCabelIdle : NetworkCabelAction
+{
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        EventManager.Instance.AddHandler<BagelSent>(OnDelivery);
+
+    }
+
+
+    public override void OnExit()
+    {
+        base.OnExit();
+        EventManager.Instance.RemoveHandler<BagelSent>(OnDelivery);
+    }
+
+    private void OnDelivery(BagelSent e)
+    {
+        if (e.Basket == Context.Basket1)
+        {
+            if (Context.Info.CurrentSide != CanonSide.Red)
+            {
+                Context.Info.LastSide = Context.Info.CurrentSide;
+                Context.Info.CurrentSide = CanonSide.Red;
+
+                TransitionTo<NetworkCabelSwtiching>();
+            }
+        }
+        else
+        {
+            if (Context.Info.CurrentSide != CanonSide.Blue)
+            {
+                Context.Info.LastSide = Context.Info.CurrentSide;
+                Context.Info.CurrentSide = CanonSide.Blue;
+
+                TransitionTo<NetworkCabelSwtiching>();
+            }
+        }
+    }
+}
+
+public class NetworkCabelSwtiching : NetworkCabelAction
+{
+    private float Timer;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        Timer = 0;
+
+        Context.RpcCameraAddRemove(true);
+
+    }
+
+
+    public override void Update()
+    {
+        base.Update();
+        Timer += Time.deltaTime;
+
+        SetCabel();
+        CheckTimer();
+
+    }
+
+    private void CheckTimer()
+    {
+        if (Timer >= Context.Data.CanonSwitchTime)
+        {
+            if (Context.Info.State != CanonState.Firing)
+            {
+                TransitionTo<NetworkCabelIdle>();
+                Context.CanonFSM.TransitionTo<NetworkCanonFiring_Normal>();
+
+                Context.Info.LockedPlayer = null;
+
+                NetworkServer.UnSpawn(Context.Info.Mark);
+                GameObject.Destroy(Context.Info.Mark);
+
+                NetworkServer.UnSpawn(Context.Info.Bomb);
+                GameObject.Destroy(Context.Info.Bomb);
+
+                Context.SetWrap();
+                Context.RpcSetWrap();
+            }
+        }
+    }
+
+    private void SetCabel() // Set cabel appearance
+    {
+        switch (Context.Info.CurrentSide)
+        {
+            case CanonSide.Neutral:
+                if (Context.Info.LastSide == CanonSide.Red)
+                {
+                    CabelChange(Context.Team1Cabel, false, true);
+                    Context.RpcCabelChange(Context.Team1Cabel, false, true,Timer);
+                }
+                else
+                {
+                    CabelChange(Context.Team2Cabel, false, false);
+                    Context.RpcCabelChange(Context.Team2Cabel, false, false,Timer);
+                }
+                break;
+            case CanonSide.Red:
+                CabelChange(Context.Team1Cabel, true, true);
+                Context.RpcCabelChange(Context.Team1Cabel, true, true,Timer);
+
+                if (Context.Info.LastSide == CanonSide.Blue)
+                {
+                    CabelChange(Context.Team2Cabel, false, false);
+                    Context.RpcCabelChange(Context.Team2Cabel, false, false,Timer);
+                }
+                break;
+            case CanonSide.Blue:
+                CabelChange(Context.Team2Cabel, true, false);
+                Context.RpcCabelChange(Context.Team2Cabel, true, false, Timer);
+                if (Context.Info.LastSide == CanonSide.Red)
+                {
+                    CabelChange(Context.Team1Cabel, false, true);
+                    Context.RpcCabelChange(Context.Team1Cabel, false, true, Timer);
+                }
+                break;
+        }
+    }
+
+
+    private void CabelChange(GameObject Cabel, bool Shine, bool Team1)
+    {
+
+        foreach (Transform child in Cabel.transform)
+        {
+            Material mat = child.GetComponent<Renderer>().material;
+            mat.EnableKeyword("_EMISSION");
+
+            Color color;
+
+            float Emission;
+
+            if (Shine)
+            {
+                Emission = Mathf.Lerp(Context.FeelData.CabelStartEmission, Context.FeelData.CabelEndEmission, Timer / Context.FeelData.CabelShineTime);
+            }
+            else
+            {
+                Emission = Mathf.Lerp(Context.FeelData.CabelEndEmission, Context.FeelData.CabelStartEmission, Timer / Context.FeelData.CabelShineTime);
+            }
+
+            if (Team1)
+            {
+                color = Context.FeelData.RedCabelColor;
+            }
+            else
+            {
+                color = Context.FeelData.BlueCabelColor;
+            }
+
+            mat.SetColor("_EmissionColor", color * Emission);
+        }
+    }
+}
 
 public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaManager>.State
 {
@@ -12,7 +182,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
         Debug.Log(this.GetType().Name);
     }
 
-    protected bool CheckDelivery() // Check if there is an available delivery for switch
+    /*protected bool CheckDelivery() // Check if there is an available delivery for switch
     {
         if (Context.DeliveryEvent != null)
         {
@@ -24,6 +194,8 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
 
                 Context.DeliveryEvent = null;
 
+                Context.SetWrap();
+                Context.RpcSetWrap();
 
                 TransitionTo<NetworkCanonSwtich>();
 
@@ -37,6 +209,9 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
 
                 Context.DeliveryEvent = null;
 
+                Context.SetWrap();
+                Context.RpcSetWrap();
+
                 TransitionTo<NetworkCanonSwtich>();
 
                 return true;
@@ -44,7 +219,7 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
         }
 
         return false;
-    }
+    }*/
 
     protected void MarkFollow(bool Normal) // Bomb area follows target
     {
@@ -214,17 +389,24 @@ public abstract class NetworkCanonAction : FSM<NetworkBrawlModeReforgedArenaMana
 
 public class NetworkCanonIdle : NetworkCanonAction
 {
+    public override void OnEnter()
+    {
+        base.OnEnter();
+
+        Context.Info.State = CanonState.Idle;
+    }
+
     public override void Update()
     {
         base.Update();
         SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
         Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
-        CheckDelivery();
+        //CheckDelivery();
     }
 
 }
 
-public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
+/*public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
 {
     private float Timer;
 
@@ -332,7 +514,7 @@ public class NetworkCanonSwtich : NetworkCanonAction // Canon switches side
 
 
 
-}
+}*/
 
 
 public class NetworkCanonCooldown : NetworkCanonAction
@@ -342,6 +524,9 @@ public class NetworkCanonCooldown : NetworkCanonAction
     public override void OnEnter()
     {
         base.OnEnter();
+
+        Context.Info.State = CanonState.Cooldown;
+
         Timer = 0;
 
         Context.RpcCameraAddRemove(false);
@@ -354,10 +539,10 @@ public class NetworkCanonCooldown : NetworkCanonAction
         SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
         Context.RpcSetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
 
-        if (CheckDelivery())
+        /*if (CheckDelivery())
         {
             return;
-        }
+        }*/
         CheckTimer();
 
     }
@@ -380,6 +565,9 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
     public override void OnEnter()
     {
         base.OnEnter();
+
+        Context.Info.State = CanonState.Aiming;
+
         Timer = 0;
         PlayerLocked = false;
 
@@ -390,7 +578,7 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
     {
         base.Update();
 
-        if (CheckDelivery())
+        /*if (CheckDelivery())
         {
             NetworkServer.UnSpawn(Context.Info.Bomb);
             GameObject.Destroy(Context.Info.Bomb);
@@ -399,7 +587,7 @@ public class NetworkCanonFiring_Normal : NetworkCanonAction // Lock and follow p
             GameObject.Destroy(Context.Info.Mark);
 
             return;
-        }
+        }*/
 
         if (PlayerLocked)
         {
@@ -467,7 +655,7 @@ public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follow
         AimingSetCanon();
         MarkFollow(false);
 
-        if (CheckDelivery())
+        /*if (CheckDelivery())
         {
             NetworkServer.UnSpawn(Context.Info.Bomb);
             GameObject.Destroy(Context.Info.Bomb);
@@ -476,7 +664,7 @@ public class NetworkCanonFiring_Alert : NetworkCanonAction // Purple mark follow
             GameObject.Destroy(Context.Info.Mark);
 
             return;
-        }
+        }*/
         CheckTimer();
     }
 
@@ -503,10 +691,11 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
     public override void OnEnter()
     {
         base.OnEnter();
+
+        Context.Info.State = CanonState.Firing;
+
         Timer = 0;
         InfoGot = false;
-
-        
 
         GetBombFlyInfo();
 
@@ -547,10 +736,10 @@ public class NetworkCanonFiring_Fall : NetworkCanonAction // Shoot ammo
         {
             BombFall();
 
-            if (CheckDelivery())
+            /*if (CheckDelivery())
             {
                 return;
-            }
+            }*/
 
             TransitionTo<NetworkCanonCooldown>();
         }
@@ -651,6 +840,8 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         public float CurrentPercentage;
         public float CurrentAngle;
 
+        public CanonState State;
+
         public CanonSide CurrentSide;
         public CanonSide LastSide;
         public float Timer;
@@ -713,6 +904,8 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
 
     public GameObject CameraFocus;
 
+    public GameObject Wrap;
+
     public GameObject Team1Cabel;
     public GameObject Team2Cabel;
 
@@ -732,7 +925,8 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     public BagelSent DeliveryEvent;
     private GameObject Bagel;
 
-    private FSM<NetworkBrawlModeReforgedArenaManager> CanonFSM;
+    public FSM<NetworkBrawlModeReforgedArenaManager> CanonFSM;
+    public FSM<NetworkBrawlModeReforgedArenaManager> CabelFSM;
 
     // Start is called before the first frame update
     void Start()
@@ -741,6 +935,9 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
 
         CanonFSM = new FSM<NetworkBrawlModeReforgedArenaManager>(this);
         CanonFSM.TransitionTo<NetworkCanonIdle>();
+
+        CabelFSM = new FSM<NetworkBrawlModeReforgedArenaManager>(this);
+        CabelFSM.TransitionTo<NetworkCabelIdle>();
 
         if (Players.transform.childCount <= 2)
         {
@@ -754,7 +951,12 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         Team1Basket = Basket1;
         Team2Basket = Basket2;
 
+        SetWrap();
 
+        if (isServer)
+        {
+            RpcSetWrap();
+        }
 
         if (isServer)
         {
@@ -782,6 +984,7 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
         }
 
         CanonFSM.Update();
+        CabelFSM.Update();
     }
 
 
@@ -794,10 +997,14 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
 
         if (Manager.TeamAScore - Manager.TeamBScore >= Data.DeliveryPoint)
         {
+            float Ran = Random.Range(0f, 1f);
+            Pos = Vector3.Lerp(Data.BagelGenerationPos, Data.BagelGenerationPosRight, Ran);
             Pos = Data.BagelGenerationPosRight;
         }
         else if (Manager.TeamBScore - Manager.TeamAScore >= Data.DeliveryPoint)
         {
+            float Ran = Random.Range(0f, 1f);
+            Pos = Vector3.Lerp(Data.BagelGenerationPos, Data.BagelGenerationPosLeft, Ran);
             Pos = Data.BagelGenerationPosLeft;
         }
 
@@ -864,6 +1071,11 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     [ClientRpc]
     public void RpcSetCanon(float TargetPercentage, float TargetAngle, float PercentageFollowSpeed)
     {
+        if(Info == null)
+        {
+            return;
+        }
+
         Info.CurrentPercentage = Mathf.Lerp(Info.CurrentPercentage, TargetPercentage, PercentageFollowSpeed * Time.deltaTime);
         if (Mathf.Abs(Info.CurrentPercentage - TargetPercentage) <= FeelData.PercentageIgnoreError)
         {
@@ -1002,5 +1214,44 @@ public class NetworkBrawlModeReforgedArenaManager : NetworkBehaviour
     public void RpcGetImpact(GameObject Player, Vector3 Offset)
     {
         Player.GetComponent<IHittableNetwork>().OnImpact(Data.CanonPower * Offset.normalized, ForceMode.Impulse, Player, ImpactType.BazookaGun);
+    }
+
+    public void SetWrap()
+    {
+        Material mat = FeelData.WrapNMat;
+        switch (Info.CurrentSide)
+        {
+            case CanonSide.Neutral:
+                mat = FeelData.WrapNMat;
+                break;
+            case CanonSide.Red:
+                mat = FeelData.WrapRedMat;
+                break;
+            case CanonSide.Blue:
+                mat = FeelData.WrapBlueMat;
+                break;
+        }
+
+        Wrap.GetComponent<MeshRenderer>().material = mat;
+    }
+
+    [ClientRpc]
+    public void RpcSetWrap()
+    {
+        Material mat = FeelData.WrapNMat;
+        switch (Info.CurrentSide)
+        {
+            case CanonSide.Neutral:
+                mat = FeelData.WrapNMat;
+                break;
+            case CanonSide.Red:
+                mat = FeelData.WrapRedMat;
+                break;
+            case CanonSide.Blue:
+                mat = FeelData.WrapBlueMat;
+                break;
+        }
+
+        Wrap.GetComponent<MeshRenderer>().material = mat;
     }
 }

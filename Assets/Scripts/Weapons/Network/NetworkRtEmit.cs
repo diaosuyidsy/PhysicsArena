@@ -13,8 +13,6 @@ public class NetworkRtEmit : NetworkWeaponBase
     public override float HelpAimDistance { get { return _waterGunData.HelpAimDistance; } }
     private WaterGunData _waterGunData;
     private float _shootCD = 0f;
-    [SyncVar(hook = nameof(OnChangeWaterSpeed))]
-    private float _waterSpeed = 0f;
     private enum State
     {
         Empty,
@@ -22,6 +20,7 @@ public class NetworkRtEmit : NetworkWeaponBase
     }
     [SyncVar]
     private State _waterGunState;
+    private HashSet<GameObject> _shootTargets;
 
     protected override void Awake()
     {
@@ -29,6 +28,7 @@ public class NetworkRtEmit : NetworkWeaponBase
         _waterGunData = WeaponDataBase as WaterGunData;
         _waterGunState = State.Empty;
         _ammo = _waterGunData.MaxAmmo;
+        _shootTargets = new HashSet<GameObject>();
     }
 
     protected override void Update()
@@ -41,7 +41,6 @@ public class NetworkRtEmit : NetworkWeaponBase
                 if (_shootCD >= _waterGunData.ShootMaxCD)
                 {
                     _shootCD = 0f;
-                    _waterSpeed = 0f;
                     WaterGunLine.OnFire(false);
                     _waterGunState = State.Empty;
                     return;
@@ -69,7 +68,7 @@ public class NetworkRtEmit : NetworkWeaponBase
         if (buttondown)
         {
             _waterGunState = State.Shooting;
-            _waterSpeed = _waterGunData.Speed;
+            _shootTargets.Clear();
             RpcOnFire();
             WaterGunLine.OnFire(true);
             GunUI.SetActive(true);
@@ -83,6 +82,7 @@ public class NetworkRtEmit : NetworkWeaponBase
     {
         // Backfire just to keep the speed 0
         WaterGunLine.OnFire(true);
+        _shootTargets.Clear();
         GunUI.SetActive(true);
         Owner.GetComponent<IHittableNetwork>().OnImpact(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.VelocityChange, Owner, ImpactType.WaterGun);
         EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
@@ -103,21 +103,20 @@ public class NetworkRtEmit : NetworkWeaponBase
             }
             else if (hit.transform.GetComponentInParent<IHittableNetwork>() != null)
             {
-                target = hit.transform.gameObject;
+                target = hit.transform.GetComponentInParent<IHittableNetwork>().GetGameObject();
             }
             if (target == null) return;
-            if (!target.transform.GetComponentInParent<IHittableNetwork>().CanBlock(Owner.transform.forward))
+            if (_shootTargets.Contains(target)) return;
+            _shootTargets.Add(target);
+            if (!target.GetComponent<IHittableNetwork>().CanBlock(Owner.transform.forward))
             {
-                GameObject receiver = target.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
-                print("Hit");
                 // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
-                CmdHit(receiver, Owner, true);
+                CmdHit(target, Owner, true);
             }
-            else if (target.transform.GetComponentInParent<IHittableNetwork>() != null)
+            else if (target.GetComponent<IHittableNetwork>() != null)
             {
-                GameObject receiver = target.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
                 // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, false);
-                CmdHit(receiver, Owner, false);
+                CmdHit(target, Owner, false);
             }
         }
     }
@@ -131,11 +130,9 @@ public class NetworkRtEmit : NetworkWeaponBase
     protected override void _onWeaponDespawn()
     {
         _shootCD = 0f;
-        _waterSpeed = 0f;
         _ammo = _waterGunData.MaxAmmo;
         ChangeAmmoUI();
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     public override void OnDrop(bool customForce, Vector3 force)
@@ -151,10 +148,6 @@ public class NetworkRtEmit : NetworkWeaponBase
     {
         WaterGunLine.OnFire(false);
         GunUI.SetActive(false);
-    }
-
-    public void OnChangeWaterSpeed(float oldWaterSpeed, float newWaterSpeed)
-    {
     }
 
     [Command]

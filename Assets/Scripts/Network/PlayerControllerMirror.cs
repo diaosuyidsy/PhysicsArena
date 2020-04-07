@@ -471,6 +471,10 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
     #endregion
 
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
     public bool CanBeBlockPushed()
     {
         return _actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||

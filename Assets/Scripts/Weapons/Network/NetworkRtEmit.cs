@@ -155,7 +155,7 @@ public class NetworkRtEmit : NetworkWeaponBase
     [TargetRpc]
     private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner, Vector3 force)
     {
-        receiver.GetComponent<IHittableNetwork>().OnImpact(_waterGunData.WaterForce * owner.transform.forward,
+        receiver.GetComponent<IHittableNetwork>().OnImpact(force,
         ForceMode.VelocityChange,
         owner,
         ImpactType.WaterGun);

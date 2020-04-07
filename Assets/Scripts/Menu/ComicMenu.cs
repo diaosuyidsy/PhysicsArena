@@ -33,6 +33,7 @@ public class ComicMenu : MonoBehaviour
     public string SelectedMapName = "BrawlModeReforged";
     public GameObject LoadingPageLoop1;
     public GameObject LoadingPageLoop2;
+    public GameObject LoadingPageLoop3;
     private PlayerInformation _finalPlayerInformation;
     private Transform[] _eggs;
     private Transform[] _chickens;
@@ -1180,14 +1181,29 @@ public class ComicMenu : MonoBehaviour
     {
         private float _travelDistance;
         private GameObject _upperLoop;
+        private GameObject _middleLoop;
         private GameObject _lowerLoop;
+        private int _backgroundIndex;
+        private int _characterIndex;
         public override void OnEnter()
         {
             base.OnEnter();
             Context.StartCoroutine(_loadScene());
-            _upperLoop = Context.LoadingPageLoop2;
+            _upperLoop = Context.LoadingPageLoop3;
+            _middleLoop = Context.LoadingPageLoop2;
             _lowerLoop = Context.LoadingPageLoop1;
+            _switchRandomBackground(_lowerLoop);
+            _switchRandomBackground(_middleLoop);
+            _switchRandomBackground(_upperLoop);
             _travelDistance = 0f;
+        }
+
+        private void _switchRandomBackground(GameObject loop)
+        {
+            loop.transform.GetChild(1).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopBackGroundSpritePool[_backgroundIndex];
+            loop.transform.GetChild(2).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopCharacterSpritePool[Context._finalPlayerInformation.ColorIndex[_characterIndex]];
+            _backgroundIndex = (_backgroundIndex + 1) % _MenuData.LoopBackGroundSpritePool.Length;
+            _characterIndex = (_characterIndex + 1) % Context._finalPlayerInformation.ColorIndex.Length;
         }
 
         public override void Update()
@@ -1196,14 +1212,17 @@ public class ComicMenu : MonoBehaviour
             _travelDistance += Time.deltaTime * _MenuData.LoopScrollSpeed;
             Context.LoadingPageLoop1.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
             Context.LoadingPageLoop2.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop3.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
             if (_travelDistance >= _MenuData.MaxScrollDistance)
             {
                 _travelDistance = 0f;
-                _upperLoop.transform.localPosition = Vector3.zero;
-                _lowerLoop.transform.localPosition = new Vector3(0f, _MenuData.MaxScrollDistance, 0f);
-                GameObject temp = _upperLoop;
-                _upperLoop = _lowerLoop;
-                _lowerLoop = temp;
+                _middleLoop.transform.localPosition = Vector3.zero;
+                _lowerLoop.transform.localPosition = new Vector3(0f, _MenuData.MaxScrollDistance * 2f, 0f);
+                _switchRandomBackground(_lowerLoop);
+                GameObject temp = _lowerLoop;
+                _lowerLoop = _middleLoop;
+                _middleLoop = _upperLoop;
+                _upperLoop = temp;
             }
         }
 
@@ -1221,7 +1240,7 @@ public class ComicMenu : MonoBehaviour
                 if (asyncload.progress >= 0.9f && loadingProgress >= 0.8f)
                 {
                     Context.LoadingBarFillImage.fillAmount = 1f;
-                    Context.LoadingTitle.text = "Press A To Continue";
+                    Context.LoadingTitle.text = "Press A To Start";
                     if (_ADown)
                         asyncload.allowSceneActivation = true;
                 }

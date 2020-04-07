@@ -108,6 +108,8 @@ public class ComicMenuData : ScriptableObject
     [Header("Loading Setting")]
     public float LoopScrollSpeed = 1f;
     public float MaxScrollDistance = 14.75f;
+    public Sprite[] LoopBackGroundSpritePool;
+    public Sprite[] LoopCharacterSpritePool;
 }
 
 [Serializable]

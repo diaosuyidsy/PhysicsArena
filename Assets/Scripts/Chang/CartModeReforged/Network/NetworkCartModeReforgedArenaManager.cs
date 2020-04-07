@@ -263,6 +263,13 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
                 Team1SpeedLevel+= CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
                 //Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
 
+                if (Team1SpeedLevel > Data.MaxLevel)
+                {
+                    Team1SpeedLevel = Data.MaxLevel;
+                }
+
+
+
                 RpcGenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, true);
 
                 TargetWayPointIndex++;
@@ -279,6 +286,11 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
             {
                 Team2SpeedLevel += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
                 //Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
+                if (Team2SpeedLevel > Data.MaxLevel)
+                {
+                    Team2SpeedLevel = Data.MaxLevel;
+                }
 
                 RpcGenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, false);
 

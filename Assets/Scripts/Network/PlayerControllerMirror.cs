@@ -1517,6 +1517,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context._animator.SetBool("PunchReleased", true);
             _time = Time.time;
             _hitOnce = false;
+            Context._helpAim(Context.CharacterDataStore.PunchHelpAimAngle, Context.CharacterDataStore.PunchHelpAimDistance);
             if (Context._movementFSM.CurrentState.GetType().Equals(typeof(IdleState)))
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else

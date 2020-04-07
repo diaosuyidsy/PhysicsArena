@@ -31,6 +31,8 @@ public class ComicMenu : MonoBehaviour
     public Image LoadingBarFillImage;
     [HideInInspector]
     public string SelectedMapName = "BrawlModeReforged";
+    public GameObject LoadingPageLoop1;
+    public GameObject LoadingPageLoop2;
     private PlayerInformation _finalPlayerInformation;
     private Transform[] _eggs;
     private Transform[] _chickens;
@@ -1176,11 +1178,33 @@ public class ComicMenu : MonoBehaviour
 
     private class LoadingState : MenuState
     {
-
+        private float _travelDistance;
+        private GameObject _upperLoop;
+        private GameObject _lowerLoop;
         public override void OnEnter()
         {
             base.OnEnter();
             Context.StartCoroutine(_loadScene());
+            _upperLoop = Context.LoadingPageLoop2;
+            _lowerLoop = Context.LoadingPageLoop1;
+            _travelDistance = 0f;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            _travelDistance += Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop1.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop2.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            if (_travelDistance >= _MenuData.MaxScrollDistance)
+            {
+                _travelDistance = 0f;
+                _upperLoop.transform.localPosition = Vector3.zero;
+                _lowerLoop.transform.localPosition = new Vector3(0f, _MenuData.MaxScrollDistance, 0f);
+                GameObject temp = _upperLoop;
+                _upperLoop = _lowerLoop;
+                _lowerLoop = temp;
+            }
         }
 
         IEnumerator _loadScene()

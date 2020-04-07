@@ -105,6 +105,9 @@ public class ComicMenuData : ScriptableObject
     public Vector3Ease CharacterSelectionToLoadingPageMovementEase1;
     public Vector3Ease CharacterSelectionToLoadingPageMovementEase2;
     public Vector3Ease CharacterSelectionToLoadingPageRotationEase1;
+    [Header("Loading Setting")]
+    public float LoopScrollSpeed = 1f;
+    public float MaxScrollDistance = 14.75f;
 }
 
 [Serializable]

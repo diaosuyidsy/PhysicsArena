@@ -71,6 +71,33 @@ public class NetworkRtHook : NetworkWeaponBase
         }
     }
 
+    public override void OnDrop(bool customForce, Vector3 force)
+    {
+        base.OnDrop(customForce, force);
+        RpcHookGunDrop();
+        if (Hooked != null)
+        {
+            foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.isKinematic = false;
+            }
+            Hooked = null;
+        }
+    }
+
+    [ClientRpc]
+    private void RpcHookGunDrop()
+    {
+        if (Hooked != null)
+        {
+            foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+            {
+                rb.isKinematic = false;
+            }
+            Hooked = null;
+        }
+    }
+
     [ClientRpc]
     private void RpcFire(bool buttondown)
     {

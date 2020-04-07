@@ -113,12 +113,7 @@ public class NetworkRtEmit : NetworkWeaponBase
             {
                 // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
                 print("Here");
-                CmdHit(target, Owner, true);
-            }
-            else if (target.GetComponent<IHittableNetwork>() != null)
-            {
-                // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, false);
-                CmdHit(target, Owner, false);
+                CmdHit(target, Owner, _waterGunData.WaterForce * Owner.transform.forward);
             }
         }
     }
@@ -153,20 +148,17 @@ public class NetworkRtEmit : NetworkWeaponBase
     }
 
     [Command]
-    private void CmdHit(GameObject receiver, GameObject owner, bool withForce)
+    private void CmdHit(GameObject receiver, GameObject owner, Vector3 force)
     {
-        TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, owner, withForce);
+        TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, owner, force);
     }
 
     [TargetRpc]
-    private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner, bool withForce)
+    private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner, Vector3 force)
     {
-        if (withForce)
-            receiver.GetComponent<IHittableNetwork>().OnImpact(_waterGunData.WaterForce * owner.transform.forward,
-            ForceMode.VelocityChange,
-            owner,
-            ImpactType.WaterGun);
-        else
-            receiver.GetComponent<IHittableNetwork>().OnImpact(owner, ImpactType.WaterGun);
+        receiver.GetComponent<IHittableNetwork>().OnImpact(_waterGunData.WaterForce * owner.transform.forward,
+        ForceMode.VelocityChange,
+        owner,
+        ImpactType.WaterGun);
     }
 }

@@ -107,13 +107,12 @@ public class NetworkRtEmit : NetworkWeaponBase
             }
             if (target == null) return;
             if (_shootTargets.Contains(target)) return;
-            print("Hit : " + target.name);
             _shootTargets.Add(target);
             if (!target.GetComponent<IHittableNetwork>().CanBlock(Owner.transform.forward))
             {
                 // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
-                print("Here");
-                CmdHit(target, Owner, _waterGunData.WaterForce * Owner.transform.forward);
+                Vector3 force = _waterGunData.WaterForce * Owner.transform.forward;
+                CmdHit(target, Owner, force);
             }
         }
     }

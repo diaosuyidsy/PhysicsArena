@@ -65,7 +65,7 @@ public class NetworkRtEmit : NetworkWeaponBase
     public override void Fire(bool buttondown)
     {
         /// means we pressed down button here
-        if (buttondown)
+        if (buttondown && _waterGunState == State.Empty)
         {
             _waterGunState = State.Shooting;
             _shootTargets.Clear();
@@ -107,6 +107,7 @@ public class NetworkRtEmit : NetworkWeaponBase
             }
             if (target == null) return;
             if (_shootTargets.Contains(target)) return;
+            print("Hit");
             _shootTargets.Add(target);
             if (!target.GetComponent<IHittableNetwork>().CanBlock(Owner.transform.forward))
             {

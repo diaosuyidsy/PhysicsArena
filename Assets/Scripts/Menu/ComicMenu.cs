@@ -1137,6 +1137,7 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context.LoadingPageLoop1.transform.GetChild(2).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopCharacterSpritePool[Context._finalPlayerInformation.ColorIndex[0]];
             Sequence sequence = DOTween.Sequence();
             Context.SceneCamera.enabled = false;
             sequence.AppendInterval(_MenuData.CharacterSelectionToLoadingPauseDuration);
@@ -1228,7 +1229,14 @@ public class ComicMenu : MonoBehaviour
 
         IEnumerator _loadScene()
         {
-            yield return 5f;
+            yield return null;
+            float elapsedTime = 0f;
+            while (elapsedTime < 3f)
+            {
+                elapsedTime += Time.deltaTime;
+                Context.LoadingBarFillImage.fillAmount = elapsedTime / 6f;
+                yield return null;
+            }
             float loadingProgress = 0f;
             AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.SelectedMapName);
             asyncload.allowSceneActivation = false;
@@ -1246,7 +1254,8 @@ public class ComicMenu : MonoBehaviour
                 }
                 else
                 {
-                    Context.LoadingBarFillImage.fillAmount = loadingProgress;
+                    if (loadingProgress > 0.5f)
+                        Context.LoadingBarFillImage.fillAmount = loadingProgress;
                 }
                 yield return null;
             }

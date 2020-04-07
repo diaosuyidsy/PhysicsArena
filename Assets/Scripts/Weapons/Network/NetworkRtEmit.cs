@@ -107,11 +107,12 @@ public class NetworkRtEmit : NetworkWeaponBase
             }
             if (target == null) return;
             if (_shootTargets.Contains(target)) return;
-            print("Hit");
+            print("Hit : " + target.name);
             _shootTargets.Add(target);
             if (!target.GetComponent<IHittableNetwork>().CanBlock(Owner.transform.forward))
             {
                 // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
+                print("Here");
                 CmdHit(target, Owner, true);
             }
             else if (target.GetComponent<IHittableNetwork>() != null)

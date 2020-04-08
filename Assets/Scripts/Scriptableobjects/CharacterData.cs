@@ -8,6 +8,9 @@ public class CharacterData : ScriptableObject
 {
     [Header("Character Movement Related Settings")]
     public float WalkSpeed = 2f;
+    public float SlowWalkSpeed = 3f;
+    [Range(0f, 1f)]
+    public float SlowWalkCutoffControllerAxisValue = 0.6f;
     public float MaxVelocityChange = 10f;
     public float InAirSpeedMultiplier = 0.5f;
     public float FacingCliffMultiplier = 0.3f;

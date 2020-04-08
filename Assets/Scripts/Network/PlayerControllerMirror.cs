@@ -941,6 +941,16 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private class RunState : ControllableMovementState
     {
         private float _runTowardsCliffTime;
+        private float _moveSpeed
+        {
+            get
+            {
+                if (Mathf.Sqrt(_HLAxis * _HLAxis + _VLAxis * _VLAxis) > Context.CharacterDataStore.SlowWalkCutoffControllerAxisValue)
+                    return Context.CharacterDataStore.WalkSpeed;
+                else
+                    return Context.CharacterDataStore.SlowWalkSpeed;
+            }
+        }
         public override void OnEnter()
         {
             base.OnEnter();
@@ -967,7 +977,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             base.FixedUpdate();
             bool isonground = Context._isGrounded();
-            Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context._walkSpeed;
+            Vector3 targetVelocity = Context.transform.forward * _moveSpeed * Context._walkSpeed;
             Vector3 velocityChange = targetVelocity - Context._rb.velocity;
             velocityChange.x = Mathf.Clamp(velocityChange.x, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
             velocityChange.z = Mathf.Clamp(velocityChange.z, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);

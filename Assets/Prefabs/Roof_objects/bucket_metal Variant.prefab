@@ -1,19 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!64 &4917259217519131318
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 217055932386603263}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: -940797229530353218, guid: d5c53a191fbe2b14e89481ed58864a2c, type: 3}
 --- !u!54 &4092800039868351049
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -30,6 +16,20 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!136 &6955813447236373848
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 217055932386603263}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.00263289
+  m_Height: 0.0070745335
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &8080247378894137846
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -42,6 +42,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: bucket_metal Variant
       objectReference: {fileID: 0}
+    - target: {fileID: -1504981713932161579, guid: d5c53a191fbe2b14e89481ed58864a2c,
+        type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 62b7e1f02c2c62c48a42da1f3cffc991, type: 2}
     - target: {fileID: -4216859302048453862, guid: d5c53a191fbe2b14e89481ed58864a2c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -112,11 +117,6 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 70
       objectReference: {fileID: 0}
-    - target: {fileID: -1504981713932161579, guid: d5c53a191fbe2b14e89481ed58864a2c,
-        type: 3}
-      propertyPath: m_Materials.Array.data[0]
-      value: 
-      objectReference: {fileID: 2100000, guid: 62b7e1f02c2c62c48a42da1f3cffc991, type: 2}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d5c53a191fbe2b14e89481ed58864a2c, type: 3}
 --- !u!1 &217055932386603263 stripped

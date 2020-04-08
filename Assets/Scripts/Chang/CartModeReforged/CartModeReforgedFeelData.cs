@@ -24,6 +24,10 @@ public class CartModeReforgedFeelData : MonoBehaviour
     public float ExpTextStayTime;
     public float TextDefaultScale;
     public float TextHopScale;
+
+    public float DefaultLevelTextScale;
+    public float BiggerLevelTextScale;
+    public float LargestLevelTextScale;
     // Start is called before the first frame update
     void Start()
     {

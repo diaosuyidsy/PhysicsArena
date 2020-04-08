@@ -260,7 +260,15 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
 
             if (CurrentSide == CartSide.Team1)
             {
-                Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                Team1SpeedLevel+= CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                //Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
+                if (Team1SpeedLevel > Data.MaxLevel)
+                {
+                    Team1SpeedLevel = Data.MaxLevel;
+                }
+
+
 
                 RpcGenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, true);
 
@@ -276,7 +284,13 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
             }
             else
             {
-                Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                Team2SpeedLevel += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                //Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
+                if (Team2SpeedLevel > Data.MaxLevel)
+                {
+                    Team2SpeedLevel = Data.MaxLevel;
+                }
 
                 RpcGenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, false);
 
@@ -419,11 +433,35 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
     private void SetTeam1SpeedLevel(int oldValue,int newValue)
     {
         Team1SpeedLevelText.GetComponent<TextMeshProUGUI>().text = newValue.ToString();
+        if (Team1SpeedLevel < 5)
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.DefaultLevelTextScale * Vector3.one;
+        }
+        else if (Team1SpeedLevel < 10)
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.BiggerLevelTextScale * Vector3.one;
+        }
+        else
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.LargestLevelTextScale * Vector3.one;
+        }
     }
 
     private void SetTeam2SpeedLevel(int oldValue,int newValue)
     {
         Team2SpeedLevelText.GetComponent<TextMeshProUGUI>().text = newValue.ToString();
+        if (Team2SpeedLevel < 5)
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.DefaultLevelTextScale * Vector3.one;
+        }
+        else if (Team2SpeedLevel < 10)
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.BiggerLevelTextScale * Vector3.one;
+        }
+        else
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.LargestLevelTextScale * Vector3.one;
+        }
     }
 
     private void SetTeam1SpeedLevelPlus(int oldValue, int newValue)

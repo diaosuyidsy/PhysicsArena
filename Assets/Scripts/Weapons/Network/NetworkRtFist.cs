@@ -180,7 +180,8 @@ public class NetworkRtFist : NetworkWeaponBase
     [TargetRpc]
     private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner)
     {
-        receiver.GetComponent<IHittableNetwork>().OnImpact(-_fistDup.transform.right * _fistGunData.FistHitForce, ForceMode.Impulse, owner, ImpactType.FistGun);
+        Vector3 forceDir = (receiver.transform.position - owner.transform.position).normalized;
+        receiver.GetComponent<IHittableNetwork>().OnImpact(forceDir * _fistGunData.FistHitForce, ForceMode.Impulse, owner, ImpactType.FistGun);
     }
 
     [ClientRpc]

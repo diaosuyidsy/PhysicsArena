@@ -248,7 +248,13 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
             if(CurrentSide == CartSide.Team1)
             {
-                Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                Team1SpeedLevel += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                //Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
+                if (Team1SpeedLevel > Data.MaxLevel)
+                {
+                    Team1SpeedLevel = Data.MaxLevel;
+                }
 
                 GenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, true);
 
@@ -264,7 +270,13 @@ public class CartModeReforgedArenaManager : MonoBehaviour
             }
             else
             {
-                Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                Team2SpeedLevel += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                //Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
+                if (Team2SpeedLevel > Data.MaxLevel)
+                {
+                    Team2SpeedLevel = Data.MaxLevel;
+                }
 
                 GenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, false);
 
@@ -406,6 +418,33 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
         Team1SpeedLevelPlusText.GetComponent<TextMeshProUGUI>().text = "+" + Team1SpeedLevelPlus.ToString();
         Team2SpeedLevelPlusText.GetComponent<TextMeshProUGUI>().text = "+" + Team2SpeedLevelPlus.ToString();
+
+        if(Team1SpeedLevel < 5)
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.DefaultLevelTextScale * Vector3.one;
+        }
+        else if(Team1SpeedLevel < 10)
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.BiggerLevelTextScale* Vector3.one;
+        }
+        else
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.LargestLevelTextScale * Vector3.one;
+        }
+
+        if (Team2SpeedLevel < 5)
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.DefaultLevelTextScale * Vector3.one;
+        }
+        else if (Team2SpeedLevel < 10)
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.BiggerLevelTextScale * Vector3.one;
+        }
+        else
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.LargestLevelTextScale * Vector3.one;
+        }
+
     }
 
    

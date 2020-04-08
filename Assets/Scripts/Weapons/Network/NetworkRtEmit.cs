@@ -6,23 +6,21 @@ using Mirror;
 
 public class NetworkRtEmit : NetworkWeaponBase
 {
-    public ObiEmitter WaterBall;
-    public ObiParticleRenderer ParticleRenderer;
+    public WaterGunLine WaterGunLine;
     public GameObject WaterUI;
     public GameObject GunUI;
     public override float HelpAimAngle { get { return _waterGunData.HelpAimAngle; } }
     public override float HelpAimDistance { get { return _waterGunData.HelpAimDistance; } }
     private WaterGunData _waterGunData;
     private float _shootCD = 0f;
-    [SyncVar(hook = nameof(OnChangeWaterSpeed))]
-    private float _waterSpeed = 0f;
     private enum State
     {
         Empty,
         Shooting,
     }
-
+    [SyncVar]
     private State _waterGunState;
+    private HashSet<GameObject> _shootTargets;
 
     protected override void Awake()
     {
@@ -30,6 +28,7 @@ public class NetworkRtEmit : NetworkWeaponBase
         _waterGunData = WeaponDataBase as WaterGunData;
         _waterGunState = State.Empty;
         _ammo = _waterGunData.MaxAmmo;
+        _shootTargets = new HashSet<GameObject>();
     }
 
     protected override void Update()
@@ -41,14 +40,20 @@ public class NetworkRtEmit : NetworkWeaponBase
                 _shootCD += Time.deltaTime;
                 if (_shootCD >= _waterGunData.ShootMaxCD)
                 {
-                    _waterSpeed = 0f;
-                    WaterBall.speed = 0f;
+                    _shootCD = 0f;
+                    WaterGunLine.OnFire(false);
                     _waterGunState = State.Empty;
                     return;
                 }
+                if (_ownerIsLocalPlayer)
+                {
+                    _detectPlayer();
+                }
                 // Statistics: Here we are using raycast for players hit
-                _detectPlayer();
-                _onWeaponUsedOnce();
+                if (isServer)
+                {
+                    _onWeaponUsedOnce();
+                }
                 // If we changed ammo, then need to change UI as well
                 ChangeAmmoUI();
                 break;
@@ -60,41 +65,54 @@ public class NetworkRtEmit : NetworkWeaponBase
     public override void Fire(bool buttondown)
     {
         /// means we pressed down button here
-        if (buttondown)
+        if (buttondown && _waterGunState == State.Empty)
         {
             _waterGunState = State.Shooting;
+            _shootTargets.Clear();
+            RpcOnFire();
+            WaterGunLine.OnFire(true);
             GunUI.SetActive(true);
-            WaterBall.speed = _waterGunData.Speed;
-            _waterSpeed = _waterGunData.Speed;
-            Owner.GetComponent<Rigidbody>().AddForce(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.Impulse);
+            Owner.GetComponent<IHittableNetwork>().OnImpact(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.VelocityChange, Owner, ImpactType.WaterGun);
             EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
         }
-        else
-        {
-            _waterGunState = State.Empty;
-            WaterBall.speed = 0f;
-            _waterSpeed = 0f;
-            _shootCD = 0f;
-        }
+    }
+
+    [ClientRpc]
+    private void RpcOnFire()
+    {
+        // Backfire just to keep the speed 0
+        WaterGunLine.OnFire(true);
+        _shootTargets.Clear();
+        GunUI.SetActive(true);
+        Owner.GetComponent<IHittableNetwork>().OnImpact(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.VelocityChange, Owner, ImpactType.WaterGun);
+        EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber));
+
     }
 
     private void _detectPlayer()
     {
         // This layermask means we are only looking for Player1Body - Player6Body
-        LayerMask layermask = NetworkServices.Config.ConfigData.AllPlayerLayer;
+        LayerMask layermask = NetworkServices.Config.ConfigData.AllPlayerLayer ^ (1 << Owner.layer);
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
+        if (Physics.SphereCast(transform.position - Owner.transform.forward * _waterGunData.WaterBackCastDistance, _waterGunData.WaterCastRadius, Owner.transform.forward, out hit, _waterGunData.WaterCastDistance, layermask))
         {
-            if (hit.transform.GetComponentInParent<IHittableNetwork>() != null &&
-                !hit.transform.GetComponentInParent<IHittableNetwork>().CanBlock(Owner.transform.forward))
+            GameObject target = null;
+            if (hit.transform.GetComponentInParent<NetworkWeaponBase>() != null)
             {
-                GameObject receiver = hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
-                TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
+                target = hit.transform.GetComponentInParent<NetworkWeaponBase>().Owner;
             }
             else if (hit.transform.GetComponentInParent<IHittableNetwork>() != null)
             {
-                GameObject receiver = hit.transform.GetComponentInParent<PlayerControllerMirror>().gameObject;
-                TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
+                target = hit.transform.GetComponentInParent<IHittableNetwork>().GetGameObject();
+            }
+            if (target == null) return;
+            if (_shootTargets.Contains(target)) return;
+            _shootTargets.Add(target);
+            if (!target.GetComponent<IHittableNetwork>().CanBlock(Owner.transform.forward))
+            {
+                // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
+                Vector3 force = _waterGunData.WaterForce * Owner.transform.forward;
+                CmdHit(target, Owner, force);
             }
         }
     }
@@ -108,35 +126,38 @@ public class NetworkRtEmit : NetworkWeaponBase
     protected override void _onWeaponDespawn()
     {
         _shootCD = 0f;
-        WaterBall.speed = 0f;
-        _waterSpeed = 0f;
         _ammo = _waterGunData.MaxAmmo;
         ChangeAmmoUI();
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
-    public override void OnDrop()
+    public override void OnDrop(bool customForce, Vector3 force)
     {
-        base.OnDrop();
-        Fire(false);
+        base.OnDrop(customForce, force);
+        WaterGunLine.OnFire(false);
+        GunUI.SetActive(false);
+        RpcOnDrop();
+    }
+
+    [ClientRpc]
+    private void RpcOnDrop()
+    {
+        WaterGunLine.OnFire(false);
         GunUI.SetActive(false);
     }
 
-    public void OnChangeWaterSpeed(float oldWaterSpeed, float newWaterSpeed)
+    [Command]
+    private void CmdHit(GameObject receiver, GameObject owner, Vector3 force)
     {
-        WaterBall.speed = newWaterSpeed;
+        TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, owner, force);
     }
 
     [TargetRpc]
-    private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner, bool withForce)
+    private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner, Vector3 force)
     {
-        if (withForce)
-            receiver.GetComponent<IHittableNetwork>().OnImpact(_waterGunData.WaterForce * owner.transform.forward,
-            ForceMode.VelocityChange,
-            owner,
-            ImpactType.WaterGun);
-        else
-            receiver.GetComponent<IHittableNetwork>().OnImpact(owner, ImpactType.WaterGun);
+        receiver.GetComponent<IHittableNetwork>().OnImpact(force,
+        ForceMode.VelocityChange,
+        owner,
+        ImpactType.WaterGun);
     }
 }

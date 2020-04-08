@@ -436,6 +436,7 @@ public interface IHittable
 
 public interface IHittableNetwork
 {
+    GameObject GetGameObject();
     /// <summary>
     /// Can Block The attack or not
     /// </summary>

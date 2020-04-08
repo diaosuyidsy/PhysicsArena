@@ -31,6 +31,9 @@ public class ComicMenu : MonoBehaviour
     public Image LoadingBarFillImage;
     [HideInInspector]
     public string SelectedMapName = "BrawlModeReforged";
+    public GameObject LoadingPageLoop1;
+    public GameObject LoadingPageLoop2;
+    public GameObject LoadingPageLoop3;
     private PlayerInformation _finalPlayerInformation;
     private Transform[] _eggs;
     private Transform[] _chickens;
@@ -1134,6 +1137,7 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context.LoadingPageLoop1.transform.GetChild(2).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopCharacterSpritePool[Context._finalPlayerInformation.ColorIndex[0]];
             Sequence sequence = DOTween.Sequence();
             Context.SceneCamera.enabled = false;
             sequence.AppendInterval(_MenuData.CharacterSelectionToLoadingPauseDuration);
@@ -1176,16 +1180,65 @@ public class ComicMenu : MonoBehaviour
 
     private class LoadingState : MenuState
     {
-
+        private float _travelDistance;
+        private GameObject _upperLoop;
+        private GameObject _middleLoop;
+        private GameObject _lowerLoop;
+        private int _backgroundIndex;
+        private int _characterIndex;
         public override void OnEnter()
         {
             base.OnEnter();
             Context.StartCoroutine(_loadScene());
+            _upperLoop = Context.LoadingPageLoop3;
+            _middleLoop = Context.LoadingPageLoop2;
+            _lowerLoop = Context.LoadingPageLoop1;
+            _switchRandomBackground(_lowerLoop);
+            _switchRandomBackground(_middleLoop);
+            _switchRandomBackground(_upperLoop);
+            _travelDistance = 0f;
+        }
+
+        private void _switchRandomBackground(GameObject loop)
+        {
+            loop.transform.GetChild(1).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopBackGroundSpritePool[_backgroundIndex];
+            loop.transform.GetChild(2).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopCharacterSpritePool[Context._finalPlayerInformation.ColorIndex[_characterIndex]];
+            _backgroundIndex = (_backgroundIndex + 1) % _MenuData.LoopBackGroundSpritePool.Length;
+            _characterIndex = (_characterIndex + 1) % Context._finalPlayerInformation.ColorIndex.Length;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            _travelDistance += Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop1.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop2.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop3.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            if (_travelDistance >= _MenuData.MaxScrollDistance)
+            {
+                _travelDistance = 0f;
+                _middleLoop.transform.localPosition = Vector3.zero;
+                _lowerLoop.transform.localPosition = new Vector3(0f, _MenuData.MaxScrollDistance * 2f, 0f);
+                _switchRandomBackground(_lowerLoop);
+                GameObject temp = _lowerLoop;
+                _lowerLoop = _middleLoop;
+                _middleLoop = _upperLoop;
+                _upperLoop = temp;
+            }
         }
 
         IEnumerator _loadScene()
         {
-            yield return 5f;
+            yield return null;
+            float elapsedTime = 0f;
+            float maxElapsedTime = 4f;
+            float totalTime = 5f;
+            while (elapsedTime < maxElapsedTime)
+            {
+                elapsedTime += Time.deltaTime;
+                Context.LoadingBarFillImage.fillAmount = elapsedTime / totalTime;
+                yield return null;
+            }
             float loadingProgress = 0f;
             AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.SelectedMapName);
             asyncload.allowSceneActivation = false;
@@ -1197,13 +1250,14 @@ public class ComicMenu : MonoBehaviour
                 if (asyncload.progress >= 0.9f && loadingProgress >= 0.8f)
                 {
                     Context.LoadingBarFillImage.fillAmount = 1f;
-                    Context.LoadingTitle.text = "Press A To Continue";
+                    Context.LoadingTitle.text = "Press A To Start";
                     if (_ADown)
                         asyncload.allowSceneActivation = true;
                 }
                 else
                 {
-                    Context.LoadingBarFillImage.fillAmount = loadingProgress;
+                    if (loadingProgress > (maxElapsedTime / totalTime))
+                        Context.LoadingBarFillImage.fillAmount = loadingProgress;
                 }
                 yield return null;
             }

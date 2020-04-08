@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 1378708261716240992}
   - component: {fileID: 7960430533671981142}
   - component: {fileID: 4415119794877689007}
-  - component: {fileID: 5808250084446787156}
   - component: {fileID: 6189945677205704317}
+  - component: {fileID: 3295805525317342026}
   m_Layer: 0
   m_Name: bbq_lower
   m_TagString: Untagged
@@ -79,20 +79,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &5808250084446787156
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2700328003269351539}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: 511771676740774090, guid: de3a12c0c1865864eb20fd3c6ccd8ec4, type: 3}
 --- !u!54 &6189945677205704317
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -109,3 +95,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &3295805525317342026
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2700328003269351539}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.00390437, y: 0.0053082327, z: 0.003603909}
+  m_Center: {x: 0, y: 0, z: -0.000028310078}

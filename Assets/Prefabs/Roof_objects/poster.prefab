@@ -11,8 +11,8 @@ GameObject:
   - component: {fileID: 7356337620651987278}
   - component: {fileID: 1967493217381444472}
   - component: {fileID: 5220087323618252673}
-  - component: {fileID: 4958135738620680998}
   - component: {fileID: 8845768014893230809}
+  - component: {fileID: 6887015795831352574}
   m_Layer: 0
   m_Name: poster
   m_TagString: Untagged
@@ -79,20 +79,6 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!64 &4958135738620680998
-MeshCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5786474403212239709}
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Convex: 0
-  m_CookingOptions: 14
-  m_Mesh: {fileID: -3779129154683797053, guid: b50e6b44c056c3d40a0b6020309424f9, type: 3}
 --- !u!54 &8845768014893230809
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -109,3 +95,16 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
+--- !u!65 &6887015795831352574
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5786474403212239709}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Size: {x: 0.0054720216, y: 0.0000697136, z: 0.0045376616}
+  m_Center: {x: 0, y: 0, z: 0}

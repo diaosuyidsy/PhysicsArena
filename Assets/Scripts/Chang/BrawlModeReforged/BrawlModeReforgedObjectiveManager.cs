@@ -117,7 +117,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             return;
         }
 
-        if (e.Basket.name.Contains ("LForceField"))
+        if (e.Basket==BrawlModeReforgedArenaManager.Team1Basket)
         {
             TeamAScore += 3;
         }

@@ -469,6 +469,44 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             handObject.transform.eulerAngles = eulerAngles;
     }
 
+    [Command]
+    private void CmdStun(GameObject receiver, float stunDuration)
+    {
+        TargetStun(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, stunDuration);
+    }
+
+    [TargetRpc]
+    private void TargetStun(NetworkConnection connection, GameObject receiver, float stunDuration)
+    {
+        receiver.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(stunDuration, 1f));
+    }
+
+    [Command]
+    private void CmdTriggerStun(GameObject target, int playerNumber)
+    {
+        RpcTriggerStun(target, playerNumber);
+    }
+
+    [ClientRpc]
+    private void RpcTriggerStun(GameObject target, int playerNumber)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerStunned(target, playerNumber, Head.transform, 1f));
+    }
+
+    [Command]
+    private void CmdTriggerUnStun(GameObject target, int playerNumber)
+    {
+        RpcTriggerUnStun(target, playerNumber);
+    }
+
+    [ClientRpc]
+    private void RpcTriggerUnStun(GameObject target, int playerNumber)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerUnStunned(target, playerNumber));
+    }
+
+
+
     #endregion
 
     public GameObject GetGameObject()
@@ -504,6 +542,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             CanBlock(sender.transform.forward))
         {
             CmdHit(sender, -force * CharacterDataStore.BlockMultiplier, false, gameObject);
+            // CmdStun(sender, CharacterDataStore.BlockStunDuration);
             // sender.GetComponentInParent<IHittableNetwork>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
         }
         else // Player is hit cause he could not block
@@ -1097,7 +1136,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             base.OnEnter();
             Context._animator.SetBool("IdleDowner", true);
-            EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform, Context._stunTimer - Time.time));
+            // EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform, Context._stunTimer - Time.time));
+            Context.CmdTriggerStun(Context.gameObject, Context.PlayerNumber);
+            Context.CmdTriggerPunchDone(Context.gameObject);
         }
 
         public override void Update()
@@ -1112,7 +1153,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void OnExit()
         {
             base.OnExit();
-            EventManager.Instance.TriggerEvent(new PlayerUnStunned(Context.gameObject, Context.PlayerNumber));
+            Context.CmdTriggerUnStun(Context.gameObject, Context.PlayerNumber);
+            // EventManager.Instance.TriggerEvent(new PlayerUnStunned(Context.gameObject, Context.PlayerNumber));
         }
     }
 
@@ -1622,6 +1664,11 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 TransitionTo<IdleActionState>();
                 return;
             }
+        }
+
+        private void _sweepPush()
+        {
+
         }
     }
 

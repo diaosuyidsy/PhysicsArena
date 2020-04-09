@@ -168,11 +168,17 @@ public class Basket : MonoBehaviour
         {
             if (other.GetComponentInParent<PlayerController>() && SameTeam(other.GetComponentInParent<PlayerController>().gameObject))
             {
-                other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().ForceDropHandObject();
+                if (other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().HandObject.CompareTag("Team2Resource"))
+                {
+                    other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().ForceDropHandObject();
+                }
             }
             else if (other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
             {
-                other.GetComponent<PlayerController>().ForceDropHandObject();
+                if (other.GetComponent<PlayerController>().HandObject.CompareTag("Team2Resource"))
+                {
+                    other.GetComponent<PlayerController>().ForceDropHandObject();
+                }
             }
         }
 

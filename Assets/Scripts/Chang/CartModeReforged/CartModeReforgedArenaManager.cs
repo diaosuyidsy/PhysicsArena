@@ -209,8 +209,9 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
         if (!Occupiable(CheckPointList[TargetWayPointIndex]))
         {
-            OccupyCounter.GetComponent<Image>().fillAmount = 0;
             CurrentState = CartState.Moving;
+
+            CartMove();
             return;
         }
 

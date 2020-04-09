@@ -41,7 +41,7 @@ public class NetworkRtEmit : NetworkWeaponBase
                 if (_shootCD >= _waterGunData.ShootMaxCD)
                 {
                     _shootCD = 0f;
-                    WaterGunLine.OnFire(false);
+                    // WaterGunLine.OnFire(false);
                     _waterGunState = State.Empty;
                     return;
                 }
@@ -92,7 +92,7 @@ public class NetworkRtEmit : NetworkWeaponBase
     private void _detectPlayer()
     {
         // This layermask means we are only looking for Player1Body - Player6Body
-        LayerMask layermask = NetworkServices.Config.ConfigData.AllPlayerLayer ^ (1 << Owner.layer);
+        LayerMask layermask = _waterGunData.WaterCanHitLayer ^ (1 << Owner.layer);
         RaycastHit hit;
         if (Physics.SphereCast(transform.position - Owner.transform.forward * _waterGunData.WaterBackCastDistance, _waterGunData.WaterCastRadius, Owner.transform.forward, out hit, _waterGunData.WaterCastDistance, layermask))
         {

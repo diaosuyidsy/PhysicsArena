@@ -27,6 +27,7 @@ public class CharacterData : ScriptableObject
     public float BlockLingerDuration = 0.2f;
     public float BlockStaminaDrain = 1f;
     public float BlockMultiplier = 2f;
+    public float BlockStunDuration = 1.3f;
     public float BlockAngle = 90f;
     public float BlockSpeedMultiplier = 0.5f;
     public float MinBlockUpTime = 0.3f;

@@ -44,6 +44,22 @@ public class CanonFeelData : MonoBehaviour
     public Material WrapBlueMat;
     public Material WrapNMat;
 
+    public float DeliverFallTime;
+    public float DeliverMoveAcTime;
+    public float DeliverMoveStableTime;
+    public float DeliverMoveDcTime;
+    //public float DeliverEndSpeed;
+    
+
+    public float CabelFirstSegAcTime;
+    public float CabelFirstSegStableTime;
+    public float CabelFirstSegDcTime;
+
+    public float CabelSecondSegTime;
+
+    public float CabelThirdSegAcTime;
+    public float CabelThirdSegStableTime;
+
     public float BombVerticalSpeedPercentage;
 
 

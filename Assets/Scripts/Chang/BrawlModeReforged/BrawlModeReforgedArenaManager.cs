@@ -32,6 +32,47 @@ public abstract class CabelAction : FSM<BrawlModeReforgedArenaManager>.State
         base.OnEnter();
         Debug.Log(this.GetType().Name);
     }
+
+    protected float CountDistance(List<GameObject> Waypoints)
+    {
+        float dis = 0;
+
+        for(int i = 0; i < Waypoints.Count-1; i++)
+        {
+            dis += (Waypoints[i + 1].transform.position - Waypoints[i].transform.position).magnitude;
+        }
+
+        return dis;
+    }
+
+    protected void MoveAlongWaypoints(List<GameObject> Waypoints,ref int TargetWaypoint, ref int CurrentWaypoint,GameObject Cart, float Speed , Vector3 Direction)
+    {
+        if (TargetWaypoint >= Waypoints.Count)
+        {
+            return;
+        }
+
+        Cart.transform.position += Direction * Speed * Time.deltaTime;
+
+        if (Vector3.Dot(Cart.transform.forward, Cart.transform.position - Waypoints[TargetWaypoint].transform.position) > 0)
+        {
+            TargetWaypoint++;
+            CurrentWaypoint++;
+
+            if(TargetWaypoint >= Waypoints.Count)
+            {
+                return;
+            }
+
+            Vector3 Dir = Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position;
+            Vector3 Forward = Dir;
+            Forward.y = 0;
+
+            Cart.transform.forward = Forward.normalized;
+            
+            Cart.transform.position = Dir.normalized * (Cart.transform.position - Waypoints[CurrentWaypoint].transform.position).magnitude + Waypoints[CurrentWaypoint].transform.position;
+        }
+    }
 }
 
 public class CabelIdle : CabelAction
@@ -54,24 +95,486 @@ public class CabelIdle : CabelAction
     {
         if (e.Basket == Context.Basket1)
         {
+            Context.Info.LastSide = Context.Info.CurrentSide;
+            Context.Info.CurrentSide = CanonSide.Red;
+
+            TransitionTo<CabelSwtiching_DeliverMove>();
+
             if (Context.Info.CurrentSide != CanonSide.Red)
             {
-                Context.Info.LastSide = Context.Info.CurrentSide;
-                Context.Info.CurrentSide = CanonSide.Red;
 
-                TransitionTo<CabelSwtiching>();
+
             }
         }
         else
         {
+            Context.Info.LastSide = Context.Info.CurrentSide;
+            Context.Info.CurrentSide = CanonSide.Blue;
+
+            TransitionTo<CabelSwtiching_DeliverMove>();
+
             if (Context.Info.CurrentSide != CanonSide.Blue)
             {
-                Context.Info.LastSide = Context.Info.CurrentSide;
-                Context.Info.CurrentSide = CanonSide.Blue;
 
-                TransitionTo<CabelSwtiching>();
             }
         }
+    }
+}
+
+public class CabelSwtiching_DeliverMove : CabelAction
+{
+    private Vector3 Target;
+    private Vector3 DeliverEnd;
+
+    private Vector3 Dir;
+    private GameObject Cart;
+
+    private float MaxSpeed;
+    private float Ac;
+    private float Dc;
+
+    private float Timer;
+    private float Speed;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        if (Context.Info.CurrentSide == CanonSide.Red)
+        {
+            Target = Context.Team1DeliverEdgePoint;
+            DeliverEnd = Context.Team1DeliverCartPoint;
+            Cart = Context.Team1Cart;
+        }
+        else
+        {
+            Target = Context.Team2DeliverEdgePoint;
+            DeliverEnd = Context.Team2DeliverCartPoint;
+            Cart = Context.Team2Cart;
+        }
+
+        Dir = (Target - Context.Bagel.transform.position).normalized;
+
+        Vector3 Offset = DeliverEnd - Target;
+        Offset.y = 0;
+        float DeliverEndSpeed = Offset.magnitude / Context.FeelData.DeliverFallTime;
+
+        float Dis = (Target - Context.Bagel.transform.position).magnitude;
+        MaxSpeed = Mathf.Abs((Dis - DeliverEndSpeed * Context.FeelData.DeliverMoveDcTime/2) / (Context.FeelData.DeliverMoveStableTime + Context.FeelData.DeliverMoveAcTime / 2 + Context.FeelData.DeliverMoveDcTime / 2));
+        Ac = MaxSpeed / Context.FeelData.DeliverMoveAcTime;
+        Dc = (MaxSpeed - DeliverEndSpeed) / Context.FeelData.DeliverMoveDcTime;
+
+        Timer = 0;
+        Speed = 0;
+
+        if (!Services.GameStateManager.CameraTargets.Contains(Cart.transform))
+        {
+            Services.GameStateManager.CameraTargets.Add(Cart.transform);
+        }
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        Timer += Time.deltaTime;
+        if(Timer <= Context.FeelData.DeliverMoveAcTime)
+        {
+            Speed += Ac * Time.deltaTime;
+        }
+        else if(Timer <= Context.FeelData.DeliverMoveAcTime + Context.FeelData.DeliverMoveStableTime)
+        {
+            Speed = MaxSpeed;
+        }
+        else if(Timer <= Context.FeelData.DeliverMoveAcTime + Context.FeelData.DeliverMoveStableTime + Context.FeelData.DeliverMoveDcTime)
+        {
+            Speed -= Dc * Time.deltaTime;
+        }
+        else
+        {
+            Context.Bagel.transform.position = Target;
+            TransitionTo<CabelSwtiching_DeliverFall>();
+            return;
+        }
+
+        Context.Bagel.transform.position += Dir * Speed * Time.deltaTime;
+
+    }
+
+}
+
+public class CabelSwtiching_DeliverFall : CabelAction
+{
+    private Vector3 Target;
+
+    private Vector3 HoriDir;
+    private float HoriSpeed;
+    private float VerSpeed;
+
+    private float HoriDc;
+    private float VerAc;
+
+    private float MaxVerSpeed;
+    
+    private GameObject Cart;
+
+    private float Timer;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        if (Context.Info.CurrentSide == CanonSide.Red)
+        {
+            Target = Context.Team1DeliverCartPoint;
+            Cart = Context.Team1Cart;
+        }
+        else
+        {
+            Target = Context.Team2DeliverCartPoint;
+            Cart = Context.Team2Cart;
+        }
+
+        HoriDir = Target - Context.Bagel.transform.position;
+        HoriDir.y = 0;
+        HoriDir.Normalize();
+
+        MaxVerSpeed = Mathf.Abs(2 * (Target - Context.Bagel.transform.position).y / Context.FeelData.DeliverFallTime);
+
+        Vector3 Offset = Target - Context.Bagel.transform.position;
+        Offset.y = 0;
+        float DeliverEndSpeed = Offset.magnitude / Context.FeelData.DeliverFallTime;
+
+        HoriDc = DeliverEndSpeed / Context.FeelData.DeliverFallTime;
+        VerAc = MaxVerSpeed/ Context.FeelData.DeliverFallTime;
+
+        HoriSpeed = DeliverEndSpeed;
+        VerSpeed = 0;
+
+        Timer = 0;
+
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        Timer += Time.deltaTime;
+        if(Timer <= Context.FeelData.DeliverFallTime)
+        {
+            HoriSpeed -= HoriDc * Time.deltaTime;
+            VerSpeed += VerAc * Time.deltaTime;
+            Context.Bagel.transform.position += HoriSpeed * HoriDir * Time.deltaTime;
+            Context.Bagel.transform.position += VerSpeed * Vector3.down * Time.deltaTime;
+        }
+        else
+        {
+            Context.Bagel.transform.position = Target;
+            TransitionTo<CabelSwtiching_FirstSegment>();
+        }
+
+    }
+
+    public override void OnExit()
+    {
+        base.OnExit();
+        Context.Bagel.transform.parent = Cart.transform;
+    }
+
+}
+
+public class CabelSwtiching_FirstSegment: CabelAction
+{
+    private List<GameObject> Waypoints;
+    private List<GameObject> SecondSegWaypoints;
+    private GameObject Cart;
+    private Vector3 Start;
+
+    private int TargetWaypoint;
+    private int CurrentWaypoint;
+
+    private float SecondSegSpeed;
+    private float MaxSpeed;
+    private float Ac;
+    private float Dc;
+
+    private float Timer;
+    private float Speed;
+    private float PauseTimer;
+
+    
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        if(Context.Info.CurrentSide == CanonSide.Red)
+        {
+            Waypoints = Context.Team1FirstSegmentWaypoints;
+            SecondSegWaypoints = Context.Team1SecondSegmentWaypoints;
+            Cart = Context.Team1Cart;
+            Start = Context.Team1CartStart;
+        }
+        else
+        {
+            Waypoints = Context.Team2FirstSegmentWaypoints;
+            SecondSegWaypoints = Context.Team2SecondSegmentWaypoints;
+            Cart = Context.Team2Cart;
+            Start = Context.Team2CartStart;
+        }
+
+        Cart.transform.position = Start;
+        TargetWaypoint = 0;
+        CurrentWaypoint = -1;
+
+        float Dis = CountDistance(Waypoints);
+
+        SecondSegSpeed = CountDistance(SecondSegWaypoints) / Context.FeelData.CabelSecondSegTime;
+
+        MaxSpeed = (Dis - SecondSegSpeed * Context.FeelData.CabelFirstSegDcTime / 2) / (Context.FeelData.CabelFirstSegStableTime + Context.FeelData.CabelFirstSegAcTime/2 + Context.FeelData.CabelFirstSegDcTime/2);
+        Ac = MaxSpeed / Context.FeelData.CabelFirstSegAcTime;
+        Dc = (MaxSpeed - SecondSegSpeed) / Context.FeelData.CabelFirstSegDcTime;
+
+        Timer = 0;
+        Speed = 0;
+
+        Vector3 offset = Start - Waypoints[TargetWaypoint].transform.position;
+        offset.y = 0;
+
+        Cart.transform.forward = offset.normalized;
+    }
+
+    public override void Update()
+    {
+        base.Update();
+        Timer += Time.deltaTime;
+        PauseTimer += Time.deltaTime;
+        if(PauseTimer < 0.1f)
+        {
+            return;
+        }
+
+
+        if (Timer <= Context.FeelData.CabelFirstSegAcTime)
+        {
+            Speed += Ac * Time.deltaTime;
+
+        }
+        else if(Timer <= Context.FeelData.CabelFirstSegStableTime+Context.FeelData.CabelFirstSegAcTime)
+        {
+            Speed = MaxSpeed;
+
+        }
+        else if(Timer<=Context.FeelData.CabelFirstSegStableTime+Context.FeelData.CabelFirstSegAcTime+Context.FeelData.CabelFirstSegDcTime)
+        {
+            Speed -= Dc * Time.deltaTime;
+        }
+        else
+        {
+            Cart.transform.position = Waypoints[Waypoints.Count - 1].transform.position;
+            TransitionTo<CabelSwtiching_SecondSegment>();
+            return;
+        }
+        if (CurrentWaypoint < 0)
+        {
+            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, Speed, (Start - Waypoints[TargetWaypoint].transform.position).normalized);
+        }
+        else if(TargetWaypoint < Waypoints.Count)
+        {
+            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, Speed, (Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position).normalized);
+        }
+        else
+        {
+            Cart.transform.position = Waypoints[Waypoints.Count - 1].transform.position;
+            TransitionTo<CabelSwtiching_SecondSegment>();
+        }
+    }
+    
+}
+
+public class CabelSwtiching_SecondSegment: CabelAction
+{
+    private List<GameObject> Waypoints;
+    private GameObject Cart;
+    private int TargetWaypoint;
+    private int CurrentWaypoint;
+
+    private float Speed;
+
+    private float Timer;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        if (Context.Info.CurrentSide == CanonSide.Red)
+        {
+            Waypoints = Context.Team1SecondSegmentWaypoints;
+            Cart = Context.Team1Cart;
+        }
+        else
+        {
+            Waypoints = Context.Team2SecondSegmentWaypoints;
+            Cart = Context.Team2Cart;
+        }
+
+        Cart.transform.position = Waypoints[0].transform.position;
+        TargetWaypoint = 1;
+        CurrentWaypoint = 0;
+
+        Speed = CountDistance(Waypoints) / Context.FeelData.CabelSecondSegTime;
+        Timer = 0;
+
+        Vector3 offset = Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position;
+        offset.y = 0;
+
+        Cart.transform.forward = offset.normalized;
+
+        Move();
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        Move();
+    }
+
+    private void Move()
+    {
+        Timer += Time.deltaTime;
+
+        if (Timer <= Context.FeelData.CabelSecondSegTime)
+        {
+            if(TargetWaypoint < Waypoints.Count)
+            {
+                MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, Speed, (Waypoints[TargetWaypoint].transform.position-Waypoints[CurrentWaypoint].transform.position).normalized);
+            }
+            else
+            {
+                Cart.transform.position = Waypoints[Waypoints.Count - 1].transform.position;
+                TransitionTo<CabelSwtiching_ThirdSegment>();
+            }
+
+        }
+        else
+        {
+            Cart.transform.position = Waypoints[Waypoints.Count - 1].transform.position;
+            TransitionTo<CabelSwtiching_ThirdSegment>();
+        }
+    }
+}
+
+public class CabelSwtiching_ThirdSegment : CabelAction
+{
+    private Vector3 StartPoint;
+    private List<GameObject> Waypoints;
+    private List<GameObject> SecondSegWaypoints;
+    private GameObject Cart;
+
+    private float SecondSegSpeed;
+    private int TargetWaypoint;
+    private int CurrentWaypoint;
+    private float MaxSpeed;
+    private float Ac;
+
+    private float Timer;
+    private float Speed;
+
+    public override void OnEnter()
+    {
+        base.OnEnter();
+        if (Context.Info.CurrentSide == CanonSide.Red)
+        {
+            StartPoint = Context.Team1CartStart;
+            Waypoints = Context.Team1ThirdSegmentWaypoints;
+            SecondSegWaypoints = Context.Team1SecondSegmentWaypoints;
+            Cart = Context.Team1Cart;
+        }
+        else
+        {
+            StartPoint = Context.Team2CartStart;
+            Waypoints = Context.Team2ThirdSegmentWaypoints;
+            SecondSegWaypoints = Context.Team2SecondSegmentWaypoints;
+            Cart = Context.Team2Cart;
+        }
+
+        Cart.transform.position = Waypoints[0].transform.position;
+        TargetWaypoint = 1;
+        CurrentWaypoint = 0;
+
+        SecondSegSpeed = CountDistance(SecondSegWaypoints) / Context.FeelData.CabelSecondSegTime;
+
+        float Dis = CountDistance(Waypoints);
+        MaxSpeed = (Dis- SecondSegSpeed * Context.FeelData.CabelThirdSegAcTime/2) / (Context.FeelData.CabelThirdSegStableTime + Context.FeelData.CabelThirdSegAcTime / 2);
+        Ac = (MaxSpeed - SecondSegSpeed) / Context.FeelData.CabelThirdSegAcTime;
+
+        Timer = 0;
+        Speed = SecondSegSpeed;
+
+        Vector3 offset = Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position;
+        offset.y = 0;
+
+        Cart.transform.forward = offset.normalized;
+
+        Move();
+
+    }
+
+    public override void Update()
+    {
+        base.Update();
+
+        Move();
+
+    }
+
+    private void Move()
+    {
+        Timer += Time.deltaTime;
+
+        if (Timer <= Context.FeelData.CabelThirdSegAcTime)
+        {
+            Speed += Ac * Time.deltaTime;
+        }
+        else if (Timer <= Context.FeelData.CabelThirdSegAcTime + Context.FeelData.CabelThirdSegStableTime)
+        {
+            Speed = MaxSpeed;
+        }
+        else
+        {
+            if(Context.Info.LastSide == Context.Info.CurrentSide)
+            {
+                Cart.transform.position = StartPoint;
+                GameObject.Destroy(Context.Bagel);
+                Context.Bagel = null;
+
+                TransitionTo<CabelIdle>();
+
+                return;
+            }
+
+            if (Context.Info.State != CanonState.Firing)
+            {
+                GameObject.Destroy(Context.Bagel);
+                Context.Bagel = null;
+
+                Cart.transform.position = StartPoint;
+
+                TransitionTo<CabelIdle>();
+                Context.CanonFSM.TransitionTo<CanonFiring_Normal>();
+
+                Context.Info.LockedPlayer = null;
+                GameObject.Destroy(Context.Info.Mark);
+                GameObject.Destroy(Context.Info.Bomb);
+
+                Context.SetWrap();
+            }
+
+            return;
+        }
+
+        MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, Speed, (Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position).normalized);
+    }
+
+    public override void OnExit()
+    {
+        base.OnExit();
+        Services.GameStateManager.CameraTargets.Remove(Cart.transform);
     }
 }
 
@@ -353,15 +856,15 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         Context.Info.LJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
         Context.Info.RJoint0.GetComponent<ConfigurableJoint>().linearLimit = JointLimit;
 
-        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
-        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
+        Context.Info.LJoint1.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, -Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
+        Context.Info.RJoint1.GetComponent<ConfigurableJoint>().targetRotation = new Quaternion(0, Mathf.Lerp(Context.FeelData.MinJointRotation, Context.FeelData.MaxJointRotation, Context.Info.CurrentPercentage), 0, 1);
 
         JointDrive Joint1Drive = new JointDrive();
         Joint1Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint1AngularYZ, Context.FeelData.MaxJoint1AngularYZ, Context.Info.CurrentPercentage);
         Joint1Drive.maximumForce = float.PositiveInfinity;
 
-        Context.Info.LeftJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
-        Context.Info.RightJoint.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+        Context.Info.LJoint1.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
+        Context.Info.RJoint1.GetComponent<ConfigurableJoint>().angularYZDrive = Joint1Drive;
 
         JointDrive Joint0Drive = new JointDrive();
         Joint0Drive.positionSpring = Mathf.Lerp(Context.FeelData.MinJoint0AngularYZ, Context.FeelData.MaxJoint0AngularYZ, Context.Info.CurrentPercentage);
@@ -413,109 +916,6 @@ public class CanonIdle: CanonAction
     }
 
 }
-
-/*public class CanonSwtich : CanonAction // Canon switches side
-{
-    private float Timer;
-
-    public override void OnEnter()
-    {
-        base.OnEnter();
-        Timer = 0;
-
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
-
-    }
-
-
-    public override void Update()
-    {
-        base.Update();
-        Timer += Time.deltaTime;
-        SetCanon(0,0, Context.FeelData.AimingPercentageFollowSpeed);
-        SetCabel();
-        CheckTimer();
-
-    }
-
-    private void CheckTimer()
-    {
-        if (Timer >= Context.Data.CanonSwitchTime)
-        {
-            TransitionTo<CanonFiring_Normal>();
-        }
-    }
-
-    private void SetCabel() // Set cabel appearance
-    {
-        switch (Context.Info.CurrentSide)
-        {
-            case CanonSide.Neutral:
-                if(Context.Info.LastSide == CanonSide.Red)
-                {
-                    CabelChange(Context.Team1Cabel, false, true);
-                }
-                else
-                {
-                    CabelChange(Context.Team2Cabel, false, false);
-                }
-                break;
-            case CanonSide.Red:
-                CabelChange(Context.Team1Cabel, true, true);
-                if (Context.Info.LastSide == CanonSide.Blue)
-                {
-                    CabelChange(Context.Team2Cabel, false, false);
-                }
-                break;
-            case CanonSide.Blue:
-                CabelChange(Context.Team2Cabel, true, false);
-                if (Context.Info.LastSide == CanonSide.Red)
-                {
-                    CabelChange(Context.Team1Cabel, false, true);
-                }
-                break;
-        }
-    }
-
-
-    private void CabelChange(GameObject Cabel,bool Shine,bool Team1)
-    {
-
-        foreach (Transform child in Cabel.transform)
-        {
-            Material mat = child.GetComponent<Renderer>().material;
-            mat.EnableKeyword("_EMISSION");
-
-            Color color;
-
-            float Emission;
-
-            if (Shine)
-            {
-                Emission = Mathf.Lerp(Context.FeelData.CabelStartEmission, Context.FeelData.CabelEndEmission, Timer / Context.FeelData.CabelShineTime);
-            }
-            else
-            {
-                Emission = Mathf.Lerp(Context.FeelData.CabelEndEmission, Context.FeelData.CabelStartEmission, Timer / Context.FeelData.CabelShineTime);
-            }
-
-            if (Team1)
-            {
-                color = Context.FeelData.RedCabelColor;
-            }
-            else
-            {
-                color = Context.FeelData.BlueCabelColor;
-            }
-
-            mat.SetColor("_EmissionColor", color * Emission);
-        }
-    }
-
-}*/
 
 
 public class CanonCooldown : CanonAction
@@ -819,12 +1219,13 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     {
         public GameObject Entity;
         public GameObject Pad;
-        public GameObject LeftJoint; //Joint1
-        public GameObject RightJoint; //Joint1
-        public GameObject CameraFocus;
-
         public GameObject LJoint0;
         public GameObject RJoint0;
+        public GameObject LJoint1; 
+        public GameObject RJoint1; 
+        public GameObject CameraFocus;
+
+
 
         public float CurrentPercentage;
         public float CurrentAngle;
@@ -841,15 +1242,16 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public GameObject LockedPlayer;
 
 
-        public CanonInfo(GameObject entity, GameObject pad, GameObject LJoint, GameObject RJoint,GameObject L0, GameObject R0, GameObject Focus)
+        public CanonInfo(GameObject entity, GameObject pad, GameObject L0, GameObject R0, GameObject L1, GameObject R1, GameObject Focus)
         {
             Entity = entity;
             Pad = pad;
-            LeftJoint = LJoint;
-            RightJoint = RJoint;
+
             CameraFocus = Focus;
             LJoint0 = L0;
             RJoint0 = R0;
+            LJoint1 = L1;
+            RJoint1 = R1;
 
             State = CanonState.Idle;
             CurrentSide = LastSide = CanonSide.Neutral;
@@ -877,13 +1279,14 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public GameObject CanonEntity;
     public GameObject CanonPad;
-    public GameObject CanonLJoint;
-    public GameObject CanonRJoint;
-
-    public GameObject CanonFinalLJoint;
-    public GameObject CanonFinalRJoint;
     public GameObject CanonLJoint0;
     public GameObject CanonRJoint0;
+    public GameObject CanonLJoint1;
+    public GameObject CanonRJoint1;
+
+    public GameObject CanonLJoint2;
+    public GameObject CanonRJoint2;
+
 
     public GameObject CameraFocus;
 
@@ -901,12 +1304,39 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     public GameObject BombPrefab;
     public GameObject ExplosionVFX;
 
+    public GameObject Team1FirstSeg;
+    public GameObject Team1SecondSeg;
+    public GameObject Team1ThirdSeg;
+
+    public List<GameObject> Team1FirstSegmentWaypoints;
+    public List<GameObject> Team1SecondSegmentWaypoints;
+    public List<GameObject> Team1ThirdSegmentWaypoints;
+
+    public GameObject Team1Cart;
+
+    public Vector3 Team1CartStart;
+    public Vector3 Team1DeliverEdgePoint;
+    public Vector3 Team1DeliverCartPoint;
+
+    public GameObject Team2FirstSeg;
+    public GameObject Team2SecondSeg;
+    public GameObject Team2ThirdSeg;
+
+    public List<GameObject> Team2FirstSegmentWaypoints;
+    public List<GameObject> Team2SecondSegmentWaypoints;
+    public List<GameObject> Team2ThirdSegmentWaypoints;
+
+    public GameObject Team2Cart;
+
+    public Vector3 Team2CartStart;
+    public Vector3 Team2DeliverEdgePoint;
+    public Vector3 Team2DeliverCartPoint;
+
     public BrawlModeReforgedModeData Data;
 
     public CanonInfo Info;
 
-    public BagelSent DeliveryEvent;
-    private GameObject Bagel;
+    public GameObject Bagel;
 
     public FSM<BrawlModeReforgedArenaManager> CanonFSM;
     public FSM<BrawlModeReforgedArenaManager> CabelFSM; 
@@ -914,6 +1344,20 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Team1FirstSegmentWaypoints = new List<GameObject>();
+        Team1SecondSegmentWaypoints = new List<GameObject>();
+        Team1ThirdSegmentWaypoints = new List<GameObject>();
+        Team2FirstSegmentWaypoints = new List<GameObject>();
+        Team2SecondSegmentWaypoints = new List<GameObject>();
+        Team2ThirdSegmentWaypoints = new List<GameObject>();
+
+        GetSegWaypoints(Team1FirstSeg, Team1FirstSegmentWaypoints);
+        GetSegWaypoints(Team1SecondSeg, Team1SecondSegmentWaypoints);
+        GetSegWaypoints(Team1ThirdSeg, Team1ThirdSegmentWaypoints);
+        GetSegWaypoints(Team2FirstSeg, Team2FirstSegmentWaypoints);
+        GetSegWaypoints(Team2SecondSeg, Team2SecondSegmentWaypoints);
+        GetSegWaypoints(Team2ThirdSeg, Team2ThirdSegmentWaypoints);
+
         CanonFSM = new FSM<BrawlModeReforgedArenaManager>(this);
         CanonFSM.TransitionTo<CanonIdle>();
 
@@ -932,21 +1376,21 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         Team1Basket = Basket1;
         Team2Basket = Basket2;
 
-        Info = new CanonInfo(CanonEntity,CanonPad,CanonLJoint,CanonRJoint,CanonLJoint0,CanonRJoint0, CameraFocus);
+
+
+        Info = new CanonInfo(CanonEntity,CanonPad,CanonLJoint0,CanonRJoint0, CanonLJoint1,CanonRJoint1, CameraFocus);
 
         SetWrap();
 
         GenerateBagel();
 
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
-        EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
         EventManager.Instance.AddHandler<BagelDespawn>(OnBagelDespawn);
     }
 
     private void OnDestroy()
     {
         EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
-        EventManager.Instance.RemoveHandler<BagelSent>(OnBagelSent);
         EventManager.Instance.RemoveHandler<BagelDespawn>(OnBagelDespawn);
     }
 
@@ -957,6 +1401,15 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         CabelFSM.Update();
     }
 
+    private void GetSegWaypoints(GameObject Seg, List<GameObject> SegWaypoints)
+    {
+        foreach(Transform child in Seg.transform)
+        {
+            SegWaypoints.Add(child.gameObject);
+        }
+
+
+    }
 
     private int GetPlayerNumber()
     {
@@ -1002,28 +1455,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     private void OnBagelDespawn(BagelDespawn e)
     {
         GenerateBagel();
-    }
-
-    private void OnBagelSent(BagelSent e)
-    {
-        Bagel = null;
-        
-
-        if(e.Basket == Team1Basket)
-        {
-            if (Info.CurrentSide != CanonSide.Red)
-            {
-                DeliveryEvent = e;
-            }
-        }
-        else
-        {
-            if (Info.CurrentSide != CanonSide.Blue)
-            {
-                DeliveryEvent = e;
-
-            }
-        }
     }
 
 

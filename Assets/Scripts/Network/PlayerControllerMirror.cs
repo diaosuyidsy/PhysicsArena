@@ -542,7 +542,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             CanBlock(sender.transform.forward))
         {
             CmdHit(sender, -force * CharacterDataStore.BlockMultiplier, false, gameObject);
-            CmdStun(sender, CharacterDataStore.BlockStunDuration);
+            // CmdStun(sender, CharacterDataStore.BlockStunDuration);
             // sender.GetComponentInParent<IHittableNetwork>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
         }
         else // Player is hit cause he could not block
@@ -1664,6 +1664,11 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 TransitionTo<IdleActionState>();
                 return;
             }
+        }
+
+        private void _sweepPush()
+        {
+
         }
     }
 

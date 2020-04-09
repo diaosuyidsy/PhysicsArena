@@ -226,6 +226,8 @@ public class NetworkCartModeReforgedArenaManager : NetworkBehaviour
         {
 
             CurrentState = CartState.Moving;
+
+            CartMove();
             return;
         }
 

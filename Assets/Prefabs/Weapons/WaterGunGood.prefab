@@ -938,6 +938,7 @@ Transform:
   - {fileID: 5375446549025732551}
   - {fileID: 5375523502490201389}
   - {fileID: 5375208419172096363}
+  - {fileID: 4093977821560195186}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -1016,7 +1017,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 28d13ba1960244cb8b2693eeb76f1302, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WeaponDataStore: {fileID: 11400000, guid: e7c515a3e28814c41a3446a425a78bd8, type: 2}
   WeaponDataBase: {fileID: 11400000, guid: 14ab812a9932c064687aaa5e03d0b845, type: 2}
   CanBePickedUp: 0
   WaterBall: {fileID: 5412471293102263891}
@@ -6382,3 +6382,78 @@ MonoBehaviour:
   shader: {fileID: 4800000, guid: 4e9aef83000c34544a0a1f20b88e86c5, type: 3}
   particleColor: {r: 0.8915094, g: 0.9658376, b: 1, a: 1}
   radiusScale: 1.7
+--- !u!1001 &4534912379228426048
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 5369995198888199863}
+    m_Modifications:
+    - target: {fileID: 450225733852383024, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_Name
+      value: WaterGunLineNew
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -1.0139999
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.01
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.040000916
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.7071068
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: b97adb27adeda644bafa9f466c583930, type: 3}
+--- !u!4 &4093977821560195186 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
+    type: 3}
+  m_PrefabInstance: {fileID: 4534912379228426048}
+  m_PrefabAsset: {fileID: 0}

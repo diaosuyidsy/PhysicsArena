@@ -333,7 +333,7 @@ public class CabelSwtiching_FirstSegment: CabelAction
         Timer = 0;
         Speed = 0;
 
-        Vector3 offset = Start - Waypoints[TargetWaypoint].transform.position;
+        Vector3 offset = Waypoints[TargetWaypoint].transform.position-  Start;
         offset.y = 0;
 
         Cart.transform.forward = offset.normalized;
@@ -372,7 +372,7 @@ public class CabelSwtiching_FirstSegment: CabelAction
         }
         if (CurrentWaypoint < 0)
         {
-            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, Speed, (Start - Waypoints[TargetWaypoint].transform.position).normalized);
+            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, Speed, (Waypoints[TargetWaypoint].transform.position - Start).normalized);
         }
         else if(TargetWaypoint < Waypoints.Count)
         {

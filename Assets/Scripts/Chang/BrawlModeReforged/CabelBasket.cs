@@ -1,10 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using TMPro;
 
-public class Basket : MonoBehaviour
+public class CabelBasket : MonoBehaviour
 {
     private enum ScoreTextState
     {
@@ -16,12 +15,13 @@ public class Basket : MonoBehaviour
 
     public int TeamNumber;
 
-    public GameObject Canvas;
     public GameObject ScoreText;
 
     public float DetectRadius;
+    public float AutoDropRadius;
     public float SuckRadius;
     public float SuckSpeed;
+    public float VerticalOffset;
 
     public float ScoreTextStartAlpha;
     public float ScoreTextEndAlpha;
@@ -53,6 +53,7 @@ public class Basket : MonoBehaviour
     {
 
         CheckCharacter();
+        CheckAutoDrop();
         CheckBagel();
         CheckScoreText();
     }
@@ -91,6 +92,40 @@ public class Basket : MonoBehaviour
                 }
                 break;
         }
+    }
+
+    private void CheckAutoDrop()
+    {
+        Collider[] AllHits = Physics.OverlapSphere(transform.position, AutoDropRadius);
+
+        for (int i = 0; i < AllHits.Length; i++)
+        {
+            GameObject other = AllHits[i].gameObject;
+            if (other.GetComponentInParent<PlayerController>() || other.GetComponent<PlayerController>())
+            {
+                if (other.GetComponentInParent<PlayerController>() && SameTeam(other.GetComponentInParent<PlayerController>().gameObject))
+                {
+                    PlayerController Pc = other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>();
+
+                    if (Pc.HandObject!=null && Pc.HandObject.CompareTag("Team2Resource"))
+                    {
+                        Pc.ForceDropHandObject();
+                        return;
+                    }
+                }
+                else if (other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
+                {
+                    PlayerController Pc = other.GetComponent<PlayerController>();
+
+                    if (Pc.HandObject != null && Pc.HandObject.CompareTag("Team2Resource"))
+                    {
+                        Pc.ForceDropHandObject();
+                        return;
+                    }
+                }
+            }
+        }
+
     }
 
     private void CheckCharacter() //Add/remove bagel holder to camera
@@ -143,7 +178,7 @@ public class Basket : MonoBehaviour
         }
         else
         {
-            Vector3 Offset = transform.position - Bagel.transform.position;
+            Vector3 Offset = transform.position +Vector3.up * VerticalOffset - Bagel.transform.position;
             Bagel.transform.position += SuckSpeed * Offset.normalized * Time.deltaTime;
             if (Vector3.Dot(Offset, transform.position - Bagel.transform.position) < 0)
             {
@@ -152,7 +187,8 @@ public class Basket : MonoBehaviour
                 TextState = ScoreTextState.Appear;
 
                 EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
-                Destroy(Bagel);
+
+                Bagel = null;
             }
         }
     }
@@ -160,28 +196,5 @@ public class Basket : MonoBehaviour
     private bool SameTeam(GameObject Player)
     {
         return Player.tag.Contains("1") && TeamNumber == 1 || Player.tag.Contains("2") && TeamNumber == 2;
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.GetComponentInParent<PlayerController>() || other.GetComponent<PlayerController>())
-        {
-            if (other.GetComponentInParent<PlayerController>() && SameTeam(other.GetComponentInParent<PlayerController>().gameObject))
-            {
-                if (other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().HandObject.CompareTag("Team2Resource"))
-                {
-                    other.GetComponentInParent<PlayerController>().gameObject.GetComponent<PlayerController>().ForceDropHandObject();
-                }
-            }
-            else if (other.GetComponent<PlayerController>() && SameTeam(other.gameObject))
-            {
-                if (other.GetComponent<PlayerController>().HandObject.CompareTag("Team2Resource"))
-                {
-                    other.GetComponent<PlayerController>().ForceDropHandObject();
-                }
-            }
-        }
-
-
     }
 }

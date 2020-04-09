@@ -41,7 +41,7 @@ public class NetworkRtEmit : NetworkWeaponBase
                 if (_shootCD >= _waterGunData.ShootMaxCD)
                 {
                     _shootCD = 0f;
-                    WaterGunLine.OnFire(false);
+                    // WaterGunLine.OnFire(false);
                     _waterGunState = State.Empty;
                     return;
                 }

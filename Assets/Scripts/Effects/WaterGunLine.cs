@@ -15,7 +15,7 @@ public class WaterGunLine : MonoBehaviour
     public float globalProgressSpeed = 1f;
     public AnimationCurve shaderProgressCurve;
     public AnimationCurve lineWidthCurve;
-    
+
 
     private LineRenderer _lr;
     private Vector3[] _resultVectors;
@@ -47,7 +47,7 @@ public class WaterGunLine : MonoBehaviour
             _maxLength = 5f;
             _spherecastRadius = 0.4f;
         }
-            
+
     }
 
     void Update()
@@ -98,21 +98,21 @@ public class WaterGunLine : MonoBehaviour
             if (i == segmentCount - 1)
             {
                 _hitPosition = _currentPosition /*+ resultVectors[i] * blockLength*/;
-                
+
                 if (hitEffect)
                 {
                     hitEffect.transform.position = _hitPosition;
-                   // hitEffect.transform.rotation = Quaternion.FromToRotation(hitEffect.transform.forward, resultVectors[i].normalized);
+                    // hitEffect.transform.rotation = Quaternion.FromToRotation(hitEffect.transform.forward, resultVectors[i].normalized);
 
                 }
 
                 _dist = Vector3.Distance(_hitPosition, transform.position);
 
             }
-            else if (Physics.SphereCast(_currentPosition, _spherecastRadius, _resultVectors[i],out hit,blockLength))
+            else if (Physics.SphereCast(_currentPosition, _spherecastRadius, _resultVectors[i], out hit, blockLength, waterGunData.WaterCanHitLayer))
             {
                 _hitPosition = _currentPosition + _resultVectors[i] * hit.distance;
-                _hitPosition = Vector3.MoveTowards(_hitPosition, _hitPosition+ _resultVectors[i] * blockLength, 0.5f);
+                _hitPosition = Vector3.MoveTowards(_hitPosition, _hitPosition + _resultVectors[i] * blockLength, 0.5f);
                 //hitPosition = Vector3.MoveTowards(hitPosition, transform.position, 0.5f);
                 if (hitEffect)
                 {
@@ -132,7 +132,7 @@ public class WaterGunLine : MonoBehaviour
 
         if (hitEffect)
         {
-            hitEffect.transform.rotation =  Quaternion.FromToRotation(Vector3.forward, _resultVectors[segmentCount - 1].normalized);
+            hitEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, _resultVectors[segmentCount - 1].normalized);
             if (_globalProgress < 0.75f)
             {
                 foreach (ParticleSystem ps in hitPsArray)
@@ -196,5 +196,5 @@ public class WaterGunLine : MonoBehaviour
         else
             _globalProgress = 1f;
     }
-    
+
 }

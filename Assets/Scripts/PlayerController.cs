@@ -288,7 +288,19 @@ public class PlayerController : MonoBehaviour, IHittable
     public void ForceDropHandObject()
     {
         if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+        {
+            _dropHandObject();
             _actionFSM.TransitionTo<DroppedRecoveryState>();
+        }
+    }
+
+    public void ForceDropHandObject(Vector3 force)
+    {
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+        {
+            _dropHandObject(true, force);
+            _actionFSM.TransitionTo<DroppedRecoveryState>();
+        }
     }
 
     public void ForceDropEquipment(EquipmentPositionType posType)
@@ -378,15 +390,13 @@ public class PlayerController : MonoBehaviour, IHittable
         return Vector3.Angle(A, B) > degree;
     }
 
-    private void _dropHandObject()
+    private void _dropHandObject(bool customDrop = false, Vector3 customDropForce = default(Vector3))
     {
         if (HandObject == null) return;
         // Drop the thing
-        HandObject.GetComponent<WeaponBase>().OnDrop();
+        HandObject.GetComponent<WeaponBase>().OnDrop(customDrop, customDropForce);
 
         EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
-        // Return the body to normal position
-        // _resetBodyAnimation();
         // Nullify the holder
         HandObject = null;
     }

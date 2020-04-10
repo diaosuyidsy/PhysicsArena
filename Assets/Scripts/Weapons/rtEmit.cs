@@ -111,13 +111,13 @@ public class rtEmit : WeaponBase
         _shootCD = 0f;
         _ammo = _waterGunData.MaxAmmo;
         ChangeAmmoUI();
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
-    public override void OnDrop()
+    public override void OnDrop(bool customForce, Vector3 force)
     {
-        base.OnDrop();
+        base.OnDrop(customForce, force);
+        _waterGunState = State.Empty;
         WaterGunLine.OnFire(false);
         GunUI.SetActive(false);
     }

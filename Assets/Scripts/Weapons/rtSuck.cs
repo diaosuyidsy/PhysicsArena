@@ -161,10 +161,9 @@ public class rtSuck : WeaponBase
         _suckBall.SetActive(false);
         _ballState = State.In;
         _ammo = _suckGunData.SuckGunMaxUseTimes;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         // Need a little clean up the line renderer and stuff
         _sbc.CleanUpAll();
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     //private void _addToSuckedTimes()

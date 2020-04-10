@@ -109,7 +109,7 @@ public class CabelBasket : MonoBehaviour
 
                     if (Pc.HandObject!=null && Pc.HandObject.CompareTag("Team2Resource"))
                     {
-                        Pc.ForceDropHandObject();
+                        Pc.ForceDropHandObject(Vector3.zero);
                         return;
                     }
                 }
@@ -119,7 +119,7 @@ public class CabelBasket : MonoBehaviour
 
                     if (Pc.HandObject != null && Pc.HandObject.CompareTag("Team2Resource"))
                     {
-                        Pc.ForceDropHandObject();
+                        Pc.ForceDropHandObject(Vector3.zero);
                         return;
                     }
                 }

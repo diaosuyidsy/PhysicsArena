@@ -214,9 +214,9 @@ public class rtHook : WeaponBase
         }
     }
 
-    public override void OnDrop()
+    public override void OnDrop(bool customForce, Vector3 force)
     {
-        base.OnDrop();
+        base.OnDrop(customForce, force);
         if (Hooked != null)
         {
             foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
@@ -286,7 +286,6 @@ public class rtHook : WeaponBase
         _hook.transform.localPosition = _hookinitlocalPos;
         _hook.gameObject.SetActive(true);
         _ammo = _hookGunData.MaxHookTimes;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         // Need to set hooked's rigidbody back
         if (Hooked != null)
         {
@@ -297,7 +296,7 @@ public class rtHook : WeaponBase
         }
 
         Hooked = null;
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     private abstract class HookState : FSM<rtHook>.State { }

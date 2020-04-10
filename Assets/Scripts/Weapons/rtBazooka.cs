@@ -172,9 +172,8 @@ public class rtBazooka : WeaponBase
         _resetThrowMark();
         _ammo = _bazookaData.MaxAmmo;
         transform.GetComponent<Rigidbody>().isKinematic = false;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         _hitGroundOnce = false;
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     private void _resetThrowMark()

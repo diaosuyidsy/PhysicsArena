@@ -44,11 +44,12 @@ public class CanonFeelData : MonoBehaviour
     public Material WrapBlueMat;
     public Material WrapNMat;
 
+
+
     public float DeliverFallTime;
     public float DeliverMoveAcTime;
     public float DeliverMoveStableTime;
     public float DeliverMoveDcTime;
-    //public float DeliverEndSpeed;
     
 
     public float CabelFirstSegAcTime;
@@ -60,8 +61,11 @@ public class CanonFeelData : MonoBehaviour
     public float CabelThirdSegAcTime;
     public float CabelThirdSegStableTime;
 
-    public float BombVerticalSpeedPercentage;
+    public float DeliverJumpTime;
+    public float DeliverJumpVerSpeed;
+    public float DeliverJumpEndHoriSpeed;
 
+    public float BombVerticalSpeedPercentage;
 
     // Start is called before the first frame update
     void Start()

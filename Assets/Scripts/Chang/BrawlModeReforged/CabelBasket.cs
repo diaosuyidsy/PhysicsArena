@@ -42,6 +42,8 @@ public class CabelBasket : MonoBehaviour
 
     private float InCameraTimer;
 
+    private Vector3 SuckRotationSpeed;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -172,6 +174,8 @@ public class CabelBasket : MonoBehaviour
                     Bagel = AllHits[i].gameObject;
                     Bagel.GetComponent<BoxCollider>().enabled = false;
                     AllHits[i].gameObject.GetComponent<Bagel>().OnSucked();
+
+                    SuckRotationSpeed = -Bagel.transform.eulerAngles * SuckSpeed / (transform.position + Vector3.up * VerticalOffset - Bagel.transform.position).magnitude;
                     break;
                 }
             }
@@ -180,8 +184,11 @@ public class CabelBasket : MonoBehaviour
         {
             Vector3 Offset = transform.position +Vector3.up * VerticalOffset - Bagel.transform.position;
             Bagel.transform.position += SuckSpeed * Offset.normalized * Time.deltaTime;
+
+            Bagel.transform.eulerAngles += SuckRotationSpeed * Time.deltaTime;
             if (Vector3.Dot(Offset, transform.position - Bagel.transform.position) < 0)
             {
+                Bagel.transform.eulerAngles = Vector3.zero;
                 ScoreTextTimer = 0;
                 ScoreText.GetComponent<TextMeshProUGUI>().enabled = true;
                 TextState = ScoreTextState.Appear;

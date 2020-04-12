@@ -32,18 +32,72 @@ MonoBehaviour:
   HookSpeed: 16
   MaxHookTimes: 9
   HookAwayForce: 900
+  HookAwayForceCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  HookAwayForceRotationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.00041154772
+      value: 0.3000442
+      inSlope: 0.24126898
+      outSlope: 0.24126898
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.61905164
+    - serializedVersion: 3
+      time: 0.4591683
+      value: 0.9975294
+      inSlope: 0.005189404
+      outSlope: 0.005189404
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.19697869
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.0045681726
+      outSlope: 0.0045681726
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   HookedTime: 0.25
   HookBlockYDirection: 1
   HookBlockReflectionForce: 5
   HookBlockReloadTime: 5
   HelpAimAngle: 60
   HelpAimDistance: 50
-  BackwardHookableLayer:
-    serializedVersion: 2
-    m_Bits: 278528
   HookableLayer:
     serializedVersion: 2
     m_Bits: 16883200
   HookOutDuration: 0.3
-  HookRadius: 0.2
-  HookDistance: 0.2
+  HookMinOutDuration: 0.15
+  HookGunUseCD: 0.5

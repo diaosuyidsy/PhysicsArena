@@ -161,7 +161,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private void OnCollisionEnter(Collision other)
     {
-        ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
+        if (_movementFSM.CurrentState != null)
+            ((MovementState)_movementFSM.CurrentState).OnCollisionEnter(other);
     }
 
     public bool CanBeBlockPushed()

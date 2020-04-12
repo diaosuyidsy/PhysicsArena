@@ -14,29 +14,26 @@ public class rtHook : WeaponBase
     private Vector3 _hookinitlocalPos;
     private Vector3 _hookinitlocalScale;
     private Vector3 _hookinitialLocalRotation;
-    private GameObject _hookmax;
-    private Vector3 _hookmaxPos = Vector3.zero;
     private HookControl _hc;
     private LineRenderer _lr;
     private Transform _hookstartpoint;
     private Transform _hookendpoint;
-    [HideInInspector]
-    public bool CanCarryBack = true;
-
-    private enum State
+    public bool CanHook
     {
-        Empty,
-        FlyingOut,
-        OnTarget,
-        FlyingIn,
-        Broken,
-        StaticFlyingIn,
+        get
+        {
+            return _hookGunFSM != null &&
+                _hookGunFSM.CurrentState != null &&
+                _hookGunFSM.CurrentState.GetType().Equals(typeof(HookFlyingOutState));
+        }
     }
-    private State _hookState;
-    private bool _released;
-    private float _brokenTimer;
 
-    private FSM<rtHook> _hookFSM;
+    private bool _released;
+    private float _releasedTimer;
+    private float _onTargetTimer;
+    private float _hookOutTimer;
+    private Vector3 _onTargetTransformForwardVector;
+    private FSM<rtHook> _hookGunFSM;
 
     protected override void Awake()
     {
@@ -49,117 +46,18 @@ public class rtHook : WeaponBase
         _hookinitlocalPos = new Vector3(_hook.transform.localPosition.x, _hook.transform.localPosition.y, _hook.transform.localPosition.z);
         _hookinitlocalScale = new Vector3(_hook.transform.localScale.x, _hook.transform.localScale.y, _hook.transform.localScale.z);
         _hookinitialLocalRotation = new Vector3(_hook.transform.localEulerAngles.x, _hook.transform.localEulerAngles.y, _hook.transform.localEulerAngles.z);
-        _hookmax = transform.GetChild(1).gameObject;
-        _hookState = State.Empty;
         _ammo = _hookGunData.MaxHookTimes;
         _lr = GetComponent<LineRenderer>();
-        _hookFSM = new FSM<rtHook>(this);
-        _hookFSM.TransitionTo<IdleState>();
+        _hookGunFSM = new FSM<rtHook>(this);
+        _hookGunFSM.TransitionTo<HookInState>();
     }
 
     protected override void Update()
     {
         base.Update();
+        _hookGunFSM.Update();
         _lr.SetPosition(0, _hookendpoint.position);
         _lr.SetPosition(1, _hookstartpoint.position);
-        // _hookFSM.Update();
-        if (_hookState == State.FlyingOut)
-        {
-            Vector3 nextpos = (_hookmaxPos - _hook.transform.position).normalized;
-            _hook.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
-            if (Vector3.Distance(_hook.transform.position, _hookmaxPos) <= 0.1f)
-            {
-                _hookState = State.FlyingIn;
-            }
-        }
-
-        if (_hookState == State.FlyingIn)
-        {
-            if (Hooked != null && _released)
-            {
-                foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
-                {
-                    rb.isKinematic = false;
-                }
-                Vector3 force = (transform.position - _hook.transform.position).normalized;
-                Vector3 vec2 = transform.right;
-                Vector3 finalVec = force - vec2;
-                force = (force + finalVec * 10f).normalized;
-
-                Hooked.GetComponent<IHittable>().OnImpact(force * _hookGunData.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
-                Hooked = null;
-            }
-            Vector3 nextpos = (transform.position - _hook.transform.position).normalized;
-            if (Hooked != null)
-            {
-                Vector3 vec2 = transform.right;
-                Vector3 finalVec = nextpos - vec2;
-                nextpos = (nextpos + finalVec * 10f).normalized;
-            }
-            _hook.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
-            if (Hooked != null && CanCarryBack)
-            {
-                Hooked.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
-            }
-            if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.6f)
-            {
-                if (Hooked != null)
-                {
-                    foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
-                    {
-                        rb.isKinematic = false;
-                    }
-                }
-                Hooked = null;
-            }
-            if (Vector3.Distance(_hook.transform.position, transform.position) <= 0.4f)
-            {
-                _hookState = State.Empty;
-                // Add once to Hook Used Times
-                _onWeaponUsedOnce();
-                _hc.CanHook = false;
-                _hook.transform.parent = transform;
-                _hook.transform.localScale = _hookinitlocalScale;
-                _hook.transform.localEulerAngles = Vector3.zero;
-                _hook.transform.localPosition = _hookinitlocalPos;
-                _released = false;
-                // Need to set hooked's rigidbody back
-                if (Hooked != null)
-                {
-                    foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
-                    {
-                        rb.isKinematic = false;
-                    }
-                }
-
-                Hooked = null;
-            }
-        }
-        if (_hookState == State.Broken)
-        {
-            if (Time.time > _brokenTimer + _hookGunData.HookBlockReloadTime)
-            {
-                _hook.SetActive(true);
-                _hookState = State.Empty;
-            }
-        }
-
-        if (_hookState == State.StaticFlyingIn)
-        {
-            Vector3 nextpos = (_hook.transform.position - transform.position).normalized;
-            transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
-            if (Vector3.Distance(transform.position, _hook.transform.position) <= 0.5f)
-            {
-                Owner.GetComponent<PlayerController>().HookedStatic(false);
-                _hookState = State.Empty;
-                _followHand = true;
-                _hc.CanHook = true;
-                _hook.transform.parent = transform;
-                _hook.transform.localPosition = _hookinitlocalPos;
-                _hook.transform.localScale = _hookinitlocalScale;
-                return;
-            }
-        }
     }
 
     public override void Fire(bool buttondown)
@@ -167,50 +65,18 @@ public class rtHook : WeaponBase
         // If button down
         if (buttondown)
         {
-            // if (_hookFSM.CurrentState.GetType().Equals(typeof(IdleState)))
-            // {
-            //     _hookFSM.TransitionTo<FlyingOutState>();
-            //     // EventManager.Instance.TriggerEvent(new HookGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
-            // }
-            if (_hookState == State.Empty)
+            if (_hookGunFSM.CurrentState.GetType().Equals(typeof(HookInState)))
             {
-                // Then we could fire the hook
-                _hookState = State.FlyingOut;
-                // Tell the hook that it can now hook players
-                CanCarryBack = true;
-                _hc.CanHook = true;
-                // Record where the hook should go to in world position
-                _hookmaxPos = new Vector3(_hookmax.transform.position.x, _hookmax.transform.position.y, _hookmax.transform.position.z);
-                // Also need to make hook out of parent
-                _hook.transform.parent = null;
+                _released = false;
                 EventManager.Instance.TriggerEvent(new HookGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
+                _hookGunFSM.TransitionTo<HookFlyingOutState>();
+                return;
             }
         }
         else
         {
-            if (_hookState == State.FlyingIn && Hooked != null)
-            {
-                foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
-                {
-                    rb.isKinematic = false;
-                }
-                Vector3 force = (transform.position - _hook.transform.position).normalized;
-                Vector3 vec2 = transform.right;
-                Vector3 finalVec = force - vec2;
-                force = (force + finalVec * 10f).normalized;
-
-                Hooked.GetComponent<IHittable>().OnImpact(force * _hookGunData.HookAwayForce, ForceMode.Impulse, Owner, ImpactType.HookGun);
-                Hooked = null;
-            }
-            if (_hookState == State.FlyingOut)
-            {
-                _hookState = State.FlyingIn;
-            }
-            if (_hookState == State.OnTarget)
-            {
-                _released = true;
-            }
-
+            _released = true;
+            _releasedTimer = Time.time;
         }
     }
 
@@ -227,129 +93,240 @@ public class rtHook : WeaponBase
         Hooked = null;
     }
 
-    public void HookStaticObject()
-    {
-        _hookState = State.StaticFlyingIn;
-        _followHand = false;
-        Owner.GetComponent<PlayerController>().HookedStatic(true);
-    }
-
     public void HookOnHit(GameObject hit)
     {
-        if (hit.GetComponent<IHittable>().CanBlock(-_hook.transform.right))
+        if (hit.transform.GetComponent<IHittable>().CanBlock(-_hook.transform.right))
         {
-            GameObject hookDup = Instantiate(_hook, _hook.transform.position, _hook.transform.rotation);
-            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, hookDup));
-            Destroy(hookDup, _hookGunData.HookBlockReloadTime);
-            _hook.transform.parent = transform;
-            _hook.transform.localPosition = _hookinitlocalPos;
-            _hook.SetActive(false);
-            // hookDup.GetComponent<HookControl>().enabled = false;
-            Destroy(hookDup.GetComponent<HookControl>());
-            hookDup.GetComponent<Rigidbody>().isKinematic = false;
-            hookDup.GetComponent<Rigidbody>().useGravity = true;
-            // hookDup.GetComponent<Collider>().isTrigger = false;
-            var coll = hookDup.AddComponent<MeshCollider>();
-            coll.convex = true;
-            Vector3 _dir = -hookDup.transform.right;
-            _dir.y = _hookGunData.HookBlockYDirection;
-            hookDup.GetComponent<Rigidbody>().AddForce(_hookGunData.HookBlockReflectionForce * _dir, ForceMode.Impulse);
-            _brokenTimer = Time.time;
-            _hookState = State.Broken;
+            EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, _hook));
+            _hookGunFSM.TransitionTo<HookBrokenState>();
             return;
         }
-        _hookState = State.OnTarget;
+
         Hooked = hit;
-        Hooked.GetComponent<IHittable>().OnImpact(Owner, ImpactType.HookGun);
-        foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
+        hit.GetComponent<IHittable>().OnImpact(Owner, ImpactType.HookGun);
+        EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _hook, hit,
+        hit.GetComponent<PlayerController>().PlayerNumber));
+        foreach (var rb in hit.GetComponentsInChildren<Rigidbody>())
         {
             rb.isKinematic = true;
         }
-        StartCoroutine(hookhelper(_hookGunData.HookedTime));
-        EventManager.Instance.TriggerEvent(new HookHit(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, _hook, hit,
-        hit.GetComponent<PlayerController>() == null ? 6 : hit.GetComponent<PlayerController>().PlayerNumber));
-    }
-
-    IEnumerator hookhelper(float time)
-    {
-        yield return new WaitForSeconds(time);
-        _hookState = State.FlyingIn;
+        _hookGunFSM.TransitionTo<HookOnTargetState>();
     }
 
     protected override void _onWeaponDespawn()
     {
-        _hookState = State.Empty;
-        _hc.CanHook = false;
-        _hook.transform.parent = transform;
-        _hook.transform.localScale = _hookinitlocalScale;
-        _hook.transform.localEulerAngles = Vector3.zero;
-        _hook.transform.localPosition = _hookinitlocalPos;
-        _hook.gameObject.SetActive(true);
+        _hookGunFSM.TransitionTo<HookInState>();
         _ammo = _hookGunData.MaxHookTimes;
-        // Need to set hooked's rigidbody back
-        if (Hooked != null)
-        {
-            foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
-            {
-                rb.isKinematic = false;
-            }
-        }
-
-        Hooked = null;
         base._onWeaponDespawn();
     }
 
-    private abstract class HookState : FSM<rtHook>.State { }
-
-    private class IdleState : HookState
+    private abstract class HookGunState : FSM<rtHook>.State
     {
-
+        protected HookGunData _hookGunData;
+        public override void Init()
+        {
+            base.Init();
+            _hookGunData = Context.WeaponDataBase as HookGunData;
+        }
     }
 
-    private class FlyingOutState : HookState
+    private class HookInState : HookGunState
     {
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.CanCarryBack = true;
-            Context._hc.CanHook = true;
-            // Record where the hook should go to in world position
-            Context._hookmaxPos = new Vector3(Context._hookmax.transform.position.x, Context._hookmax.transform.position.y, Context._hookmax.transform.position.z);
-            // Also need to make hook out of parent
+            Context._hook.SetActive(true);
+            Context._hook.transform.parent = Context.transform;
+            Context._hook.transform.localScale = Context._hookinitlocalScale;
+            Context._hook.transform.localEulerAngles = Context._hookinitialLocalRotation;
+            Context._hook.transform.localPosition = Context._hookinitlocalPos;
+            Context._released = false;
+        }
+    }
+
+    private class HookFlyingOutState : HookGunState
+    {
+        private float _hookOutTimer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _hookOutTimer = 0f;
             Context._hook.transform.parent = null;
-            EventManager.Instance.TriggerEvent(new HookGunFired(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerController>().PlayerNumber));
+            Context._hookOutTimer = Time.time;
         }
 
         public override void Update()
         {
             base.Update();
-            Vector3 nextpos = (Context._hookmaxPos - Context._hook.transform.position).normalized;
-            Context._hook.transform.Translate(nextpos * Time.deltaTime * Context._hookGunData.HookSpeed, Space.World);
-            if (Vector3.Distance(Context._hook.transform.position, Context._hookmaxPos) <= 0.1f)
+            _hookOutTimer += Time.deltaTime;
+            Context._hook.transform.Translate(-Context._hook.transform.right * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
+            if (_hookOutTimer >= _hookGunData.HookOutDuration)
             {
-                TransitionTo<FlyingInState>();
+                TransitionTo<HookFlyingInState>();
+                return;
+            }
+            if (_hookOutTimer >= _hookGunData.HookMinOutDuration && Context._released)
+            {
+                TransitionTo<HookFlyingInState>();
                 return;
             }
         }
     }
 
-    private class OnTargetState : HookState
+    private class HookOnTargetState : HookGunState
     {
+        private float _hookStopTimer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            _hookStopTimer = Time.time + _hookGunData.HookedTime;
+            Context._onTargetTimer = Time.time;
+            Context._onTargetTransformForwardVector = -Context.transform.right;
+        }
 
+        public override void Update()
+        {
+            base.Update();
+            if (_hookStopTimer < Time.time)
+            {
+                TransitionTo<HookFlyingInState>();
+                return;
+            }
+        }
     }
 
-    private class FlyingInState : HookState
+    private class HookFlyingInState : HookGunState
     {
+        public override void Update()
+        {
+            base.Update();
+            // Whatever we do, retract the hook
+            Vector3 nextpos = (Context.transform.position - Context._hook.transform.position).normalized;
+            if (Context.Hooked != null)
+            {
+                Vector3 vec = Context.transform.right;
+                Vector3 finalVec1 = nextpos - vec;
+                nextpos = (nextpos + finalVec1 * 10f).normalized;
+            }
+            Context._hook.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
 
+            // if hooked and not released
+            // Then make hooked follow hook position
+            if (Context.Hooked != null && !Context._released)
+            {
+                Context.Hooked.transform.Translate(nextpos * Time.deltaTime * _hookGunData.HookSpeed, Space.World);
+            }
+
+            // if hooked and released the trigger,
+            // Slingshot them out
+            if (Context.Hooked != null && Context._released)
+            {
+                Vector3 force = (Context.transform.position - Context._hook.transform.position).normalized;
+                Vector3 vec2 = Context.transform.right;
+                Vector3 finalVec = force - vec2;
+                finalVec.y = 0f;
+                if (finalVec.magnitude <= 0.3f)
+                    finalVec = force;
+                force = finalVec.normalized;
+                foreach (var rb in Context.Hooked.GetComponentsInChildren<Rigidbody>())
+                {
+                    rb.isKinematic = false;
+                }
+                float HookForceMagnitude = _hookGunData.HookAwayForce;
+                float releaseOnTargetTimeDiff = Context._releasedTimer - Context._onTargetTimer;
+                if (releaseOnTargetTimeDiff <= 1f)
+                {
+                    HookForceMagnitude *= _hookGunData.HookAwayForceCurve.Evaluate(releaseOnTargetTimeDiff);
+                }
+                float GunTotalRotation = Vector3.Angle(Context._onTargetTransformForwardVector, -Context.transform.right);
+                HookForceMagnitude *= _hookGunData.HookAwayForceRotationCurve.Evaluate(GunTotalRotation / 180f);
+                Context.Hooked.GetComponent<IHittable>().OnImpact(force * HookForceMagnitude, ForceMode.Impulse, Context.Owner, ImpactType.HookGun);
+                Context.Hooked = null;
+            }
+
+            // If it's almost in, then get rid of the hooked player first
+            // to make sure no hardcore collision happens
+            if (Vector3.Distance(Context._hook.transform.position, Context.transform.position) <= 0.6f)
+            {
+                if (Context.Hooked != null)
+                {
+                    foreach (var rb in Context.Hooked.GetComponentsInChildren<Rigidbody>())
+                    {
+                        rb.isKinematic = false;
+                    }
+                    Context.Hooked = null;
+                }
+            }
+
+            // If almost in, then count that as in
+            if (Vector3.Distance(Context._hook.transform.position, Context.transform.position) <= 0.3f)
+            {
+                TransitionTo<HookRecoveryState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._onWeaponUsedOnce();
+        }
     }
 
-    private class BrokenState : HookState
+    private class HookRecoveryState : HookGunState
     {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._hook.SetActive(true);
+            Context._hook.transform.parent = Context.transform;
+            Context._hook.transform.localScale = Context._hookinitlocalScale;
+            Context._hook.transform.localEulerAngles = Context._hookinitialLocalRotation;
+            Context._hook.transform.localPosition = Context._hookinitlocalPos;
+        }
 
+        public override void Update()
+        {
+            base.Update();
+            if (Context._hookOutTimer + _hookGunData.HookGunUseCD < Time.time)
+            {
+                TransitionTo<HookInState>();
+                return;
+            }
+        }
     }
 
-    private class StaticFlyingIn : HookState
+    private class HookBrokenState : HookGunState
     {
+        private float _brokenTimer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            GameObject hookDup = Instantiate(Context._hook, Context._hook.transform.position, Context._hook.transform.rotation);
+            Destroy(hookDup, _hookGunData.HookBlockReloadTime);
+            Context._hook.transform.parent = Context.transform;
+            Context._hook.transform.localScale = Context._hookinitlocalScale;
+            Context._hook.transform.localEulerAngles = Context._hookinitialLocalRotation;
+            Context._hook.transform.localPosition = Context._hookinitlocalPos;
+            Context._hook.SetActive(false);
+            hookDup.GetComponent<Rigidbody>().isKinematic = false;
+            hookDup.GetComponent<Rigidbody>().useGravity = true;
+            var coll = hookDup.AddComponent<MeshCollider>();
+            coll.convex = true;
+            Vector3 _dir = -hookDup.transform.right;
+            _dir.y = _hookGunData.HookBlockYDirection;
+            hookDup.GetComponent<Rigidbody>().AddForce(_hookGunData.HookBlockReflectionForce * _dir, ForceMode.Impulse);
+            _brokenTimer = Time.time + _hookGunData.HookBlockReloadTime;
+        }
 
+        public override void Update()
+        {
+            base.Update();
+            if (_brokenTimer < Time.time)
+            {
+                TransitionTo<HookInState>();
+                return;
+            }
+        }
     }
 }

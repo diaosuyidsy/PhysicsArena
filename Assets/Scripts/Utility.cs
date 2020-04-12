@@ -398,6 +398,7 @@ public interface IAimable
 public interface IHittable
 {
     GameObject GetGameObject();
+    void SetVelocity(Vector3 vel);
     bool CanBeBlockPushed();
     /// <summary>
     /// Can Block The attack or not

@@ -9,6 +9,7 @@ public class SuckBallController : MonoBehaviour
     public List<GameObject> InRangePlayers;
 
     public GameObject lineEndPrefab;
+    public SuckGunData SuckGunData;
     private rtSuck _rts;
     private string _opponentTeamTag = "";
     private List<GameObject> _lineEnds = new List<GameObject>();
@@ -30,7 +31,7 @@ public class SuckBallController : MonoBehaviour
     {
         if (_rts.isSucking()) return;
         GameObject go = other.gameObject;
-        if (go.tag.Contains(_opponentTeamTag) && other.GetType() == typeof(CapsuleCollider))
+        if (go.tag.Contains(_opponentTeamTag) && other.GetType() == typeof(CapsuleCollider) && (((1 << go.layer) | SuckGunData.CanSuckLayer) == SuckGunData.CanSuckLayer))
         {
             /*GameObject lrContainer = new GameObject("LineRenderer");
             lrContainer.transform.parent = transform;*/

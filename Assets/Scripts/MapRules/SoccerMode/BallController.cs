@@ -48,6 +48,11 @@ public class BallController : MonoBehaviour, IHittable
         GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
 
+    public void SetVelocity(Vector3 vel)
+    {
+        _rb.velocity = vel;
+    }
+
     public bool CanBeBlockPushed()
     {
         return false;

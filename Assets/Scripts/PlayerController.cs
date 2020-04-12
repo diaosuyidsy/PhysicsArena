@@ -344,6 +344,14 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    public void SetVelocity(Vector3 vel)
+    {
+        foreach (Rigidbody rb in _allPlayerRBs)
+        {
+            rb.velocity = vel;
+        }
+    }
+
     private bool _frontIsCliff()
     {
         RaycastHit hit;
@@ -1393,6 +1401,30 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 TransitionTo<IdleActionState>();
                 return;
+            }
+            // _sweepInHitDirection();
+        }
+
+        private void _sweepInHitDirection()
+        {
+            RaycastHit[] hits = Context._rb.SweepTestAll(Context._rb.velocity.normalized, Context.CharacterDataStore.HitSweepBackwardDistance);
+            for (int i = 0; i < hits.Length; i++)
+            {
+                Transform hit = hits[i].transform;
+                GameObject target = null;
+                if (hit.GetComponent<WeaponBase>() != null && hit.transform.GetComponent<WeaponBase>().Owner != null)
+                    target = hit.transform.GetComponent<WeaponBase>().Owner;
+                else if (hit.transform.GetComponentInParent<IHittable>() != null)
+                    target = hit.transform.gameObject;
+                else return;
+
+                Vector3 targetToPlayerDirection = (target.transform.position - Context.transform.position).normalized;
+                Vector3 playerMovingDirection = Context._rb.velocity.normalized;
+                Vector3 projected = Vector3.Project(targetToPlayerDirection, playerMovingDirection);
+                Vector3 temp = (targetToPlayerDirection - projected);
+                temp.y = 0f;
+                Vector3 result = temp.normalized * Context.CharacterDataStore.HitSweepPushBackForce;
+                target.transform.GetComponentInParent<IHittable>().OnImpact(result, ForceMode.VelocityChange, Context.gameObject, ImpactType.Melee);
             }
         }
     }

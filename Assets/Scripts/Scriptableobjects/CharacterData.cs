@@ -81,4 +81,5 @@ public class CharacterData : ScriptableObject
     public Ease HitStopViberationEase = Ease.OutBack;
     public float HitSweepBackwardDistance = 0.2f;
     public float HitSweepPushBackForce = 100f;
+    public float HitSweepRadius = 0.3f;
 }

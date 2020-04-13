@@ -1383,15 +1383,18 @@ public class PlayerController : MonoBehaviour, IHittable
         private float _timer;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         private int myLayer;
+        private HashSet<GameObject> _sweepedObjects;
         public override void OnEnter()
         {
             base.OnEnter();
             Context._dropHandObject();
+            _sweepedObjects = new HashSet<GameObject>();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
             EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
             myLayer = Context.gameObject.layer;
             Context.gameObject.layer = 19;
             Context._rb.AddForce(Context._hitForceTuple.Force, Context._hitForceTuple.ForceMode);
+            _sweepInHitDirection();
         }
 
         public override void OnExit()
@@ -1408,12 +1411,13 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            // _sweepInHitDirection();
+            _sweepInHitDirection();
         }
 
         private void _sweepInHitDirection()
         {
-            RaycastHit[] hits = Context._rb.SweepTestAll(Context._rb.velocity.normalized, Context.CharacterDataStore.HitSweepBackwardDistance);
+            RaycastHit[] hits = Physics.SphereCastAll(Context.transform.position, Context.CharacterDataStore.HitSweepRadius, Context._rb.velocity.normalized,
+            Context.CharacterDataStore.HitSweepBackwardDistance, Context.CharacterDataStore.CanHitLayer);
             for (int i = 0; i < hits.Length; i++)
             {
                 Transform hit = hits[i].transform;
@@ -1424,6 +1428,8 @@ public class PlayerController : MonoBehaviour, IHittable
                     target = hit.transform.gameObject;
                 else continue;
                 if (target == Context.gameObject) continue;
+                if (_sweepedObjects.Contains(target)) continue;
+                _sweepedObjects.Add(target);
                 Vector3 targetToPlayerDirection = (target.transform.position - Context.transform.position).normalized;
                 Vector3 playerMovingDirection = Context._rb.velocity.normalized;
                 Vector3 projected = Vector3.Project(targetToPlayerDirection, playerMovingDirection);

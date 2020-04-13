@@ -12,11 +12,6 @@ using System;
 
 public class GameStateManager : GameStateManagerBase
 {
-    // public PlayerController[] PlayerControllers;
-    // public PlayerInformation PlayersInformation;
-    // public List<Transform> CameraTargets;
-
-    // public GameMapData _gameMapdata;
     private ConfigData _configData;
     private FSM<GameStateManager> _gameStateFSM;
     private TextMeshProUGUI _holdAText;
@@ -29,7 +24,6 @@ public class GameStateManager : GameStateManagerBase
     private Transform _tutorialBackgroundMask;
     private Transform _tutorialObjectiveImages;
     private Transform _playersHolder;
-    private Transform[] _playersOutestHolder;
     private TextMeshProUGUI _countDownText;
     private Camera _cam;
     private Vector3 _endFocusPosition;
@@ -81,7 +75,6 @@ public class GameStateManager : GameStateManagerBase
         _tutorialBackgroundMask = GameObject.Find("TutorialCanvas").transform.Find("BackgroundMask");
         _tutorialObjectiveImages = GameObject.Find("TutorialCanvas").transform.Find("ObjectiveImages");
         Debug.Assert(_tutorialImage != null);
-        _playersOutestHolder = new Transform[6];
         _countDownText = GameObject.Find("TutorialCanvas").transform.Find("CountDown").GetComponent<TextMeshProUGUI>();
         _pauseMenu = GameObject.Find("PauseMenu").transform;
         _pauseBackgroundMask = _pauseMenu.Find("BackgroundMask");
@@ -89,7 +82,6 @@ public class GameStateManager : GameStateManagerBase
         _pauseResume = _pauseMenu.Find("Resume");
         _pauseQuit = _pauseMenu.Find("Quit");
         _pauseWholeMask = _pauseMenu.Find("WholeMask");
-        PlayerControllers = new PlayerController[PlayersInformation.ColorIndex.Length];
         _statisticPanel = _gameEndCanvas.Find("StatisticPanel");
         _MVPDisplay = _statisticPanel.Find("MVPDisplay");
         _MVPTitle = _statisticPanel.Find("MVPTitle");
@@ -99,19 +91,12 @@ public class GameStateManager : GameStateManagerBase
         _MVPPlayerHolder = _MVP.Find("MVPPlayerHolder");
         _MVPSpotLight = _MVP.Find("MVPSpotLight");
         _MVPPodium = _MVP.Find("MVPPodium");
-        CameraTargets = new List<Transform>();
-        for (int i = 0; i < 6; i++)
-        {
-            _playersOutestHolder[i] = _playersHolder.GetChild(i);
-        }
         for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
         {
-            PlayerControllers[i] = _playersOutestHolder[PlayersInformation.ColorIndex[i]].GetComponentInChildren<PlayerController>(true);
-            CameraTargets.Add(PlayerControllers[i].transform);
+            GameObject player = GameObject.Instantiate(_configData.PlayerPrefabs[PlayersInformation.ColorIndex[i]]);
+            player.transform.parent = _playersHolder;
         }
         EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
-        EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
-        EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
         EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
@@ -146,8 +131,6 @@ public class GameStateManager : GameStateManagerBase
     public override void Destroy()
     {
         EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
-        EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
-        EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawn);
         EventManager.Instance.RemoveHandler<HitStopEvent>(_onHitStop);
         if (_gameStateFSM.CurrentState != null)
             _gameStateFSM.CurrentState.CleanUp();
@@ -174,16 +157,6 @@ public class GameStateManager : GameStateManagerBase
             _gameStateFSM.TransitionTo<WinState>();
             return;
         }
-    }
-
-    private void _onPlayerDied(PlayerDied pd)
-    {
-        CameraTargets.Remove(pd.Player.transform);
-    }
-
-    private void _onPlayerRespawn(PlayerRespawned pr)
-    {
-        CameraTargets.Add(pr.Player.transform);
     }
 
     private abstract class GameState : FSM<GameStateManager>.State
@@ -325,11 +298,9 @@ public class GameStateManager : GameStateManagerBase
         public override void OnEnter()
         {
             base.OnEnter();
-            for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+            for (int i = 0; i < Context._playersHolder.childCount; i++)
             {
-                int playerindex = _PlayersInformation.ColorIndex[i];
-                int rewiredid = _PlayersInformation.RewiredID[i];
-                PlayerController playercontroller = Context._playersOutestHolder[playerindex].GetComponentInChildren<PlayerController>(true);
+                PlayerController playercontroller = Context._playersHolder.GetChild(i).GetComponent<PlayerController>();
                 playercontroller.enabled = false;
                 playercontroller.GetComponent<Rigidbody>().isKinematic = false;
             }
@@ -581,11 +552,9 @@ public class GameStateManager : GameStateManagerBase
             Context._pauseResume.gameObject.SetActive(true);
             Context._pauseQuit.gameObject.SetActive(true);
             _switchMenu();
-            for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+            for (int i = 0; i < Context._playersHolder.childCount; i++)
             {
-                int playerindex = _PlayersInformation.ColorIndex[i];
-                int rewiredid = _PlayersInformation.RewiredID[i];
-                PlayerController playercontroller = Context._playersOutestHolder[playerindex].GetComponentInChildren<PlayerController>(true);
+                PlayerController playercontroller = Context._playersHolder.GetChild(i).GetComponent<PlayerController>();
                 playercontroller.enabled = false;
             }
             Time.timeScale = 0f;
@@ -660,11 +629,9 @@ public class GameStateManager : GameStateManagerBase
             Context._pausePausedText.gameObject.SetActive(false);
             Context._pauseResume.gameObject.SetActive(false);
             Context._pauseQuit.gameObject.SetActive(false);
-            for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+            for (int i = 0; i < Context._playersHolder.childCount; i++)
             {
-                int playerindex = _PlayersInformation.ColorIndex[i];
-                int rewiredid = _PlayersInformation.RewiredID[i];
-                PlayerController playercontroller = Context._playersOutestHolder[playerindex].GetComponentInChildren<PlayerController>(true);
+                PlayerController playercontroller = Context._playersHolder.GetChild(i).GetComponent<PlayerController>();
                 playercontroller.enabled = true;
             }
         }
@@ -695,15 +662,15 @@ public class GameStateManager : GameStateManagerBase
             _cam.DOFieldOfView(_GameMapData.CameraTargetFOV, _GameMapData.CameraMoveDuration).SetDelay(_GameMapData.CameraMoveDelay).SetEase(_GameMapData.CameraMoveEase);
             int chickenPosIndex = 0;
             int duckPosIndex = 0;
-            for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+            for (int i = 0; i < Context._playersHolder.childCount; i++)
             {
-                int playerIndex = _PlayersInformation.ColorIndex[i];
-                int rewiredID = Context.GetRewiredIDFromColorIndex(playerIndex);
-                if (playerIndex < 3) Context._playersOutestHolder[playerIndex].position = _GameMapData.DuckLandingPostion[duckPosIndex++];
-                else Context._playersOutestHolder[playerIndex].position = _GameMapData.ChickenLandingPosition[chickenPosIndex++];
+                int colorIndex = Utility.GetColorIndexFromPlayer(Context._playersHolder.GetChild(i).gameObject);
+                int rewiredID = Context.GetRewiredIDFromColorIndex(colorIndex);
+                if (colorIndex < 3) Context._playersHolder.GetChild(i).position = _GameMapData.DuckLandingPostion[duckPosIndex++];
+                else Context._playersHolder.GetChild(i).position = _GameMapData.ChickenLandingPosition[chickenPosIndex++];
                 int temp = i;
-                Context._playersOutestHolder[playerIndex].gameObject.SetActive(true);
-                seq.Join(Context._playersOutestHolder[playerIndex].DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[temp]).SetEase(_GameMapData.BirdsFlyDownEase).
+                Context._playersHolder.GetChild(i).gameObject.SetActive(true);
+                seq.Join(Context._playersHolder.GetChild(i).DOLocalMoveY(0.64f, _GameMapData.BirdsFlyDownDuration).SetDelay(_GameMapData.BirdsFlyDownDelay[temp]).SetEase(_GameMapData.BirdsFlyDownEase).
                 OnComplete(() =>
                 {
                     Services.GameFeelManager.ViberateController(rewiredID, 1f, 0.3f);
@@ -740,11 +707,10 @@ public class GameStateManager : GameStateManagerBase
             /// TODO: Color the players
             /// 2. Enable Camera
             /// 3. Send Game Start Event
-            for (int i = 0; i < _PlayersInformation.ColorIndex.Length; i++)
+            for (int i = 0; i < Context._playersHolder.childCount; i++)
             {
-                int playerindex = _PlayersInformation.ColorIndex[i];
                 int rewiredid = _PlayersInformation.RewiredID[i];
-                PlayerController playercontroller = Context._playersOutestHolder[playerindex].GetComponentInChildren<PlayerController>(true);
+                PlayerController playercontroller = Context._playersHolder.GetChild(i).GetComponent<PlayerController>();
                 playercontroller.enabled = true;
                 playercontroller.Init(rewiredid);
                 playercontroller.GetComponent<Rigidbody>().isKinematic = false;

@@ -10,7 +10,7 @@ public class BallController : MonoBehaviour, IHittable
     private void Awake()
     {
         InitialPosition = new Vector3(transform.position.x, transform.position.y, transform.position.z);
-        Services.GameStateManager.CameraTargets.Add(transform);
+        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(gameObject, 1));
         _rb = GetComponent<Rigidbody>();
         Debug.Assert(_rb != null, "Rigidbody missing on soccer ball");
     }

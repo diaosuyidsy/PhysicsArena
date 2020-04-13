@@ -349,11 +349,7 @@ public class PlayerController : MonoBehaviour, IHittable
     }
     private void _setToSpawn(float yOffset)
     {
-        int colorindex = 0;
-        for (int j = 0; j < Services.GameStateManager.PlayersInformation.RewiredID.Length; j++)
-        {
-            if (PlayerNumber == Services.GameStateManager.PlayersInformation.RewiredID[j]) colorindex = Services.GameStateManager.PlayersInformation.ColorIndex[j];
-        }
+        int colorindex = Utility.GetColorIndexFromPlayer(gameObject);
         if (CompareTag("Team1"))
         {
             Vector3 pos = Services.Config.Team1RespawnPoints[colorindex - 3];

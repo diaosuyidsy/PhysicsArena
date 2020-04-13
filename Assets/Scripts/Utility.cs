@@ -10,16 +10,7 @@ public static class Utility
 {
     public static int GetPlayerNumber()
     {
-        int Count = 0;
-        for (int i = 0; i < Services.GameStateManager.CameraTargets.Count; i++)
-        {
-            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
-            {
-                Count++;
-            }
-        }
-
-        return Count;
+        return GameObject.Find("Players").transform.childCount;
     }
 
 

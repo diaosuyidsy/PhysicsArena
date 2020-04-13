@@ -407,14 +407,6 @@ public interface IHittable
     /// <returns></returns>
     bool CanBlock(Vector3 forwardAngle);
     /// <summary>
-    /// A method to call when hitting a blockable object
-    /// </summary>
-    /// <param name="force"></param>
-    /// <param name="_meleeCharge"></param>
-    /// <param name="sender"></param>
-    /// <param name="_blockable"></param>
-    void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable);
-    /// <summary>
     /// A method to call when directly dealing impact with no blocking possiblity
     /// </summary>
     /// <param name="force"></param>
@@ -483,5 +475,17 @@ public class CameraTargets
     {
         Target = target;
         Weight = weight;
+    }
+}
+
+public class ForceTuple
+{
+    public Vector3 Force;
+    public ForceMode ForceMode;
+
+    public ForceTuple(Vector3 force, ForceMode forceMode)
+    {
+        Force = force;
+        ForceMode = forceMode;
     }
 }

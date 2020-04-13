@@ -96,6 +96,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private Vector3 _storedVelocity;
     private int _hitStopFrames;
     public bool IsIdle { get { return _movementFSM.CurrentState.GetType().Equals(typeof(IdleState)); } }
+    private ForceTuple _hitForceTuple;
     #endregion
 
     private void Awake()
@@ -186,21 +187,6 @@ public class PlayerController : MonoBehaviour, IHittable
         return false;
     }
 
-    public void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable)
-    {
-        // First check if the player could block the attack
-        if (_blockable &&
-            CanBlock(sender.transform.forward))
-        {
-            sender.GetComponentInParent<IHittable>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
-        }
-        else // Player is hit cause he could not block
-        {
-            EventManager.Instance.TriggerEvent(new PlayerHit(sender, gameObject, force, sender.GetComponent<PlayerController>().PlayerNumber, PlayerNumber, _meleeCharge, !_blockable));
-            OnImpact(force, ForceMode.Impulse, sender, _blockable ? ImpactType.Melee : ImpactType.Block);
-        }
-    }
-
     /// <summary>
     /// This function is called when enemies want to impact the player
     /// </summary>
@@ -209,11 +195,11 @@ public class PlayerController : MonoBehaviour, IHittable
     /// <param name="enforcer">who is the impactor</param>
     public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType)
     {
-        _rb.AddForce(force, forcemode);
         OnImpact(enforcer, impactType);
 
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
         {
+            _hitForceTuple = new ForceTuple(force, forcemode);
             _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeSmall;
             _hitStopFrames = CharacterDataStore.HitStopFramesSmall;
             if (force.magnitude > CharacterDataStore.HitBigThreshold)
@@ -223,19 +209,23 @@ public class PlayerController : MonoBehaviour, IHittable
             }
             if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
-                if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
-                    _movementFSM.TransitionTo<PunchHittedStopMovementState>();
-                else
-                    _movementFSM.TransitionTo<HitUncontrollableState>();
+                // if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+                //     _movementFSM.TransitionTo<PunchHittedStopMovementState>();
+                // else
+                _movementFSM.TransitionTo<HitUncontrollableState>();
             }
 
             if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
             {
-                if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
-                    _actionFSM.TransitionTo<PunchHittedStopActionState>();
-                else
-                    _actionFSM.TransitionTo<HitUnControllableActionState>();
+                // if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
+                //     _actionFSM.TransitionTo<PunchHittedStopActionState>();
+                // else
+                _actionFSM.TransitionTo<HitUnControllableActionState>();
             }
+        }
+        else
+        {
+            _rb.AddForce(force, forcemode);
         }
     }
 
@@ -336,15 +326,6 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
-    #region Helper Method
-    private void _setVelocity(Vector3 vel)
-    {
-        foreach (Rigidbody rb in _allPlayerRBs)
-        {
-            rb.velocity = vel;
-        }
-    }
-
     public void SetVelocity(Vector3 vel)
     {
         foreach (Rigidbody rb in _allPlayerRBs)
@@ -353,6 +334,7 @@ public class PlayerController : MonoBehaviour, IHittable
         }
     }
 
+    #region Helper Method
     private bool _frontIsCliff()
     {
         RaycastHit hit;
@@ -1312,6 +1294,7 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         private float _time;
         private bool _hitOnce;
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
 
         public override void OnEnter()
         {
@@ -1332,40 +1315,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (Time.time < _time + Context.CharacterDataStore.PunchActivateTime)
-            {
-                RaycastHit hit;
-                // This Layermask get all player's layer except this player's
-                int layermask = 0;
-                if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
-                else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
-                if (!_hitOnce && Physics.SphereCast(Context.transform.position - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
-                {
-                    GameObject target = null;
-                    if (hit.transform.GetComponent<WeaponBase>() != null)
-                    {
-                        target = hit.transform.GetComponent<WeaponBase>().Owner;
-                    }
-                    else if (hit.transform.GetComponentInParent<IHittable>() != null)
-                    {
-                        target = hit.transform.gameObject;
-                    }
-                    else return;
-                    _hitOnce = true;
-                    foreach (var rb in target.transform.GetComponentInParent<PlayerController>().gameObject.GetComponentsInChildren<Rigidbody>(true))
-                    {
-                        rb.velocity = Vector3.zero;
-                    }
-                    Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
-                    target.transform.GetComponentInParent<IHittable>().OnImpact(force, 1f, Context.gameObject, true);
-                    if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
-                        Context._setVelocity(Vector3.zero);
-                    Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
-                    //TransitionTo<PunchHitStopActionState>();
-                    //Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
-                    return;
-                }
-            }
+            _checkHit();
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
@@ -1377,8 +1327,54 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void OnExit()
         {
             base.OnExit();
+            _checkHit();
             Context._animator.SetBool("PunchReleased", false);
             Context._rotationSpeedMultiplier = 1f;
+        }
+
+        private void _checkHit()
+        {
+            RaycastHit hit;
+            // This Layermask get all player's layer except this player's
+            int layermask = 0;
+            if (Context.gameObject.layer == LayerMask.NameToLayer("ReviveInvincible")) layermask = Context.CharacterDataStore.CanHitLayer;
+            else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
+            if (!_hitOnce && Physics.SphereCast(Context.transform.position - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
+            {
+                GameObject target = null;
+                if (hit.transform.GetComponent<WeaponBase>() != null)
+                {
+                    target = hit.transform.GetComponent<WeaponBase>().Owner;
+                }
+                else if (hit.transform.GetComponentInParent<IHittable>() != null)
+                {
+                    target = hit.transform.GetComponentInParent<IHittable>().GetGameObject();
+                }
+                else return;
+                _hitOnce = true;
+                foreach (var rb in target.GetComponentsInChildren<Rigidbody>(true))
+                {
+                    rb.velocity = Vector3.zero;
+                }
+                Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
+                Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
+                if (target.GetComponent<IHittable>().CanBlock(Context.transform.forward))
+                {
+                    force *= (-Context.CharacterDataStore.BlockMultiplier);
+                    EventManager.Instance.TriggerEvent(new PlayerHit(target, Context.gameObject, force, target.GetComponent<PlayerController>().PlayerNumber, Context.PlayerNumber, 1f, true));
+                    Context.OnImpact(force, ForceMode.Impulse, target, ImpactType.Block);
+                }
+                else
+                {
+                    EventManager.Instance.TriggerEvent(new PlayerHit(Context.gameObject, target, force, Context.PlayerNumber, target.GetComponent<PlayerController>().PlayerNumber, 1f, false));
+                    if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
+                        Context.SetVelocity(Vector3.zero);
+                    target.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Context.gameObject, ImpactType.Melee);
+                }
+                // TransitionTo<PunchHitStopActionState>();
+                // Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
+                return;
+            }
         }
     }
 
@@ -1395,6 +1391,7 @@ public class PlayerController : MonoBehaviour, IHittable
             EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
             myLayer = Context.gameObject.layer;
             Context.gameObject.layer = 19;
+            Context._rb.AddForce(Context._hitForceTuple.Force, Context._hitForceTuple.ForceMode);
         }
 
         public override void OnExit()

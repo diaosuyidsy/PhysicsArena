@@ -1386,13 +1386,21 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         private float _timer;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
-
+        private int myLayer;
         public override void OnEnter()
         {
             base.OnEnter();
             Context._dropHandObject();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
             EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            myLayer = Context.gameObject.layer;
+            Context.gameObject.layer = 19;
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context.gameObject.layer = myLayer;
         }
 
         public override void Update()
@@ -1417,8 +1425,8 @@ public class PlayerController : MonoBehaviour, IHittable
                     target = hit.transform.GetComponent<WeaponBase>().Owner;
                 else if (hit.transform.GetComponentInParent<IHittable>() != null)
                     target = hit.transform.gameObject;
-                else return;
-
+                else continue;
+                if (target == Context.gameObject) continue;
                 Vector3 targetToPlayerDirection = (target.transform.position - Context.transform.position).normalized;
                 Vector3 playerMovingDirection = Context._rb.velocity.normalized;
                 Vector3 projected = Vector3.Project(targetToPlayerDirection, playerMovingDirection);

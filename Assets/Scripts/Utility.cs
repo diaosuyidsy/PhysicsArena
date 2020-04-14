@@ -10,16 +10,7 @@ public static class Utility
 {
     public static int GetPlayerNumber()
     {
-        int Count = 0;
-        for (int i = 0; i < Services.GameStateManager.CameraTargets.Count; i++)
-        {
-            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
-            {
-                Count++;
-            }
-        }
-
-        return Count;
+        return GameObject.Find("Players").transform.childCount;
     }
 
 
@@ -398,6 +389,7 @@ public interface IAimable
 public interface IHittable
 {
     GameObject GetGameObject();
+    void SetVelocity(Vector3 vel);
     bool CanBeBlockPushed();
     /// <summary>
     /// Can Block The attack or not
@@ -405,14 +397,6 @@ public interface IHittable
     /// <param name="forwardAngle"></param>
     /// <returns></returns>
     bool CanBlock(Vector3 forwardAngle);
-    /// <summary>
-    /// A method to call when hitting a blockable object
-    /// </summary>
-    /// <param name="force"></param>
-    /// <param name="_meleeCharge"></param>
-    /// <param name="sender"></param>
-    /// <param name="_blockable"></param>
-    void OnImpact(Vector3 force, float _meleeCharge, GameObject sender, bool _blockable);
     /// <summary>
     /// A method to call when directly dealing impact with no blocking possiblity
     /// </summary>
@@ -482,5 +466,17 @@ public class CameraTargets
     {
         Target = target;
         Weight = weight;
+    }
+}
+
+public class ForceTuple
+{
+    public Vector3 Force;
+    public ForceMode ForceMode;
+
+    public ForceTuple(Vector3 force, ForceMode forceMode)
+    {
+        Force = force;
+        ForceMode = forceMode;
     }
 }

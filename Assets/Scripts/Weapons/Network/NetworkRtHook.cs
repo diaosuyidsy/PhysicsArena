@@ -209,38 +209,38 @@ public class NetworkRtHook : NetworkWeaponBase
 
         private void _checkHook()
         {
-            RaycastHit hit;
-            if (Physics.SphereCast(Context._hook.transform.position,
-                                _hookGunData.HookRadius,
-                                -Context._hook.transform.right,
-                                out hit,
-                                _hookGunData.HookDistance,
-                                _hookGunData.HookableLayer ^ (1 << Context.gameObject.layer)) ||
-                Physics.Linecast(_lastFramePosition, Context._hook.transform.position, out hit, _hookGunData.HookableLayer ^ (1 << Context.gameObject.layer)))
-            {
-                if (Context._ownerIsLocalPlayer && hit.transform.GetComponent<IHittableNetwork>() != null)
-                {
-                    // Decide if he blocked
-                    if (hit.transform.GetComponent<IHittableNetwork>().CanBlock(-Context._hook.transform.right))
-                    {
-                        Context.CmdHookBlocked(hit.transform.gameObject);
-                        EventManager.Instance.TriggerEvent(new HookBlocked(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hit.transform.gameObject, hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber, Context._hook));
-                        TransitionTo<HookBrokenState>();
-                        return;
-                    }
+            // RaycastHit hit;
+            // if (Physics.SphereCast(Context._hook.transform.position,
+            //                     _hookGunData.HookRadius,
+            //                     -Context._hook.transform.right,
+            //                     out hit,
+            //                     _hookGunData.HookDistance,
+            //                     _hookGunData.HookableLayer ^ (1 << Context.gameObject.layer)) ||
+            //     Physics.Linecast(_lastFramePosition, Context._hook.transform.position, out hit, _hookGunData.HookableLayer ^ (1 << Context.gameObject.layer)))
+            // {
+            //     if (Context._ownerIsLocalPlayer && hit.transform.GetComponent<IHittableNetwork>() != null)
+            //     {
+            //         // Decide if he blocked
+            //         if (hit.transform.GetComponent<IHittableNetwork>().CanBlock(-Context._hook.transform.right))
+            //         {
+            //             Context.CmdHookBlocked(hit.transform.gameObject);
+            //             EventManager.Instance.TriggerEvent(new HookBlocked(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, hit.transform.gameObject, hit.transform.GetComponent<PlayerControllerMirror>().PlayerNumber, Context._hook));
+            //             TransitionTo<HookBrokenState>();
+            //             return;
+            //         }
 
-                    Context.Hooked = hit.transform.gameObject;
-                    // Context.RpcHookHit(hit.transform.gameObject);
-                    Context.CmdHookHit(hit.transform.gameObject);
-                    Context.Hooked.GetComponent<IHittableNetwork>().OnImpact(Context.Owner, ImpactType.HookGun);
-                    foreach (var rb in Context.Hooked.GetComponentsInChildren<Rigidbody>())
-                    {
-                        rb.isKinematic = true;
-                    }
-                    TransitionTo<HookOnTargetState>();
-                    return;
-                }
-            }
+            //         Context.Hooked = hit.transform.gameObject;
+            //         // Context.RpcHookHit(hit.transform.gameObject);
+            //         Context.CmdHookHit(hit.transform.gameObject);
+            //         Context.Hooked.GetComponent<IHittableNetwork>().OnImpact(Context.Owner, ImpactType.HookGun);
+            //         foreach (var rb in Context.Hooked.GetComponentsInChildren<Rigidbody>())
+            //         {
+            //             rb.isKinematic = true;
+            //         }
+            //         TransitionTo<HookOnTargetState>();
+            //         return;
+            //     }
+            // }
         }
     }
 

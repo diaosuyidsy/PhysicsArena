@@ -6,6 +6,7 @@ using DG.Tweening;
 [CreateAssetMenu(fileName = "ConfigData", menuName = "ScriptableObjects/ConfigData", order = 1)]
 public class ConfigData : ScriptableObject
 {
+    public GameObject[] PlayerPrefabs;
     public LayerMask AllPlayerLayer;
     public string[] IndexToName;
     public Color[] IndexToColor;

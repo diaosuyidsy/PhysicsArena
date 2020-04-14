@@ -46,9 +46,9 @@ public class rtBirdFood : WeaponBase
         GetComponent<Rigidbody>().velocity = Vector3.zero;
     }
 
-    public override void OnDrop()
+    public override void OnDrop(bool customForce, Vector3 force)
     {
         LastHolder = Owner.GetComponent<PlayerController>().PlayerNumber;
-        base.OnDrop();
+        base.OnDrop(customForce, force);
     }
 }

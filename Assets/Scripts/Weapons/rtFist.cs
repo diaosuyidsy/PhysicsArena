@@ -124,8 +124,7 @@ public class rtFist : WeaponBase
         _fistDup = null;
         _fist.gameObject.SetActive(true);
         _ammo = _fistGunData.MaxAmmo;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     private void _switchToRecharge(bool maintainSpeed = false)

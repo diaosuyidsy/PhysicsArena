@@ -12,7 +12,7 @@ public class WaterGunLine : MonoBehaviour
     //public Renderer meshRenderer2;
     public ParticleSystem[] hitPsArray;
     public int segmentCount = 32;
-    public float globalProgressSpeed = 1f;
+    public float globalProgressSpeed { get { return 1f / waterGunData.ShootMaxCD; } }
     public AnimationCurve shaderProgressCurve;
     public AnimationCurve lineWidthCurve;
 

@@ -7,13 +7,14 @@ public abstract class WeaponBase : MonoBehaviour
     public WeaponDataBase WeaponDataBase;
     public virtual float HelpAimAngle { get; }
     public virtual float HelpAimDistance { get; }
+    public bool OnDropDisappear = true;
 
     public GameObject Owner { get; protected set; }
     protected int _ammo { get; set; }
     protected bool _hitGroundOnce;
     public bool CanBePickedUp;
     protected bool _followHand;
-    protected float _pickUpTimer;
+    private bool _dropFromHand;
 
     protected virtual void Awake()
     {
@@ -74,6 +75,12 @@ public abstract class WeaponBase : MonoBehaviour
         }
         if ((WeaponDataBase.OnNoAmmoDropDisappear == (WeaponDataBase.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
         {
+            if (OnDropDisappear && _dropFromHand)
+            {
+                _dropFromHand = false;
+                _onWeaponDespawn();
+                return;
+            }
             if (!_hitGroundOnce)
             {
                 gameObject.layer = LayerMask.NameToLayer("Pickup");
@@ -88,11 +95,13 @@ public abstract class WeaponBase : MonoBehaviour
     {
         CanBePickedUp = true;
         _followHand = true;
+        _dropFromHand = false;
         gameObject.layer = LayerMask.NameToLayer("Pickup");
     }
 
     public virtual void OnDrop(bool customForce, Vector3 force)
     {
+        _dropFromHand = true;
         _hitGroundOnce = false;
         CanBePickedUp = false;
         GetComponent<Rigidbody>().isKinematic = false;

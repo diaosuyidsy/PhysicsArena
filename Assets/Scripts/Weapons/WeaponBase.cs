@@ -68,10 +68,12 @@ public abstract class WeaponBase : MonoBehaviour
         if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer))
         {
             _onWeaponDespawn();
+            return;
         }
         if ((WeaponDataBase.OnNoAmmoDropDisappear == (WeaponDataBase.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))) && _ammo <= 0)
         {
             _onWeaponDespawn();
+            return;
         }
         if ((WeaponDataBase.OnNoAmmoDropDisappear == (WeaponDataBase.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
         {

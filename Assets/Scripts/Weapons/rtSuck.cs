@@ -14,7 +14,7 @@ public class rtSuck : WeaponBase
     private Vector3 _suckBallInitialScale;
     private float _matOpacity = 1;
     private Quaternion _ballEffectQuaternion;
-    
+
 
 
     private enum State
@@ -128,10 +128,9 @@ public class rtSuck : WeaponBase
         }
         yield return new WaitForSeconds(0.25f);
         blackHoleEffect.gameObject.SetActive(false);
-        
+
         disappearEffect.Play();
-        yield return new WaitForSeconds(0.25f);
-        yield return new WaitForSeconds(_suckGunData.SuckBallStayUpTime);
+        yield return new WaitForSeconds(_suckGunData.SuckBallStayUpTime - 0.25f);
         ////Second prototype
         //yield return StartCoroutine(Congregate(time, gos));
         // After time, disable the suckball and return it to the original position,

@@ -279,6 +279,11 @@ public class CabelSwtiching_DeliverFall : CabelAction
 
 }
 
+public class CabelSwtiching_DeliverToCart : CabelAction
+{
+
+}
+
 public class CabelSwtiching_FirstSegment: CabelAction
 {
     private List<GameObject> Waypoints;
@@ -536,12 +541,12 @@ public class CabelSwtiching_ThirdSegment : CabelAction
             if(Context.Info.LastSide == Context.Info.CurrentSide)
             {
                 Cart.transform.position = StartPoint;
+                Cart.transform.eulerAngles = Vector3.zero;
 
                 Context.Bagel.transform.position = Context.DeliveryPlacePoint;
                 GameObject.Destroy(Context.Info.Delivery);
                 Context.Info.Delivery = Context.Bagel;
 
-                //GameObject.Destroy(Context.Bagel);
                 Context.Bagel = null;
 
                 TransitionTo<CabelIdle>();
@@ -554,10 +559,10 @@ public class CabelSwtiching_ThirdSegment : CabelAction
                 Context.Bagel.transform.position = Context.DeliveryPlacePoint;
                 GameObject.Destroy(Context.Info.Delivery);
                 Context.Info.Delivery = Context.Bagel;
-                //GameObject.Destroy(Context.Bagel);
                 Context.Bagel = null;
 
                 Cart.transform.position = StartPoint;
+                Cart.transform.eulerAngles = Vector3.zero;
 
                 TransitionTo<CabelIdle>();
                 Context.CanonFSM.TransitionTo<CanonFiring_Normal>();
@@ -567,6 +572,8 @@ public class CabelSwtiching_ThirdSegment : CabelAction
                 GameObject.Destroy(Context.Info.Bomb);
 
                 Context.SetWrap();
+
+                Context.CanonEntity.GetComponent<AudioSource>().Play();
             }
 
             return;

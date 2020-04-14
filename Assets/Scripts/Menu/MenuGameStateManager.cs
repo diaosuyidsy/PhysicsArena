@@ -8,7 +8,6 @@ public class MenuGameStateManager : GameStateManagerBase
     {
         _gameMapdata = _gmp;
         PlayersInformation = new PlayerInformation(new int[6] { -1, -1, -1, -1, -1, -1 }, new int[6] { -1, -1, -1, -1, -1, -1 }, new int[6] { -1, -1, -1, -1, -1, -1 });
-        CameraTargets = new List<Transform>();
         PlayerControllers = new PlayerController[PlayersInformation.ColorIndex.Length];
     }
 

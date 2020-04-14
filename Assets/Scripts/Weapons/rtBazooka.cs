@@ -139,7 +139,7 @@ public class rtBazooka : WeaponBase
             _bazookaState = BazookaStates.Aiming;
             _player = ReInput.players.GetPlayer(Owner.GetComponent<PlayerController>().PlayerNumber);
             _throwMark.gameObject.SetActive(true);
-            Services.GameStateManager.CameraTargets.Add(_throwMark);
+            EventManager.Instance.TriggerEvent(new OnAddCameraTargets(_throwMark.gameObject, 1));
             _shadowThrowMark.gameObject.SetActive(true);
             _throwMark.parent = null;
             _shadowThrowMark.parent = null;
@@ -172,15 +172,14 @@ public class rtBazooka : WeaponBase
         _resetThrowMark();
         _ammo = _bazookaData.MaxAmmo;
         transform.GetComponent<Rigidbody>().isKinematic = false;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         _hitGroundOnce = false;
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     private void _resetThrowMark()
     {
         _throwMark.gameObject.SetActive(false);
-        Services.GameStateManager.CameraTargets.Remove(_throwMark);
+        EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(_throwMark.gameObject));
         _shadowThrowMark.gameObject.SetActive(false);
         _throwMark.parent = transform;
         _shadowThrowMark.parent = transform;

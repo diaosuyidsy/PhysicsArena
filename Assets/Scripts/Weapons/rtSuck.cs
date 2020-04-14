@@ -128,8 +128,8 @@ public class rtSuck : WeaponBase
         }
         yield return new WaitForSeconds(0.25f);
         blackHoleEffect.gameObject.SetActive(false);
-
         disappearEffect.Play();
+        _sbc.CleanUpAll();
         yield return new WaitForSeconds(_suckGunData.SuckBallStayUpTime - 0.25f);
         ////Second prototype
         //yield return StartCoroutine(Congregate(time, gos));
@@ -144,7 +144,7 @@ public class rtSuck : WeaponBase
         _suckBall.SetActive(false);
         _ballState = State.In;
         // Need a little clean up the line renderer and stuff
-        _sbc.CleanUpAll();
+        
         _onWeaponUsedOnce();
     }
 

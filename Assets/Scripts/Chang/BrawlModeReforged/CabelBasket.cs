@@ -20,6 +20,8 @@ public class CabelBasket : MonoBehaviour
     public GameObject Up;
     public GameObject Down;
 
+    public float DropAngleTolerance;
+
     public float DoorOpenTime;
 
     public float DetectRadius;
@@ -102,6 +104,7 @@ public class CabelBasket : MonoBehaviour
                 {
                     TextState = ScoreTextState.Disappear;
                     ScoreTextTimer = 0;
+                    ScoreText.transform.localScale = Vector3.zero;
                 }
                 break;
         }
@@ -122,7 +125,15 @@ public class CabelBasket : MonoBehaviour
 
                     if (Pc.HandObject!=null && Pc.HandObject.CompareTag("Team2Resource"))
                     {
-                        Pc.ForceDropHandObject();
+                        Vector3 Offset = transform.position - Pc.transform.position;
+                        Offset.y = 0;
+                        Vector3 Forward = Pc.HandObject.transform.forward;
+                        Forward.y = 0;
+
+                        if (Vector3.Angle(Offset, Forward) < DropAngleTolerance)
+                        {
+                            Pc.ForceDropHandObject(new Vector3(0, 2, 2));
+                        }
                         return;
                     }
                 }
@@ -132,7 +143,15 @@ public class CabelBasket : MonoBehaviour
 
                     if (Pc.HandObject != null && Pc.HandObject.CompareTag("Team2Resource"))
                     {
-                        Pc.ForceDropHandObject();
+                        Vector3 Offset = transform.position - Pc.transform.position;
+                        Offset.y = 0;
+                        Vector3 Forward = Pc.HandObject.transform.forward;
+                        Forward.y = 0;
+
+                        if (Vector3.Angle(Offset, Forward) < DropAngleTolerance)
+                        {
+                            Pc.ForceDropHandObject(new Vector3(0, 2, 2));
+                        }
                         return;
                     }
                 }

@@ -4534,6 +4534,7 @@ MonoBehaviour:
   ScoreText: {fileID: 1114383008}
   Up: {fileID: 8656799516444385373}
   Down: {fileID: 5342510336736235163}
+  DropAngleTolerance: 45
   DoorOpenTime: 0.5
   DetectRadius: 3
   AutoDropRadius: 1.2
@@ -14290,7 +14291,8 @@ MonoBehaviour:
   - {fileID: 5280293990200061506, guid: 80806367fc5c8174db77f42a640ecca8, type: 3}
   - {fileID: 4836811480432223405, guid: 72c3811b922351f46a96df8c012db16c, type: 3}
   - {fileID: 7308740760496570814, guid: d7e68fc47f9187543a36b1f7064fbc2f, type: 3}
-  WeaponQuantityList: 03000000020000000200000001000000
+  - {fileID: 5372403526962513977, guid: 9a4898bcb2e7bdf489c4a6305e4a6d40, type: 3}
+  WeaponQuantityList: 0200000002000000020000000100000001000000
 --- !u!4 &548079443 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4859520026582428, guid: 1d54c92011a4fa44abc8bcea479467c2,
@@ -14418,7 +14420,7 @@ MonoBehaviour:
   CabelSecondSegTime: 0.7
   CabelThirdSegAcTime: 0.1
   CabelThirdSegStableTime: 0.6
-  DeliverJumpTime: 0.5
+  DeliverJumpTime: 0.4
   DeliverJumpVerSpeed: 2
   DeliverJumpEndHoriSpeed: 0.5
   BombVerticalSpeedPercentage: 0.25
@@ -68540,6 +68542,7 @@ MonoBehaviour:
   ScoreText: {fileID: 95946968}
   Up: {fileID: 1033331342773913429}
   Down: {fileID: 4346089031925623187}
+  DropAngleTolerance: 45
   DoorOpenTime: 0.5
   DetectRadius: 3
   AutoDropRadius: 1.2
@@ -85543,6 +85546,7 @@ MonoBehaviour:
   ScoreText: {fileID: 1955696576}
   Up: {fileID: 0}
   Down: {fileID: 0}
+  DropAngleTolerance: 0
   DoorOpenTime: 0
   DetectRadius: 3
   AutoDropRadius: 1
@@ -85591,6 +85595,7 @@ MonoBehaviour:
   ScoreText: {fileID: 1966477086}
   Up: {fileID: 0}
   Down: {fileID: 0}
+  DropAngleTolerance: 0
   DoorOpenTime: 0
   DetectRadius: 3
   AutoDropRadius: 1

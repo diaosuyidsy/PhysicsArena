@@ -469,6 +469,7 @@ public class CabelSwtiching_ThirdSegment : CabelAction
     private float DeliveryJumpVerDc;
     private float DeliveryJumpVerSpeed;
     private Vector3 DeliveryJumpHoriDir;
+    private Vector3 DeliveryJumpRotateSpeed;
 
 
     public override void OnEnter()
@@ -537,6 +538,7 @@ public class CabelSwtiching_ThirdSegment : CabelAction
         {
             if(Context.Info.LastSide == Context.Info.CurrentSide)
             {
+                Context.Bagel.transform.eulerAngles = Vector3.zero;
                 Cart.transform.position = StartPoint;
                 Cart.transform.eulerAngles = Vector3.zero;
 
@@ -553,6 +555,7 @@ public class CabelSwtiching_ThirdSegment : CabelAction
 
             if (Context.Info.State != CanonState.Firing)
             {
+                Context.Bagel.transform.eulerAngles = Vector3.zero;
                 Context.Bagel.transform.position = Context.DeliveryPlacePoint;
                 GameObject.Destroy(Context.Info.Delivery);
                 Context.Info.Delivery = Context.Bagel;
@@ -620,6 +623,7 @@ public class CabelSwtiching_ThirdSegment : CabelAction
         DeliveryJumpVerSpeed = Context.FeelData.DeliverJumpVerSpeed;
         DeliveryJumpVerDc = (DeliveryJumpVerSpeed - DeliveryEndJumpSpeed)/ Context.FeelData.DeliverJumpTime;
 
+        DeliveryJumpRotateSpeed = Context.Bagel.transform.eulerAngles/ Context.FeelData.DeliverJumpTime;
 
     }
 
@@ -631,7 +635,7 @@ public class CabelSwtiching_ThirdSegment : CabelAction
 
         Context.Bagel.transform.position += DeliveryJumpHoriSpeed * DeliveryJumpHoriDir * Time.deltaTime + DeliveryJumpVerSpeed * Vector3.up * Time.deltaTime;
 
-        
+        Context.Bagel.transform.eulerAngles -= DeliveryJumpRotateSpeed/ Context.FeelData.DeliverJumpTime;
     }
 }
 

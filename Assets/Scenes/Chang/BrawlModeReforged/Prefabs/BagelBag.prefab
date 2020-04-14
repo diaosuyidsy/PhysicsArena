@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2977257950968027857
+--- !u!1 &8529124432406568408
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,46 +8,48 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2236601873865828546}
-  - component: {fileID: 7084451604278137588}
-  - component: {fileID: 3561659396339150349}
-  - component: {fileID: 2890744820877305401}
-  m_Layer: 0
-  m_Name: Bagel_Packge
-  m_TagString: Untagged
+  - component: {fileID: 4613604269086748619}
+  - component: {fileID: 4421925827578107389}
+  - component: {fileID: 7953743385160902916}
+  - component: {fileID: 8579687380425630000}
+  - component: {fileID: 1667786795766537215}
+  - component: {fileID: -611042463498583425}
+  m_Layer: 20
+  m_Name: BagelBag
+  m_TagString: Team2Resource
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2236601873865828546
+--- !u!4 &4613604269086748619
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2977257950968027857}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_GameObject: {fileID: 8529124432406568408}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 19.17293, y: 0.224, z: -17.616507}
-  m_LocalScale: {x: 100, y: 100, z: 100}
+  m_LocalScale: {x: 80, y: 80, z: 80}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &7084451604278137588
+--- !u!33 &4421925827578107389
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2977257950968027857}
+  m_GameObject: {fileID: 8529124432406568408}
   m_Mesh: {fileID: 8768339339314544604, guid: 1fb9fb66633af324f8f8f347e0b0cd84, type: 3}
---- !u!23 &3561659396339150349
+--- !u!23 &7953743385160902916
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2977257950968027857}
+  m_GameObject: {fileID: 8529124432406568408}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -78,16 +80,52 @@ MeshRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
---- !u!65 &2890744820877305401
+--- !u!65 &8579687380425630000
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2977257950968027857}
+  m_GameObject: {fileID: 8529124432406568408}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
   m_Size: {x: 0.01001206, y: 0.0034219467, z: 0.0056174193}
   m_Center: {x: 2.3283064e-10, y: 0, z: 1.1641532e-10}
+--- !u!114 &1667786795766537215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8529124432406568408}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d9c485f5e8bc1164a920144ce525da09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  WeaponDataBase: {fileID: 11400000, guid: e68950b442d2ba04aa46774f7a020950, type: 2}
+  CanBePickedUp: 1
+  Data: {fileID: 11400000, guid: 02308cdd234d4104a9b5ba42b61b1914, type: 2}
+  Entity: {fileID: 5812035999268780057, guid: d7031a4afcc5a7546b347692f86e6b4c, type: 3}
+  Default: {r: 0.7169812, g: 0.7169812, b: 0.7169812, a: 1}
+  Blue: {r: 0.11681202, g: 0.50922894, b: 0.7075472, a: 1}
+  Red: {r: 0.6320754, g: 0.11627804, b: 0.11627804, a: 1}
+  Hold: 0
+--- !u!54 &-611042463498583425
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8529124432406568408}
+  serializedVersion: 2
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 48
+  m_CollisionDetection: 0

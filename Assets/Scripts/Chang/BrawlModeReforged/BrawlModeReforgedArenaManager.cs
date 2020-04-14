@@ -166,10 +166,7 @@ public class CabelSwtiching_DeliverMove : CabelAction
         Timer = 0;
         Speed = 0;
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Cart.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Cart.transform);
-        }
+        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Cart, 1));
     }
 
     public override void Update()
@@ -597,7 +594,7 @@ public class CabelSwtiching_ThirdSegment : CabelAction
     public override void OnExit()
     {
         base.OnExit();
-        Services.GameStateManager.CameraTargets.Remove(Cart.transform);
+        EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Cart));
     }
 
     private void GetDeliverJumpInfo()
@@ -647,10 +644,7 @@ public class CabelSwtiching : CabelAction
         base.OnEnter();
         Timer = 0;
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
+        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.CameraFocus, 1));
 
     }
 
@@ -989,7 +983,8 @@ public class CanonCooldown : CanonAction
         Context.Info.State = CanonState.Cooldown;
 
         Timer = 0;
-        Services.GameStateManager.CameraTargets.Remove(Context.Info.CameraFocus.transform);
+
+        EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.CameraFocus));
     }
 
     public override void Update()
@@ -1030,10 +1025,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         Timer = 0;
         PlayerLocked = false;
 
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
+        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.CameraFocus, 1));
     }
 
     public override void Update()
@@ -1106,11 +1098,6 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
         base.OnEnter();
         Timer = 0;
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkAlertColor;
-
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
     }
 
     public override void Update()
@@ -1174,11 +1161,6 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
 
 
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkFallColor;
-
-        if (!Services.GameStateManager.CameraTargets.Contains(Context.Info.CameraFocus.transform))
-        {
-            Services.GameStateManager.CameraTargets.Add(Context.Info.CameraFocus.transform);
-        }
     }
 
     public override void Update()
@@ -1493,16 +1475,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     private int GetPlayerNumber()
     {
-        int Count = 0;
-        for(int i=0;i < Services.GameStateManager.CameraTargets.Count; i++)
-        {
-            if (Services.GameStateManager.CameraTargets[i].GetComponent<PlayerController>())
-            {
-                Count++;
-            }
-        }
-
-        return Count;
+        return Players.transform.childCount;
 
     }
 

@@ -122,7 +122,7 @@ public class CabelBasket : MonoBehaviour
 
                     if (Pc.HandObject!=null && Pc.HandObject.CompareTag("Team2Resource"))
                     {
-                        Pc.ForceDropHandObject(Vector3.zero);
+                        Pc.ForceDropHandObject();
                         return;
                     }
                 }
@@ -132,7 +132,7 @@ public class CabelBasket : MonoBehaviour
 
                     if (Pc.HandObject != null && Pc.HandObject.CompareTag("Team2Resource"))
                     {
-                        Pc.ForceDropHandObject(Vector3.zero);
+                        Pc.ForceDropHandObject();
                         return;
                     }
                 }
@@ -154,7 +154,8 @@ public class CabelBasket : MonoBehaviour
                 if (!InCamera)
                 {
                     InCamera = true;
-                    Services.GameStateManager.CameraTargets.Add(transform);
+
+                    EventManager.Instance.TriggerEvent(new OnAddCameraTargets(gameObject, 1));
                 }
                 return;
             }
@@ -167,7 +168,7 @@ public class CabelBasket : MonoBehaviour
             if (InCameraTimer >= InCameraTime)
             {
                 InCamera = false;
-                Services.GameStateManager.CameraTargets.Remove(transform);
+                EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(gameObject));
             }
         }
 

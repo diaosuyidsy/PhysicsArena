@@ -20,17 +20,14 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     protected bool _followHand;
     protected float _pickUpTimer;
     protected bool _ownerIsLocalPlayer => Owner == null ? false : Owner.GetComponent<NetworkIdentity>().isLocalPlayer;
-    // protected FSM<WeaponBase> WeaponBaseFSM;
 
     protected virtual void Awake()
     {
-        // WeaponBaseFSM = new FSM<WeaponBase>(this);
         OnSpawn();
     }
 
     protected virtual void Update()
     {
-        // WeaponBaseFSM.Update();
         if (Owner != null && _followHand)
         {
             Vector3 targetposition = (Owner.GetComponent<PlayerControllerMirror>().LeftHand.transform.position
@@ -89,7 +86,6 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
 
     protected virtual void OnCollisionEnter(Collision other)
     {
-        // ((WeaponState)WeaponBaseFSM.CurrentState).OnCollisionEnter(other);
         if (!isServer) return;
         if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer))
         {
@@ -121,7 +117,6 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
 
     public virtual void OnSpawn()
     {
-        // WeaponBaseFSM.TransitionTo<InAirState>();
         CanBePickedUp = true;
         _followHand = true;
         gameObject.layer = LayerMask.NameToLayer("Pickup");
@@ -188,7 +183,6 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        // ((WeaponState)WeaponBaseFSM.CurrentState).OnTriggerEnter(other);
         if (!isServer) return;
         if (other.CompareTag("DeathZone"))
         {

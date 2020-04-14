@@ -31,7 +31,7 @@ public class Bagel : WeaponBase
     {
         base.Update();
         SetGuide();
-        
+
     }
 
     private void SetGuide()
@@ -67,9 +67,9 @@ public class Bagel : WeaponBase
         Hold = true;
     }
 
-    public override void OnDrop()
+    public override void OnDrop(bool customForce, Vector3 force)
     {
-        base.OnDrop();
+        base.OnDrop(customForce, force);
 
         Hold = false;
         Destroy(Guide);

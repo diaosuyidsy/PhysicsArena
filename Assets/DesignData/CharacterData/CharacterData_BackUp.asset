@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 77f59a2ecbe94604094d30020f1b14bd, type: 3}
-  m_Name: CharacterData
+  m_Name: CharacterData_BackUp
   m_EditorClassIdentifier: 
-  WalkSpeed: 7.5
-  MaxVelocityChange: 16
+  WalkSpeed: 6
+  MaxVelocityChange: 12
   InAirSpeedMultiplier: 0.1
   FacingCliffMultiplier: 1
   PickupSpeed: 2
@@ -50,13 +50,13 @@ MonoBehaviour:
   MeleeChargeThreshold: 0.75
   PunchRadius: 0.3
   PunchDistance: 0.4
-  PunchForce: 900
+  PunchForce: 800
   MeleeHoldTime: Infinity
   HitUncontrollableTimeSmall: 0.4
   HitStopFramesSmall: 6
-  HitSmallThreshold: 562.5
+  HitSmallThreshold: 500
   HitUncontrollableTimeBig: 0.6
-  HitBigThreshold: 1012.5
+  HitBigThreshold: 900
   HitStopFramesBig: 12
   PunchReleaseRotationMultiplier: 0.3
   PunchResetVelocityBeforeHitDuration: 0.5

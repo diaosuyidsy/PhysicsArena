@@ -103,33 +103,35 @@ public class rtSuck : WeaponBase
                 DistortionSphere.Play();
 
                 _ballState = State.Suck;
-                StartCoroutine(sucking(0.1f));
+                StartCoroutine(sucking());
 
             }
         }
     }
 
-    IEnumerator sucking(float time)
+    IEnumerator sucking()
     {
         List<GameObject> gos = _sbc.InRangePlayers;
         EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerController>().PlayerNumber,
             gos));
         // First prototype: let's try adding a force to every object
-        yield return new WaitForSeconds(time);
-
         foreach (GameObject go in gos)
         {
-            Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * _suckGunData.SuckStrength;
-            go.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
+            Vector3 forceRawDir = _suckBall.transform.position - go.transform.position;
+            forceRawDir.y = 0f;
+            forceRawDir.Normalize();
+            Vector3 force = (forceRawDir + Vector3.up * _suckGunData.SuckUpStrengthMultiplier) * _suckGunData.SuckStrength;
+            go.GetComponent<IHittable>().SetVelocity(Vector3.zero);
+            go.GetComponent<IHittable>().OnImpact(force, ForceMode.VelocityChange, Owner, ImpactType.SuckGun);
         }
-        yield return new WaitForSeconds(0.45f);
+        // yield return new WaitForSeconds(0.45f);
         foreach (var suckBallExplodeEffect in suckBallExplodeEffects)
         {
             suckBallExplodeEffect.GetComponent<ParticleSystem>().Play();
         }
         suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Suck");
         suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Explode");
-        yield return new WaitForSeconds(0.45f);
+        yield return new WaitForSeconds(_suckGunData.SuckBallStayUpTime);
         ////Second prototype
         //yield return StartCoroutine(Congregate(time, gos));
         // After time, disable the suckball and return it to the original position,
@@ -161,10 +163,9 @@ public class rtSuck : WeaponBase
         _suckBall.SetActive(false);
         _ballState = State.In;
         _ammo = _suckGunData.SuckGunMaxUseTimes;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         // Need a little clean up the line renderer and stuff
         _sbc.CleanUpAll();
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     //private void _addToSuckedTimes()

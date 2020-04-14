@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 20459301899154910}
   - component: {fileID: 81368121330123058}
   - component: {fileID: 114089129262350066}
-  - component: {fileID: 114076445684659868}
   - component: {fileID: 114982356382100536}
   - component: {fileID: 82697173938787356}
   - component: {fileID: 114322385920369306}
@@ -106,30 +105,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FollowTarget: {x: 0, y: 0, z: 0}
   CameraData: {fileID: 11400000, guid: 3ac4fad23cad1e643b8c7c96f8a2e4d5, type: 2}
---- !u!114 &114076445684659868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1995234145574352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90d1945bbd58b4cf98eb19621dd83cdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  particleRenderers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  autoupdate: 1
-  blurRadius: 0.02
-  thicknessCutoff: 1.2
-  colorMaterial: {fileID: 2100000, guid: d16ca3f3b0ff44edb8bc98af8c286687, type: 2}
-  fluidMaterial: {fileID: 2100000, guid: 0247f7af5bd7d41d7a0a17ab9f40d3be, type: 2}
 --- !u!114 &114982356382100536
 MonoBehaviour:
   m_ObjectHideFlags: 0

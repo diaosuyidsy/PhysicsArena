@@ -1655,6 +1655,8 @@ public class PlayerController : MonoBehaviour, IHittable
 
     private class StunActionState : ActionState
     {
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
         public override void OnEnter()
         {
             base.OnEnter();

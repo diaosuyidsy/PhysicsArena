@@ -48,7 +48,7 @@ public abstract class WeaponBase : MonoBehaviour
     protected virtual void _onWeaponDespawn()
     {
         EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-        gameObject.SetActive(false);
+        Destroy(gameObject);
     }
 
     protected void _onWeaponUsedOnce()

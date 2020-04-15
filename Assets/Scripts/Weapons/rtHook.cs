@@ -183,7 +183,7 @@ public class rtHook : WeaponBase
             base.OnEnter();
             _hookStopTimer = Time.time + _hookGunData.HookedTime;
             Context._onTargetTimer = Time.time;
-            Context._onTargetTransformForwardVector = -Context.transform.right;
+            Context._onTargetTransformForwardVector = (Context.Hooked.transform.position - Context.transform.position).normalized;
         }
 
         public override void Update()

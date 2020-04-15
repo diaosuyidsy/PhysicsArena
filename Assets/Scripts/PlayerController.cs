@@ -97,6 +97,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private int _hitStopFrames;
     public bool IsIdle { get { return _movementFSM.CurrentState.GetType().Equals(typeof(IdleState)); } }
     private ForceTuple _hitForceTuple;
+    private bool _isHit;
     #endregion
 
     private void Awake()
@@ -212,6 +213,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 // if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
                 //     _movementFSM.TransitionTo<PunchHittedStopMovementState>();
                 // else
+                // _isHit = true;
                 _movementFSM.TransitionTo<HitUncontrollableState>();
             }
 
@@ -220,7 +222,8 @@ public class PlayerController : MonoBehaviour, IHittable
                 // if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
                 //     _actionFSM.TransitionTo<PunchHittedStopActionState>();
                 // else
-                _actionFSM.TransitionTo<HitUnControllableActionState>();
+                _isHit = true;
+                // _actionFSM.TransitionTo<HitUnControllableActionState>();
             }
         }
         else
@@ -1028,6 +1031,11 @@ public class PlayerController : MonoBehaviour, IHittable
                 // if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._currentStamina += (Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
                 if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._drainStamina(-Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
             }
+            if (Context._isHit && ShouldOnHitTransitToUncontrollableState)
+            {
+                Context._isHit = false;
+                TransitionTo<HitUnControllableActionState>();
+            }
         }
 
         public virtual void OnEnterDeathZone()
@@ -1310,20 +1318,20 @@ public class PlayerController : MonoBehaviour, IHittable
 
         public override void Update()
         {
-            base.Update();
-            _checkHit();
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<IdleActionState>();
                 return;
             }
+            _checkHit();
+            base.Update();
         }
 
         public override void OnExit()
         {
             base.OnExit();
-            _checkHit();
+            // _checkHit();
             Context._animator.SetBool("PunchReleased", false);
             Context._rotationSpeedMultiplier = 1f;
         }

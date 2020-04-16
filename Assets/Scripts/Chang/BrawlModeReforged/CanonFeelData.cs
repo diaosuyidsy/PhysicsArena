@@ -64,6 +64,7 @@ public class CanonFeelData : MonoBehaviour
     public float DeliverJumpTime;
     public float DeliverJumpVerSpeed;
     public float DeliverJumpEndHoriSpeed;
+    public int DeliverJumpEndExtraSpin;
 
     public float BombVerticalSpeedPercentage;
 

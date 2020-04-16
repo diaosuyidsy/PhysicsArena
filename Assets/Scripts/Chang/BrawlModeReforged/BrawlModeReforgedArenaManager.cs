@@ -45,14 +45,24 @@ public abstract class CabelAction : FSM<BrawlModeReforgedArenaManager>.State
         return dis;
     }
 
-    protected void MoveAlongWaypoints(List<GameObject> Waypoints,ref int TargetWaypoint, ref int CurrentWaypoint,GameObject Cart, float Speed , Vector3 Direction)
+    protected void MoveAlongWaypoints(List<GameObject> Waypoints,ref int TargetWaypoint, ref int CurrentWaypoint,GameObject Cart, float Speed , Vector3 Target, Vector3 Start, Vector3 LastDirection)
     {
         if (TargetWaypoint >= Waypoints.Count)
         {
             return;
         }
 
+        Vector3 Direction = Target - Start;
+        Direction.Normalize();
+
         Cart.transform.position += Direction * Speed * Time.deltaTime;
+
+        Direction.y = 0;
+        Direction.Normalize();
+        LastDirection.y = 0;
+        LastDirection.Normalize();
+
+
 
         if (Vector3.Dot(Direction, Cart.transform.position - Waypoints[TargetWaypoint].transform.position) > 0)
         {
@@ -71,6 +81,11 @@ public abstract class CabelAction : FSM<BrawlModeReforgedArenaManager>.State
             Cart.transform.forward = Forward.normalized;
             
             Cart.transform.position = Dir.normalized * (Cart.transform.position - Waypoints[CurrentWaypoint].transform.position).magnitude + Waypoints[CurrentWaypoint].transform.position;
+        }
+        else
+        {
+            float T = (Start - Cart.transform.position).magnitude / (Target - Start).magnitude;
+            Cart.transform.forward = Vector3.Lerp(LastDirection, Direction,T);
         }
     }
 }
@@ -372,11 +387,21 @@ public class CabelSwtiching_FirstSegment: CabelAction
 
         if (CurrentWaypoint < 0)
         {
-            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, TrueSpeed, (Waypoints[TargetWaypoint].transform.position - Start).normalized);
+            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, TrueSpeed, Waypoints[TargetWaypoint].transform.position, Start,(Waypoints[TargetWaypoint].transform.position - Start).normalized);
         }
         else if(TargetWaypoint < Waypoints.Count)
         {
-            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, TrueSpeed, (Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position).normalized);
+            Vector3 LastDir;
+            if (CurrentWaypoint < 1)
+            {
+                LastDir = (Waypoints[CurrentWaypoint].transform.position - Start).normalized;
+            }
+            else
+            {
+                LastDir = (Waypoints[CurrentWaypoint].transform.position - Waypoints[CurrentWaypoint - 1].transform.position).normalized;
+            }
+
+            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, TrueSpeed, Waypoints[TargetWaypoint].transform.position, Waypoints[CurrentWaypoint].transform.position, LastDir);
         }
     }
     
@@ -437,7 +462,17 @@ public class CabelSwtiching_SecondSegment: CabelAction
         {
             if(TargetWaypoint < Waypoints.Count)
             {
-                MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, Speed, (Waypoints[TargetWaypoint].transform.position-Waypoints[CurrentWaypoint].transform.position).normalized);
+                Vector3 LastDir;
+                if(CurrentWaypoint < 1)
+                {
+                    LastDir = (Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position).normalized;
+                }
+                else
+                {
+                    LastDir = (Waypoints[CurrentWaypoint].transform.position - Waypoints[CurrentWaypoint-1].transform.position).normalized;
+                }
+
+                MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, Speed, Waypoints[TargetWaypoint].transform.position, Waypoints[CurrentWaypoint].transform.position,LastDir );
             }
         }
         else
@@ -591,7 +626,21 @@ public class CabelSwtiching_ThirdSegment : CabelAction
             DeliverJump();
         }
 
-        MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, TrueSpeed, (Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position).normalized);
+        Vector3 LastDir;
+        if(CurrentWaypoint < 1)
+        {
+            LastDir = (Waypoints[TargetWaypoint].transform.position - Waypoints[CurrentWaypoint].transform.position).normalized;
+        }
+        else
+        {
+            LastDir = (Waypoints[CurrentWaypoint].transform.position - Waypoints[CurrentWaypoint - 1].transform.position).normalized;
+        }
+
+        if(TargetWaypoint < Waypoints.Count)
+        {
+            MoveAlongWaypoints(Waypoints, ref TargetWaypoint, ref CurrentWaypoint, Cart, TrueSpeed, Waypoints[TargetWaypoint].transform.position, Waypoints[CurrentWaypoint].transform.position,LastDir);
+        }
+
     }
 
     public override void OnExit()
@@ -623,7 +672,23 @@ public class CabelSwtiching_ThirdSegment : CabelAction
         DeliveryJumpVerSpeed = Context.FeelData.DeliverJumpVerSpeed;
         DeliveryJumpVerDc = (DeliveryJumpVerSpeed - DeliveryEndJumpSpeed)/ Context.FeelData.DeliverJumpTime;
 
-        DeliveryJumpRotateSpeed = Context.Bagel.transform.eulerAngles/ Context.FeelData.DeliverJumpTime;
+        Vector3 AngleOffset = Context.Bagel.transform.eulerAngles;
+        if (AngleOffset.y > 180)
+        {
+            AngleOffset.y -= 360;
+        }
+
+        if (AngleOffset.y > 0)
+        {
+            AngleOffset.y += Context.FeelData.DeliverJumpEndExtraSpin * 360f;
+        }
+        else
+        {
+            AngleOffset.y -= Context.FeelData.DeliverJumpEndExtraSpin * 360f;
+        }
+
+        DeliveryJumpRotateSpeed = AngleOffset/ Context.FeelData.DeliverJumpTime;
+
 
     }
 
@@ -635,7 +700,7 @@ public class CabelSwtiching_ThirdSegment : CabelAction
 
         Context.Bagel.transform.position += DeliveryJumpHoriSpeed * DeliveryJumpHoriDir * Time.deltaTime + DeliveryJumpVerSpeed * Vector3.up * Time.deltaTime;
 
-        Context.Bagel.transform.eulerAngles -= DeliveryJumpRotateSpeed/ Context.FeelData.DeliverJumpTime;
+        Context.Bagel.transform.eulerAngles -= DeliveryJumpRotateSpeed * Time.deltaTime;
     }
 }
 

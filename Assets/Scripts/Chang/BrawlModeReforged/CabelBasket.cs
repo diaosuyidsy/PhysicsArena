@@ -231,6 +231,10 @@ public class CabelBasket : MonoBehaviour
 
             Vector3 NewHoriOffset = Target - Bagel.transform.position;
             NewHoriOffset.y = 0;
+
+            Bagel.transform.eulerAngles += SuckRotationSpeed * Time.deltaTime;
+
+
             if (Vector3.Dot(HoriOffset, NewHoriOffset) < 0)
             {
                 Bagel.transform.position = new Vector3(Target.x, Bagel.transform.position.y, Target.z);
@@ -250,7 +254,6 @@ public class CabelBasket : MonoBehaviour
             }
 
 
-            Bagel.transform.eulerAngles += SuckRotationSpeed * Time.deltaTime;
 
 
             /*if (Vector3.Dot(Offset, transform.position - Bagel.transform.position) < 0)

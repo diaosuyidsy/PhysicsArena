@@ -10,6 +10,8 @@ public class CartModeReforgedModeData : ModeSepcificData
     public int MaxLevel;
     public float SpeedUpTime;
 
+    public float CartObtainTime;
+
 
     public List<float> CartSpeedWithCheckpoint;
     public List<float> OccupySpeedWithCheckpoint;

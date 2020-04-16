@@ -100,7 +100,7 @@ public class GameStateManager : GameStateManagerBase
         EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-        _gameStateFSM.TransitionTo<FoodCartTutorialState>();
+        _gameStateFSM.TransitionTo<TutorialState>();
         // _gameStateFSM.TransitionTo<MVPEndPanelState>();
     }
 
@@ -720,24 +720,16 @@ public class GameStateManager : GameStateManagerBase
         }
     }
 
-    private abstract class TutorialState : GameState
-    {
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Context._cam.GetComponent<AudioSource>().Play();
-            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
-            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
-        }
-    }
-
-    private class FoodCartTutorialState : TutorialState
+    private class TutorialState : GameState
     {
         private bool _canHoldA;
 
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._cam.GetComponent<AudioSource>().Play();
+            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
+            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
             Context._tutorialBackgroundMask.gameObject.SetActive(true);
             Sequence seq = DOTween.Sequence();
             seq.Append(Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase));
@@ -749,7 +741,6 @@ public class GameStateManager : GameStateManagerBase
             }
             seq.Append(Context._holdAText.DOText("Start Game", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
         }
-
         public override void Update()
         {
             base.Update();

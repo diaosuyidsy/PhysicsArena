@@ -22,20 +22,23 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     private TextMeshProUGUI TimerText;
 
     private BrawlModeReforgedModeData ModeData;
+    private BrawlModeReforgedUIData UIData;
+
 
     private bool gameEnd;
     private bool gameStart;
 
     private float OneSecTimer;
     private int Timer;
+    private float HopTimer;
 
-    public BrawlModeReforgedObjectiveManager(BrawlModeReforgedModeData Data) : base()
+    public BrawlModeReforgedObjectiveManager(BrawlModeReforgedModeData Data,BrawlModeReforgedUIData UI) : base()
     {
 
         ModeData = Data;
-        Timer = Data.TotalTime;
+        UIData = UI;
 
-        Debug.Log(Data.name);
+        Timer = Data.TotalTime;
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
@@ -51,6 +54,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         RefreshScore();
         gameEnd = false;
 
+        TimerText.text = TimerToMinute();
     }
 
     public override void Destroy()
@@ -73,12 +77,14 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         OneSecTimer += Time.deltaTime;
         if (OneSecTimer >= 1f)
         {
+            HopTimer = 0;
             OneSecTimer = 0f;
             Timer--;
         }
         if (Timer <= 0)
         {
-            TimerText.text = "0:00";
+            TimerHop();
+            TimerText.text = "0";
             if (TeamAScore != TeamBScore)
             {
                 EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
@@ -88,6 +94,12 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         }
         else
         {
+            if (Timer <= UIData.TimerHopValue)
+            {
+                TimerHop();
+            }
+
+
             TimerText.text = TimerToMinute();
         }
 
@@ -98,7 +110,29 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         int seconds = Timer % 10;
         int tenseconds = (Timer % 60) / 10;
         int minute = Timer / 60;
-        return minute.ToString("F0") + ":" + tenseconds.ToString("F0") + seconds.ToString("F0");
+
+        if (Timer <= UIData.TimerHopValue)
+        {
+            return tenseconds.ToString() + seconds.ToString();
+        }
+        else
+        {
+            return minute.ToString("F0") + ":" + tenseconds.ToString("F0") + seconds.ToString("F0");
+        }
+    }
+
+    private void TimerHop()
+    {
+        HopTimer += Time.deltaTime;
+
+        if (HopTimer <= UIData.TimerHopTime / 2)
+        {
+            TimerText.transform.localScale = Vector3.one * Mathf.Lerp(UIData.TimerStartScale, UIData.TimerHopScale, HopTimer / (UIData.TimerHopTime / 2));
+        }
+        else
+        {
+            TimerText.transform.localScale = Vector3.one * Mathf.Lerp(UIData.TimerHopScale, UIData.TimerStartScale,  (HopTimer- UIData.TimerHopTime / 2) / (UIData.TimerHopTime / 2));
+        }
     }
 
     private void RefreshScore()

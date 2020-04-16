@@ -1337,6 +1337,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         Context.Info.LockedPlayer = null;
 
         GameObject.Instantiate(Context.ExplosionVFX, Context.Info.Mark.transform.position, Context.ExplosionVFX.transform.rotation);
+        EventManager.Instance.TriggerEvent(new AmmoExplode());
         GameObject.Destroy(Context.Info.Bomb);
         GameObject.Destroy(Context.Info.Mark);
     }

@@ -9,10 +9,11 @@ public class Game : MonoBehaviour
     public VFXData VFXData;
     public ConfigData ConfigData;
     public GameFeelData GameFeelData;
-    public ModeSepcificData ModeSpecificData;
     public GameMapData GameMapData;
+    public ModeSepcificData ModeSpecificData;
 
     public ModeSepcificData ModeSpecificData_2Player;
+    public UIData UIData;
 
     private void Awake()
     {
@@ -35,11 +36,11 @@ public class Game : MonoBehaviour
             case GameMapMode.DeathMode:
                 if (Utility.GetPlayerNumber() <= 2)
                 {
-                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData_2Player);
+                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData_2Player,(BrawlModeReforgedUIData)UIData);
                 }
                 else
                 {
-                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData);
+                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData, (BrawlModeReforgedUIData)UIData);
                 }
                 break;
             case GameMapMode.RaceMode:

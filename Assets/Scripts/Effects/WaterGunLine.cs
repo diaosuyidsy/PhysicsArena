@@ -39,8 +39,8 @@ public class WaterGunLine : MonoBehaviour
 
         if (waterGunData)
         {
-            _maxLength = waterGunData.WaterCastDistance;
             _spherecastRadius = waterGunData.WaterCastRadius;
+            _maxLength = waterGunData.WaterCastDistance +_spherecastRadius;
         }
         else
         {
@@ -97,7 +97,7 @@ public class WaterGunLine : MonoBehaviour
 
             if (i == segmentCount - 1)
             {
-                _hitPosition = _currentPosition /*+ resultVectors[i] * blockLength*/;
+                _hitPosition = _currentPosition;
 
                 if (hitEffect)
                 {
@@ -112,7 +112,7 @@ public class WaterGunLine : MonoBehaviour
             else if (Physics.SphereCast(_currentPosition, _spherecastRadius, _resultVectors[i], out hit, blockLength, waterGunData.WaterCanHitLayer))
             {
                 _hitPosition = _currentPosition + _resultVectors[i] * hit.distance;
-                _hitPosition = Vector3.MoveTowards(_hitPosition, _hitPosition + _resultVectors[i] * blockLength, 0.5f);
+                _hitPosition = Vector3.MoveTowards(_hitPosition, _hitPosition + _resultVectors[i] * blockLength, 0.3f);
                 //hitPosition = Vector3.MoveTowards(hitPosition, transform.position, 0.5f);
                 if (hitEffect)
                 {

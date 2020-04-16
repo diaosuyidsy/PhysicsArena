@@ -597,6 +597,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WeaponDataBase: {fileID: 11400000, guid: 14ab812a9932c064687aaa5e03d0b845, type: 2}
+  OnDropDisappear: 1
   CanBePickedUp: 0
   WaterGunLine: {fileID: 4093977821560195181}
   WaterUI: {fileID: 5371108102030370879}
@@ -762,6 +763,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5369995198888199863}
     m_Modifications:
+    - target: {fileID: 450225733852383024, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: m_Name
+      value: WaterGunLineNew
+      objectReference: {fileID: 0}
+    - target: {fileID: 450225733852383021, guid: b97adb27adeda644bafa9f466c583930,
+        type: 3}
+      propertyPath: segmentCount
+      value: 11
+      objectReference: {fileID: 0}
     - target: {fileID: 450225733852383026, guid: b97adb27adeda644bafa9f466c583930,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -816,11 +827,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 450225733852383024, guid: b97adb27adeda644bafa9f466c583930,
-        type: 3}
-      propertyPath: m_Name
-      value: WaterGunLineNew
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b97adb27adeda644bafa9f466c583930, type: 3}

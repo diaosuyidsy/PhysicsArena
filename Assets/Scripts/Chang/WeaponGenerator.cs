@@ -34,10 +34,7 @@ public class WeaponGenerator : MonoBehaviour
     {
 
         GameObject Weapon = Instantiate(WeaponPrefab);
-        // if (Weapon.name.Contains("Water"))
-        // {
-        //     Camera.main.GetComponent<Obi.ObiBaseFluidRenderer>().particleRenderers.Add(Weapon.GetComponent<rtEmit>().ParticleRenderer);
-        // }
+
 
         Vector2 XZOffset = Random.insideUnitCircle * GenerationRadius;
 

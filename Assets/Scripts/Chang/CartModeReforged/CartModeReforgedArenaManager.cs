@@ -63,6 +63,7 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     private bool GameEnd;
 
     private float SpeedLevelTimer;
+    private float CartObtainTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -159,26 +160,49 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         }
         if (CurrentSide != CartSide.Neutral)
         {
+            if(CurrentSide != LastSide)
+            {
+                CartObtainTimer = 0;
+            }
             LastSide = CurrentSide;
         }
 
         if (Team1Count>0 && Team2Count>0)
         {
+            CartObtainTimer = 0;
             CurrentSide = CartSide.Neutral;
             CurrentSpeed = 0;
         }
         else if (Team1Count > 0)
         {
+
             CurrentSide = CartSide.Team1;
-            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel-1];
+            CartObtainTimer += Time.deltaTime;
+            if (CartObtainTimer >= Data.CartObtainTime)
+            {
+                CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel - 1];
+            }
+            else
+            {
+                CurrentSpeed = 0;
+            }
         }
         else if(Team2Count > 0)
         {
             CurrentSide = CartSide.Team2;
-            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel-1];
+            CartObtainTimer += Time.deltaTime;
+            if (CartObtainTimer >= Data.CartObtainTime)
+            {
+                CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel - 1];
+            }
+            else
+            {
+                CurrentSpeed = 0;
+            }
         }
         else
         {
+            CartObtainTimer = 0;
             CurrentSide = CartSide.Neutral;
             CurrentSpeed = 0;
         }
@@ -192,10 +216,24 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CartDotline.GetComponent<SpriteRenderer>().color = FeelData.NeutralDotlineColor;
                 break;
             case CartSide.Team1:
-                CartDotline.GetComponent<SpriteRenderer>().color = FeelData.Team1DotlineColor;
+                if (CartObtainTimer >= Data.CartObtainTime)
+                {
+                    CartDotline.GetComponent<SpriteRenderer>().color = FeelData.Team1DotlineColor;
+                }
+                else
+                {
+                    CartDotline.GetComponent<SpriteRenderer>().color = FeelData.NeutralDotlineColor;
+                }
                 break;
             case CartSide.Team2:
-                CartDotline.GetComponent<SpriteRenderer>().color = FeelData.Team2DotlineColor;
+                if (CartObtainTimer >= Data.CartObtainTime)
+                {
+                    CartDotline.GetComponent<SpriteRenderer>().color = FeelData.Team2DotlineColor;
+                }
+                else
+                {
+                    CartDotline.GetComponent<SpriteRenderer>().color = FeelData.NeutralDotlineColor;
+                }
                 break;
         }
     }
@@ -209,13 +247,16 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
         if (!Occupiable(CheckPointList[TargetWayPointIndex]))
         {
+
+
             CurrentState = CartState.Moving;
 
             CartMove();
             return;
         }
 
-        if(CurrentSide == CartSide.Neutral)
+
+        if (CurrentSide == CartSide.Neutral || CartObtainTimer <= Data.CartObtainTime)
         {
             CurrentOccupyProgress -= Data.RecoverSpeed * Time.deltaTime;
             if (CurrentOccupyProgress < 0)

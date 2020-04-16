@@ -23,6 +23,8 @@ public class Bagel : WeaponBase
         base.Awake();
         _hitGroundOnce = true;
 
+        _ammo = 1;
+
         Team1Basket = BrawlModeReforgedArenaManager.Team1Basket;
         Team2Basket = BrawlModeReforgedArenaManager.Team2Basket;
     }
@@ -88,23 +90,19 @@ public class Bagel : WeaponBase
     {
         gameObject.layer = 2;
         GetComponent<BoxCollider>().enabled = false;
-        GetComponent<Rigidbody>().useGravity = false;
+
         GetComponent<Rigidbody>().velocity = Vector3.zero;
+        GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+        GetComponent<Rigidbody>().useGravity = false;
+        GetComponent<Rigidbody>().isKinematic = true;
     }
 
     protected override void _onWeaponDespawn()
     {
+        base._onWeaponDespawn();
+        _hitGroundOnce = false;
+        EventManager.Instance.TriggerEvent(new BagelDespawn());
 
-    }
-
-    protected override void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("DeathZone"))
-        {
-            _hitGroundOnce = false;
-            EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-            EventManager.Instance.TriggerEvent(new BagelDespawn());
-            return;
-        }
+        Destroy(gameObject);
     }
 }

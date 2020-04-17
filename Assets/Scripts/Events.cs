@@ -339,6 +339,11 @@ public class BagelDespawn : GameEvent
 
 }
 
+public class AmmoExplode : GameEvent
+{
+
+}
+
 public class ObjectPickedUp : GameEvent
 {
     public GameObject Player;

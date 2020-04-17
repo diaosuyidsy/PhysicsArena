@@ -65,6 +65,7 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected virtual void OnCollisionEnter(Collision other)
     {
+        if (!gameObject.activeSelf) return;
         if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer))
         {
             _onWeaponDespawn();

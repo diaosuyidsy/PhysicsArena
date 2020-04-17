@@ -34,6 +34,7 @@ public class rtHook : WeaponBase
     private float _hookOutTimer;
     private Vector3 _onTargetTransformForwardVector;
     private FSM<rtHook> _hookGunFSM;
+    private GameObject _hookDup;
 
     protected override void Awake()
     {
@@ -135,6 +136,7 @@ public class rtHook : WeaponBase
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._hookDup = null;
             Context._hook.SetActive(true);
             Context._hook.transform.parent = Context.transform;
             Context._hook.transform.localScale = Context._hookinitlocalScale;
@@ -181,7 +183,7 @@ public class rtHook : WeaponBase
             base.OnEnter();
             _hookStopTimer = Time.time + _hookGunData.HookedTime;
             Context._onTargetTimer = Time.time;
-            Context._onTargetTransformForwardVector = -Context.transform.right;
+            Context._onTargetTransformForwardVector = (Context.Hooked.transform.position - Context.transform.position).normalized;
         }
 
         public override void Update()
@@ -302,20 +304,20 @@ public class rtHook : WeaponBase
         public override void OnEnter()
         {
             base.OnEnter();
-            GameObject hookDup = Instantiate(Context._hook, Context._hook.transform.position, Context._hook.transform.rotation);
-            Destroy(hookDup, _hookGunData.HookBlockReloadTime);
+            Context._hookDup = Instantiate(Context._hook, Context._hook.transform.position, Context._hook.transform.rotation);
+            Destroy(Context._hookDup, _hookGunData.HookBlockReloadTime);
             Context._hook.transform.parent = Context.transform;
             Context._hook.transform.localScale = Context._hookinitlocalScale;
             Context._hook.transform.localEulerAngles = Context._hookinitialLocalRotation;
             Context._hook.transform.localPosition = Context._hookinitlocalPos;
             Context._hook.SetActive(false);
-            hookDup.GetComponent<Rigidbody>().isKinematic = false;
-            hookDup.GetComponent<Rigidbody>().useGravity = true;
-            var coll = hookDup.AddComponent<MeshCollider>();
+            Context._hookDup.GetComponent<Rigidbody>().isKinematic = false;
+            Context._hookDup.GetComponent<Rigidbody>().useGravity = true;
+            var coll = Context._hookDup.AddComponent<MeshCollider>();
             coll.convex = true;
-            Vector3 _dir = -hookDup.transform.right;
+            Vector3 _dir = -Context._hookDup.transform.right;
             _dir.y = _hookGunData.HookBlockYDirection;
-            hookDup.GetComponent<Rigidbody>().AddForce(_hookGunData.HookBlockReflectionForce * _dir, ForceMode.Impulse);
+            Context._hookDup.GetComponent<Rigidbody>().AddForce(_hookGunData.HookBlockReflectionForce * _dir, ForceMode.Impulse);
             _brokenTimer = Time.time + _hookGunData.HookBlockReloadTime;
         }
 

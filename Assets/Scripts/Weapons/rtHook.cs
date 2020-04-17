@@ -96,6 +96,7 @@ public class rtHook : WeaponBase
 
     public void HookOnHit(GameObject hit)
     {
+        if (Hooked != null) return;
         if (hit.transform.GetComponent<IHittable>().CanBlock(-_hook.transform.right))
         {
             EventManager.Instance.TriggerEvent(new HookBlocked(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, hit, hit.GetComponent<PlayerController>().PlayerNumber, _hook));

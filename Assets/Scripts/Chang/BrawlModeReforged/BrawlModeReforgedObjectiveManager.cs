@@ -113,7 +113,14 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if (Timer <= UIData.TimerHopValue)
         {
-            return tenseconds.ToString() + seconds.ToString();
+            if (tenseconds > 0)
+            {
+                return tenseconds.ToString() + seconds.ToString();
+            }
+            else
+            {
+                return seconds.ToString();
+            }
         }
         else
         {

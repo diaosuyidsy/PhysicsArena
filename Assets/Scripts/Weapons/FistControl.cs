@@ -49,6 +49,7 @@ public class FistControl : MonoBehaviour
                 PlayerController pc = hit.collider.GetComponentInParent<PlayerController>();
                 if (IHittable != null && !IHittable.CanBlock(-Context.transform.right))
                 {
+                    IHittable.SetVelocity(Vector3.zero);
                     IHittable.OnImpact(-Context.transform.right * _fistGunData.FistHitForce, ForceMode.Impulse, Context.FireOwner, ImpactType.FistGun);
                     EventManager.Instance.TriggerEvent(new FistGunHit(Context.RtFist.gameObject, Context.gameObject, Context.FireOwner, ((MonoBehaviour)IHittable).gameObject, Context.FireOwner.GetComponent<PlayerController>().PlayerNumber, pc == null ? 6 : pc.PlayerNumber));
                     TransitionTo<FistUpUselessState>();

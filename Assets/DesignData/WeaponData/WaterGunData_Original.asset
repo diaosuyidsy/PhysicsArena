@@ -31,7 +31,7 @@ MonoBehaviour:
   DropForce: {x: 0, y: 2, z: -2}
   Speed: 25
   BackFireThrust: 0
-  WaterForce: 135
+  WaterForce: 17
   MaxAmmo: 300
   ShootMaxCD: 0.3
   HelpAimAngle: 60
@@ -39,6 +39,41 @@ MonoBehaviour:
   WaterCastRadius: 0.4
   WaterCastDistance: 5
   WaterBackCastDistance: 0.3
+  WaterForceDecreaseGraph:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 0.21867082
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0.3
+      inSlope: -0.8959092
+      outSlope: -0.8959092
+      tangentMode: 34
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  FireWalkSpeedMultiplier: 0.5
+  FireRotationMultiplier: 0.5
   WaterCanHitLayer:
     serializedVersion: 2
     m_Bits: 384512

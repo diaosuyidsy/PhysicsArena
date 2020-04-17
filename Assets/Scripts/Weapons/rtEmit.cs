@@ -37,13 +37,13 @@ public class rtEmit : WeaponBase
         switch (_waterGunState)
         {
             case State.Shooting:
-                _shootCD += Time.deltaTime;
-                if (_shootCD >= _waterGunData.ShootMaxCD)
-                {
-                    _shootCD = 0f;
-                    _waterGunState = State.Empty;
-                    return;
-                }
+                // _shootCD += Time.deltaTime;
+                // if (_shootCD >= _waterGunData.ShootMaxCD)
+                // {
+                //     _shootCD = 0f;
+                //     _waterGunState = State.Empty;
+                //     return;
+                // }
                 // Statistics: Here we are using raycast for players hit
                 _detectPlayer();
                 _onWeaponUsedOnce();
@@ -67,6 +67,11 @@ public class rtEmit : WeaponBase
             Owner.GetComponent<IHittable>().OnImpact(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.VelocityChange, Owner, ImpactType.WaterGun);
             EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
         }
+        else if (!buttondown && _waterGunState == State.Shooting)
+        {
+            _waterGunState = State.Empty;
+            WaterGunLine.OnFire(false);
+        }
     }
 
     private void _detectPlayer()
@@ -85,7 +90,6 @@ public class rtEmit : WeaponBase
             }
             if (Physics.SphereCast(_currentPosition, _waterGunData.WaterCastRadius, WaterGunLine.ResultVectors[i], out hit, blockLength, layermask))
             {
-                print(hit.transform.name);
                 GameObject target = null;
                 if (hit.transform.GetComponentInParent<WeaponBase>() != null)
                 {
@@ -96,12 +100,14 @@ public class rtEmit : WeaponBase
                     target = hit.transform.GetComponentInParent<IHittable>().GetGameObject();
                 }
                 if (target == null) return;
-                if (_shootTargets.Contains(target)) return;
-                _shootTargets.Add(target);
+                // if (_shootTargets.Contains(target)) return;
+                // _shootTargets.Add(target);
                 if (!target.GetComponent<IHittable>().CanBlock(Owner.transform.forward))
                 {
-                    // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
-                    Vector3 force = _waterGunData.WaterForce * Owner.transform.forward;
+                    float dist = Vector3.Distance(hit.transform.position, transform.position);
+                    float distPer = dist / _waterGunData.WaterCastDistance;
+                    float forceMultiplier = _waterGunData.WaterForceDecreaseGraph.Evaluate(distPer);
+                    Vector3 force = _waterGunData.WaterForce * forceMultiplier * Owner.transform.forward;
                     target.GetComponent<IHittable>().OnImpact(force,
                             ForceMode.VelocityChange,
                             Owner,

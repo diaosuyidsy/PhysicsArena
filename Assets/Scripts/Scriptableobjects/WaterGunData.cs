@@ -15,5 +15,8 @@ public class WaterGunData : WeaponDataBase
     public float WaterCastRadius = 0.4f;
     public float WaterCastDistance = 5f;
     public float WaterBackCastDistance = 0.3f;
+    public AnimationCurve WaterForceDecreaseGraph;
+    public float FireWalkSpeedMultiplier = 1f;
+    public float FireRotationMultiplier = 1f;
     public LayerMask WaterCanHitLayer;
 }

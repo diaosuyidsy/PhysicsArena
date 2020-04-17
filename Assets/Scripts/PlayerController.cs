@@ -281,7 +281,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     public void ForceDropHandObject()
     {
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+        if ((_actionFSM.CurrentState as ActionState).ShouldDropHandObjectWhenForced)
         {
             _dropHandObject();
             _actionFSM.TransitionTo<DroppedRecoveryState>();
@@ -290,7 +290,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
     public void ForceDropHandObject(Vector3 force)
     {
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+        if ((_actionFSM.CurrentState as ActionState).ShouldDropHandObjectWhenForced)
         {
             _dropHandObject(true, force);
             _actionFSM.TransitionTo<DroppedRecoveryState>();
@@ -1015,6 +1015,7 @@ public class PlayerController : MonoBehaviour, IHittable
         protected bool _BUp { get { return Context._player.GetButtonUp("Block"); } }
 
         public virtual bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
+        public virtual bool ShouldDropHandObjectWhenForced { get { return false; } }
 
         // public override void OnEnter()
         // {
@@ -1122,6 +1123,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private class HoldingState : ActionState
     {
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        public override bool ShouldDropHandObjectWhenForced { get { return true; } }
 
         public override void OnEnter()
         {
@@ -1162,14 +1164,22 @@ public class PlayerController : MonoBehaviour, IHittable
                 {
                     Context._movementFSM.TransitionTo<BazookaMovmentAimState>();
                     TransitionTo<BazookaActionState>();
+                    return;
                 }
                 else if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtBoomerang)))
                 {
                     TransitionTo<BoomerangActionState>();
+                    return;
                 }
                 else if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtSmallBaz)))
                 {
                     TransitionTo<IdleActionState>();
+                    return;
+                }
+                else if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtEmit)))
+                {
+                    TransitionTo<WaterGunActionState>();
+                    return;
                 }
             }
             if (_RightTriggerUp)
@@ -1660,7 +1670,40 @@ public class PlayerController : MonoBehaviour, IHittable
             Context.OnImpact(new RemovePermaSlowEffect(0f, 0.5f));
         }
     }
+    private class WaterGunActionState : WeaponActionState
+    {
+        public override bool ShouldDropHandObjectWhenForced { get { return true; } }
 
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            Context._animator.SetBool("PickUpHalf", true);
+            WaterGunData data = Context.HandObject.GetComponent<WeaponBase>().WeaponDataBase as WaterGunData;
+            Context._permaSlow++;
+            Context._permaSlowWalkSpeedMultiplier = data.FireWalkSpeedMultiplier;
+            Context._rotationSpeedMultiplier = data.FireRotationMultiplier;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_RightTriggerUp)
+            {
+                Context.HandObject.GetComponent<WeaponBase>().Fire(false);
+                TransitionTo<HoldingState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context._permaSlow = 1;
+            Context._walkSpeedMultiplier = 1f;
+            Context._rotationSpeedMultiplier = 1f;
+            Context._animator.SetBool("PickUpHalf", false);
+        }
+    }
     private class StunActionState : ActionState
     {
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }

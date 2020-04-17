@@ -74,28 +74,40 @@ public class rtEmit : WeaponBase
         // This layermask means we are only looking for Player1Body - Player6Body
         LayerMask layermask = _waterGunData.WaterCanHitLayer ^ (1 << Owner.layer);
         RaycastHit hit;
-        if (Physics.SphereCast(transform.position - Owner.transform.forward * _waterGunData.WaterBackCastDistance, _waterGunData.WaterCastRadius, Owner.transform.forward, out hit, _waterGunData.WaterCastDistance, layermask))
+
+        for (int i = 0; i < WaterGunLine.segmentCount; i++)
         {
-            GameObject target = null;
-            if (hit.transform.GetComponentInParent<WeaponBase>() != null)
+            Vector3 _currentPosition = transform.position;
+            float blockLength = (_waterGunData.WaterCastDistance + _waterGunData.WaterCastRadius) / WaterGunLine.segmentCount;
+            for (int j = 0; j < i; j++)
             {
-                target = hit.transform.GetComponentInParent<WeaponBase>().Owner;
+                _currentPosition += WaterGunLine.ResultVectors[j] * blockLength;
             }
-            else if (hit.transform.GetComponentInParent<IHittable>() != null)
+            if (Physics.SphereCast(_currentPosition, _waterGunData.WaterCastRadius, WaterGunLine.ResultVectors[i], out hit, blockLength, layermask))
             {
-                target = hit.transform.GetComponentInParent<IHittable>().GetGameObject();
-            }
-            if (target == null) return;
-            if (_shootTargets.Contains(target)) return;
-            _shootTargets.Add(target);
-            if (!target.GetComponent<IHittable>().CanBlock(Owner.transform.forward))
-            {
-                // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
-                Vector3 force = _waterGunData.WaterForce * Owner.transform.forward;
-                target.GetComponent<IHittable>().OnImpact(force,
-                        ForceMode.VelocityChange,
-                        Owner,
-                        ImpactType.WaterGun);
+                print(hit.transform.name);
+                GameObject target = null;
+                if (hit.transform.GetComponentInParent<WeaponBase>() != null)
+                {
+                    target = hit.transform.GetComponentInParent<WeaponBase>().Owner;
+                }
+                else if (hit.transform.GetComponentInParent<IHittable>() != null)
+                {
+                    target = hit.transform.GetComponentInParent<IHittable>().GetGameObject();
+                }
+                if (target == null) return;
+                if (_shootTargets.Contains(target)) return;
+                _shootTargets.Add(target);
+                if (!target.GetComponent<IHittable>().CanBlock(Owner.transform.forward))
+                {
+                    // TargetHit(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, Owner, true);
+                    Vector3 force = _waterGunData.WaterForce * Owner.transform.forward;
+                    target.GetComponent<IHittable>().OnImpact(force,
+                            ForceMode.VelocityChange,
+                            Owner,
+                            ImpactType.WaterGun);
+                }
+                break;
             }
         }
     }

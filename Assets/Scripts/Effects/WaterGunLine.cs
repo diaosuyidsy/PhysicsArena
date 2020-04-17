@@ -19,6 +19,7 @@ public class WaterGunLine : MonoBehaviour
 
     private LineRenderer _lr;
     private Vector3[] _resultVectors;
+    public Vector3[] ResultVectors { get { return _resultVectors; } }
     private float _dist;
     private float _globalProgress;
     private Vector3 _hitPosition;
@@ -40,7 +41,7 @@ public class WaterGunLine : MonoBehaviour
         if (waterGunData)
         {
             _spherecastRadius = waterGunData.WaterCastRadius;
-            _maxLength = waterGunData.WaterCastDistance +_spherecastRadius;
+            _maxLength = waterGunData.WaterCastDistance + _spherecastRadius;
         }
         else
         {

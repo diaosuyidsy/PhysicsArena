@@ -282,8 +282,8 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         if ((_actionFSM.CurrentState as ActionState).ShouldDropHandObjectWhenForced)
         {
-            _dropHandObject();
             _actionFSM.TransitionTo<DroppedRecoveryState>();
+            _dropHandObject();
         }
     }
 
@@ -291,8 +291,8 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         if ((_actionFSM.CurrentState as ActionState).ShouldDropHandObjectWhenForced)
         {
-            _dropHandObject(true, force);
             _actionFSM.TransitionTo<DroppedRecoveryState>();
+            _dropHandObject(true, force);
         }
     }
 
@@ -1154,6 +1154,8 @@ public class PlayerController : MonoBehaviour, IHittable
                 WeaponBase wb = Context.HandObject.GetComponent<WeaponBase>();
                 Context._helpAim(wb.HelpAimAngle, wb.HelpAimDistance);
                 Context.HandObject.GetComponent<WeaponBase>().Fire(true);
+                if (Context.HandObject == null) return;
+
                 if (Context.HandObject.GetComponent<WeaponBase>().GetType().Equals(typeof(rtBazooka)))
                 {
                     Context._movementFSM.TransitionTo<BazookaMovmentAimState>();

@@ -97,7 +97,6 @@ public class PlayerController : MonoBehaviour, IHittable
     private int _hitStopFrames;
     public bool IsIdle { get { return _movementFSM.CurrentState.GetType().Equals(typeof(IdleState)); } }
     private ForceTuple _hitForceTuple;
-    private bool _isHit;
     #endregion
 
     private void Awake()
@@ -222,8 +221,8 @@ public class PlayerController : MonoBehaviour, IHittable
                 // if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
                 //     _actionFSM.TransitionTo<PunchHittedStopActionState>();
                 // else
-                _isHit = true;
-                // _actionFSM.TransitionTo<HitUnControllableActionState>();
+                // _isHit = true;
+                _actionFSM.TransitionTo<HitUnControllableActionState>();
             }
         }
         else
@@ -1032,11 +1031,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 // if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._currentStamina += (Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
                 if (Context._currentStamina < Context.CharacterDataStore.MaxStamina) Context._drainStamina(-Time.deltaTime * Context.CharacterDataStore.StaminaRegenRate);
             }
-            if (Context._isHit && ShouldOnHitTransitToUncontrollableState)
-            {
-                Context._isHit = false;
-                TransitionTo<HitUnControllableActionState>();
-            }
         }
 
         public virtual void OnEnterDeathZone()
@@ -1328,6 +1322,7 @@ public class PlayerController : MonoBehaviour, IHittable
 
         public override void Update()
         {
+            base.Update();
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
@@ -1335,7 +1330,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 return;
             }
             _checkHit();
-            base.Update();
         }
 
         public override void OnExit()
@@ -1365,6 +1359,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     target = hit.transform.GetComponentInParent<IHittable>().GetGameObject();
                 }
                 else return;
+                if (target == null) return;
                 _hitOnce = true;
                 foreach (var rb in target.GetComponentsInChildren<Rigidbody>(true))
                 {
@@ -1673,6 +1668,8 @@ public class PlayerController : MonoBehaviour, IHittable
     private class WaterGunActionState : WeaponActionState
     {
         public override bool ShouldDropHandObjectWhenForced { get { return true; } }
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+
 
         public override void OnEnter()
         {

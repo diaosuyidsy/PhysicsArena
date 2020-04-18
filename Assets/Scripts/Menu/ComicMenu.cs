@@ -707,6 +707,7 @@ public class ComicMenu : MonoBehaviour
 
             int gamePlayerId = _getNextGamePlayerId();
             if (gamePlayerId == 7) return;
+
             _playerMap.Add(new PlayerMap(rewiredPlayerId, gamePlayerId));
             _playersFSM[gamePlayerId] = new FSM<CharacterSelectionState>(this);
             _playersFSM[gamePlayerId].TransitionTo<UnselectingState>();
@@ -783,6 +784,7 @@ public class ComicMenu : MonoBehaviour
             {
                 int rewiredId = args.controllerId;
                 if (_rewiredPlayerIndex != rewiredId) return;
+                ReInput.players.GetPlayer(rewiredId).controllers.maps.SetMapsEnabled(true, "Assignment");
                 Context._unassignPlayer(rewiredId);
                 return;
             }
@@ -851,20 +853,39 @@ public class ComicMenu : MonoBehaviour
             public override void Update()
             {
                 base.Update();
-                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
-                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
-
-                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
-
                 RaycastHit hit;
-                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
+                Ray ray = Context._mainCamera.ScreenPointToRay(Context._mainCamera.WorldToScreenPoint(_CursorPos));
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.transform.name != "RenderMaterialQuad") return;
+                    Vector2 localPoint = hit.textureCoord;
+
+                    Ray portalRay = Context._sceneCamera.ScreenPointToRay(new Vector2(localPoint.x * Context._sceneCamera.pixelWidth,
+                    localPoint.y * Context._sceneCamera.pixelHeight));
+                    RaycastHit sceneHit;
+
+                    if (Physics.Raycast(portalRay, out sceneHit, 100f, Context._MenuData.EggLayer))
+                    {
+                        TransitionTo<HoveringState>();
+                        return;
+                    }
+
+                }
+
+                // float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
+                // float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+
+                // Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
+                // // RaycastHit hit;
+                // Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 /// If cursor Casted to a egg
-                if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
-                {
-                    TransitionTo<HoveringState>();
-                    return;
-                }
+                // if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+                // {
+                //     TransitionTo<HoveringState>();
+                //     return;
+                // }
             }
         }
 
@@ -878,70 +899,138 @@ public class ComicMenu : MonoBehaviour
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuEggJiggleAudioClip);
                 Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
 
-                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
-                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
-                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
-
-
                 RaycastHit hit;
-                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
+                Ray ray = Context._mainCamera.ScreenPointToRay(Context._mainCamera.WorldToScreenPoint(_CursorPos));
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.transform.name != "RenderMaterialQuad") return;
+                    Vector2 localPoint = hit.textureCoord;
+
+                    Ray portalRay = Context._sceneCamera.ScreenPointToRay(new Vector2(localPoint.x * Context._sceneCamera.pixelWidth,
+                    localPoint.y * Context._sceneCamera.pixelHeight));
+                    RaycastHit sceneHit;
+
+                    if (Physics.Raycast(portalRay, out sceneHit, 100f, Context._MenuData.EggLayer))
+                    {
+                        _castedEggSiblingIndex = sceneHit.transform.GetSiblingIndex();
+                        Context._onCursorChange(1, _castedEggSiblingIndex);
+                        /// Show Grey image on hole
+                        Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(true);
+                        Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).GetComponent<SpriteRenderer>().color = Context._MenuData.HoverImageColor;
+                        // Also Change Hole Color to related color
+                        Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleCursorveHoverColor[_castedEggSiblingIndex];
+                        // Hide the indicators
+                        Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+                    }
+
+                }
+                // float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
+                // float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+                // Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
+
+                // RaycastHit hit;
+                // Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 /// If cursor Casted to a egg
-                if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
-                {
-                    _castedEggSiblingIndex = hit.transform.GetSiblingIndex();
-                    Context._onCursorChange(1, _castedEggSiblingIndex);
-                    /// Show Grey image on hole
-                    Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(true);
-                    Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).GetComponent<SpriteRenderer>().color = Context._MenuData.HoverImageColor;
-                    // Also Change Hole Color to related color
-                    Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleCursorveHoverColor[_castedEggSiblingIndex];
-                    // Hide the indicators
-                    Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
-                }
+                // if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+                // {
+                //     _castedEggSiblingIndex = hit.transform.GetSiblingIndex();
+                //     Context._onCursorChange(1, _castedEggSiblingIndex);
+                //     /// Show Grey image on hole
+                //     Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(true);
+                //     Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).GetComponent<SpriteRenderer>().color = Context._MenuData.HoverImageColor;
+                //     // Also Change Hole Color to related color
+                //     Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleCursorveHoverColor[_castedEggSiblingIndex];
+                //     // Hide the indicators
+                //     Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+                // }
             }
 
             public override void Update()
             {
                 base.Update();
-                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
-                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
-                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+                // float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
+                // float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+                // Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
+                // RaycastHit hit;
+                // Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 RaycastHit hit;
-                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
-
-                /// If cursor Casted to another egg
-                if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+                Ray ray = Context._mainCamera.ScreenPointToRay(Context._mainCamera.WorldToScreenPoint(_CursorPos));
+                if (Physics.Raycast(ray, out hit))
                 {
-                    if (hit.transform.GetSiblingIndex() != _castedEggSiblingIndex)
+                    if (hit.transform.name != "RenderMaterialQuad") return;
+                    Vector2 localPoint = hit.textureCoord;
+
+                    Ray portalRay = Context._sceneCamera.ScreenPointToRay(new Vector2(localPoint.x * Context._sceneCamera.pixelWidth,
+                    localPoint.y * Context._sceneCamera.pixelHeight));
+                    RaycastHit sceneHit;
+
+                    if (Physics.Raycast(portalRay, out sceneHit, 100f, Context._MenuData.EggLayer))
                     {
-                        Context._onCursorChange(-1, _castedEggSiblingIndex);
-                        Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
-                        //Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(-244f, Context._MenuData.HoleImageOutDuration);
-                        TransitionTo<HoveringState>();
-                        return;
+                        if (sceneHit.transform.GetSiblingIndex() != _castedEggSiblingIndex)
+                        {
+                            Context._onCursorChange(-1, _castedEggSiblingIndex);
+                            Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+                            //Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(-244f, Context._MenuData.HoleImageOutDuration);
+                            TransitionTo<HoveringState>();
+                            return;
+                        }
+                        else
+                        {
+                            if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Jump"))
+                            {
+                                /// Record this cursor selected which egg
+                                Context._cursorSelectedEggIndex[_gamePlayerIndex] = _castedEggSiblingIndex;
+                                Context._eggSelectedCursorIndex[_castedEggSiblingIndex] = _gamePlayerIndex;
+
+                                TransitionTo<HoverToSelectedTransition>();
+                                Context._eggsFSM[_castedEggSiblingIndex].TransitionTo<EggToChickenTransition>();
+                                return;
+                            }
+                        }
                     }
                     else
                     {
-                        if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Jump"))
-                        {
-                            /// Record this cursor selected which egg
-                            Context._cursorSelectedEggIndex[_gamePlayerIndex] = _castedEggSiblingIndex;
-                            Context._eggSelectedCursorIndex[_castedEggSiblingIndex] = _gamePlayerIndex;
-
-                            TransitionTo<HoverToSelectedTransition>();
-                            Context._eggsFSM[_castedEggSiblingIndex].TransitionTo<EggToChickenTransition>();
-                            return;
-                        }
+                        Context._onCursorChange(-1, _castedEggSiblingIndex);
+                        Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+                        TransitionTo<UnselectingState>();
+                        return;
                     }
-                }
-                else
-                {
-                    Context._onCursorChange(-1, _castedEggSiblingIndex);
-                    Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
-                    TransitionTo<UnselectingState>();
-                    return;
+                    // /// If cursor Casted to another egg
+                    // if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+                    // {
+                    //     if (hit.transform.GetSiblingIndex() != _castedEggSiblingIndex)
+                    //     {
+                    //         Context._onCursorChange(-1, _castedEggSiblingIndex);
+                    //         Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+                    //         //Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(-244f, Context._MenuData.HoleImageOutDuration);
+                    //         TransitionTo<HoveringState>();
+                    //         return;
+                    //     }
+                    //     else
+                    //     {
+                    //         if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Jump"))
+                    //         {
+                    //             /// Record this cursor selected which egg
+                    //             Context._cursorSelectedEggIndex[_gamePlayerIndex] = _castedEggSiblingIndex;
+                    //             Context._eggSelectedCursorIndex[_castedEggSiblingIndex] = _gamePlayerIndex;
+
+                    //             TransitionTo<HoverToSelectedTransition>();
+                    //             Context._eggsFSM[_castedEggSiblingIndex].TransitionTo<EggToChickenTransition>();
+                    //             return;
+                    //         }
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     Context._onCursorChange(-1, _castedEggSiblingIndex);
+                    //     Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+                    //     TransitionTo<UnselectingState>();
+                    //     return;
+                    // }
                 }
             }
 
@@ -1011,7 +1100,7 @@ public class ComicMenu : MonoBehaviour
                 base.Init();
                 _eggIndex = Context._getEggFSMIndex(Parent);
                 _eggChild = Context.Context._eggs[_eggIndex].GetChild(0);
-                ReInput.ControllerPreDisconnectEvent += _onControllerDisconnected;
+                ReInput.ControllerDisconnectedEvent += _onControllerDisconnected;
             }
 
             protected virtual void _onControllerDisconnected(ControllerStatusChangedEventArgs args)
@@ -1021,7 +1110,7 @@ public class ComicMenu : MonoBehaviour
             public override void CleanUp()
             {
                 base.CleanUp();
-                ReInput.ControllerPreDisconnectEvent -= _onControllerDisconnected;
+                ReInput.ControllerDisconnectedEvent -= _onControllerDisconnected;
             }
         }
 
@@ -1124,6 +1213,8 @@ public class ComicMenu : MonoBehaviour
                 /// Reset _eggCursors
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuChickenToEggAudioClip);
                 Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
+                Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().enabled = false;
+                Context.Context._chickens[_eggIndex].GetComponent<Rigidbody>().isKinematic = true;
                 Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
                 Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
                 Context._eggCursors[_eggIndex] = 0;

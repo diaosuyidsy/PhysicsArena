@@ -282,6 +282,7 @@ public class ComicMenu : MonoBehaviour
                 {
                     tmp.sortingLayerID = SortingLayer.NameToID("Front");
                 }
+                Context.CoverPage.transform.position -= Vector3.up * 0.1f;
             });
             sequence.Append(Context.CoverPage.transform.DOLocalMove(_MenuData.CoverPageReturnLocalMovement, _MenuData.CoverpageReturnDuration)
             .SetEase(_MenuData.CoverPageReturnEase).SetRelative(true));
@@ -349,6 +350,7 @@ public class ComicMenu : MonoBehaviour
                 {
                     tmp.sortingLayerID = SortingLayer.NameToID("CoverPage");
                 }
+                Context.CoverPage.transform.position += Vector3.up * 0.1f;
             });
             sequence.Append(Context.CoverPage.transform.DOMove(_MenuData.MapToFirstFirstMenuMove2.EndValue, _MenuData.MapToFirstFirstMenuMove2.Duration)
             .SetEase(_MenuData.MapToFirstFirstMenuMove2.Ease).SetRelative(_MenuData.MapToFirstFirstMenuMove2.Relative));
@@ -635,7 +637,7 @@ public class ComicMenu : MonoBehaviour
                 Context._hintText.DOText("Everybody in Circle", 1f);
             }
             else
-                Context._hintText.DOText("Enter The Circle", 0f);
+                Context._hintText.DOText("Stand in Circle", 0f);
         }
 
         private bool _isRewiredPlayerInGame(int rewiredID)
@@ -1258,6 +1260,8 @@ public class ComicMenu : MonoBehaviour
                 {
                     c.sortingLayerID = 0;
                 }
+                Context.SelectionPage.transform.position -= Vector3.up * 0.1f;
+
             });
             sequence.Append(Context.SelectionPage.transform.DOMove(_MenuData.CharacterSelectionToLoadingPageMovementEase2.EndValue,
             _MenuData.CharacterSelectionToLoadingPageMovementEase2.Duration).SetEase(_MenuData.CharacterSelectionToLoadingPageMovementEase2.Ease)

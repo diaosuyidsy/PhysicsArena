@@ -1374,6 +1374,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     force *= (-Context.CharacterDataStore.BlockMultiplier);
                     EventManager.Instance.TriggerEvent(new PlayerHit(target, Context.gameObject, force, target.GetComponent<PlayerController>().PlayerNumber, Context.PlayerNumber, 1f, true));
                     Context.OnImpact(force, ForceMode.Impulse, target, ImpactType.Block);
+
                 }
                 else
                 {
@@ -1712,6 +1713,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnEnter();
             Context._dropHandObject();
             Context._animator.SetBool("IdleUpper", true);
+            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
 
         public override void Update()

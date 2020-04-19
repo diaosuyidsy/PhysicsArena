@@ -50,6 +50,7 @@ public class VFXData : ScriptableObject
     public GameObject ChickenSlowedVFX;
     public GameObject DuckSlowedVFX;
     public GameObject CartExplosionVFX;
+    public GameObject BagelExplosionVFX;
     public GameObject ChickenFoodVFX;
     public GameObject DuckFoodVFX;
     public GameObject FistGunFistTrailVFX;

@@ -392,6 +392,12 @@ public class VFXManager
         }
     }
 
+    private void _onAmmoExplode(AmmoExplode ev)
+    {
+        GameObject VFX = VFXDataStore.BagelExplosionVFX;
+        _instantiateVFX(VFX, ev.Pos, VFX.transform.rotation);
+    }
+
     IEnumerator _startBlinking(float time, Renderer r)
     {
         float curTime = 0;
@@ -483,6 +489,7 @@ public class VFXManager
         EventManager.Instance.AddHandler<FistGunHit>(_onFistGunHit);
         EventManager.Instance.AddHandler<HookGunFired>(_onHookGunFired);
         EventManager.Instance.AddHandler<HookHit>(_onHookGunHit);
+        EventManager.Instance.AddHandler<AmmoExplode>(_onAmmoExplode);
 
         _blinkTime = Services.Config.GameMapData.InvincibleTime;
     }
@@ -518,6 +525,7 @@ public class VFXManager
         EventManager.Instance.RemoveHandler<FistGunHit>(_onFistGunHit);
         EventManager.Instance.RemoveHandler<HookGunFired>(_onHookGunFired);
         EventManager.Instance.RemoveHandler<HookHit>(_onHookGunHit);
+        EventManager.Instance.RemoveHandler<AmmoExplode>(_onAmmoExplode);
     }
 
     public void Destory()

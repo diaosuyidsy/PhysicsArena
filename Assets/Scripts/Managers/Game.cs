@@ -25,6 +25,7 @@ public class Game : MonoBehaviour
         Services.StatisticsManager = new StatisticsManager();
         Services.TinylyticsManager = new TinylyticsHandler();
         Services.GameStateManager = new GameStateManager(GameMapData, ConfigData, gameObject);
+        Services.ActionManager = new ActionManager();
         switch (GameMapData.GameMapMode)
         {
             case GameMapMode.FoodCartMode:
@@ -36,7 +37,7 @@ public class Game : MonoBehaviour
             case GameMapMode.DeathMode:
                 if (Utility.GetPlayerNumber() <= 2)
                 {
-                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData_2Player,(BrawlModeReforgedUIData)UIData);
+                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData_2Player, (BrawlModeReforgedUIData)UIData);
                 }
                 else
                 {
@@ -58,6 +59,7 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Services.ActionManager.Update();
         Services.WeaponGenerationManager.Update();
         Services.GameStateManager.Update();
         Services.GameObjectiveManager.Update();
@@ -87,6 +89,9 @@ public class Game : MonoBehaviour
 
     private void OnDestroy()
     {
+        Services.ActionManager.Destroy();
+        Services.ActionManager = null;
+
         Services.AudioManager.Destroy();
         Services.AudioManager = null;
 

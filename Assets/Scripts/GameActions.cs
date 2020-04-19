@@ -33,18 +33,6 @@ public class HitAction : GameActions
     }
 }
 
-// public class FistHitAction : HitAction
-// {
-//     public FistHitAction(GameObject hitTarget, GameObject hiter, Vector3 hitForce, ForceMode forceMode, ImpactType impactType) : base(hitTarget, hiter, hitForce, forceMode, impactType)
-//     {
-//     }
-//     public override void Execute()
-//     {
-//         base.Execute();
-
-//     }
-// }
-
 public class MeleeHitAction : HitAction
 {
     public MeleeHitAction(GameObject hitTarget, GameObject hiter, Vector3 hitForce, ForceMode forceMode, ImpactType impactType) : base(hitTarget, hiter, hitForce, forceMode, impactType)

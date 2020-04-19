@@ -1424,7 +1424,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            _sweepInHitDirection();
+            // _sweepInHitDirection();
         }
 
         private void _sweepInHitDirection()

@@ -341,7 +341,11 @@ public class BagelDespawn : GameEvent
 
 public class AmmoExplode : GameEvent
 {
-
+    public Vector3 Pos;
+    public AmmoExplode(Vector3 P)
+    {
+        Pos = P;
+    }
 }
 
 public class ObjectPickedUp : GameEvent

@@ -1374,7 +1374,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     force *= (-Context.CharacterDataStore.BlockMultiplier);
                     // EventManager.Instance.TriggerEvent(new PlayerHit(target, Context.gameObject, force, target.GetComponent<PlayerController>().PlayerNumber, Context.PlayerNumber, 1f, true));
                     // Context.OnImpact(force, ForceMode.Impulse, target, ImpactType.Block);
-                    Services.ActionManager.RegisterAction(Time.frameCount, new MeleeHitAction(Context.gameObject, target, force, true));
+                    Services.ActionManager.RegisterAction(Time.frameCount, new MeleeHitAction(Context.gameObject, target, force, ForceMode.Impulse, ImpactType.Block));
                 }
                 else
                 {
@@ -1382,7 +1382,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     // if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                     //     Context.SetVelocity(Vector3.zero);
                     // target.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Context.gameObject, ImpactType.Melee);
-                    Services.ActionManager.RegisterAction(Time.frameCount, new MeleeHitAction(target, Context.gameObject, force, false));
+                    Services.ActionManager.RegisterAction(Time.frameCount, new MeleeHitAction(target, Context.gameObject, force, ForceMode.Impulse, ImpactType.Melee));
                 }
                 // TransitionTo<PunchHitStopActionState>();
                 // Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
@@ -1435,10 +1435,10 @@ public class PlayerController : MonoBehaviour, IHittable
             {
                 Transform hit = hits[i].transform;
                 GameObject target = null;
-                if (hit.GetComponent<WeaponBase>() != null && hit.transform.GetComponent<WeaponBase>().Owner != null)
-                    target = hit.transform.GetComponent<WeaponBase>().Owner;
-                else if (hit.transform.GetComponentInParent<IHittable>() != null)
-                    target = hit.transform.gameObject;
+                // if (hit.GetComponent<WeaponBase>() != null && hit.transform.GetComponent<WeaponBase>().Owner != null)
+                //     target = hit.transform.GetComponent<WeaponBase>().Owner;
+                if (hit.transform.GetComponentInParent<IHittable>() != null)
+                    target = hit.transform.GetComponentInParent<IHittable>().GetGameObject();
                 else continue;
                 if (target == Context.gameObject) continue;
                 if (_sweepedObjects.Contains(target)) continue;
@@ -1449,7 +1449,8 @@ public class PlayerController : MonoBehaviour, IHittable
                 Vector3 temp = (targetToPlayerDirection - projected);
                 temp.y = 0f;
                 Vector3 result = temp.normalized * Context.CharacterDataStore.HitSweepPushBackForce;
-                target.transform.GetComponentInParent<IHittable>().OnImpact(result, ForceMode.VelocityChange, Context.gameObject, ImpactType.Melee);
+                // target.GetComponent<IHittable>().OnImpact(result, ForceMode.VelocityChange, Context.gameObject, ImpactType.Melee);
+                Services.ActionManager.RegisterAction(Time.frameCount, new HitAction(target, Context.gameObject, result, ForceMode.VelocityChange, ImpactType.Melee));
             }
         }
     }
@@ -1616,7 +1617,8 @@ public class PlayerController : MonoBehaviour, IHittable
                     rb.velocity = Vector3.zero;
                 }
                 Vector3 force = Context.transform.forward * Context.CharacterDataStore.BlockPushForce;
-                ihit.OnImpact(force, ForceMode.VelocityChange, Context.gameObject, ImpactType.Block);
+                // ihit.OnImpact(force, ForceMode.VelocityChange, Context.gameObject, ImpactType.Block);
+                Services.ActionManager.RegisterAction(Time.frameCount, new HitAction(ihit.GetGameObject(), Context.gameObject, force, ForceMode.VelocityChange, ImpactType.Block));
             }
         }
 

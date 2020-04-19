@@ -19,14 +19,9 @@ public class ActionManager
         // If action dict does not contain current framecount
         // Create a new list then add the gameactions to the list
         if (!_actionDict.ContainsKey(frameCount))
-        {
             _actionDict.Add(frameCount, new List<GameActions>());
-            _actionDict[frameCount].Add(ev);
-        }
-        else
-        {
-            _actionDict[frameCount].Add(ev);
-        }
+
+        _actionDict[frameCount].Add(ev);
     }
 
     public void Update()

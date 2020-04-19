@@ -646,6 +646,7 @@ public class CabelSwtiching_ThirdSegment : CabelAction
     public override void OnExit()
     {
         base.OnExit();
+        Context.GenerateBagel();
         EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Cart));
     }
 
@@ -1517,12 +1518,14 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
         EventManager.Instance.AddHandler<BagelDespawn>(OnBagelDespawn);
+        //EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
     }
 
     private void OnDestroy()
     {
         EventManager.Instance.RemoveHandler<PlayerDied>(OnPlayerDied);
         EventManager.Instance.RemoveHandler<BagelDespawn>(OnBagelDespawn);
+        //EventManager.Instance.RemoveHandler<BagelSent>(OnBagelSent);
     }
 
     // Update is called once per frame
@@ -1550,7 +1553,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
 
 
-    private void GenerateBagel()
+    public void GenerateBagel()
     {
         Vector3 Pos = Data.BagelGenerationPos;
 
@@ -1580,7 +1583,6 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
     }
 
 
-
     private void OnPlayerDied(PlayerDied e)
     {
         if(e.Player == Info.LockedPlayer)
@@ -1588,7 +1590,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
             Info.LockedPlayer = null;
         }
 
-        if (Bagel == null)
+        if (Bagel == null && GetPlayerNumber()>2)
         {
             GenerateBagel();
         }

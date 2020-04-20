@@ -391,7 +391,7 @@ public class GameStateManager : GameStateManagerBase
                 Context._holdBImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
                 if (Context._holdBImage.fillAmount >= 1f)
                 {
-                    SceneManager.LoadScene("NewMenu");
+                    SceneManager.LoadScene("ComicMenu");
                 }
             }
             else
@@ -578,7 +578,7 @@ public class GameStateManager : GameStateManagerBase
             }
             if (!onresume && _AnyADown)
             {
-                Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene("NewMenu"));
+                Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene("ComicMenu"));
                 Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
                 TransitionTo<GameQuitState>();
                 return;

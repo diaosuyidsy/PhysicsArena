@@ -29,12 +29,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16384
   DropForce: {x: 0, y: 2, z: -2}
-  FistSpeed: 15
+  FistSpeed: 17
   MaxAmmo: 7
   FistHitForce: 1015
   BackfireHitForce: 200
   IdleBackfireHitForce: 100
-  MaxFlyDistance: 10
+  MaxFlyDistance: 30
   ReloadTime: 1
   ReloadEase:
     serializedVersion: 2
@@ -91,9 +91,10 @@ MonoBehaviour:
   FistReboundForce: 1
   FistHitScanRadius: 0.15
   FistHitScanDist: 0.4
+  FistUselessDuration: 1
+  FistOutDuration: 0.2
   AllThingFistCanCollideLayer:
     serializedVersion: 2
     m_Bits: 17169920
   HelpAimAngle: 60
   HelpAimDistance: 50
-  FistMaxCD: 0.3

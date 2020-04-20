@@ -18,6 +18,7 @@ public class ComicMenuGame : MonoBehaviour
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
         Services.GameStateManager = new MenuGameStateManager(GameMapData, ConfigData, gameObject);
+        Services.ActionManager = new ActionManager();
     }
 
     private void OnDrawGizmos()
@@ -43,11 +44,15 @@ public class ComicMenuGame : MonoBehaviour
     }
     void Update()
     {
+        Services.ActionManager.Update();
         Services.GameStateManager.Update();
 
     }
     private void OnDestroy()
     {
+        Services.ActionManager.Destroy();
+        Services.ActionManager = null;
+
         Services.AudioManager.Destroy();
         Services.AudioManager = null;
 

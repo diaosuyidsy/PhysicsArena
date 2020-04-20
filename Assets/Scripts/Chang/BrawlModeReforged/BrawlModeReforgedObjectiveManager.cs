@@ -44,6 +44,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         EventManager.Instance.AddHandler<PlayerDied>(OnPlayerDied);
         EventManager.Instance.AddHandler<BagelSent>(OnBagelSent);
 
+        GameObject Title = TutorialCanvas.Find("ObjectiveImages").Find("Title").gameObject;
+        Title.GetComponent<TextMeshProUGUI>().text = "Score " + ModeData.TargetScore.ToString() + " First";
 
         TeamAScoreText = GameUI.Find("Team1Score").GetComponent<TextMeshProUGUI>();
         TeamBScoreText = GameUI.Find("Team2Score").GetComponent<TextMeshProUGUI>();
@@ -87,8 +89,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             TimerText.text = "0";
             if (TeamAScore != TeamBScore)
             {
-                EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
-                gameEnd = true;
+                //EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+                //gameEnd = true;
                 return;
             }
         }
@@ -148,6 +150,20 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         TeamBScoreText.text = TeamBScore.ToString();
     }
 
+    private void CheckWin()
+    {
+        if (TeamAScore >= ModeData.TargetScore)
+        {
+            gameEnd = true;
+            EventManager.Instance.TriggerEvent(new GameEnd(1, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+        }
+        else if(TeamBScore >= ModeData.TargetScore)
+        {
+            gameEnd = true;
+            EventManager.Instance.TriggerEvent(new GameEnd(2, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+        }
+    }
+
     private void OnBagelSent(BagelSent e)
     {
         if (gameEnd || !gameStart)
@@ -157,14 +173,15 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if (e.Basket == BrawlModeReforgedArenaManager.Team1Basket)
         {
-            TeamAScore += 3;
+            TeamAScore += ModeData.DeliveryPoint;
         }
         else
         {
-            TeamBScore += 3;
+            TeamBScore += ModeData.DeliveryPoint;
         }
 
         RefreshScore();
+        CheckWin();
     }
 
     private void OnPlayerDied(PlayerDied e)
@@ -184,6 +201,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         }
 
         RefreshScore();
+        CheckWin();
     }
 
     private void OnGameStart(GameStart e)

@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 8900973205179038535}
   - component: {fileID: 2328720101541501454}
   - component: {fileID: 525994969481524516}
-  - component: {fileID: 3547910392350749756}
+  - component: {fileID: 4031599160371930648}
   m_Layer: 0
   m_Name: Fist
   m_TagString: Untagged
@@ -110,7 +110,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 0
---- !u!114 &3547910392350749756
+--- !u!114 &4031599160371930648
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -119,9 +119,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 2328720101541501453}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ba9011835f6451f4b876b6dc2c06b6d6, type: 3}
+  m_Script: {fileID: 11500000, guid: 3540c5a02a7fcbb4ab8654449eaa7ba2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  FistGunData: {fileID: 11400000, guid: e622188261ba2a947aaed1d15e0f456e, type: 2}
 --- !u!1 &2747658201903773669
 GameObject:
   m_ObjectHideFlags: 0
@@ -214,6 +215,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WeaponDataBase: {fileID: 11400000, guid: e622188261ba2a947aaed1d15e0f456e, type: 2}
+  OnDropDisappear: 1
   CanBePickedUp: 0
 --- !u!1001 &5779857717497606519
 PrefabInstance:

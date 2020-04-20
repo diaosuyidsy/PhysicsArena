@@ -19,15 +19,24 @@ public class WaterGunLine : MonoBehaviour
 
     private LineRenderer _lr;
     private Vector3[] _resultVectors;
+    public Vector3[] ResultVectors { get { return _resultVectors; } }
     private float _dist;
     private float _globalProgress;
     private Vector3 _hitPosition;
     private Vector3 _currentPosition;
     private float _maxLength;
     private float _spherecastRadius;
-
+    private enum State
+    {
+        StartFire,
+        Fire,
+        StopFire,
+        Stop
+    }
+    private State _waterlineState;
     void Start()
     {
+        _waterlineState = State.Stop;
         _globalProgress = 1f;
         _lr = this.GetComponent<LineRenderer>();
         _lr.positionCount = segmentCount;
@@ -40,7 +49,7 @@ public class WaterGunLine : MonoBehaviour
         if (waterGunData)
         {
             _spherecastRadius = waterGunData.WaterCastRadius;
-            _maxLength = waterGunData.WaterCastDistance +_spherecastRadius;
+            _maxLength = waterGunData.WaterCastDistance + _spherecastRadius;
         }
         else
         {
@@ -52,6 +61,33 @@ public class WaterGunLine : MonoBehaviour
 
     void Update()
     {
+        //switch state
+        switch (_waterlineState)
+        {
+            case State.StartFire:
+                if (_globalProgress > 0f)
+
+                    _globalProgress -= Time.deltaTime * globalProgressSpeed * 3f;
+                else
+                {
+                    _waterlineState = State.Fire;
+                }
+                break;
+            case State.StopFire:
+
+                if (_globalProgress < 1f)
+                {
+                    _globalProgress += Time.deltaTime * globalProgressSpeed;
+                }
+                else
+                {
+                    _waterlineState = State.Stop;
+                }
+
+                break;
+
+
+        }
 
 
         //Move LineRenderer One By One
@@ -165,10 +201,10 @@ public class WaterGunLine : MonoBehaviour
         //     globalProgress = 0f;
         // }
 
-        if (_globalProgress <= 1f)
+        /*if (_globalProgress <= 1f)
         {
             _globalProgress += Time.deltaTime * globalProgressSpeed;
-        }
+        }*/
 
 
         float progress = shaderProgressCurve.Evaluate(_globalProgress);
@@ -192,9 +228,9 @@ public class WaterGunLine : MonoBehaviour
     public void OnFire(bool fire)
     {
         if (fire)
-            _globalProgress = 0f;
+            _waterlineState = State.StartFire;
         else
-            _globalProgress = 1f;
+            _waterlineState = State.StopFire;
     }
 
 }

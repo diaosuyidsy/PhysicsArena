@@ -125,7 +125,8 @@ public abstract class WeaponBase : MonoBehaviour
         CanBePickedUp = false;
         Owner = owner;
         GetComponent<Rigidbody>().isKinematic = true;
-        gameObject.layer = owner.layer;
+        // gameObject.layer = owner.layer;
+        gameObject.layer = LayerMask.NameToLayer("PickedUpWeapon");
     }
 
     protected virtual void OnTriggerEnter(Collider other)

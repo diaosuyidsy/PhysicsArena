@@ -11,12 +11,15 @@ public class BrawlModeReforgedModeData : ModeSepcificData
     public float CanonCooldown;
     public float CanonSwitchTime;
 
+
+
     public float NormalFollowSpeed;
     public float AlertFollowSpeed;
     public float CanonRadius;
     public float CanonPower;
     public int MaxCanonFireCount;
 
+    public int TargetScore;
     public int DeliveryPoint;
     public int BagelKillPoint;
     public int NormalKillPoint;

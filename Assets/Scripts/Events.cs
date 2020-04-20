@@ -341,7 +341,23 @@ public class BagelDespawn : GameEvent
 
 public class AmmoExplode : GameEvent
 {
+    public Vector3 Pos;
+    public AmmoExplode(Vector3 P)
+    {
+        Pos = P;
+    }
+}
 
+public class TriggerEmoji : GameEvent
+{
+    public int EmojiType;
+    public GameObject Player;
+
+    public TriggerEmoji(int emojiType, GameObject player)
+    {
+        EmojiType = emojiType;
+        Player = player;
+    }
 }
 
 public class ObjectPickedUp : GameEvent

@@ -1275,20 +1275,21 @@ public class PlayerController : MonoBehaviour, IHittable
                 EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             }
 
-            if (_RightTriggerUp && _holding)
-            {
-                TransitionTo<PunchReleasingState>();
-                return;
-            }
-            if (_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime && !_RightTrigger)
-            {
-                TransitionTo<PunchReleasingState>();
-                return;
-            }
+
             if (_holding && _BDown)
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<BlockingState>();
+                return;
+            }
+            if (_holding && !_RightTrigger)
+            {
+                TransitionTo<PunchReleasingState>();
+                return;
+            }
+            if (_RightTriggerUp && _holding)
+            {
+                TransitionTo<PunchReleasingState>();
                 return;
             }
         }

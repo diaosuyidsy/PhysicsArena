@@ -497,7 +497,6 @@ public class PlayerController : MonoBehaviour, IHittable
         protected float _VLAxisRaw { get { return Context._player.GetAxisRaw("Move Vertical"); } }
         protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
         protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
-        protected bool _B { get { return Context._player.GetButton("Block"); } }
         public virtual bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         public void OnEnterDeathZone()
         {
@@ -1001,10 +1000,6 @@ public class PlayerController : MonoBehaviour, IHittable
     #region Action States
     private class ActionState : FSM<PlayerController>.State
     {
-        protected bool _LeftTrigger { get { return Context._player.GetButton("Left Trigger"); } }
-        protected bool _LeftTriggerDown { get { return Context._player.GetButtonDown("Left Trigger"); } }
-        protected bool _LeftTriggerUp { get { return Context._player.GetButtonUp("Left Trigger"); } }
-
         protected bool _RightTrigger { get { return Context._player.GetButton("Right Trigger"); } }
         protected bool _RightTriggerDown { get { return Context._player.GetButtonDown("Right Trigger"); } }
         protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
@@ -1063,7 +1058,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PunchHoldingState>();
                 return;
             }
-            if ((_B || _LeftTrigger) && Context._canDrainStamina(0.1f))
+            if (_B && Context._canDrainStamina(0.1f))
             {
                 TransitionTo<BlockingState>();
                 return;
@@ -1144,7 +1139,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_LeftTriggerDown || _BDown)
+            if (_BDown)
             {
                 TransitionTo<DroppingState>();
                 return;
@@ -1212,7 +1207,7 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_LeftTriggerUp || _BUp)
+            if (_BUp)
             {
                 TransitionTo<DroppedRecoveryState>();
                 return;
@@ -1282,7 +1277,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<PunchReleasingState>();
                 return;
             }
-            if (_holding && (_BDown || _LeftTriggerDown))
+            if (_holding && _BDown)
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<BlockingState>();
@@ -1574,12 +1569,12 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void Update()
         {
             base.Update();
-            if (_BUp || _LeftTriggerUp)
+            if (_BUp)
             {
                 _blockPutDownTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.BlockLingerDuration;
             }
 
-            if (!(_B || _LeftTrigger) && _blockPutDownTimer < Time.timeSinceLevelLoad)
+            if (!_B && _blockPutDownTimer < Time.timeSinceLevelLoad)
             {
                 TransitionTo<IdleActionState>();
                 return;
@@ -1751,7 +1746,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            if (_B || _RightTrigger || _LeftTrigger)
+            if (_B || _RightTrigger)
             {
                 TransitionTo<IdleActionState>();
                 return;

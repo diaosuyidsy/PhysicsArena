@@ -348,6 +348,18 @@ public class AmmoExplode : GameEvent
     }
 }
 
+public class TriggerEmoji : GameEvent
+{
+    public int EmojiType;
+    public GameObject Player;
+
+    public TriggerEmoji(int emojiType, GameObject player)
+    {
+        EmojiType = emojiType;
+        Player = player;
+    }
+}
+
 public class ObjectPickedUp : GameEvent
 {
     public GameObject Player;

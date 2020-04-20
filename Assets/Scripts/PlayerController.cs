@@ -1008,6 +1008,8 @@ public class PlayerController : MonoBehaviour, IHittable
         protected bool _BDown { get { return Context._player.GetButtonDown("Block"); } }
         protected bool _BUp { get { return Context._player.GetButtonUp("Block"); } }
 
+        protected bool _QDown { get { return Context._player.GetButtonDown("QuestionMark"); } }
+
         public virtual bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
         public virtual bool ShouldDropHandObjectWhenForced { get { return false; } }
 
@@ -1039,7 +1041,7 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         private float _pickUpTimer;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
-
+        private float _emojiTimer;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -1065,6 +1067,12 @@ public class PlayerController : MonoBehaviour, IHittable
             }
             if (_pickUpTimer < Time.timeSinceLevelLoad)
                 _pickupcheck();
+
+            if (_QDown && _emojiTimer < Time.time)
+            {
+                _emojiTimer = Time.time + 0.3f;
+                EventManager.Instance.TriggerEvent(new TriggerEmoji(0, Context.gameObject));
+            }
         }
 
         private void _pickupcheck()

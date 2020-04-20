@@ -398,6 +398,12 @@ public class VFXManager
         _instantiateVFX(VFX, ev.Pos, VFX.transform.rotation);
     }
 
+    private void _onEmoji(TriggerEmoji ev)
+    {
+        GameObject[] VFX = VFXDataStore.EmojiVFXs;
+        GameObject.Instantiate(VFX[ev.EmojiType], ev.Player.transform);
+    }
+
     IEnumerator _startBlinking(float time, Renderer r)
     {
         float curTime = 0;
@@ -490,6 +496,7 @@ public class VFXManager
         EventManager.Instance.AddHandler<HookGunFired>(_onHookGunFired);
         EventManager.Instance.AddHandler<HookHit>(_onHookGunHit);
         EventManager.Instance.AddHandler<AmmoExplode>(_onAmmoExplode);
+        EventManager.Instance.AddHandler<TriggerEmoji>(_onEmoji);
 
         _blinkTime = Services.Config.GameMapData.InvincibleTime;
     }
@@ -526,6 +533,8 @@ public class VFXManager
         EventManager.Instance.RemoveHandler<HookGunFired>(_onHookGunFired);
         EventManager.Instance.RemoveHandler<HookHit>(_onHookGunHit);
         EventManager.Instance.RemoveHandler<AmmoExplode>(_onAmmoExplode);
+        EventManager.Instance.RemoveHandler<TriggerEmoji>(_onEmoji);
+
     }
 
     public void Destory()

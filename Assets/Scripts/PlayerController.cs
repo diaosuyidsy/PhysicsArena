@@ -1339,7 +1339,10 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            _checkHit();
+            if (Time.time < _time + Context.CharacterDataStore.PunchActivateTime)
+            {
+                _checkHit();
+            }
         }
 
         public override void OnExit()

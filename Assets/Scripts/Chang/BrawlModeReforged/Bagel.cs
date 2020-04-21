@@ -223,7 +223,7 @@ public class Bagel : WeaponBase
             GuideHopTimer = 0;
         }
 
-        if (Owner != null)
+        if (Owner == null)
         {
             return;
         }

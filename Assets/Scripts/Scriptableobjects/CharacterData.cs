@@ -37,6 +37,7 @@ public class CharacterData : ScriptableObject
 
     [Tooltip("How much time it takes to charge to full")]
     public float ClockFistTime = 1f;
+    public float HoldEventTriggerDuration = 0.1f;
     [Tooltip("How much time it takes to release the punch (before it resets to normal state)")]
     public float FistReleaseTime = 0.2f;
     [Tooltip("Actual Fist Punchable Time")]

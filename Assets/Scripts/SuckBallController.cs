@@ -6,113 +6,112 @@ using UnityEngine;
 public class SuckBallController : MonoBehaviour
 {
     [HideInInspector]
-    public List<GameObject> InRangePlayers;
+    public List<GameObject> InRangePlayers
+    {
+        get
+        {
+            return new List<GameObject>(InRangePlayersDict.Keys);
+        }
+    }
 
     public GameObject lineEndPrefab;
     public SuckGunData SuckGunData;
+    public Transform LineRendererContainer;
     private rtSuck _rts;
-    private string _opponentTeamTag = "";
-    private List<GameObject> _lineEnds = new List<GameObject>();
-    private List<LineRenderer> _lineRenderers = new List<LineRenderer>();
+
+    // Key is Sucked Object, Value is Corresponding LineRendererObject
+    private Dictionary<GameObject, GameObject> InRangePlayersDict = new Dictionary<GameObject, GameObject>();
 
     private void Awake()
     {
         _rts = GetComponentInParent<rtSuck>();
-        InRangePlayers = new List<GameObject>();
-    }
-
-    private void OnEnable()
-    {
-        // _opponentTeamTag = _gpc.Owner.CompareTag("Team1") ? "Team2" : "Team1";
-        _opponentTeamTag = "Team";
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (_rts.isSucking()) return;
         GameObject go = other.gameObject;
-        if (go.tag.Contains(_opponentTeamTag) && other.GetType() == typeof(CapsuleCollider) && (((1 << go.layer) | SuckGunData.CanSuckLayer) == SuckGunData.CanSuckLayer))
+        if (!InRangePlayersDict.ContainsKey(go) && go.GetComponent<IHittable>() != null && (((1 << go.layer) | SuckGunData.CanSuckLayer) == SuckGunData.CanSuckLayer))
         {
-            /*GameObject lrContainer = new GameObject("LineRenderer");
-            lrContainer.transform.parent = transform;*/
-
-            // Add a linerenderer to the in range players and configure the linerenderer properly
-            if (go.GetComponent<LineRenderer>() != null) return;
-            LineRenderer lr = go.AddComponent<LineRenderer>();
-            //lr.material = new Material(Shader.Find("Sprites/Default"));
-            lr.material = new Material(Shader.Find("SuckGunLine"));
-            //lr.widthMultiplier = 0.18f;
-            lr.widthCurve = AnimationCurve.Linear(0, 0.05f, 1, 0.1f);
-            lr.positionCount = 2;
-            lr.numCapVertices = 90;
-            lr.useWorldSpace = true;
-            lr.startColor = Color.yellow;
-            lr.sortingOrder = -1;
-            // Add the gameobject to the list of InRangePlayers
-            InRangePlayers.Add(go);
-
-            GameObject lineEnd = GameObject.Instantiate(lineEndPrefab, transform);
-            //lineEnd.transform.localScale = Vector3.one * 0.5f;
-            lineEnd.SetActive(true);
-            _lineEnds.Add(lineEnd);
-            _lineRenderers.Add(lr);
+            GameObject lro = _getOrCreateLineRendererObject();
+            InRangePlayersDict.Add(go, lro);
         }
     }
 
-    public void MakeLineSicker()
+    private GameObject _getOrCreateLineRendererObject()
     {
-        foreach (var lr in _lineRenderers)
+        Debug.Assert(LineRendererContainer != null);
+        for (int i = 0; i < LineRendererContainer.childCount; i++)
         {
-            lr.widthMultiplier += 2f * Time.deltaTime;
+            GameObject go = LineRendererContainer.GetChild(i).gameObject;
+            if (!InRangePlayersDict.ContainsValue(go))
+            {
+                go.GetComponent<LineRenderer>().enabled = true;
+                go.transform.GetChild(0).gameObject.SetActive(true);
+                return go;
+            }
         }
+        // Create LineRendererObject
+        GameObject LineRendererObject = new GameObject("LineRenderer");
+        LineRendererObject.transform.parent = LineRendererContainer;
+        LineRendererObject.transform.localPosition = Vector3.one;
+        LineRendererObject.transform.localScale = Vector3.one;
+        // Add and setup Linerenderer Component to the object
+        LineRenderer lr = LineRendererObject.AddComponent<LineRenderer>();
+        lr.material = new Material(Shader.Find("SuckGunLine"));
+        lr.widthCurve = AnimationCurve.Linear(0, 0.05f, 1, 0.1f);
+        lr.positionCount = 2;
+        lr.numCapVertices = 90;
+        lr.useWorldSpace = true;
+        lr.startColor = Color.yellow;
+        lr.sortingOrder = -1;
+        // Create LineEnd Object In LineRendererObject
+        GameObject lineEnd = GameObject.Instantiate(lineEndPrefab, LineRendererObject.transform);
+        lineEnd.SetActive(true);
+        return LineRendererObject;
+    }
+
+    private void _disableLineRendererFromDict(GameObject player)
+    {
+        if (!InRangePlayersDict.ContainsKey(player)) return;
+        LineRenderer lr = InRangePlayersDict[player].GetComponent<LineRenderer>();
+        lr.enabled = false;
+        InRangePlayersDict[player].transform.GetChild(0).gameObject.SetActive(false);
     }
 
     private void Update()
     {
-        for (int i = 0; i < InRangePlayers.Count; i++)
+        foreach (var kvPair in InRangePlayersDict)
         {
-            Vector3 playerPos = _lineRenderers[i].gameObject.transform.position;
+            GameObject LineRendererObject = kvPair.Value;
+            LineRenderer linerenderer = LineRendererObject.GetComponent<LineRenderer>();
+            GameObject SuckedObject = kvPair.Key;
+            Vector3 playerPos = SuckedObject.transform.position;
             Vector3 ballPos = transform.position;
-            _lineRenderers[i].SetPosition(0, playerPos);
-            _lineRenderers[i].SetPosition(1, ballPos);
+            linerenderer.SetPosition(0, playerPos);
+            linerenderer.SetPosition(1, ballPos);
             float dis = Vector3.Distance(playerPos, ballPos);
             if (dis < 0.8f)
             {
-                _lineRenderers[i].widthMultiplier = 3f;
+                linerenderer.widthMultiplier = 3f;
             }
             else
             {
-                _lineRenderers[i].widthMultiplier = 1 / Vector3.Distance(playerPos, ballPos) * 2.5f;
+                linerenderer.widthMultiplier = 1 / Vector3.Distance(playerPos, ballPos) * 2.5f;
             }
-
             Vector3 dir = playerPos - ballPos;
-            _lineEnds[i].transform.position = ballPos;
-            _lineEnds[i].transform.forward = dir;
+            LineRendererObject.transform.GetChild(0).position = ballPos;
+            LineRendererObject.transform.GetChild(0).forward = dir;
         }
     }
 
     private void OnTriggerExit(Collider other)
     {
-        if (other.tag.Contains(_opponentTeamTag) && other.GetType() == typeof(CapsuleCollider) && !_rts.isSucking())
+        if (other.GetComponent<IHittable>() != null)
         {
-            _lineRenderers.Remove(other.gameObject.GetComponent<LineRenderer>());
-            Destroy(other.gameObject.GetComponent<LineRenderer>());
-            if (_lineEnds.Count > 0)
-            {
-                GameObject lineEnd = _lineEnds[0];
-                _lineEnds.Remove(_lineEnds[0]);
-                Destroy(lineEnd);
-            }
-
-            // Delete the gameobject from the list in range players
-            foreach (GameObject go in InRangePlayers)
-            {
-                if (go == other.gameObject)
-                {
-                    InRangePlayers.Remove(other.gameObject);
-                    break;
-                }
-            }
+            if (!InRangePlayersDict.ContainsKey(other.gameObject)) return;
+            _disableLineRendererFromDict(other.gameObject);
+            InRangePlayersDict.Remove(other.gameObject);
         }
     }
 
@@ -120,19 +119,10 @@ public class SuckBallController : MonoBehaviour
     // Call this when done with ball suck
     public void CleanUpAll()
     {
-        foreach (GameObject go in InRangePlayers)
+        foreach (var kvpair in InRangePlayersDict)
         {
-            _lineRenderers.Remove(go.GetComponent<LineRenderer>());
-            Destroy(go.GetComponent<LineRenderer>());
-            if (_lineEnds.Count > 0)
-            {
-                GameObject lineEnd = _lineEnds[0];
-                _lineEnds.Remove(_lineEnds[0]);
-                Destroy(lineEnd);
-            }
+            _disableLineRendererFromDict(kvpair.Key);
         }
-        InRangePlayers = new List<GameObject>();
-        _lineEnds.Clear();
-        _lineRenderers.Clear();
+        InRangePlayersDict.Clear();
     }
 }

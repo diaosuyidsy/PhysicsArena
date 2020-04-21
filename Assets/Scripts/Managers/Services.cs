@@ -129,4 +129,18 @@ public static class Services
             _gameObjectiveManager = value;
         }
     }
+
+    private static ActionManager _actionManager;
+    public static ActionManager ActionManager
+    {
+        get
+        {
+            Debug.Assert(_actionManager != null);
+            return _actionManager;
+        }
+        set
+        {
+            _actionManager = value;
+        }
+    }
 }

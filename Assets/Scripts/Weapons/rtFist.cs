@@ -122,6 +122,7 @@ public class rtFist : WeaponBase
         public override void OnEnter()
         {
             base.OnEnter();
+            Context._onWeaponUsedOnce();
             _stateTimer = Time.timeSinceLevelLoad;
             Context._fist.DOScale(0f, _fistGunData.ReloadTime).SetEase(_fistGunData.ReloadEase).From().OnPlay(() => Context._fist.gameObject.SetActive(true));
             EventManager.Instance.TriggerEvent(new FistGunStartCharging(gameObject, Context._fireOwner, Context._fireOwner.GetComponent<PlayerController>().PlayerNumber));

@@ -17,6 +17,8 @@ public class CabelBasket : MonoBehaviour
 
     public GameObject ScoreText;
 
+    public float Size;
+
     public GameObject Up;
     public GameObject Down;
 
@@ -166,7 +168,7 @@ public class CabelBasket : MonoBehaviour
         Collider[] AllHits = Physics.OverlapSphere(transform.position, DetectRadius);
         for (int i = 0; i < AllHits.Length; i++)
         {
-            if (AllHits[i].gameObject.CompareTag("Team2Resource") && AllHits[i].gameObject.GetComponent<Bagel>().Hold)
+            if (AllHits[i].gameObject.CompareTag("Team2Resource") && AllHits[i].gameObject.GetComponent<Bagel>().GetHold())
             {
                 InCameraTimer = 0;
 
@@ -200,7 +202,7 @@ public class CabelBasket : MonoBehaviour
             Collider[] AllHits = Physics.OverlapSphere(transform.position, SuckRadius);
             for (int i = 0; i < AllHits.Length; i++)
             {
-                if (AllHits[i].gameObject.CompareTag("Team2Resource") && !AllHits[i].gameObject.GetComponent<Bagel>().Hold)
+                if (AllHits[i].gameObject.CompareTag("Team2Resource") && !AllHits[i].gameObject.GetComponent<Bagel>().GetHold())
                 {
                     Bagel = AllHits[i].gameObject;
                     Bagel.GetComponent<BoxCollider>().enabled = false;
@@ -252,22 +254,6 @@ public class CabelBasket : MonoBehaviour
 
                 Bagel = null;
             }
-
-
-
-
-            /*if (Vector3.Dot(Offset, transform.position - Bagel.transform.position) < 0)
-            {
-                Bagel.transform.eulerAngles = Vector3.zero;
-                ScoreTextTimer = 0;
-                ScoreText.GetComponent<TextMeshProUGUI>().enabled = true;
-                TextState = ScoreTextState.Appear;
-
-                StartCoroutine(DoorOpenClose(false));
-                EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
-
-                Bagel = null;
-            }*/
         }
     }
 
@@ -298,7 +284,5 @@ public class CabelBasket : MonoBehaviour
 
             yield return null;
         }
-
-
     }
 }

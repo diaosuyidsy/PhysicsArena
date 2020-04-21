@@ -223,6 +223,11 @@ public class Bagel : WeaponBase
             GuideHopTimer = 0;
         }
 
+        if (Owner != null)
+        {
+            return;
+        }
+
         Transform Feet = Owner.GetComponent<PlayerController>().PlayerFeet;
 
         Guide.transform.position = Feet.position + Guide.transform.forward * GuideOffset;

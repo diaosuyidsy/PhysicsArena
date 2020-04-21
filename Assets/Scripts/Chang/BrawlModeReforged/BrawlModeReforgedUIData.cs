@@ -16,4 +16,7 @@ public class BrawlModeReforgedUIData : UIData
     public float ScoreHopFirstPhaseTime;
     public float ScoreHopSecondPhaseTime;
     public float ScoreHopBoardHopBeginTime;
+
+    public float ShakeRadius;
+    public float ShakeSpeed;
 }

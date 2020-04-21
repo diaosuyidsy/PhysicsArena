@@ -20,6 +20,7 @@ public class BrawlModeReforgedModeData : ModeSepcificData
     public int MaxCanonFireCount;
 
     public int TargetScore;
+    public int CloseScore;
     public int DeliveryPoint;
     public int BagelKillPoint;
     public int NormalKillPoint;

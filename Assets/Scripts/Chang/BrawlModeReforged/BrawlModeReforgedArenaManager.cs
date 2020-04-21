@@ -1559,13 +1559,13 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
         BrawlModeReforgedObjectiveManager Manager = (BrawlModeReforgedObjectiveManager)Services.GameObjectiveManager;
 
-        if (Manager.TeamAScore - Manager.TeamBScore >= Data.DeliveryPoint)
+        if (Manager.Team1Score - Manager.Team2Score >= Data.DeliveryPoint)
         {
             float Ran = Random.Range(0.0f, 1.0f);
             Pos = Vector3.Lerp(Data.BagelGenerationPos, Data.BagelGenerationPosRight,Ran);
             //Pos = Data.BagelGenerationPosRight;
         }
-        else if(Manager.TeamBScore - Manager.TeamAScore >= Data.DeliveryPoint)
+        else if(Manager.Team2Score - Manager.Team1Score >= Data.DeliveryPoint)
         {
             float Ran = Random.Range(0.0f, 1.0f);
             Pos = Vector3.Lerp(Data.BagelGenerationPos, Data.BagelGenerationPosLeft, Ran);

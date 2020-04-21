@@ -404,6 +404,12 @@ public class ComicMenu : MonoBehaviour
 
             if (_ADown && !_hAxisInUse)
             {
+                // GameObject textDup = Instantiate(Context.Maps.transform.GetChild(_mapIndex).GetChild(0).gameObject, Context.Maps.transform.GetChild(_mapIndex));
+                // foreach (var i in textDup.GetComponentsInChildren<DOTweenAnimation>(true))
+                // {
+                //     i.DOPlayById("Selected");
+                // }
+                // Destroy(textDup, 0.4f);
                 TransitionTo<MapToCharacterTransition>();
                 return;
             }

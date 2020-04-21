@@ -99,7 +99,7 @@ public class Basket : MonoBehaviour
         Collider[] AllHits = Physics.OverlapSphere(transform.position, DetectRadius);
         for (int i = 0; i < AllHits.Length; i++)
         {
-            if (AllHits[i].gameObject.CompareTag("Team2Resource") && AllHits[i].gameObject.GetComponent<Bagel>().Hold)
+            if (AllHits[i].gameObject.CompareTag("Team2Resource") && AllHits[i].gameObject.GetComponent<Bagel>().GetHold())
             {
                 InCameraTimer = 0;
 
@@ -132,7 +132,7 @@ public class Basket : MonoBehaviour
             Collider[] AllHits = Physics.OverlapSphere(transform.position, SuckRadius);
             for (int i = 0; i < AllHits.Length; i++)
             {
-                if (AllHits[i].gameObject.CompareTag("Team2Resource") && !AllHits[i].gameObject.GetComponent<Bagel>().Hold)
+                if (AllHits[i].gameObject.CompareTag("Team2Resource") && !AllHits[i].gameObject.GetComponent<Bagel>().GetHold())
                 {
                     Bagel = AllHits[i].gameObject;
                     Bagel.GetComponent<BoxCollider>().enabled = false;

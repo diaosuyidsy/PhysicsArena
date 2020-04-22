@@ -132,24 +132,8 @@ public static class Utility
 
     public static int GetColorIndexFromPlayer(GameObject player)
     {
-        int layer = player.layer;
-        switch (layer)
-        {
-            case 16:
-                return 0;
-            case 12:
-                return 1;
-            case 15:
-                return 2;
-            case 9:
-                return 3;
-            case 11:
-                return 4;
-            case 10:
-                return 5;
-        }
-        Debug.Assert(false, "Should not be here at all");
-        return 0;
+        Debug.Assert(player.GetComponent<PlayerIdentification>() != null, "Forgot to put ID on player");
+        return player.GetComponent<PlayerIdentification>().ColorIndex;
     }
 
     public static string GetNextSceneName()

@@ -9,6 +9,7 @@ public class PlayerController : MonoBehaviour, IHittable
 {
     [Header("Player Data Section")]
     public CharacterData CharacterDataStore;
+    public PlayerIdentification PlayerID;
     [Header("Player Body Setting Section")]
     public GameObject Chest;
     public GameObject Head;
@@ -352,7 +353,7 @@ public class PlayerController : MonoBehaviour, IHittable
     private void _setToSpawn(float yOffset)
     {
         int colorindex = Utility.GetColorIndexFromPlayer(gameObject);
-        if (CompareTag("Team1"))
+        if (PlayerID.PlayerTeamNumber == 0)
         {
             Vector3 pos = Services.Config.Team1RespawnPoints[colorindex - 3];
             pos.y += yOffset;
@@ -409,7 +410,7 @@ public class PlayerController : MonoBehaviour, IHittable
     {
         GameObject target = null;
         float minAngle = 360f;
-        GameObject[] enemies = tag == "Team1" ? GameObject.FindGameObjectsWithTag("Team2") : GameObject.FindGameObjectsWithTag("Team1");
+        GameObject[] enemies = PlayerID.PlayerTeamNumber == 0 ? GameObject.FindGameObjectsWithTag("Team2") : GameObject.FindGameObjectsWithTag("Team1");
         foreach (GameObject otherPlayer in enemies)
         {
             if (otherPlayer.activeSelf)

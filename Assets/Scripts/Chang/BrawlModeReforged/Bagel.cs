@@ -106,6 +106,9 @@ public class Bagel : WeaponBase
 
             if (ScreenPos.x <= Screen.width && ScreenPos.x >=0  && ScreenPos.y<=Screen.height && ScreenPos.y >=0)
             {
+                Pointer.transform.position = ScreenPos;
+                Pointer.transform.position -= Pointer.transform.right * PointerDis;
+
                 Pointer.SetActive(false);
             }
             else

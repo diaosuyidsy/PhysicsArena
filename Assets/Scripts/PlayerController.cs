@@ -496,7 +496,7 @@ public class PlayerController : MonoBehaviour, IHittable
         protected float _HLAxisRaw { get { return Context._player.GetAxisRaw("Move Horizontal"); } }
         protected float _VLAxisRaw { get { return Context._player.GetAxisRaw("Move Vertical"); } }
         protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
-        protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
+        protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Attack"); } }
         public virtual bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         public void OnEnterDeathZone()
         {
@@ -1000,9 +1000,9 @@ public class PlayerController : MonoBehaviour, IHittable
     #region Action States
     private class ActionState : FSM<PlayerController>.State
     {
-        protected bool _RightTrigger { get { return Context._player.GetButton("Right Trigger"); } }
-        protected bool _RightTriggerDown { get { return Context._player.GetButtonDown("Right Trigger"); } }
-        protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Right Trigger"); } }
+        protected bool _RightTrigger { get { return Context._player.GetButton("Attack"); } }
+        protected bool _RightTriggerDown { get { return Context._player.GetButtonDown("Attack"); } }
+        protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Attack"); } }
 
         protected bool _B { get { return Context._player.GetButton("Block"); } }
         protected bool _BDown { get { return Context._player.GetButtonDown("Block"); } }
@@ -1251,7 +1251,7 @@ public class PlayerController : MonoBehaviour, IHittable
         private float _startHoldingTime;
         private bool _holding;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
-
+        private bool _triggerdHoldingEvent;
 
         public override void OnEnter()
         {
@@ -1263,32 +1263,37 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.FistHoldRotationMutiplier;
             EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             _holding = false;
+            _triggerdHoldingEvent = false;
             _startHoldingTime = Time.time;
         }
 
         public override void Update()
         {
             base.Update();
+            if (!_triggerdHoldingEvent && Time.time > _startHoldingTime + Context.CharacterDataStore.HoldEventTriggerDuration)
+            {
+                _triggerdHoldingEvent = true;
+                EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            }
             if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
                 _holding = true;
-                EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             }
 
-            if (_RightTriggerUp && _holding)
-            {
-                TransitionTo<PunchReleasingState>();
-                return;
-            }
-            if (_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime && !_RightTrigger)
-            {
-                TransitionTo<PunchReleasingState>();
-                return;
-            }
             if (_holding && _BDown)
             {
                 EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<BlockingState>();
+                return;
+            }
+            if (_holding && !_RightTrigger)
+            {
+                TransitionTo<PunchReleasingState>();
+                return;
+            }
+            if (_RightTriggerUp && _holding)
+            {
+                TransitionTo<PunchReleasingState>();
                 return;
             }
         }
@@ -1334,7 +1339,10 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
-            _checkHit();
+            if (Time.time < _time + Context.CharacterDataStore.PunchActivateTime)
+            {
+                _checkHit();
+            }
         }
 
         public override void OnExit()
@@ -1741,7 +1749,9 @@ public class PlayerController : MonoBehaviour, IHittable
         {
             base.OnEnter();
             _startTime = Time.time;
+            Context._drainStamina(-5f);
             Context._animator.SetBool("IdleUpper", true);
+            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
             Context._dropHandObject();
             if (Context.MeleeVFXHolder != null) Destroy(Context.MeleeVFXHolder);
         }

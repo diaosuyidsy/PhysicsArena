@@ -110,10 +110,14 @@ MonoBehaviour:
   CanBePickedUp: 1
   Data: {fileID: 11400000, guid: 02308cdd234d4104a9b5ba42b61b1914, type: 2}
   Entity: {fileID: 5812035999268780057, guid: d7031a4afcc5a7546b347692f86e6b4c, type: 3}
-  Default: {r: 0.7169812, g: 0.7169812, b: 0.7169812, a: 1}
-  Blue: {r: 0.11681202, g: 0.50922894, b: 0.7075472, a: 1}
-  Red: {r: 0.6320754, g: 0.11627804, b: 0.11627804, a: 1}
-  Hold: 0
+  RedPointerPrefab: {fileID: 5208621616853281320, guid: dee6aa6668203b540acaa4a0e18d1bc8,
+    type: 3}
+  BluePointerPrefab: {fileID: 5208621616853281320, guid: 5a0a10f533b06604cb22059c00036ac1,
+    type: 3}
+  PointerDis: 130
+  GuideHopInterval: 1
+  GuideHopDis: 0.3
+  GuideHopTime: 0.2
 --- !u!54 &-611042463498583425
 Rigidbody:
   m_ObjectHideFlags: 0

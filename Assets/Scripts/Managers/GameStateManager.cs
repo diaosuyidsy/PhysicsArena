@@ -215,7 +215,7 @@ public class GameStateManager : GameStateManagerBase
             {
                 for (int i = 0; i < _PlayersInformation.RewiredID.Length; i++)
                 {
-                    if (ReInput.players.GetPlayer(_PlayersInformation.RewiredID[i]).GetButton("Left Trigger")) return true;
+                    if (ReInput.players.GetPlayer(_PlayersInformation.RewiredID[i]).GetButton("QuestionMark")) return true;
                 }
                 return false;
             }

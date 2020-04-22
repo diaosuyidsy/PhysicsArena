@@ -31,9 +31,9 @@ public class FoodGuidePointToBasket : MonoBehaviour
 
     void Update()
     {
-        Vector3 lookPos = _targetBasket.position - transform.position;
+        /*Vector3 lookPos = _targetBasket.position - transform.position;
         lookPos.y = 0f;
         var rotation = Quaternion.LookRotation(lookPos);
-        transform.rotation = rotation;
+        transform.rotation = rotation;*/
     }
 }

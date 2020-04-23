@@ -194,6 +194,11 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             return;
         }
 
+        if ((!e.HitterIsValid || e.PlayerHitter == null) && Utility.GetPlayerNumber()<=2)
+        {
+            return;
+        }
+
         if (e.Player.tag.Contains("1"))
         {
             Team2HopTimer = 0;

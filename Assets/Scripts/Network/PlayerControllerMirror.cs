@@ -1330,7 +1330,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context._animator.SetBool("IdleUpper", true);
             Context._permaSlow = 0;
             Context._permaSlowWalkSpeedMultiplier = 1f;
-            _pickUpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.PickUpCD;
         }
 
         public override void Update()
@@ -1346,15 +1345,14 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 TransitionTo<BlockingState>();
                 return;
             }
-            if (_pickUpTimer < Time.timeSinceLevelLoad)
-                _pickupcheck();
+            _pickupcheck();
         }
 
         private void _pickupcheck()
         {
             RaycastHit hit;
             if (Physics.SphereCast(Context.Chest.transform.position,
-                Context.CharacterDataStore.Radius,
+                Context.CharacterDataStore.PickupRadius,
                 Vector3.down,
                 out hit,
                 Context._distToGround,

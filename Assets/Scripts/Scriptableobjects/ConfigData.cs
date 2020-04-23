@@ -7,31 +7,26 @@ using DG.Tweening;
 public class ConfigData : ScriptableObject
 {
     public GameObject[] PlayerPrefabs;
-    public LayerMask AllPlayerLayer;
-    public string[] IndexToName;
     public Color[] IndexToColor;
     [Tooltip("Team Index 0 is chicken, 1 is duck")]
     public Color[] TeamColor;
     [Header("Statistics Setting")]
+    public Sprite[] TeamNumberToMVPBackground;
+    public Sprite[] ColorIndexToMVPPlayerPortrait;
+    public Vector3 MVPTitleMoveAmount;
+    public float MVPTitleMoveDuration = 0.5f;
+    public Ease MVPTitleMoveEase = Ease.OutQuad;
+    public Vector3 MVPPortraitMoveAmount;
+    public float MVPPortraitMoveDuration = 0.5f;
+    public Ease MVPPortraitMoveEase = Ease.OutQuad;
+    public float MVPPortraitToStatisticDelay = 0.5f;
+    public Sprite[] ColorIndexToStatisticPlayerIcon;
     public float[] FrameYPosition;
+    public float FrameXPosition;
     public StatisticsInformation[] StatsInfo;
     public StatisticsInformation UselessInfo;
-    public float StatisticsTitleAnimationDuration = 1f;
-    public float StatisticsNomineeAnimationDuration = 0.5f;
-    public float StatisticsRecordAnimationDuration = 1f;
-    public float StatisStayTime = 3f;
-    public float MVPPodiumMoveDuration = 1f;
-    public Ease MVPPodiumMoveEase = Ease.OutQuad;
-    public float MVPSpotLightDuration = 0.2f;
-    public float MVPSpotLightIntensity = 5f;
-    public Ease MVPSpotLightEase = Ease.OutQuad;
-    public float MVPSpotLightToLandDuration = 0.5f;
-    public float MVPLandToWordShowDuration = 0.2f;
 
-    public float MVPToUIMoveInDuration = 0.5f;
-    public float MVPScaleDownDuration = 0.5f;
     public float FrameMoveInDuration = 0.2f;
-    public GameObject MVPBadgePrefab;
     [Header("Misc")]
     public string FightString = "FIGHT!";
     public string ReadyString = "READY?";

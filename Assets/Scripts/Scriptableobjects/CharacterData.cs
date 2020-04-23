@@ -72,8 +72,9 @@ public class CharacterData : ScriptableObject
     public LayerMask CanHitLayer;
 
     [Header("Character Other Settings")]
-    public float Radius = 1f;
-    public float PickUpCD = 0f;
+    public float PickupRadius = 1f;
+    public float PickupDownDistance = 1f;
+    public float PickupUpDistance = 0.3f;
     public LayerMask PickUpLayer;
     public float DropRecoveryTime = 0.2f;
     public Vector3 HitStopViberation = new Vector3(1f, 0.1f, 1f);

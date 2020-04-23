@@ -1050,7 +1050,6 @@ public class PlayerController : MonoBehaviour, IHittable
             Context._animator.SetBool("IdleUpper", true);
             Context._permaSlow = 0;
             Context._permaSlowWalkSpeedMultiplier = 1f;
-            _pickUpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.PickUpCD;
         }
 
         public override void Update()
@@ -1066,49 +1065,83 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<BlockingState>();
                 return;
             }
-            if (_pickUpTimer < Time.timeSinceLevelLoad)
-                _pickupcheck();
 
             if (_QDown && _emojiTimer < Time.time)
             {
                 _emojiTimer = Time.time + 0.3f;
                 EventManager.Instance.TriggerEvent(new TriggerEmoji(0, Context.gameObject));
             }
+            _pickupcheck();
         }
 
         private void _pickupcheck()
         {
-            RaycastHit hit;
-            if (Physics.SphereCast(Context.Chest.transform.position,
-                Context.CharacterDataStore.Radius,
-                Vector3.down,
-                out hit,
-                Context._distToGround,
-                Context.CharacterDataStore.PickUpLayer))
+            Collider[] colliders = Physics.OverlapSphere(Context.transform.position, Context.CharacterDataStore.PickupRadius,
+            Context.CharacterDataStore.PickUpLayer);
+            GameObject target = null;
+            float minDistance = Mathf.Infinity;
+            foreach (Collider coll in colliders)
             {
-
-                if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>() != null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
+                float dist = Vector3.Distance(coll.transform.position, Context.transform.position);
+                if (dist < minDistance)
                 {
-                    EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
-                    // Tell other necessary components that it has taken something
-                    Context.HandObject = hit.collider.gameObject;
-
-                    // Tell the collected weapon who picked it up
-                    hit.collider.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
-                    TransitionTo<HoldingState>();
-                    return;
-                }
-                else if (Context.EquipmentObject == null &&
-                        hit.collider.GetComponent<EquipmentBase>() != null &&
-                        hit.collider.GetComponent<EquipmentBase>().CanBePickedUp)
-                {
-                    EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
-                    Context.EquipmentObject = hit.collider.gameObject;
-                    hit.collider.GetComponent<EquipmentBase>().OnPickUp(Context.gameObject);
-                    TransitionTo<IdleActionState>();
-                    return;
+                    target = coll.gameObject;
+                    minDistance = dist;
                 }
             }
+            if (target == null) return;
+            if (Context.HandObject == null && target.GetComponent<WeaponBase>() != null && target.GetComponent<WeaponBase>().CanBePickedUp)
+            {
+                EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, target.gameObject));
+                // Tell other necessary components that it has taken something
+                Context.HandObject = target.gameObject;
+
+                // Tell the collected weapon who picked it up
+                target.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
+                TransitionTo<HoldingState>();
+                return;
+            }
+            else if (Context.EquipmentObject == null &&
+                    target.GetComponent<EquipmentBase>() != null &&
+                    target.GetComponent<EquipmentBase>().CanBePickedUp)
+            {
+                EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, target.gameObject));
+                Context.EquipmentObject = target.gameObject;
+                target.GetComponent<EquipmentBase>().OnPickUp(Context.gameObject);
+                TransitionTo<IdleActionState>();
+                return;
+            }
+            // RaycastHit hit;
+            // if (Physics.SphereCast(Context.transform.position + Vector3.up * Context.CharacterDataStore.PickupUpDistance,
+            //     Context.CharacterDataStore.PickupRadius,
+            //     Vector3.down,
+            //     out hit,
+            //     Context.CharacterDataStore.PickupDownDistance,
+            //     Context.CharacterDataStore.PickUpLayer))
+            // {
+
+            //     if (Context.HandObject == null && hit.collider.GetComponent<WeaponBase>() != null && hit.collider.GetComponent<WeaponBase>().CanBePickedUp)
+            //     {
+            //         EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
+            //         // Tell other necessary components that it has taken something
+            //         Context.HandObject = hit.collider.gameObject;
+
+            //         // Tell the collected weapon who picked it up
+            //         hit.collider.GetComponent<WeaponBase>().OnPickUp(Context.gameObject);
+            //         TransitionTo<HoldingState>();
+            //         return;
+            //     }
+            //     else if (Context.EquipmentObject == null &&
+            //             hit.collider.GetComponent<EquipmentBase>() != null &&
+            //             hit.collider.GetComponent<EquipmentBase>().CanBePickedUp)
+            //     {
+            //         EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
+            //         Context.EquipmentObject = hit.collider.gameObject;
+            //         hit.collider.GetComponent<EquipmentBase>().OnPickUp(Context.gameObject);
+            //         TransitionTo<IdleActionState>();
+            //         return;
+            //     }
+            // }
         }
 
         public override void OnExit()

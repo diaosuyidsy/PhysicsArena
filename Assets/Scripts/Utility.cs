@@ -136,6 +136,19 @@ public static class Utility
         return player.GetComponent<PlayerIdentification>().ColorIndex;
     }
 
+    public static PlayerIdentification GetIdentificationFromRewiredID(int rewiredID)
+    {
+        Transform holder = GameObject.Find("Players").transform;
+        for (int i = 0; i < holder.childCount; i++)
+        {
+            PlayerController pc = holder.GetChild(i).GetComponent<PlayerController>();
+            if (pc.PlayerNumber == rewiredID)
+                return pc.GetComponent<PlayerIdentification>();
+        }
+        Debug.Assert(false, "Something went wrong finding player holder or getting rewired ID");
+        return null;
+    }
+
     public static string GetNextSceneName()
     {
         var nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;

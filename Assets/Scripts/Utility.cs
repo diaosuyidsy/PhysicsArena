@@ -132,24 +132,21 @@ public static class Utility
 
     public static int GetColorIndexFromPlayer(GameObject player)
     {
-        int layer = player.layer;
-        switch (layer)
+        Debug.Assert(player.GetComponent<PlayerIdentification>() != null, "Forgot to put ID on player");
+        return player.GetComponent<PlayerIdentification>().ColorIndex;
+    }
+
+    public static PlayerIdentification GetIdentificationFromRewiredID(int rewiredID)
+    {
+        Transform holder = GameObject.Find("Players").transform;
+        for (int i = 0; i < holder.childCount; i++)
         {
-            case 16:
-                return 0;
-            case 12:
-                return 1;
-            case 15:
-                return 2;
-            case 9:
-                return 3;
-            case 11:
-                return 4;
-            case 10:
-                return 5;
+            PlayerController pc = holder.GetChild(i).GetComponent<PlayerController>();
+            if (pc.PlayerNumber == rewiredID)
+                return pc.GetComponent<PlayerIdentification>();
         }
-        Debug.Assert(false, "Should not be here at all");
-        return 0;
+        Debug.Assert(false, "Something went wrong finding player holder or getting rewired ID");
+        return null;
     }
 
     public static string GetNextSceneName()

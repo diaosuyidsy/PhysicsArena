@@ -76,8 +76,6 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         Team1BoardOriPos = Team1Board.GetComponent<RectTransform>().localPosition;
         Team2BoardOriPos = Team2Board.GetComponent<RectTransform>().localPosition;
 
-        Debug.Log(Team1BoardOriPos);
-
         GetShakeInfo(true);
         GetShakeInfo(false);
 
@@ -254,6 +252,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         }
         else
         {
+            Color color = Text.GetComponent<TextMeshProUGUI>().color;
+            Text.GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, 1);
             Text.transform.localScale = Vector3.one * UIData.ScoreTextHopNormalScale;
         }
 
@@ -265,7 +265,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             if (Team1HopTimer - Time.deltaTime <= UIData.ScoreHopBoardHopBeginTime)
             {
                 Team1ScoreImpact.GetComponent<Image>().enabled = true;
-                Team1ScoreImpact.GetComponent<Animator>().Play("ScoreImpact", -1, 0);
+                Team1ScoreImpact.GetComponent<Animator>().Play("Team1ScoreImpact", -1, 0);
             }
 
             if (Current < Total/2)
@@ -310,6 +310,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         }
         else
         {
+            Color color = Text.GetComponent<TextMeshProUGUI>().color;
+            Text.GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, 1);
             Text.transform.localScale = Vector3.one * UIData.ScoreTextHopNormalScale;
         }
 
@@ -321,7 +323,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             if (Team2HopTimer - Time.deltaTime <= UIData.ScoreHopBoardHopBeginTime)
             {
                 Team2ScoreImpact.GetComponent<Image>().enabled = true;
-                Team2ScoreImpact.GetComponent<Animator>().Play("ScoreImpact", -1, 0);
+                Team2ScoreImpact.GetComponent<Animator>().Play("Team2ScoreImpact", -1, 0);
             }
 
             if (Current < Total / 2)

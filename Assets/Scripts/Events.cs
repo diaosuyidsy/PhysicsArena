@@ -80,10 +80,12 @@ public class PlayerDied : GameEvent
 public class BagelSent : GameEvent
 {
     public GameObject Basket;
+    public GameObject Deliverer;
 
-    public BagelSent(GameObject obj)
+    public BagelSent(GameObject obj, GameObject deliverer)
     {
         Basket = obj;
+        Deliverer = deliverer;
     }
 }
 

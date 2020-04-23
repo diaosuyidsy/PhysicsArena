@@ -151,7 +151,7 @@ public class Basket : MonoBehaviour
                 ScoreText.GetComponent<TextMeshProUGUI>().enabled = true;
                 TextState = ScoreTextState.Appear;
 
-                EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
+                EventManager.Instance.TriggerEvent(new BagelSent(gameObject,Bagel.GetComponent<Bagel>().GetLastOwner()));
                 Destroy(Bagel);
             }
         }

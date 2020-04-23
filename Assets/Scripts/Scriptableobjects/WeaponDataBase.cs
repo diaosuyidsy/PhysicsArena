@@ -4,6 +4,9 @@ using UnityEngine;
 
 public abstract class WeaponDataBase : ScriptableObject
 {
+    public float YFloatDistance = 0.5f;
+    public float RotationSpeed = 90f;
+    public Vector3 RotatingRotation;
     public float XRotation;
     public float YRotation;
     public float ZRotation;

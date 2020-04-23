@@ -161,7 +161,7 @@ Shader "Blend_Base"
 }
 /*ASEBEGIN
 Version=17000
-125;101;1522;737;3293.827;544.1333;2.520131;True;False
+6.4;1136;1524;747;3206.982;-448.6698;1.454142;True;False
 Node;AmplifyShaderEditor.CommentaryNode;104;-4130.993,490.5418;Float;False;1910.996;537.6462;Texture distortion;12;91;33;100;102;99;94;95;103;92;59;98;110;;1,1,1,1;0;0
 Node;AmplifyShaderEditor.Vector4Node;99;-3968.293,619.481;Float;False;Property;_DistortionSpeedXYPowerZ;Distortion Speed XY Power Z;5;0;Create;True;0;0;False;0;0,0,0,0;0,0,0,0;0;5;FLOAT4;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
 Node;AmplifyShaderEditor.TextureCoordinatesNode;98;-3920.299,848.9976;Float;False;0;91;3;3;2;SAMPLER2D;;False;0;FLOAT2;1,1;False;1;FLOAT2;0,0;False;5;FLOAT3;0;FLOAT;1;FLOAT;2;FLOAT;3;FLOAT;4
@@ -254,4 +254,4 @@ WireConnection;87;0;51;0
 WireConnection;87;3;88;0
 WireConnection;68;0;87;0
 ASEEND*/
-//CHKSM=C5B33D5F4576EFC6131AFAF74CE680A8CFF0F495
+//CHKSM=E7027495B1CC8E223834C6860D709E6DA6F0E0E3

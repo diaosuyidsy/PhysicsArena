@@ -244,6 +244,7 @@ public class rtHook : WeaponBase
                 float GunTotalRotation = Vector3.Angle(Context._onTargetTransformForwardVector, -Context.transform.right);
                 HookForceMagnitude *= _hookGunData.HookAwayForceRotationCurve.Evaluate(GunTotalRotation / 180f);
                 Context.Hooked.GetComponent<IHittable>().OnImpact(force * HookForceMagnitude, ForceMode.Impulse, Context.Owner, ImpactType.HookGun);
+                EventManager.Instance.TriggerEvent(new HookSlingShot(Context.gameObject, Context.Owner, Context.Owner.GetComponent<PlayerController>().PlayerNumber, Context.Hooked, force));
                 Context.Hooked = null;
             }
 

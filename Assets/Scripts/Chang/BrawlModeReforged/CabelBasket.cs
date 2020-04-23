@@ -21,6 +21,7 @@ public class CabelBasket : MonoBehaviour
 
     public GameObject Up;
     public GameObject Down;
+    public GameObject HoleEffect;
 
     public float DropAngleTolerance;
 
@@ -63,6 +64,13 @@ public class CabelBasket : MonoBehaviour
     void Start()
     {
         TextState = ScoreTextState.Hide;
+
+        EventManager.Instance.AddHandler<GameStart>(OnGameStart);
+    }
+
+    private void OnDestroy()
+    {
+        EventManager.Instance.RemoveHandler<GameStart>(OnGameStart);
     }
 
     // Update is called once per frame
@@ -284,5 +292,10 @@ public class CabelBasket : MonoBehaviour
 
             yield return null;
         }
+    }
+
+    private void OnGameStart(GameStart e)
+    {
+        StartCoroutine(DoorOpenClose(false));
     }
 }

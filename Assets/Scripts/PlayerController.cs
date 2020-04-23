@@ -355,7 +355,7 @@ public class PlayerController : MonoBehaviour, IHittable
         int colorindex = Utility.GetColorIndexFromPlayer(gameObject);
         if (PlayerID.PlayerTeamNumber == 0)
         {
-            Vector3 pos = Services.Config.Team1RespawnPoints[colorindex - 3];
+            Vector3 pos = Services.Config.Team1RespawnPoints[colorindex - 2];
             pos.y += yOffset;
             transform.position = pos;
         }

@@ -67,6 +67,7 @@ public class VFXData : ScriptableObject
     public GameObject[] FistGunHitVFX;
     public GameObject[] HookGunFireVFX;
     public GameObject[] HookGunHitVFX;
+    public GameObject[] HookGunSlingShotVFX;
     public LayerMask HitBlockedLayer;
     public GameObject[] EmojiVFXs;
 

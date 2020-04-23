@@ -465,6 +465,19 @@ public class HookBlocked : HookGunEvent
     }
 }
 
+public class HookSlingShot : HookGunEvent
+{
+    public HookSlingShot(GameObject hookGun, GameObject hookGunOwner, int hookGunOwnerPlayerNumber, GameObject hookedObject, Vector3 force) : base(hookGun, hookGunOwner, hookGunOwnerPlayerNumber)
+    {
+        HookedObject = hookedObject;
+        HookedForce = force;
+    }
+
+    public GameObject HookedObject { get; }
+    public Vector3 HookedForce { get; }
+
+}
+
 public class SuckGunFired : GameEvent
 {
     public GameObject SuckGun { get; }

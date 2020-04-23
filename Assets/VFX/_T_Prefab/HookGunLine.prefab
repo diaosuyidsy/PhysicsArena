@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4336963593815382394}
   - component: {fileID: 4336963593815382393}
   - component: {fileID: 4336963593815382392}
+  - component: {fileID: 7932404182923324187}
   m_Layer: 0
   m_Name: HookGunLine
   m_TagString: Untagged
@@ -46,7 +47,7 @@ ParticleSystem:
   cullingMode: 0
   ringBufferMode: 0
   ringBufferLoopRange: {x: 0, y: 1}
-  looping: 1
+  looping: 0
   prewarm: 0
   playOnAwake: 1
   useUnscaledTime: 0
@@ -4810,3 +4811,15 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &7932404182923324187
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4336963593815382391}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9ad2ba5881bb3c942ac6a5c1b9586da4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

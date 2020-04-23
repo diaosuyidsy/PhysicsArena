@@ -92,8 +92,8 @@ public class GameStateManager : GameStateManagerBase
         EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
         _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
-        // _gameStateFSM.TransitionTo<TutorialState>();
-        _gameStateFSM.TransitionTo<MVPEndPanelState>();
+        _gameStateFSM.TransitionTo<TutorialState>();
+        // _gameStateFSM.TransitionTo<MVPEndPanelState>();
     }
 
     public int GetColorIndexFromRewiredID(int rewiredID)
@@ -647,7 +647,7 @@ public class GameStateManager : GameStateManagerBase
             {
                 int colorIndex = Utility.GetColorIndexFromPlayer(Context._playersHolder.GetChild(i).gameObject);
                 int rewiredID = Context.GetRewiredIDFromColorIndex(colorIndex);
-                if (colorIndex < 3) Context._playersHolder.GetChild(i).position = _GameMapData.DuckLandingPostion[duckPosIndex++];
+                if (colorIndex < 2) Context._playersHolder.GetChild(i).position = _GameMapData.DuckLandingPostion[duckPosIndex++];
                 else Context._playersHolder.GetChild(i).position = _GameMapData.ChickenLandingPosition[chickenPosIndex++];
                 int temp = i;
                 Context._playersHolder.GetChild(i).gameObject.SetActive(true);

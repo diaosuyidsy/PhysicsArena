@@ -11,6 +11,16 @@ public class Bagel : WeaponBase
     public GameObject BluePointerPrefab;
     public float PointerDis;
 
+    public float PointerFarScale;
+    public float PointerCloseScale;
+    public float PointerFarDis;
+    public float PointerCloseDis;
+    public float PercentChangeSpeed;
+
+    public float OutScreenClamp;
+
+    public float WorldPointerScale;
+
     public float GuideHopInterval;
     public float GuideHopDis;
     public float GuideHopTime;
@@ -23,10 +33,16 @@ public class Bagel : WeaponBase
     private GameObject Guide;
     private GameObject GameUI;
     private GameObject Pointer;
+    private GameObject WorldPointer;
 
     private float GuideOffset;
 
     private float GuideHopTimer;
+
+    private float PointerPercent;
+    private float WorldPointerPercent;
+
+    private GameObject LastOwner;
 
 
     protected override void Awake()
@@ -62,6 +78,8 @@ public class Bagel : WeaponBase
         {
             GameObject Basket = Owner.tag.Contains("1") ? Team1Basket : Team2Basket;
 
+            WorldPointer = Basket.transform.Find("ArrowMark").gameObject;
+
             Vector3 Offset = Basket.transform.position - Owner.transform.position;
 
             Offset.y = 0;
@@ -91,6 +109,8 @@ public class Bagel : WeaponBase
 
             Vector3 ScreenPos = Camera.main.WorldToScreenPoint(ContactPoint);
 
+            ScreenPos = Camera.main.WorldToScreenPoint(Basket.transform.position);
+
             Vector3 OwnerScreenPos = Camera.main.WorldToScreenPoint(Owner.transform.position);
 
             ScreenPos.z = 0;
@@ -103,13 +123,40 @@ public class Bagel : WeaponBase
             Pointer.transform.right = (ScreenPos - OwnerScreenPos).normalized;
 
 
+            float t = Mathf.Clamp((Offset.magnitude - PointerCloseDis) / (PointerFarDis - PointerCloseDis),0,1);
+
+
+            float Scale = Mathf.Lerp(PointerCloseScale, PointerFarScale, t);
+
+            Pointer.transform.localScale = new Vector3(Scale/GameUI.transform.localScale.x, Scale / GameUI.transform.localScale.y, Scale / GameUI.transform.localScale.z);
+
 
             if (ScreenPos.x <= Screen.width && ScreenPos.x >=0  && ScreenPos.y<=Screen.height && ScreenPos.y >=0)
             {
-                Pointer.transform.position = ScreenPos;
-                Pointer.transform.position -= Pointer.transform.right * PointerDis;
 
-                Pointer.SetActive(false);
+                PointerPercent -= PercentChangeSpeed * Time.deltaTime;
+                if (PointerPercent < 0)
+                {
+                    PointerPercent = 0;
+                    WorldPointerPercent += PercentChangeSpeed * Time.deltaTime;
+
+                    if(WorldPointerPercent > 1)
+                    {
+                        WorldPointerPercent = 1;
+                    }
+
+                    WorldPointer.SetActive(true);
+                }
+
+                Pointer.transform.localScale *= PointerPercent;
+
+                Pointer.transform.position = ScreenPos;
+                Pointer.transform.position -= Pointer.transform.right * PointerDis * Scale * PointerPercent;
+
+                WorldPointer.transform.localScale = WorldPointerScale * Vector3.one * WorldPointerPercent;
+
+
+                //Pointer.SetActive(false);
             }
             else
             {
@@ -126,6 +173,14 @@ public class Bagel : WeaponBase
                     {
                         y = 0;
                         x = -b / k;
+                        if (k < 0)
+                        {
+                            x = Mathf.Clamp(x,Screen.width * (1 - OutScreenClamp), Screen.width);
+                        }
+                        else
+                        {
+                            x = Mathf.Clamp(x, 0, Screen.width * OutScreenClamp);
+                        }
                     }
                 }
                 else
@@ -134,6 +189,15 @@ public class Bagel : WeaponBase
                     {
                         y = Screen.height;
                         x = (Screen.height - b) / k;
+
+                        if (k < 0)
+                        {
+                            x = Mathf.Clamp(x, 0, Screen.width * OutScreenClamp);
+                        }
+                        else
+                        {
+                            x = Mathf.Clamp(x, Screen.width * (1 - OutScreenClamp), Screen.width);
+                        }
                     }
                 }
 
@@ -143,6 +207,15 @@ public class Bagel : WeaponBase
                     {
                         y = b;
                         x = 0;
+
+                        if (k > 0)
+                        {
+                            y = Mathf.Clamp(y,0, Screen.height * OutScreenClamp);
+                        }
+                        else
+                        {
+                            y = Mathf.Clamp(y, Screen.height * (1 - OutScreenClamp), Screen.height);
+                        }
                     }
                 }
                 else
@@ -151,20 +224,49 @@ public class Bagel : WeaponBase
                     {
                         y = k * Screen.width + b;
                         x = Screen.width;
+
+                        if (k > 0)
+                        {
+                            y = Mathf.Clamp(y, Screen.height * (1 - OutScreenClamp), Screen.height);
+                        }
+                        else
+                        {
+                            y = Mathf.Clamp(y, 0, Screen.height * OutScreenClamp);
+                        }
                     }
                 }
 
+                WorldPointerPercent -= PercentChangeSpeed * Time.deltaTime;
+                if(WorldPointerPercent < 0)
+                {
+                    WorldPointerPercent = 0;
+                    PointerPercent+= PercentChangeSpeed * Time.deltaTime;
+
+                    if(PointerPercent > 1)
+                    {
+                        PointerPercent = 1;
+                    }
+
+                    WorldPointer.SetActive(false);
+                }
+
+                Pointer.transform.localScale *= PointerPercent;
+
                 Pointer.transform.position = new Vector3(x, y, 0);
 
-                //Pointer.transform.localPosition /= GameUI.transform.localScale.x;
+                Pointer.transform.position -= Pointer.transform.right * PointerDis * Scale * PointerPercent;
 
-                Pointer.transform.position -= Pointer.transform.right * PointerDis;
+                WorldPointer.transform.localScale = WorldPointerScale * Vector3.one * WorldPointerPercent;
 
-                Pointer.SetActive(true);
+                //Pointer.SetActive(true);
             }
         }
         else
         {
+            if (WorldPointer != null)
+            {
+                WorldPointer.SetActive(false);
+            }
             Destroy(Pointer);
         }
     }
@@ -238,6 +340,7 @@ public class Bagel : WeaponBase
         base.OnPickUp(owner);
 
         Hold = true;
+        LastOwner = owner;
     }
 
     public override void OnDrop(bool customForce, Vector3 force)
@@ -267,6 +370,10 @@ public class Bagel : WeaponBase
         GetComponent<Rigidbody>().useGravity = false;
         GetComponent<Rigidbody>().isKinematic = true;
 
+        if (WorldPointer != null)
+        {
+            WorldPointer.SetActive(false);
+        }
         Destroy(Pointer);
     }
 
@@ -277,5 +384,10 @@ public class Bagel : WeaponBase
         EventManager.Instance.TriggerEvent(new BagelDespawn());
 
         Destroy(gameObject);
+    }
+
+    public GameObject GetLastOwner()
+    {
+        return LastOwner;
     }
 }

@@ -250,7 +250,7 @@ public class CabelBasket : MonoBehaviour
                 TextState = ScoreTextState.Appear;
 
                 StartCoroutine(DoorOpenClose(false));
-                EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
+                EventManager.Instance.TriggerEvent(new BagelSent(gameObject,Bagel.GetComponent<Bagel>().GetLastOwner()));
 
                 Bagel = null;
             }

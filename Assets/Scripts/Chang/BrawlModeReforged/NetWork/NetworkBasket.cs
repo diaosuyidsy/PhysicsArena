@@ -213,7 +213,7 @@ public class NetworkBasket : NetworkBehaviour
                 ScoreText.GetComponent<TextMeshProUGUI>().enabled = true;
                 TextState = ScoreTextState.Appear;
 
-                EventManager.Instance.TriggerEvent(new BagelSent(gameObject));
+                EventManager.Instance.TriggerEvent(new BagelSent(gameObject,Bagel.GetComponent<Bagel>().GetLastOwner()));
 
                 NetworkServer.UnSpawn(Bagel);
                 Destroy(Bagel);

@@ -31,6 +31,9 @@ public class ComicMenu : MonoBehaviour
     public Image LoadingBarFillImage;
     [HideInInspector]
     public string SelectedMapName = "BrawlModeReforged";
+    public GameObject LoadingPageLoop1;
+    public GameObject LoadingPageLoop2;
+    public GameObject LoadingPageLoop3;
     private PlayerInformation _finalPlayerInformation;
     private Transform[] _eggs;
     private Transform[] _chickens;
@@ -47,19 +50,20 @@ public class ComicMenu : MonoBehaviour
     private Vector3[] _eggsOriginalLocalScale;
 
     private FSM<ComicMenu> ComicMenuFSM;
+    private const int MAXPLAYERCOUNT = 4;
 
     private void Awake()
     {
         ComicMenuFSM = new FSM<ComicMenu>(this);
         ComicMenuFSM.TransitionTo<FirstMenuState>();
-        _eggs = new Transform[6];
-        _chickens = new Transform[6];
-        _hoverEggCharacterImages = new Transform[6];
-        _3rdMenuCursorsOriginalLocalPosition = new Vector3[6];
-        _chickenOriginalLocalPosition = new Vector3[6];
-        _eggsOriginalLocalPosition = new Vector3[6];
-        _eggsOriginalLocalScale = new Vector3[6];
-        for (int i = 0; i < 6; i++)
+        _eggs = new Transform[MAXPLAYERCOUNT];
+        _chickens = new Transform[MAXPLAYERCOUNT];
+        _hoverEggCharacterImages = new Transform[MAXPLAYERCOUNT];
+        _3rdMenuCursorsOriginalLocalPosition = new Vector3[MAXPLAYERCOUNT];
+        _chickenOriginalLocalPosition = new Vector3[MAXPLAYERCOUNT];
+        _eggsOriginalLocalPosition = new Vector3[MAXPLAYERCOUNT];
+        _eggsOriginalLocalScale = new Vector3[MAXPLAYERCOUNT];
+        for (int i = 0; i < MAXPLAYERCOUNT; i++)
         {
             _eggs[i] = EggHolder.transform.GetChild(i);
             _chickens[i] = PlayerHolder.transform.GetChild(i);
@@ -279,6 +283,7 @@ public class ComicMenu : MonoBehaviour
                 {
                     tmp.sortingLayerID = SortingLayer.NameToID("Front");
                 }
+                Context.CoverPage.transform.position -= Vector3.up * 0.1f;
             });
             sequence.Append(Context.CoverPage.transform.DOLocalMove(_MenuData.CoverPageReturnLocalMovement, _MenuData.CoverpageReturnDuration)
             .SetEase(_MenuData.CoverPageReturnEase).SetRelative(true));
@@ -309,7 +314,6 @@ public class ComicMenu : MonoBehaviour
                 result.AppendCallback(() =>
                 {
                     child.GetComponent<Animator>().SetBool("Play", true);
-
                 });
                 result.AppendInterval(AnimationDuration);
             }
@@ -319,6 +323,19 @@ public class ComicMenu : MonoBehaviour
             }
         }
         return result;
+    }
+
+    private void _setComicCoverToLastFrame(Transform holderTransform)
+    {
+        for (int i = 0; i < holderTransform.childCount; i++)
+        {
+            Transform child = holderTransform.GetChild(i);
+            if (child.name.ToLower().Contains("cover"))
+            {
+                child.GetComponent<Animator>().Play("Cover", 0, 1f);
+            }
+
+        }
     }
 
     private class MapToFirstMenuTransition : MenuState
@@ -346,6 +363,7 @@ public class ComicMenu : MonoBehaviour
                 {
                     tmp.sortingLayerID = SortingLayer.NameToID("CoverPage");
                 }
+                Context.CoverPage.transform.position += Vector3.up * 0.1f;
             });
             sequence.Append(Context.CoverPage.transform.DOMove(_MenuData.MapToFirstFirstMenuMove2.EndValue, _MenuData.MapToFirstFirstMenuMove2.Duration)
             .SetEase(_MenuData.MapToFirstFirstMenuMove2.Ease).SetRelative(_MenuData.MapToFirstFirstMenuMove2.Relative));
@@ -386,6 +404,12 @@ public class ComicMenu : MonoBehaviour
 
             if (_ADown && !_hAxisInUse)
             {
+                // GameObject textDup = Instantiate(Context.Maps.transform.GetChild(_mapIndex).GetChild(0).gameObject, Context.Maps.transform.GetChild(_mapIndex));
+                // foreach (var i in textDup.GetComponentsInChildren<DOTweenAnimation>(true))
+                // {
+                //     i.DOPlayById("Selected");
+                // }
+                // Destroy(textDup, 0.4f);
                 TransitionTo<MapToCharacterTransition>();
                 return;
             }
@@ -414,23 +438,46 @@ public class ComicMenu : MonoBehaviour
 
     private class MapToCharacterTransition : MenuState
     {
+        private Sequence comicSequence;
+        private bool _jumped;
+        private bool _cameraMoved1;
         public override void OnEnter()
         {
             base.OnEnter();
+            _jumped = false;
+            _cameraMoved1 = false;
             Context.MapSelectionLeft.SetActive(false);
             Context.MapSelectionRight.SetActive(false);
-            Sequence sequence = DOTween.Sequence();
-            sequence.AppendInterval(_MenuData.InitialStopDuration);
-            sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation1, _MenuData.CameraToCharacterMoveDuration1).SetEase(_MenuData.CameraMoveEase1));
-            sequence.Append(Context._getComicTween(Context.SelectionPageComic3.transform, Context.ComicMenuData.Comic3Duration));
-            sequence.Append(Context._getComicTween(Context.SelectionPageComic4.transform, Context.ComicMenuData.Comic4Duration));
-            sequence.Append(Context._getComicTween(Context.SelectionPageComic5.transform, Context.ComicMenuData.Comic5Duration));
-            sequence.AppendInterval(_MenuData.CameraStopDuration1);
-            sequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation2, _MenuData.CameraToCharacterMoveDuration2).SetEase(_MenuData.CameraMoveEase2));
-            sequence.AppendCallback(() =>
+            comicSequence = DOTween.Sequence();
+            comicSequence.AppendInterval(_MenuData.InitialStopDuration);
+            comicSequence.Append(_MainCamera.transform.DOMove(_MenuData.CameraStopLocation1, _MenuData.CameraToCharacterMoveDuration1).SetEase(_MenuData.CameraMoveEase1).OnComplete(() => _cameraMoved1 = true));
+            comicSequence.Append(Context._getComicTween(Context.SelectionPageComic3.transform, Context.ComicMenuData.Comic3Duration));
+            comicSequence.Append(Context._getComicTween(Context.SelectionPageComic4.transform, Context.ComicMenuData.Comic4Duration));
+            comicSequence.Append(Context._getComicTween(Context.SelectionPageComic5.transform, Context.ComicMenuData.Comic5Duration));
+            comicSequence.AppendCallback(() =>
             {
+                _MainCamera.transform.DOMove(_MenuData.CameraStopLocation2, _MenuData.CameraToCharacterMoveDuration2).SetEase(_MenuData.CameraMoveEase2).SetDelay(_MenuData.CameraStopDuration1);
                 TransitionTo<CharacterSelectionState>();
             });
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_ADown && !_jumped && _cameraMoved1)
+            {
+                _jumped = true;
+                Context._setComicCoverToLastFrame(Context.SelectionPageComic3.transform);
+                Context._setComicCoverToLastFrame(Context.SelectionPageComic4.transform);
+                Context._setComicCoverToLastFrame(Context.SelectionPageComic5.transform);
+                comicSequence.Kill(true);
+                _MainCamera.transform.DOMove(_MenuData.CameraStopLocation2, _MenuData.CameraToCharacterMoveDuration2).SetEase(_MenuData.CameraMoveEase2).SetDelay(_MenuData.CameraStopDuration1)
+                .OnComplete(() =>
+                {
+                    TransitionTo<CharacterSelectionState>();
+                });
+                return;
+            }
         }
     }
 
@@ -470,7 +517,7 @@ public class ComicMenu : MonoBehaviour
         private int[] _eggSelectedCursorIndex;
 
         /// <summary>
-        /// Index of players means the slot holes from 1-6
+        /// Index of players means the slot holes from 1-MAXPLAYERCOUNT
         /// Not the rewired id
         /// </summary>
         private FSM<CharacterSelectionState>[] _playersFSM;
@@ -506,7 +553,7 @@ public class ComicMenu : MonoBehaviour
             get
             {
                 int count = 0;
-                for (int i = 3; i < 6; i++)
+                for (int i = 3; i < MAXPLAYERCOUNT; i++)
                 {
                     if (_eggSelected[i]) count++;
                 }
@@ -520,13 +567,13 @@ public class ComicMenu : MonoBehaviour
             _playerMap = new List<PlayerMap>();
             _mainCamera = Camera.main;
 
-            _playersFSM = new FSM<CharacterSelectionState>[6];
-            _eggsFSM = new FSM<CharacterSelectionState>[6];
-            _eggCursors = new int[6];
-            _cursorSelectedEggIndex = new int[6];
-            _eggSelectedCursorIndex = new int[6];
-            _eggSelected = new bool[6];
-            for (int i = 0; i < 6; i++)
+            _playersFSM = new FSM<CharacterSelectionState>[MAXPLAYERCOUNT];
+            _eggsFSM = new FSM<CharacterSelectionState>[MAXPLAYERCOUNT];
+            _eggCursors = new int[MAXPLAYERCOUNT];
+            _cursorSelectedEggIndex = new int[MAXPLAYERCOUNT];
+            _eggSelectedCursorIndex = new int[MAXPLAYERCOUNT];
+            _eggSelected = new bool[MAXPLAYERCOUNT];
+            for (int i = 0; i < MAXPLAYERCOUNT; i++)
             {
                 _eggsFSM[i] = new FSM<CharacterSelectionState>(this);
                 _eggsFSM[i].TransitionTo<EggNormalState>();
@@ -575,7 +622,7 @@ public class ComicMenu : MonoBehaviour
                     _playersFSM[_getGamePlayerIDFromRewiredId(i)].CurrentState.GetType().BaseType.Equals(typeof(ControllableState)))
                     _unassignPlayer(i);
             }
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < MAXPLAYERCOUNT; i++)
             {
                 if (_playersFSM[i] != null)
                     _playersFSM[i].Update();
@@ -586,7 +633,7 @@ public class ComicMenu : MonoBehaviour
         public override void CleanUp()
         {
             base.CleanUp();
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < MAXPLAYERCOUNT; i++)
             {
                 if (_playersFSM[i] != null) _playersFSM[i].CurrentState.CleanUp();
                 if (_eggsFSM[i] != null) _eggsFSM[i].CurrentState.CleanUp();
@@ -632,7 +679,7 @@ public class ComicMenu : MonoBehaviour
                 Context._hintText.DOText("Everybody in Circle", 1f);
             }
             else
-                Context._hintText.DOText("Enter The Circle", 0f);
+                Context._hintText.DOText("Stand in Circle", 0f);
         }
 
         private bool _isRewiredPlayerInGame(int rewiredID)
@@ -652,7 +699,7 @@ public class ComicMenu : MonoBehaviour
 
         private PlayerMap _getPlayerFSMIndex(FSM<CharacterSelectionState> fsm)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < MAXPLAYERCOUNT; i++)
             {
                 if (_playersFSM[i] != null && _playersFSM[i] == fsm)
                 {
@@ -668,7 +715,7 @@ public class ComicMenu : MonoBehaviour
 
         private int _getEggFSMIndex(FSM<CharacterSelectionState> fsm)
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < MAXPLAYERCOUNT; i++)
             {
                 if (_eggsFSM[i] != null && _eggsFSM[i] == fsm)
                 {
@@ -700,10 +747,11 @@ public class ComicMenu : MonoBehaviour
 
         private void _assignNextPlayer(int rewiredPlayerId)
         {
-            if (_playerMap.Count >= 6) { return; }
+            if (_playerMap.Count >= MAXPLAYERCOUNT) { return; }
 
             int gamePlayerId = _getNextGamePlayerId();
             if (gamePlayerId == 7) return;
+
             _playerMap.Add(new PlayerMap(rewiredPlayerId, gamePlayerId));
             _playersFSM[gamePlayerId] = new FSM<CharacterSelectionState>(this);
             _playersFSM[gamePlayerId].TransitionTo<UnselectingState>();
@@ -740,7 +788,7 @@ public class ComicMenu : MonoBehaviour
 
         private int _getNextGamePlayerId()
         {
-            for (int i = 0; i < 6; i++)
+            for (int i = 0; i < MAXPLAYERCOUNT; i++)
             {
                 if (_playersFSM[i] == null)
                 {
@@ -780,6 +828,7 @@ public class ComicMenu : MonoBehaviour
             {
                 int rewiredId = args.controllerId;
                 if (_rewiredPlayerIndex != rewiredId) return;
+                ReInput.players.GetPlayer(rewiredId).controllers.maps.SetMapsEnabled(true, "Assignment");
                 Context._unassignPlayer(rewiredId);
                 return;
             }
@@ -792,7 +841,7 @@ public class ComicMenu : MonoBehaviour
                 Context.Context._selectionCursors[_gamePlayerIndex].gameObject.SetActive(false);
                 Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
                 Context.Context._3rdMenuPrompts[_gamePlayerIndex].gameObject.SetActive(true);
-                for (int i = 0; i < 6; i++) { Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(i).gameObject.SetActive(false); }
+                for (int i = 0; i < MAXPLAYERCOUNT; i++) { Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(i).gameObject.SetActive(false); }
                 Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleNormalColor;
             }
         }
@@ -837,7 +886,7 @@ public class ComicMenu : MonoBehaviour
                 base.OnEnter();
                 Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(true);
                 // Disable all grey images
-                for (int i = 0; i < 6; i++)
+                for (int i = 0; i < MAXPLAYERCOUNT; i++)
                 {
                     Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(i).gameObject.SetActive(false);
                 }
@@ -848,20 +897,39 @@ public class ComicMenu : MonoBehaviour
             public override void Update()
             {
                 base.Update();
-                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
-                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
-
-                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
-
                 RaycastHit hit;
-                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
+                Ray ray = Context._mainCamera.ScreenPointToRay(Context._mainCamera.WorldToScreenPoint(_CursorPos));
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.transform.name != "RenderMaterialQuad") return;
+                    Vector2 localPoint = hit.textureCoord;
+
+                    Ray portalRay = Context._sceneCamera.ScreenPointToRay(new Vector2(localPoint.x * Context._sceneCamera.pixelWidth,
+                    localPoint.y * Context._sceneCamera.pixelHeight));
+                    RaycastHit sceneHit;
+
+                    if (Physics.Raycast(portalRay, out sceneHit, 100f, Context._MenuData.EggLayer))
+                    {
+                        TransitionTo<HoveringState>();
+                        return;
+                    }
+
+                }
+
+                // float xPercentage = (_CursorPos.x - (0.2f)) / (0.MAXPLAYERCOUNTf - 0.2f);
+                // float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+
+                // Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
+                // // RaycastHit hit;
+                // Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 /// If cursor Casted to a egg
-                if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
-                {
-                    TransitionTo<HoveringState>();
-                    return;
-                }
+                // if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+                // {
+                //     TransitionTo<HoveringState>();
+                //     return;
+                // }
             }
         }
 
@@ -875,70 +943,138 @@ public class ComicMenu : MonoBehaviour
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuEggJiggleAudioClip);
                 Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
 
-                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
-                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
-                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
-
-
                 RaycastHit hit;
-                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
+                Ray ray = Context._mainCamera.ScreenPointToRay(Context._mainCamera.WorldToScreenPoint(_CursorPos));
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.transform.name != "RenderMaterialQuad") return;
+                    Vector2 localPoint = hit.textureCoord;
+
+                    Ray portalRay = Context._sceneCamera.ScreenPointToRay(new Vector2(localPoint.x * Context._sceneCamera.pixelWidth,
+                    localPoint.y * Context._sceneCamera.pixelHeight));
+                    RaycastHit sceneHit;
+
+                    if (Physics.Raycast(portalRay, out sceneHit, 100f, Context._MenuData.EggLayer))
+                    {
+                        _castedEggSiblingIndex = sceneHit.transform.GetSiblingIndex();
+                        Context._onCursorChange(1, _castedEggSiblingIndex);
+                        /// Show Grey image on hole
+                        Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(true);
+                        Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).GetComponent<SpriteRenderer>().color = Context._MenuData.HoverImageColor;
+                        // Also Change Hole Color to related color
+                        Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleCursorveHoverColor[_castedEggSiblingIndex];
+                        // Hide the indicators
+                        Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+                    }
+
+                }
+                // float xPercentage = (_CursorPos.x - (0.2f)) / (0.MAXPLAYERCOUNTf - 0.2f);
+                // float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+                // Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
+
+                // RaycastHit hit;
+                // Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 /// If cursor Casted to a egg
-                if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
-                {
-                    _castedEggSiblingIndex = hit.transform.GetSiblingIndex();
-                    Context._onCursorChange(1, _castedEggSiblingIndex);
-                    /// Show Grey image on hole
-                    Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(true);
-                    Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).GetComponent<SpriteRenderer>().color = Context._MenuData.HoverImageColor;
-                    // Also Change Hole Color to related color
-                    Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleCursorveHoverColor[_castedEggSiblingIndex];
-                    // Hide the indicators
-                    Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
-                }
+                // if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+                // {
+                //     _castedEggSiblingIndex = hit.transform.GetSiblingIndex();
+                //     Context._onCursorChange(1, _castedEggSiblingIndex);
+                //     /// Show Grey image on hole
+                //     Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(true);
+                //     Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).GetComponent<SpriteRenderer>().color = Context._MenuData.HoverImageColor;
+                //     // Also Change Hole Color to related color
+                //     Context.Context._characterSelectionHolders[_gamePlayerIndex].GetComponent<SpriteRenderer>().color = Context._MenuData.HoleCursorveHoverColor[_castedEggSiblingIndex];
+                //     // Hide the indicators
+                //     Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
+                // }
             }
 
             public override void Update()
             {
                 base.Update();
-                float xPercentage = (_CursorPos.x - (0.2f)) / (0.6f - 0.2f);
-                float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
-                Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+                // float xPercentage = (_CursorPos.x - (0.2f)) / (0.MAXPLAYERCOUNTf - 0.2f);
+                // float yPercentage = (_CursorPos.z - (-0.3f)) / (0f + 0.3f);
+                // Vector3 translatedCursorPosition = new Vector3(_ScreenX * xPercentage, _ScreenY * yPercentage, 10f);
+
+                // RaycastHit hit;
+                // Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
 
                 RaycastHit hit;
-                Ray ray = Context._sceneCamera.ScreenPointToRay(translatedCursorPosition);
-
-                /// If cursor Casted to another egg
-                if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+                Ray ray = Context._mainCamera.ScreenPointToRay(Context._mainCamera.WorldToScreenPoint(_CursorPos));
+                if (Physics.Raycast(ray, out hit))
                 {
-                    if (hit.transform.GetSiblingIndex() != _castedEggSiblingIndex)
+                    if (hit.transform.name != "RenderMaterialQuad") return;
+                    Vector2 localPoint = hit.textureCoord;
+
+                    Ray portalRay = Context._sceneCamera.ScreenPointToRay(new Vector2(localPoint.x * Context._sceneCamera.pixelWidth,
+                    localPoint.y * Context._sceneCamera.pixelHeight));
+                    RaycastHit sceneHit;
+
+                    if (Physics.Raycast(portalRay, out sceneHit, 100f, Context._MenuData.EggLayer))
                     {
-                        Context._onCursorChange(-1, _castedEggSiblingIndex);
-                        Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
-                        //Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(-244f, Context._MenuData.HoleImageOutDuration);
-                        TransitionTo<HoveringState>();
-                        return;
+                        if (sceneHit.transform.GetSiblingIndex() != _castedEggSiblingIndex)
+                        {
+                            Context._onCursorChange(-1, _castedEggSiblingIndex);
+                            Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+                            //Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(-244f, Context._MenuData.HoleImageOutDuration);
+                            TransitionTo<HoveringState>();
+                            return;
+                        }
+                        else
+                        {
+                            if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Jump"))
+                            {
+                                /// Record this cursor selected which egg
+                                Context._cursorSelectedEggIndex[_gamePlayerIndex] = _castedEggSiblingIndex;
+                                Context._eggSelectedCursorIndex[_castedEggSiblingIndex] = _gamePlayerIndex;
+
+                                TransitionTo<HoverToSelectedTransition>();
+                                Context._eggsFSM[_castedEggSiblingIndex].TransitionTo<EggToChickenTransition>();
+                                return;
+                            }
+                        }
                     }
                     else
                     {
-                        if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Jump"))
-                        {
-                            /// Record this cursor selected which egg
-                            Context._cursorSelectedEggIndex[_gamePlayerIndex] = _castedEggSiblingIndex;
-                            Context._eggSelectedCursorIndex[_castedEggSiblingIndex] = _gamePlayerIndex;
-
-                            TransitionTo<HoverToSelectedTransition>();
-                            Context._eggsFSM[_castedEggSiblingIndex].TransitionTo<EggToChickenTransition>();
-                            return;
-                        }
+                        Context._onCursorChange(-1, _castedEggSiblingIndex);
+                        Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+                        TransitionTo<UnselectingState>();
+                        return;
                     }
-                }
-                else
-                {
-                    Context._onCursorChange(-1, _castedEggSiblingIndex);
-                    Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
-                    TransitionTo<UnselectingState>();
-                    return;
+                    // /// If cursor Casted to another egg
+                    // if (Physics.Raycast(ray, out hit, 100f, Context._MenuData.EggLayer))
+                    // {
+                    //     if (hit.transform.GetSiblingIndex() != _castedEggSiblingIndex)
+                    //     {
+                    //         Context._onCursorChange(-1, _castedEggSiblingIndex);
+                    //         Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+                    //         //Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).DOLocalMoveX(-244f, Context._MenuData.HoleImageOutDuration);
+                    //         TransitionTo<HoveringState>();
+                    //         return;
+                    //     }
+                    //     else
+                    //     {
+                    //         if (ReInput.players.GetPlayer(_rewiredPlayerIndex).GetButtonDown("Jump"))
+                    //         {
+                    //             /// Record this cursor selected which egg
+                    //             Context._cursorSelectedEggIndex[_gamePlayerIndex] = _castedEggSiblingIndex;
+                    //             Context._eggSelectedCursorIndex[_castedEggSiblingIndex] = _gamePlayerIndex;
+
+                    //             TransitionTo<HoverToSelectedTransition>();
+                    //             Context._eggsFSM[_castedEggSiblingIndex].TransitionTo<EggToChickenTransition>();
+                    //             return;
+                    //         }
+                    //     }
+                    // }
+                    // else
+                    // {
+                    //     Context._onCursorChange(-1, _castedEggSiblingIndex);
+                    //     Context.Context._3rdMenuHoleImages[_gamePlayerIndex].GetChild(_castedEggSiblingIndex).gameObject.SetActive(false);
+                    //     TransitionTo<UnselectingState>();
+                    //     return;
+                    // }
                 }
             }
 
@@ -1008,7 +1144,7 @@ public class ComicMenu : MonoBehaviour
                 base.Init();
                 _eggIndex = Context._getEggFSMIndex(Parent);
                 _eggChild = Context.Context._eggs[_eggIndex].GetChild(0);
-                ReInput.ControllerPreDisconnectEvent += _onControllerDisconnected;
+                ReInput.ControllerDisconnectedEvent += _onControllerDisconnected;
             }
 
             protected virtual void _onControllerDisconnected(ControllerStatusChangedEventArgs args)
@@ -1018,7 +1154,7 @@ public class ComicMenu : MonoBehaviour
             public override void CleanUp()
             {
                 base.CleanUp();
-                ReInput.ControllerPreDisconnectEvent -= _onControllerDisconnected;
+                ReInput.ControllerDisconnectedEvent -= _onControllerDisconnected;
             }
         }
 
@@ -1121,6 +1257,8 @@ public class ComicMenu : MonoBehaviour
                 /// Reset _eggCursors
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuChickenToEggAudioClip);
                 Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
+                Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().enabled = false;
+                Context.Context._chickens[_eggIndex].GetComponent<Rigidbody>().isKinematic = true;
                 Context.Context._eggs[_eggIndex].localPosition = Context.Context._eggsOriginalLocalPosition[_eggIndex];
                 Context.Context._eggs[_eggIndex].localScale = Context.Context._eggsOriginalLocalScale[_eggIndex];
                 Context._eggCursors[_eggIndex] = 0;
@@ -1134,6 +1272,7 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            Context.LoadingPageLoop1.transform.GetChild(2).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopCharacterSpritePool[Context._finalPlayerInformation.ColorIndex[0]];
             Sequence sequence = DOTween.Sequence();
             Context.SceneCamera.enabled = false;
             sequence.AppendInterval(_MenuData.CharacterSelectionToLoadingPauseDuration);
@@ -1163,6 +1302,8 @@ public class ComicMenu : MonoBehaviour
                 {
                     c.sortingLayerID = 0;
                 }
+                Context.SelectionPage.transform.position -= Vector3.up * 0.1f;
+
             });
             sequence.Append(Context.SelectionPage.transform.DOMove(_MenuData.CharacterSelectionToLoadingPageMovementEase2.EndValue,
             _MenuData.CharacterSelectionToLoadingPageMovementEase2.Duration).SetEase(_MenuData.CharacterSelectionToLoadingPageMovementEase2.Ease)
@@ -1176,16 +1317,65 @@ public class ComicMenu : MonoBehaviour
 
     private class LoadingState : MenuState
     {
-
+        private float _travelDistance;
+        private GameObject _upperLoop;
+        private GameObject _middleLoop;
+        private GameObject _lowerLoop;
+        private int _backgroundIndex;
+        private int _characterIndex;
         public override void OnEnter()
         {
             base.OnEnter();
             Context.StartCoroutine(_loadScene());
+            _upperLoop = Context.LoadingPageLoop3;
+            _middleLoop = Context.LoadingPageLoop2;
+            _lowerLoop = Context.LoadingPageLoop1;
+            _switchRandomBackground(_lowerLoop);
+            _switchRandomBackground(_middleLoop);
+            _switchRandomBackground(_upperLoop);
+            _travelDistance = 0f;
+        }
+
+        private void _switchRandomBackground(GameObject loop)
+        {
+            loop.transform.GetChild(1).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopBackGroundSpritePool[_backgroundIndex];
+            loop.transform.GetChild(2).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopCharacterSpritePool[Context._finalPlayerInformation.ColorIndex[_characterIndex]];
+            _backgroundIndex = (_backgroundIndex + 1) % _MenuData.LoopBackGroundSpritePool.Length;
+            _characterIndex = (_characterIndex + 1) % Context._finalPlayerInformation.ColorIndex.Length;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            _travelDistance += Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop1.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop2.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            Context.LoadingPageLoop3.transform.localPosition += Vector3.down * Time.deltaTime * _MenuData.LoopScrollSpeed;
+            if (_travelDistance >= _MenuData.MaxScrollDistance)
+            {
+                _travelDistance = 0f;
+                _middleLoop.transform.localPosition = Vector3.zero;
+                _lowerLoop.transform.localPosition = new Vector3(0f, _MenuData.MaxScrollDistance * 2f, 0f);
+                _switchRandomBackground(_lowerLoop);
+                GameObject temp = _lowerLoop;
+                _lowerLoop = _middleLoop;
+                _middleLoop = _upperLoop;
+                _upperLoop = temp;
+            }
         }
 
         IEnumerator _loadScene()
         {
-            yield return 5f;
+            yield return null;
+            float elapsedTime = 0f;
+            float maxElapsedTime = 4f;
+            float totalTime = 5f;
+            while (elapsedTime < maxElapsedTime)
+            {
+                elapsedTime += Time.deltaTime;
+                Context.LoadingBarFillImage.fillAmount = elapsedTime / totalTime;
+                yield return null;
+            }
             float loadingProgress = 0f;
             AsyncOperation asyncload = SceneManager.LoadSceneAsync(Context.SelectedMapName);
             asyncload.allowSceneActivation = false;
@@ -1197,13 +1387,14 @@ public class ComicMenu : MonoBehaviour
                 if (asyncload.progress >= 0.9f && loadingProgress >= 0.8f)
                 {
                     Context.LoadingBarFillImage.fillAmount = 1f;
-                    Context.LoadingTitle.text = "Press A To Continue";
+                    Context.LoadingTitle.text = "Press A To Start";
                     if (_ADown)
                         asyncload.allowSceneActivation = true;
                 }
                 else
                 {
-                    Context.LoadingBarFillImage.fillAmount = loadingProgress;
+                    if (loadingProgress > (maxElapsedTime / totalTime))
+                        Context.LoadingBarFillImage.fillAmount = loadingProgress;
                 }
                 yield return null;
             }

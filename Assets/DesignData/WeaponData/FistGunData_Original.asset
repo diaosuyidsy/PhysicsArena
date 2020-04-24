@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7918f048c98c69649a8f0cd0943dc7b2, type: 3}
   m_Name: FistGunData_Original
   m_EditorClassIdentifier: 
+  YFloatDistance: 0.5
+  RotationSpeed: 160
+  RotatingRotation: {x: -8, y: -5, z: -54}
   XRotation: 0
   YRotation: 90
   ZRotation: 0
@@ -29,12 +32,12 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 16384
   DropForce: {x: 0, y: 2, z: -2}
-  FistSpeed: 15
+  FistSpeed: 17
   MaxAmmo: 7
-  FistHitForce: 900
+  FistHitForce: 1015
   BackfireHitForce: 200
   IdleBackfireHitForce: 100
-  MaxFlyDistance: 7
+  MaxFlyDistance: 30
   ReloadTime: 1
   ReloadEase:
     serializedVersion: 2
@@ -91,8 +94,10 @@ MonoBehaviour:
   FistReboundForce: 1
   FistHitScanRadius: 0.15
   FistHitScanDist: 0.4
+  FistUselessDuration: 1
+  FistOutDuration: 0.2
   AllThingFistCanCollideLayer:
     serializedVersion: 2
     m_Bits: 17169920
-  HelpAimAngle: 45
+  HelpAimAngle: 60
   HelpAimDistance: 50

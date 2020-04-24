@@ -49,7 +49,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 48
   m_CollisionDetection: 0
 --- !u!65 &5783126998796661541
 BoxCollider:
@@ -77,13 +77,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   WeaponDataBase: {fileID: 11400000, guid: e68950b442d2ba04aa46774f7a020950, type: 2}
+  OnDropDisappear: 0
+  ShouldFloat: 0
   CanBePickedUp: 1
   Data: {fileID: 11400000, guid: 02308cdd234d4104a9b5ba42b61b1914, type: 2}
   Entity: {fileID: 5812035999268780057}
-  Default: {r: 0.7169812, g: 0.7169812, b: 0.7169812, a: 1}
-  Blue: {r: 0.11681202, g: 0.50922894, b: 0.7075472, a: 1}
-  Red: {r: 0.6320754, g: 0.11627804, b: 0.11627804, a: 1}
-  Hold: 0
+  RedPointerPrefab: {fileID: 0}
+  BluePointerPrefab: {fileID: 0}
+  PointerDis: 0
+  GuideHopInterval: 0
+  GuideHopDis: 0
+  GuideHopTime: 0
 --- !u!1001 &5332164940370193278
 PrefabInstance:
   m_ObjectHideFlags: 0

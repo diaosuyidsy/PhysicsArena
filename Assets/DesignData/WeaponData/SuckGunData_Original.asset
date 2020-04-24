@@ -12,6 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6b598af8ab0478f4c855302750c13e5c, type: 3}
   m_Name: SuckGunData_Original
   m_EditorClassIdentifier: 
+  YFloatDistance: 0.5
+  RotationSpeed: 160
+  RotatingRotation: {x: -8, y: -5, z: -54}
   XRotation: 0
   YRotation: 90
   ZRotation: 0
@@ -30,6 +33,11 @@ MonoBehaviour:
     m_Bits: 16384
   DropForce: {x: 0, y: 2, z: -2}
   MaxBallTravelTime: 4
-  BallTravelSpeed: 5
-  SuckStrength: 470
-  SuckGunMaxUseTimes: 7
+  BallTravelSpeed: 9
+  SuckStrength: 84
+  SuckUpStrengthMultiplier: 1
+  SuckBallStayUpTime: 0.9
+  SuckGunMaxUseTimes: 8
+  CanSuckLayer:
+    serializedVersion: 2
+    m_Bits: 58720055

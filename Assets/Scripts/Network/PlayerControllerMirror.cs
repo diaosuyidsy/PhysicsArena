@@ -50,7 +50,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private float _lastTimeUseStamina;
     // private float _lastTimeUSeStaminaUnimportant;
     private Vector2 _staminaUISize;
-    private float _sideStepTimer;
     private float _jumpTimer;
     private Vector3 _freezeBody;
     private ImpactMarker _impactMarker;
@@ -98,8 +97,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     private Rigidbody[] _allPlayerRBs;
     private IEnumerator _deadInvincible;
     private int _playerBodiesLayer;
-    private Vector3 _storedVelocity;
     private int _hitStopFrames;
+    private bool _customDrop;
+    private Vector3 _customDropForce;
     #endregion
 
     #region Network Variables
@@ -399,13 +399,26 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     [Command]
     private void CmdPickUpObject(GameObject _object, GameObject owner)
     {
-        _object.GetComponent<NetworkWeaponBase>().OnPickUp(owner);
+        if (_object.GetComponent<NetworkWeaponBase>().CanBePickedUp)
+        {
+            _object.GetComponent<NetworkWeaponBase>().OnPickUp(owner);
+            TargetPickUpObject(GetComponent<NetworkIdentity>().connectionToClient, _object, owner);
+        }
+    }
+
+    [TargetRpc]
+    private void TargetPickUpObject(NetworkConnection connection, GameObject _object, GameObject owner)
+    {
+        HandObject = _object;
+        CmdTriggerObjectPickedUp(gameObject, _object);
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(IdleActionState)))
+            _actionFSM.TransitionTo<HoldingState>();
     }
 
     [Command]
-    private void CmdDropObject(GameObject _object)
+    private void CmdDropObject(GameObject _object, bool customDrop, Vector3 force)
     {
-        _object.GetComponent<NetworkWeaponBase>().OnDrop();
+        _object.GetComponent<NetworkWeaponBase>().OnDrop(customDrop, force);
     }
 
     [Command]
@@ -456,8 +469,50 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             handObject.transform.eulerAngles = eulerAngles;
     }
 
+    [Command]
+    private void CmdStun(GameObject receiver, float stunDuration)
+    {
+        TargetStun(receiver.GetComponent<NetworkIdentity>().connectionToClient, receiver, stunDuration);
+    }
+
+    [TargetRpc]
+    private void TargetStun(NetworkConnection connection, GameObject receiver, float stunDuration)
+    {
+        receiver.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(stunDuration, 1f));
+    }
+
+    [Command]
+    private void CmdTriggerStun(GameObject target, int playerNumber)
+    {
+        RpcTriggerStun(target, playerNumber);
+    }
+
+    [ClientRpc]
+    private void RpcTriggerStun(GameObject target, int playerNumber)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerStunned(target, playerNumber, Head.transform, 1f));
+    }
+
+    [Command]
+    private void CmdTriggerUnStun(GameObject target, int playerNumber)
+    {
+        RpcTriggerUnStun(target, playerNumber);
+    }
+
+    [ClientRpc]
+    private void RpcTriggerUnStun(GameObject target, int playerNumber)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerUnStunned(target, playerNumber));
+    }
+
+
+
     #endregion
 
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
     public bool CanBeBlockPushed()
     {
         return _actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) ||
@@ -487,6 +542,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             CanBlock(sender.transform.forward))
         {
             CmdHit(sender, -force * CharacterDataStore.BlockMultiplier, false, gameObject);
+            // CmdStun(sender, CharacterDataStore.BlockStunDuration);
             // sender.GetComponentInParent<IHittableNetwork>().OnImpact(-force * CharacterDataStore.BlockMultiplier, _meleeCharge, gameObject, false);
         }
         else // Player is hit cause he could not block
@@ -596,8 +652,18 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     public void ForceDropHandObject()
     {
         if (!isLocalPlayer) return;
+        _customDrop = false;
         if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
-            _actionFSM.TransitionTo<DroppedRecoveryState>();
+            _actionFSM.TransitionTo<DroppingState>();
+    }
+
+    public void ForceDropHandObject(Vector3 force)
+    {
+        if (!isLocalPlayer) return;
+        _customDrop = true;
+        _customDropForce = force;
+        if (_actionFSM.CurrentState.GetType().Equals(typeof(HoldingState)))
+            _actionFSM.TransitionTo<DroppingState>();
     }
 
     /// <summary>
@@ -680,13 +746,10 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
     {
         if (HandObject == null) return;
         // Drop the thing
-        // HandObject.GetComponent<NetworkWeaponBase>().OnDrop();
-        CmdDropObject(HandObject);
-
+        CmdDropObject(HandObject, _customDrop, _customDropForce);
+        _customDrop = false;
         CmdTriggerObjectDropped(gameObject, HandObject);
-        // EventManager.Instance.TriggerEvent(new ObjectDropped(gameObject, PlayerNumber, HandObject));
         // Return the body to normal position
-        // _resetBodyAnimation();
         // Nullify the holder
         HandObject = null;
     }
@@ -1073,7 +1136,9 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         {
             base.OnEnter();
             Context._animator.SetBool("IdleDowner", true);
-            EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform, Context._stunTimer - Time.time));
+            // EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform, Context._stunTimer - Time.time));
+            Context.CmdTriggerStun(Context.gameObject, Context.PlayerNumber);
+            Context.CmdTriggerPunchDone(Context.gameObject);
         }
 
         public override void Update()
@@ -1088,7 +1153,8 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void OnExit()
         {
             base.OnExit();
-            EventManager.Instance.TriggerEvent(new PlayerUnStunned(Context.gameObject, Context.PlayerNumber));
+            Context.CmdTriggerUnStun(Context.gameObject, Context.PlayerNumber);
+            // EventManager.Instance.TriggerEvent(new PlayerUnStunned(Context.gameObject, Context.PlayerNumber));
         }
     }
 
@@ -1264,7 +1330,6 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
             Context._animator.SetBool("IdleUpper", true);
             Context._permaSlow = 0;
             Context._permaSlowWalkSpeedMultiplier = 1f;
-            _pickUpTimer = Time.timeSinceLevelLoad + Context.CharacterDataStore.PickUpCD;
         }
 
         public override void Update()
@@ -1280,15 +1345,14 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 TransitionTo<BlockingState>();
                 return;
             }
-            if (_pickUpTimer < Time.timeSinceLevelLoad)
-                _pickupcheck();
+            _pickupcheck();
         }
 
         private void _pickupcheck()
         {
             RaycastHit hit;
             if (Physics.SphereCast(Context.Chest.transform.position,
-                Context.CharacterDataStore.Radius,
+                Context.CharacterDataStore.PickupRadius,
                 Vector3.down,
                 out hit,
                 Context._distToGround,
@@ -1297,15 +1361,15 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
 
                 if (Context.HandObject == null && hit.collider.GetComponent<NetworkWeaponBase>() != null && hit.collider.GetComponent<NetworkWeaponBase>().CanBePickedUp)
                 {
-                    Context.CmdTriggerObjectPickedUp(Context.gameObject, hit.collider.gameObject);
+                    // Context.CmdTriggerObjectPickedUp(Context.gameObject, hit.collider.gameObject);
                     // EventManager.Instance.TriggerEvent(new ObjectPickedUp(Context.gameObject, Context.PlayerNumber, hit.collider.gameObject));
                     // Tell other necessary components that it has taken something
-                    Context.HandObject = hit.collider.gameObject;
+                    // Context.HandObject = hit.collider.gameObject;
 
                     // Tell the collected weapon who picked it up
                     Context.CmdPickUpObject(hit.collider.gameObject, Context.gameObject);
                     // hit.collider.GetComponent<NetworkWeaponBase>().OnPickUp(Context.gameObject);
-                    TransitionTo<HoldingState>();
+                    // TransitionTo<HoldingState>();
                     return;
                 }
             }
@@ -1407,7 +1471,7 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
         public override void Update()
         {
             base.Update();
-            if (_LeftTriggerUp || _BUp)
+            if (!_LeftTrigger && !_B)
             {
                 TransitionTo<DroppedRecoveryState>();
                 return;
@@ -1539,13 +1603,22 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 else layermask = Context.CharacterDataStore.CanHitLayer ^ (1 << Context.gameObject.layer);
                 if (!_hitOnce && Physics.SphereCast(Context.transform.position - Context.transform.forward * Context.CharacterDataStore.PunchBackwardCastDistance, Context.CharacterDataStore.PunchRadius, Context.transform.forward, out hit, Context.CharacterDataStore.PunchDistance, layermask))
                 {
-                    if (hit.transform.GetComponentInParent<IHittableNetwork>() == null) return;
+                    GameObject target = null;
+                    if (hit.transform.GetComponent<NetworkWeaponBase>() != null)
+                    {
+                        target = hit.transform.GetComponent<NetworkWeaponBase>().Owner;
+                    }
+                    else if (hit.transform.GetComponentInParent<IHittableNetwork>() != null)
+                    {
+                        target = hit.transform.gameObject;
+                    }
+                    else return;
                     _hitOnce = true;
                     Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
                     if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                         Context._setVelocity(Vector3.zero);
                     Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
-                    Context.CmdHit(hit.transform.GetComponentInParent<NetworkIdentity>().gameObject, force, true, Context.gameObject);
+                    Context.CmdHit(target.transform.GetComponentInParent<NetworkIdentity>().gameObject, force, true, Context.gameObject);
                     // TransitionTo<PunchHitStopActionState>();
                     // Context._movementFSM.TransitionTo<PunchHitStopMovementState>();
                 }
@@ -1589,6 +1662,11 @@ public class PlayerControllerMirror : NetworkBehaviour, IHittableNetwork
                 TransitionTo<IdleActionState>();
                 return;
             }
+        }
+
+        private void _sweepPush()
+        {
+
         }
     }
 

@@ -9718,7 +9718,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Side: 0
-  Score: 1
+  Score: 2
   Occupied: 0
 --- !u!23 &488920609
 MeshRenderer:
@@ -17651,6 +17651,9 @@ MonoBehaviour:
   ExpTextStayTime: 1
   TextDefaultScale: 1
   TextHopScale: 1.5
+  DefaultLevelTextScale: 0
+  BiggerLevelTextScale: 0
+  LargestLevelTextScale: 0
 --- !u!114 &856148610
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22613,6 +22616,9 @@ MonoBehaviour:
   ExpTextStayTime: 1
   TextDefaultScale: 1
   TextHopScale: 1.5
+  DefaultLevelTextScale: 1
+  BiggerLevelTextScale: 1.5
+  LargestLevelTextScale: 2
 --- !u!114 &881600388
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22732,7 +22738,8 @@ MonoBehaviour:
   - {fileID: 5640671049982168115, guid: ce98fe3d58d39674799d49a8ca12c0ba, type: 3}
   - {fileID: 1559725054074712744, guid: 77b30ead072f7ed4c81adbaf19872f18, type: 3}
   - {fileID: 5993521544988853584, guid: 452294ec5c722cc4dad7dbbb2c39827c, type: 3}
-  WeaponQuantityList: 02000000020000000200000001000000
+  - {fileID: 7037211732015215638, guid: 6bd3f14049b1dea45b5f108003205db3, type: 3}
+  WeaponQuantityList: 0200000002000000020000000100000002000000
 --- !u!1 &904358622
 GameObject:
   m_ObjectHideFlags: 0
@@ -38186,7 +38193,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1287550438
 RectTransform:
   m_ObjectHideFlags: 0
@@ -42343,7 +42350,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1623976793
 RectTransform:
   m_ObjectHideFlags: 0
@@ -50148,7 +50155,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Side: 1
-  Score: 1
+  Score: 2
   Occupied: 0
 --- !u!23 &1867601937
 MeshRenderer:
@@ -53651,7 +53658,6 @@ GameObject:
   - component: {fileID: 4697122783582206}
   - component: {fileID: 33183946060819052}
   - component: {fileID: 23405843238186564}
-  - component: {fileID: 136455673611661236}
   m_Layer: 13
   m_Name: Cart
   m_TagString: Untagged
@@ -54357,7 +54363,7 @@ MeshRenderer:
   m_RenderingLayerMask: 4294967295
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 0d9839eab1f5b6a40a9d61a8fd4ce387, type: 2}
+  - {fileID: 2100000, guid: 359ef2e4b09204eeab112e419c308068, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -54471,20 +54477,6 @@ SphereCollider:
   serializedVersion: 2
   m_Radius: 1.7
   m_Center: {x: 0, y: 0, z: 0}
---- !u!136 &136455673611661236
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1683563693085516}
-  m_Material: {fileID: 13400000, guid: 0592e4686757a764fa065ec05b6a0c0c, type: 2}
-  m_IsTrigger: 0
-  m_Enabled: 1
-  m_Radius: 0.24203965
-  m_Height: 0.78917414
-  m_Direction: 0
-  m_Center: {x: 0.010472776, y: 0.05835098, z: 0.0010073808}
 --- !u!198 &198003296431158940
 ParticleSystem:
   m_ObjectHideFlags: 0

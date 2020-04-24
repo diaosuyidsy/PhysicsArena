@@ -27,6 +27,7 @@ public class CharacterData : ScriptableObject
     public float BlockLingerDuration = 0.2f;
     public float BlockStaminaDrain = 1f;
     public float BlockMultiplier = 2f;
+    public float BlockStunDuration = 1.3f;
     public float BlockAngle = 90f;
     public float BlockSpeedMultiplier = 0.5f;
     public float MinBlockUpTime = 0.3f;
@@ -36,6 +37,7 @@ public class CharacterData : ScriptableObject
 
     [Tooltip("How much time it takes to charge to full")]
     public float ClockFistTime = 1f;
+    public float HoldEventTriggerDuration = 0.1f;
     [Tooltip("How much time it takes to release the punch (before it resets to normal state)")]
     public float FistReleaseTime = 0.2f;
     [Tooltip("Actual Fist Punchable Time")]
@@ -70,12 +72,16 @@ public class CharacterData : ScriptableObject
     public LayerMask CanHitLayer;
 
     [Header("Character Other Settings")]
-    public float Radius = 1f;
-    public float PickUpCD = 0f;
+    public float PickupRadius = 1f;
+    public float PickupDownDistance = 1f;
+    public float PickupUpDistance = 0.3f;
     public LayerMask PickUpLayer;
     public float DropRecoveryTime = 0.2f;
     public Vector3 HitStopViberation = new Vector3(1f, 0.1f, 1f);
     public int HitStopViberato = 90;
     public float HitStopRandomness = 90f;
     public Ease HitStopViberationEase = Ease.OutBack;
+    public float HitSweepBackwardDistance = 0.2f;
+    public float HitSweepPushBackForce = 100f;
+    public float HitSweepRadius = 0.3f;
 }

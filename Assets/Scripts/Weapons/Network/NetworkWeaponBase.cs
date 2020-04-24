@@ -20,17 +20,14 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
     protected bool _followHand;
     protected float _pickUpTimer;
     protected bool _ownerIsLocalPlayer => Owner == null ? false : Owner.GetComponent<NetworkIdentity>().isLocalPlayer;
-    // protected FSM<WeaponBase> WeaponBaseFSM;
 
     protected virtual void Awake()
     {
-        // WeaponBaseFSM = new FSM<WeaponBase>(this);
         OnSpawn();
     }
 
     protected virtual void Update()
     {
-        // WeaponBaseFSM.Update();
         if (Owner != null && _followHand)
         {
             Vector3 targetposition = (Owner.GetComponent<PlayerControllerMirror>().LeftHand.transform.position
@@ -89,7 +86,6 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
 
     protected virtual void OnCollisionEnter(Collision other)
     {
-        // ((WeaponState)WeaponBaseFSM.CurrentState).OnCollisionEnter(other);
         if (!isServer) return;
         if (WeaponDataBase.OnHitDisappear == (WeaponDataBase.OnHitDisappear | 1 << other.gameObject.layer))
         {
@@ -121,41 +117,51 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
 
     public virtual void OnSpawn()
     {
-        // WeaponBaseFSM.TransitionTo<InAirState>();
         CanBePickedUp = true;
         _followHand = true;
         gameObject.layer = LayerMask.NameToLayer("Pickup");
     }
 
-    public virtual void OnDrop()
+    public virtual void OnDrop(bool customForce, Vector3 force)
     {
         GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
         GetComponent<Smooth.SmoothSyncMirror>().rotationLerpSpeed = 0.85f;
-        RpcOnDrop(Owner);
+        RpcOnDrop(Owner, customForce, force);
         _hitGroundOnce = false;
         CanBePickedUp = false;
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
-        Owner.transform.up * WeaponDataBase.DropForce.y +
-        Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
+        if (!customForce)
+            GetComponent<Rigidbody>().AddForce(Owner.transform.right * WeaponDataBase.DropForce.x +
+            Owner.transform.up * WeaponDataBase.DropForce.y +
+            Owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
+        else
+            GetComponent<Rigidbody>().AddForce(Owner.transform.right * force.x +
+                Owner.transform.up * force.y +
+                Owner.transform.forward * force.z, ForceMode.VelocityChange);
         Owner = null;
     }
 
     [ClientRpc]
-    public void RpcOnDrop(GameObject owner)
+    public void RpcOnDrop(GameObject owner, bool customForce, Vector3 force)
     {
         GetComponent<Smooth.SmoothSyncMirror>().positionLerpSpeed = 0.85f;
         GetComponent<Smooth.SmoothSyncMirror>().rotationLerpSpeed = 0.85f;
         GetComponent<Rigidbody>().isKinematic = false;
         GetComponent<Rigidbody>().velocity = Vector3.zero;
-        GetComponent<Rigidbody>().AddForce(owner.transform.right * WeaponDataBase.DropForce.x +
-        owner.transform.up * WeaponDataBase.DropForce.y +
-        owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
+        if (!customForce)
+            GetComponent<Rigidbody>().AddForce(owner.transform.right * WeaponDataBase.DropForce.x +
+            owner.transform.up * WeaponDataBase.DropForce.y +
+            owner.transform.forward * WeaponDataBase.DropForce.z, ForceMode.VelocityChange);
+        else
+            GetComponent<Rigidbody>().AddForce(owner.transform.right * force.x +
+            owner.transform.up * force.y +
+            owner.transform.forward * force.z, ForceMode.VelocityChange);
     }
 
     public virtual void OnPickUp(GameObject owner)
     {
+        CanBePickedUp = false;
         Owner = owner;
         gameObject.layer = owner.layer;
         GetComponent<Rigidbody>().isKinematic = true;
@@ -177,7 +183,6 @@ public abstract class NetworkWeaponBase : NetworkBehaviour
 
     protected virtual void OnTriggerEnter(Collider other)
     {
-        // ((WeaponState)WeaponBaseFSM.CurrentState).OnTriggerEnter(other);
         if (!isServer) return;
         if (other.CompareTag("DeathZone"))
         {

@@ -9,21 +9,23 @@ public class Game : MonoBehaviour
     public VFXData VFXData;
     public ConfigData ConfigData;
     public GameFeelData GameFeelData;
-    public ModeSepcificData ModeSpecificData;
     public GameMapData GameMapData;
+    public ModeSepcificData ModeSpecificData;
 
     public ModeSepcificData ModeSpecificData_2Player;
+    public UIData UIData;
 
     private void Awake()
     {
         Services.Config = new Config(ConfigData, GameMapData, CharacterData);
-        Services.AudioManager = new AudioManager(AudioData);
+        Services.AudioManager = new AudioManager(AudioData, gameObject);
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
         Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData);
         Services.StatisticsManager = new StatisticsManager();
         Services.TinylyticsManager = new TinylyticsHandler();
         Services.GameStateManager = new GameStateManager(GameMapData, ConfigData, gameObject);
+        Services.ActionManager = new ActionManager();
         switch (GameMapData.GameMapMode)
         {
             case GameMapMode.FoodCartMode:
@@ -35,11 +37,11 @@ public class Game : MonoBehaviour
             case GameMapMode.DeathMode:
                 if (Utility.GetPlayerNumber() <= 2)
                 {
-                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData_2Player);
+                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData_2Player, (BrawlModeReforgedUIData)UIData);
                 }
                 else
                 {
-                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData);
+                    Services.GameObjectiveManager = new BrawlModeReforgedObjectiveManager((BrawlModeReforgedModeData)ModeSpecificData, (BrawlModeReforgedUIData)UIData);
                 }
                 break;
             case GameMapMode.RaceMode:
@@ -57,6 +59,7 @@ public class Game : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Services.ActionManager.Update();
         Services.WeaponGenerationManager.Update();
         Services.GameStateManager.Update();
         Services.GameObjectiveManager.Update();
@@ -86,6 +89,9 @@ public class Game : MonoBehaviour
 
     private void OnDestroy()
     {
+        Services.ActionManager.Destroy();
+        Services.ActionManager = null;
+
         Services.AudioManager.Destroy();
         Services.AudioManager = null;
 

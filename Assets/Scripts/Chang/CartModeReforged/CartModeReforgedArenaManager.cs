@@ -63,6 +63,7 @@ public class CartModeReforgedArenaManager : MonoBehaviour
     private bool GameEnd;
 
     private float SpeedLevelTimer;
+    private float CartObtainTimer;
 
     // Start is called before the first frame update
     void Start()
@@ -159,26 +160,49 @@ public class CartModeReforgedArenaManager : MonoBehaviour
         }
         if (CurrentSide != CartSide.Neutral)
         {
+            if(CurrentSide != LastSide)
+            {
+                CartObtainTimer = 0;
+            }
             LastSide = CurrentSide;
         }
 
         if (Team1Count>0 && Team2Count>0)
         {
+            CartObtainTimer = 0;
             CurrentSide = CartSide.Neutral;
             CurrentSpeed = 0;
         }
         else if (Team1Count > 0)
         {
+
             CurrentSide = CartSide.Team1;
-            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel-1];
+            CartObtainTimer += Time.deltaTime;
+            if (CartObtainTimer >= Data.CartObtainTime)
+            {
+                CurrentSpeed = Data.CartSpeedWithCheckpoint[Team1SpeedLevel - 1];
+            }
+            else
+            {
+                CurrentSpeed = 0;
+            }
         }
         else if(Team2Count > 0)
         {
             CurrentSide = CartSide.Team2;
-            CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel-1];
+            CartObtainTimer += Time.deltaTime;
+            if (CartObtainTimer >= Data.CartObtainTime)
+            {
+                CurrentSpeed = Data.CartSpeedWithCheckpoint[Team2SpeedLevel - 1];
+            }
+            else
+            {
+                CurrentSpeed = 0;
+            }
         }
         else
         {
+            CartObtainTimer = 0;
             CurrentSide = CartSide.Neutral;
             CurrentSpeed = 0;
         }
@@ -192,10 +216,24 @@ public class CartModeReforgedArenaManager : MonoBehaviour
                 CartDotline.GetComponent<SpriteRenderer>().color = FeelData.NeutralDotlineColor;
                 break;
             case CartSide.Team1:
-                CartDotline.GetComponent<SpriteRenderer>().color = FeelData.Team1DotlineColor;
+                if (CartObtainTimer >= Data.CartObtainTime)
+                {
+                    CartDotline.GetComponent<SpriteRenderer>().color = FeelData.Team1DotlineColor;
+                }
+                else
+                {
+                    CartDotline.GetComponent<SpriteRenderer>().color = FeelData.NeutralDotlineColor;
+                }
                 break;
             case CartSide.Team2:
-                CartDotline.GetComponent<SpriteRenderer>().color = FeelData.Team2DotlineColor;
+                if (CartObtainTimer >= Data.CartObtainTime)
+                {
+                    CartDotline.GetComponent<SpriteRenderer>().color = FeelData.Team2DotlineColor;
+                }
+                else
+                {
+                    CartDotline.GetComponent<SpriteRenderer>().color = FeelData.NeutralDotlineColor;
+                }
                 break;
         }
     }
@@ -209,12 +247,16 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
         if (!Occupiable(CheckPointList[TargetWayPointIndex]))
         {
-            OccupyCounter.GetComponent<Image>().fillAmount = 0;
+
+
             CurrentState = CartState.Moving;
+
+            CartMove();
             return;
         }
 
-        if(CurrentSide == CartSide.Neutral)
+
+        if (CurrentSide == CartSide.Neutral || CartObtainTimer <= Data.CartObtainTime)
         {
             CurrentOccupyProgress -= Data.RecoverSpeed * Time.deltaTime;
             if (CurrentOccupyProgress < 0)
@@ -248,7 +290,13 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
             if(CurrentSide == CartSide.Team1)
             {
-                Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                Team1SpeedLevel += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                //Team1SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
+                if (Team1SpeedLevel > Data.MaxLevel)
+                {
+                    Team1SpeedLevel = Data.MaxLevel;
+                }
 
                 GenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, true);
 
@@ -264,7 +312,13 @@ public class CartModeReforgedArenaManager : MonoBehaviour
             }
             else
             {
-                Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                Team2SpeedLevel += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+                //Team2SpeedLevelPlus += CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score;
+
+                if (Team2SpeedLevel > Data.MaxLevel)
+                {
+                    Team2SpeedLevel = Data.MaxLevel;
+                }
 
                 GenerateCheckpointScore(CheckPointList[TargetWayPointIndex].GetComponent<Checkpoint>().Score, CheckPointList[TargetWayPointIndex].transform.position, false);
 
@@ -406,6 +460,33 @@ public class CartModeReforgedArenaManager : MonoBehaviour
 
         Team1SpeedLevelPlusText.GetComponent<TextMeshProUGUI>().text = "+" + Team1SpeedLevelPlus.ToString();
         Team2SpeedLevelPlusText.GetComponent<TextMeshProUGUI>().text = "+" + Team2SpeedLevelPlus.ToString();
+
+        if(Team1SpeedLevel < 5)
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.DefaultLevelTextScale * Vector3.one;
+        }
+        else if(Team1SpeedLevel < 10)
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.BiggerLevelTextScale* Vector3.one;
+        }
+        else
+        {
+            Team1SpeedLevelText.transform.localScale = FeelData.LargestLevelTextScale * Vector3.one;
+        }
+
+        if (Team2SpeedLevel < 5)
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.DefaultLevelTextScale * Vector3.one;
+        }
+        else if (Team2SpeedLevel < 10)
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.BiggerLevelTextScale * Vector3.one;
+        }
+        else
+        {
+            Team2SpeedLevelText.transform.localScale = FeelData.LargestLevelTextScale * Vector3.one;
+        }
+
     }
 
    

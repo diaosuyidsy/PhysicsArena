@@ -4,60 +4,115 @@ using UnityEngine;
 
 public class WaterGunLine : MonoBehaviour
 {
-    public float maxLength = 16.0f;
+    public WaterGunData waterGunData;
+    //public float maxLength = 16.0f;
+    //public float spherecastRadius = 0.5f;
     public GameObject hitEffect;
     public Renderer meshRenderer1;
-    public Renderer meshRenderer2;
+    //public Renderer meshRenderer2;
     public ParticleSystem[] hitPsArray;
     public int segmentCount = 32;
-    public float globalProgressSpeed = 1f;
+    public float globalProgressSpeed { get { return 1f / waterGunData.ShootMaxCD; } }
     public AnimationCurve shaderProgressCurve;
     public AnimationCurve lineWidthCurve;
 
-    private LineRenderer lr;
-    private Vector3[] resultVectors;
-    private float dist;
-    private float globalProgress;
-    private Vector3 hitPosition;
-    private Vector3 currentPosition;
 
+    private LineRenderer _lr;
+    private Vector3[] _resultVectors;
+    public Vector3[] ResultVectors { get { return _resultVectors; } }
+    private float _dist;
+    private float _globalProgress;
+    private Vector3 _hitPosition;
+    private Vector3 _currentPosition;
+    private float _maxLength;
+    private float _spherecastRadius;
+    private enum State
+    {
+        StartFire,
+        Fire,
+        StopFire,
+        Stop
+    }
+    private State _waterlineState;
     void Start()
     {
-        globalProgress = 1f;
-        lr = this.GetComponent<LineRenderer>();
-        lr.positionCount = segmentCount;
-        resultVectors = new Vector3[segmentCount + 1];
+        _waterlineState = State.Stop;
+        _globalProgress = 1f;
+        _lr = this.GetComponent<LineRenderer>();
+        _lr.positionCount = segmentCount;
+        _resultVectors = new Vector3[segmentCount + 1];
         for (int i = 0; i < segmentCount + 1; i++)
         {
-            resultVectors[i] = transform.forward;
+            _resultVectors[i] = transform.forward;
         }
+
+        if (waterGunData)
+        {
+            _spherecastRadius = waterGunData.WaterCastRadius;
+            _maxLength = waterGunData.WaterCastDistance + _spherecastRadius;
+        }
+        else
+        {
+            _maxLength = 5f;
+            _spherecastRadius = 0.4f;
+        }
+
     }
 
     void Update()
     {
+        //switch state
+        switch (_waterlineState)
+        {
+            case State.StartFire:
+                if (_globalProgress > 0f)
+
+                    _globalProgress -= Time.deltaTime * globalProgressSpeed * 3f;
+                else
+                {
+                    _waterlineState = State.Fire;
+                }
+                break;
+            case State.StopFire:
+
+                if (_globalProgress < 1f)
+                {
+                    _globalProgress += Time.deltaTime * globalProgressSpeed;
+                }
+                else
+                {
+                    _waterlineState = State.Stop;
+                }
+
+                break;
+
+
+        }
+
+
         //Move LineRenderer One By One
 
         for (int i = segmentCount - 1; i > 0; i--)
         {
-            resultVectors[i] = resultVectors[i - 1];
+            _resultVectors[i] = _resultVectors[i - 1];
         }
 
-        resultVectors[0] = transform.forward;
-        resultVectors[segmentCount] = resultVectors[segmentCount - 1];
-        float blockLength = maxLength / segmentCount;
+        _resultVectors[0] = transform.forward;
+        _resultVectors[segmentCount] = _resultVectors[segmentCount - 1];
+        float blockLength = _maxLength / segmentCount;
 
 
-        currentPosition = new Vector3(0, 0, 0);
+        _currentPosition = new Vector3(0, 0, 0);
 
         for (int i = 0; i < segmentCount; i++)
         {
-            currentPosition = transform.position;
+            _currentPosition = transform.position;
             for (int j = 0; j < i; j++)
             {
-                currentPosition += resultVectors[j] * blockLength;
+                _currentPosition += _resultVectors[j] * blockLength;
             }
 
-            lr.SetPosition(i, currentPosition);
+            _lr.SetPosition(i, _currentPosition);
         }
 
 
@@ -69,49 +124,52 @@ public class WaterGunLine : MonoBehaviour
         for (int i = 0; i < segmentCount; i++)
         {
 
-            currentPosition = transform.position;
+            _currentPosition = transform.position;
             for (int j = 0; j < i; j++)
             {
-                currentPosition += resultVectors[j] * blockLength;
+                _currentPosition += _resultVectors[j] * blockLength;
             }
             RaycastHit hit;
 
             if (i == segmentCount - 1)
             {
-                hitPosition = currentPosition + resultVectors[i] * blockLength;
-                hitPosition = Vector3.MoveTowards(hitPosition, transform.position, 0.5f);
+                _hitPosition = _currentPosition;
+
                 if (hitEffect)
                 {
-                    hitEffect.transform.position = hitPosition;
+                    hitEffect.transform.position = _hitPosition;
+                    // hitEffect.transform.rotation = Quaternion.FromToRotation(hitEffect.transform.forward, resultVectors[i].normalized);
 
                 }
 
-                dist = Vector3.Distance(hitPosition, transform.position);
+                _dist = Vector3.Distance(_hitPosition, transform.position);
 
             }
-            else if (Physics.Raycast(currentPosition, resultVectors[i], out hit, blockLength))
+            else if (Physics.SphereCast(_currentPosition, _spherecastRadius, _resultVectors[i], out hit, blockLength, waterGunData.WaterCanHitLayer))
             {
-                hitPosition = currentPosition + resultVectors[i] * hit.distance;
-                hitPosition = Vector3.MoveTowards(hitPosition, transform.position, 0.5f);
+                _hitPosition = _currentPosition + _resultVectors[i] * hit.distance;
+                _hitPosition = Vector3.MoveTowards(_hitPosition, _hitPosition + _resultVectors[i] * blockLength, 0.3f);
+                //hitPosition = Vector3.MoveTowards(hitPosition, transform.position, 0.5f);
                 if (hitEffect)
                 {
-                    hitEffect.transform.position = hitPosition;
+                    hitEffect.transform.position = _hitPosition;
 
                 }
 
-                dist = Vector3.Distance(hitPosition, transform.position);
+                _dist = Vector3.Distance(_hitPosition, transform.position);
 
                 break;
             }
         }
-        
+
 
 
         //Emit Hit Particles 
 
         if (hitEffect)
         {
-            if (globalProgress < 0.75f)
+            hitEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, _resultVectors[segmentCount - 1].normalized);
+            if (_globalProgress < 0.75f)
             {
                 foreach (ParticleSystem ps in hitPsArray)
                 {
@@ -135,31 +193,30 @@ public class WaterGunLine : MonoBehaviour
 
         //Emit Particles on Collision End
 
-        GetComponent<Renderer>().material.SetFloat("_Distance", dist);
+        GetComponent<Renderer>().material.SetFloat("_Distance", _dist);
         GetComponent<Renderer>().material.SetVector("_Position", transform.position);
 
-        if (Input.GetMouseButton(0))
+        // if (Input.GetMouseButton(0))
+        // {
+        //     globalProgress = 0f;
+        // }
+
+        /*if (_globalProgress <= 1f)
         {
-            globalProgress = 0f;
-        }
-
-        if (globalProgress <= 1f)
-        {
-            globalProgress += Time.deltaTime * globalProgressSpeed;
-        }
+            _globalProgress += Time.deltaTime * globalProgressSpeed;
+        }*/
 
 
-        float progress = shaderProgressCurve.Evaluate(globalProgress);
+        float progress = shaderProgressCurve.Evaluate(_globalProgress);
         GetComponent<Renderer>().material.SetFloat("_Progress", progress);
 
-        if (meshRenderer1 != null && meshRenderer2 != null)
+        if (meshRenderer1 != null)
         {
             meshRenderer1.material.SetFloat("_Progress", progress);
-            meshRenderer2.material.SetFloat("_Progress", progress);
         }
 
-        float width = lineWidthCurve.Evaluate(globalProgress);
-        lr.widthMultiplier = width;
+        float width = lineWidthCurve.Evaluate(_globalProgress);
+        _lr.widthMultiplier = width;
 
         /*if (Input.GetMouseButtonDown(0) && hitEffect)
         {
@@ -167,4 +224,13 @@ public class WaterGunLine : MonoBehaviour
         }*/
 
     }
+
+    public void OnFire(bool fire)
+    {
+        if (fire)
+            _waterlineState = State.StartFire;
+        else
+            _waterlineState = State.StopFire;
+    }
+
 }

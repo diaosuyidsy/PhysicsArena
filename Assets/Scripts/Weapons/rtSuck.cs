@@ -6,14 +6,15 @@ using UnityEngine;
 public class rtSuck : WeaponBase
 {
     public GameObject suckBallEffect;
-    public List<GameObject> suckBallExplodeEffects;
-    public ParticleSystem DistortionSphere;
     public DOTweenAnimation lineParticle;
+    public DOTweenAnimation blackHoleEffect;
+    public ParticleSystem disappearEffect;
     private float _ballTraveledTime = 0f;
     private GameObject _suckBall;
     private Vector3 _suckBallInitialScale;
     private float _matOpacity = 1;
     private Quaternion _ballEffectQuaternion;
+
 
 
     private enum State
@@ -37,6 +38,7 @@ public class rtSuck : WeaponBase
         _suckBallInitialScale = new Vector3(_suckBall.transform.localScale.x, _suckBall.transform.localScale.y, _suckBall.transform.localScale.z);
         _ammo = _suckGunData.SuckGunMaxUseTimes;
         _ballEffectQuaternion = suckBallEffect.transform.rotation;
+        blackHoleEffect.gameObject.SetActive(false);
 
     }
 
@@ -83,7 +85,6 @@ public class rtSuck : WeaponBase
                     _ballState = State.Out;
                     _suckBall.SetActive(true);
                     suckBallEffect.transform.rotation = _ballEffectQuaternion;
-                    suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Explode");
                     suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Create");
                     _matOpacity = 1;
                     _suckBall.transform.parent = null;
@@ -100,40 +101,41 @@ public class rtSuck : WeaponBase
                 suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Suck");
                 lineParticle.DORestart();
                 lineParticle.GetComponent<ParticleSystem>().Play();
-                DistortionSphere.Play();
+                blackHoleEffect.DORestart();
+                blackHoleEffect.gameObject.SetActive(true);
 
                 _ballState = State.Suck;
-                StartCoroutine(sucking(0.1f));
+                StartCoroutine(sucking());
 
             }
         }
     }
 
-    IEnumerator sucking(float time)
+    IEnumerator sucking()
     {
         List<GameObject> gos = _sbc.InRangePlayers;
         EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerController>().PlayerNumber,
             gos));
         // First prototype: let's try adding a force to every object
-        yield return new WaitForSeconds(time);
-
         foreach (GameObject go in gos)
         {
-            Vector3 force = (_suckBall.transform.position + new Vector3(0, 2f, 0) - go.transform.position).normalized * _suckGunData.SuckStrength;
-            go.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Owner, ImpactType.SuckGun);
+            Vector3 forceRawDir = _suckBall.transform.position - go.transform.position;
+            forceRawDir.y = 0f;
+            forceRawDir.Normalize();
+            Vector3 force = (forceRawDir + Vector3.up * _suckGunData.SuckUpStrengthMultiplier) * _suckGunData.SuckStrength;
+            go.GetComponent<IHittable>().SetVelocity(Vector3.zero);
+            go.GetComponent<IHittable>().OnImpact(force, ForceMode.VelocityChange, Owner, ImpactType.SuckGun);
         }
-        yield return new WaitForSeconds(0.45f);
-        foreach (var suckBallExplodeEffect in suckBallExplodeEffects)
-        {
-            suckBallExplodeEffect.GetComponent<ParticleSystem>().Play();
-        }
-        suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Suck");
-        suckBallEffect.GetComponent<DOTweenAnimation>().DORestartById("Explode");
-        yield return new WaitForSeconds(0.45f);
+        yield return new WaitForSeconds(0.25f);
+        blackHoleEffect.gameObject.SetActive(false);
+        disappearEffect.Play();
+        _sbc.CleanUpAll();
+        yield return new WaitForSeconds(_suckGunData.SuckBallStayUpTime - 0.25f);
         ////Second prototype
         //yield return StartCoroutine(Congregate(time, gos));
         // After time, disable the suckball and return it to the original position,
         // reset ballstate;
+        suckBallEffect.GetComponent<DOTweenAnimation>().DOPauseAllById("Suck");
         _ballTraveledTime = 0f;
         _suckBall.transform.parent = transform;
         _suckBall.transform.localPosition = new Vector3(-0.468f, 0f);
@@ -142,7 +144,7 @@ public class rtSuck : WeaponBase
         _suckBall.SetActive(false);
         _ballState = State.In;
         // Need a little clean up the line renderer and stuff
-        _sbc.CleanUpAll();
+        
         _onWeaponUsedOnce();
     }
 
@@ -161,10 +163,9 @@ public class rtSuck : WeaponBase
         _suckBall.SetActive(false);
         _ballState = State.In;
         _ammo = _suckGunData.SuckGunMaxUseTimes;
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
         // Need a little clean up the line renderer and stuff
         _sbc.CleanUpAll();
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
     //private void _addToSuckedTimes()

@@ -11,7 +11,6 @@ public class NetworkRtFist : NetworkWeaponBase
     private FistGunData _fistGunData;
     private Transform _fist;
     private GameObject _fistDup;
-    private Fist _fistScript;
     [SyncVar]
     private FistGunState _fistGunState = FistGunState.Idle;
     [SyncVar]
@@ -32,7 +31,6 @@ public class NetworkRtFist : NetworkWeaponBase
         _fistGunData = WeaponDataBase as FistGunData;
         _fist = transform.Find("Fist");
         Debug.Assert(_fist != null);
-        _fistScript = _fist.GetComponent<Fist>();
         _ammo = _fistGunData.MaxAmmo;
     }
 
@@ -180,7 +178,8 @@ public class NetworkRtFist : NetworkWeaponBase
     [TargetRpc]
     private void TargetHit(NetworkConnection connection, GameObject receiver, GameObject owner)
     {
-        receiver.GetComponent<IHittableNetwork>().OnImpact(-_fistDup.transform.right * _fistGunData.FistHitForce, ForceMode.Impulse, owner, ImpactType.FistGun);
+        Vector3 forceDir = (receiver.transform.position - owner.transform.position).normalized;
+        receiver.GetComponent<IHittableNetwork>().OnImpact(forceDir * _fistGunData.FistHitForce, ForceMode.Impulse, owner, ImpactType.FistGun);
     }
 
     [ClientRpc]

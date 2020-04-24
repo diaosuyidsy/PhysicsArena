@@ -101,8 +101,6 @@ public class WeaponGenerationManager
         if (!hasInactiveWeapon)
         {
             GameObject weapon = GameObject.Instantiate(GameMapData.WeaponsInformation[index].WeaponPrefab);
-            if (GameMapData.WeaponsInformation[index].WeaponName.Contains("Water"))
-                Camera.main.GetComponent<Obi.ObiBaseFluidRenderer>().particleRenderers.Add(weapon.GetComponent<rtEmit>().ParticleRenderer);
             _moveWeaponToSpawnArea(weapon);
             weapon.GetComponent<WeaponBase>().OnSpawn();
             _curWeapons[index].Add(weapon);

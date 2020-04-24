@@ -14,14 +14,30 @@ public class CameraController : MonoBehaviour
     private FSM<CameraController> _camFSM;
     private Vector3 _minPosition;
     private Vector3 _maxPosition;
+    private List<CameraTargets> _cameraTargets;
 
     private void Awake()
     {
         _minPosition = transform.position - Services.GameStateManager._gameMapdata.CameraClampRelativePosition;
         _maxPosition = transform.position + Services.GameStateManager._gameMapdata.CameraClampRelativePosition;
         _cam = GetComponent<Camera>();
+        _cameraTargets = new List<CameraTargets>();
         _camFSM = new FSM<CameraController>(this);
         _camFSM.TransitionTo<EntryState>();
+    }
+
+    private void Start()
+    {
+        GameObject[] team1players = GameObject.FindGameObjectsWithTag("Team1");
+        GameObject[] team2players = GameObject.FindGameObjectsWithTag("Team2");
+        foreach (GameObject t in team1players)
+        {
+            EventManager.Instance.TriggerEvent(new OnAddCameraTargets(t, 1));
+        }
+        foreach (GameObject t in team2players)
+        {
+            EventManager.Instance.TriggerEvent(new OnAddCameraTargets(t, 1));
+        }
     }
 
     // Update is called once per frame
@@ -65,15 +81,16 @@ public class CameraController : MonoBehaviour
             Vector3 total = Vector3.zero;
             int length = 0;
 
-            foreach (Transform go in Services.GameStateManager.CameraTargets)
+            foreach (CameraTargets ct in Context._cameraTargets)
             {
+                Transform go = ct.Target.transform;
                 PlayerController pc = go.GetComponent<PlayerController>();
                 if ((pc != null
                     && pc.OnDeathHidden[0].activeSelf)
                     || (pc == null))
                 {
-                    total += go.position;
-                    length++;
+                    total += (go.position * ct.Weight);
+                    length += ct.Weight;
                 }
             }
             total /= (length == 0 ? 1 : length);
@@ -96,11 +113,11 @@ public class CameraController : MonoBehaviour
         private float _getMaxDistance()
         {
             float maxDist = 0f;
-            for (int i = 0; i < Services.GameStateManager.CameraTargets.Count; i++)
+            for (int i = 0; i < Context._cameraTargets.Count; i++)
             {
-                for (int j = i + 1; j < Services.GameStateManager.CameraTargets.Count; j++)
+                for (int j = i + 1; j < Context._cameraTargets.Count; j++)
                 {
-                    float temp = Vector3.Distance(Services.GameStateManager.CameraTargets[i].position, Services.GameStateManager.CameraTargets[j].position);
+                    float temp = Vector3.Distance(Context._cameraTargets[i].Target.transform.position, Context._cameraTargets[j].Target.transform.position);
                     if (temp > maxDist)
                     {
                         maxDist = temp;
@@ -133,17 +150,18 @@ public class CameraController : MonoBehaviour
 
     private void _onPlayerDead(PlayerDied pd)
     {
+        EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(pd.Player));
         /// If all players are dead, transition to all dead state
-        for (int i = 0; i < Services.GameStateManager.PlayerControllers.Length; i++)
+        for (int i = 0; i < _cameraTargets.Count; i++)
         {
-            if (Services.GameStateManager.PlayerControllers[i].OnDeathHidden[0].activeSelf
-                && Services.GameStateManager.PlayerControllers[i] != pd.Player.GetComponent<PlayerController>()) return;
+            if (_cameraTargets[i].Target.GetComponent<PlayerController>() != null) return;
         }
         if (_camFSM.CurrentState.GetType().Equals(typeof(TrackingState))) _camFSM.TransitionTo<AllDeadState>();
     }
 
     private void _onPlayerRespawn(PlayerRespawned pr)
     {
+        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(pr.Player, 1));
         /// If a player respawn and they are in all dead state, transition to tracking state
         if (_camFSM.CurrentState.GetType().Equals(typeof(AllDeadState))) _camFSM.TransitionTo<TrackingState>();
     }
@@ -159,12 +177,43 @@ public class CameraController : MonoBehaviour
         return;
     }
 
+    private void _onAddCameraTarget(OnAddCameraTargets ev)
+    {
+        for (int i = 0; i < _cameraTargets.Count; i++)
+        {
+            if (_cameraTargets[i].Target == ev.Target)
+            {
+                _cameraTargets[i].Weight = ev.Weight;
+                return;
+            }
+        }
+        // Else it's a new Target
+        _cameraTargets.Add(new CameraTargets(ev.Target, ev.Weight));
+    }
+
+    private void _onRemoveCameraTarget(OnRemoveCameraTargets ev)
+    {
+        int index = -1;
+        for (int i = 0; i < _cameraTargets.Count; i++)
+        {
+            if (_cameraTargets[i].Target == ev.Target)
+            {
+                index = i;
+                break;
+            }
+        }
+        if (index != -1)
+            _cameraTargets.RemoveAt(index);
+    }
+
     private void OnEnable()
     {
         EventManager.Instance.AddHandler<GameStart>(_onGameStart);
         EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDead);
         EventManager.Instance.AddHandler<PlayerRespawned>(_onPlayerRespawn);
         EventManager.Instance.AddHandler<GameEnd>(_onGameWon);
+        EventManager.Instance.AddHandler<OnAddCameraTargets>(_onAddCameraTarget);
+        EventManager.Instance.AddHandler<OnRemoveCameraTargets>(_onRemoveCameraTarget);
     }
 
     private void OnDisable()
@@ -173,5 +222,7 @@ public class CameraController : MonoBehaviour
         EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDead);
         EventManager.Instance.RemoveHandler<PlayerRespawned>(_onPlayerRespawn);
         EventManager.Instance.RemoveHandler<GameEnd>(_onGameWon);
+        EventManager.Instance.RemoveHandler<OnAddCameraTargets>(_onAddCameraTarget);
+        EventManager.Instance.RemoveHandler<OnRemoveCameraTargets>(_onRemoveCameraTarget);
     }
 }

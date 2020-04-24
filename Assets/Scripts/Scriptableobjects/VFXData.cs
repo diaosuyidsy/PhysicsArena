@@ -50,6 +50,7 @@ public class VFXData : ScriptableObject
     public GameObject ChickenSlowedVFX;
     public GameObject DuckSlowedVFX;
     public GameObject CartExplosionVFX;
+    public GameObject BagelExplosionVFX;
     public GameObject ChickenFoodVFX;
     public GameObject DuckFoodVFX;
     public GameObject FistGunFistTrailVFX;
@@ -66,6 +67,8 @@ public class VFXData : ScriptableObject
     public GameObject[] FistGunHitVFX;
     public GameObject[] HookGunFireVFX;
     public GameObject[] HookGunHitVFX;
+    public GameObject[] HookGunSlingShotVFX;
     public LayerMask HitBlockedLayer;
+    public GameObject[] EmojiVFXs;
 
 }

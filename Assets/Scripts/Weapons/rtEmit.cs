@@ -5,8 +5,7 @@ using UnityEngine;
 
 public class rtEmit : WeaponBase
 {
-    public ObiEmitter WaterBall;
-    public ObiParticleRenderer ParticleRenderer;
+    public WaterGunLine WaterGunLine;
     public GameObject WaterUI;
     public GameObject GunUI;
     public override float HelpAimAngle { get { return _waterGunData.HelpAimAngle; } }
@@ -21,6 +20,7 @@ public class rtEmit : WeaponBase
     }
 
     private State _waterGunState;
+    private HashSet<GameObject> _shootTargets;
 
     protected override void Awake()
     {
@@ -28,6 +28,7 @@ public class rtEmit : WeaponBase
         _waterGunData = WeaponDataBase as WaterGunData;
         _waterGunState = State.Empty;
         _ammo = _waterGunData.MaxAmmo;
+        _shootTargets = new HashSet<GameObject>();
     }
 
     protected override void Update()
@@ -36,13 +37,13 @@ public class rtEmit : WeaponBase
         switch (_waterGunState)
         {
             case State.Shooting:
-                _shootCD += Time.deltaTime;
-                if (_shootCD >= _waterGunData.ShootMaxCD)
-                {
-                    WaterBall.speed = 0f;
-                    _waterGunState = State.Empty;
-                    return;
-                }
+                // _shootCD += Time.deltaTime;
+                // if (_shootCD >= _waterGunData.ShootMaxCD)
+                // {
+                //     _shootCD = 0f;
+                //     _waterGunState = State.Empty;
+                //     return;
+                // }
                 // Statistics: Here we are using raycast for players hit
                 _detectPlayer();
                 _onWeaponUsedOnce();
@@ -57,41 +58,62 @@ public class rtEmit : WeaponBase
     public override void Fire(bool buttondown)
     {
         /// means we pressed down button here
-        if (buttondown)
+        if (buttondown && _waterGunState == State.Empty)
         {
             _waterGunState = State.Shooting;
+            _shootTargets.Clear();
+            WaterGunLine.OnFire(true);
             GunUI.SetActive(true);
-            WaterBall.speed = _waterGunData.Speed;
-            Owner.GetComponent<Rigidbody>().AddForce(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.Impulse);
-            Owner.GetComponent<Rigidbody>().AddForce(Owner.transform.up * _waterGunData.UpThrust, ForceMode.Impulse);
+            Owner.GetComponent<IHittable>().OnImpact(-Owner.transform.forward * _waterGunData.BackFireThrust, ForceMode.VelocityChange, Owner, ImpactType.WaterGun);
             EventManager.Instance.TriggerEvent(new WaterGunFired(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber));
         }
-        else
+        else if (!buttondown && _waterGunState == State.Shooting)
         {
             _waterGunState = State.Empty;
-            WaterBall.speed = 0f;
-            _shootCD = 0f;
+            WaterGunLine.OnFire(false);
         }
     }
 
     private void _detectPlayer()
     {
         // This layermask means we are only looking for Player1Body - Player6Body
-        LayerMask layermask = Services.Config.ConfigData.AllPlayerLayer;
+        LayerMask layermask = _waterGunData.WaterCanHitLayer ^ (1 << Owner.layer);
         RaycastHit hit;
-        if (Physics.Raycast(transform.position, -transform.right, out hit, Mathf.Infinity, layermask))
+
+        for (int i = 0; i < WaterGunLine.segmentCount; i++)
         {
-            // if (hit.transform.GetComponentInParent<IHittable>() != null)
-            //     hit.transform.GetComponentInParent<IHittable>().OnImpact(Owner, ImpactType.WaterGun);
-            if (hit.transform.GetComponentInParent<IHittable>() != null &&
-                !hit.transform.GetComponentInParent<IHittable>().CanBlock(Owner.transform.forward))
-                hit.transform.GetComponentInParent<IHittable>().OnImpact(_waterGunData.WaterForce * Owner.transform.forward,
-                ForceMode.VelocityChange,
-                Owner,
-                ImpactType.WaterGun);
-            else if (hit.transform.GetComponentInParent<IHittable>() != null)
+            Vector3 _currentPosition = transform.position;
+            float blockLength = (_waterGunData.WaterCastDistance + _waterGunData.WaterCastRadius) / WaterGunLine.segmentCount;
+            for (int j = 0; j < i; j++)
             {
-                hit.transform.GetComponentInParent<IHittable>().OnImpact(Owner, ImpactType.WaterGun);
+                _currentPosition += WaterGunLine.ResultVectors[j] * blockLength;
+            }
+            if (Physics.SphereCast(_currentPosition, _waterGunData.WaterCastRadius, WaterGunLine.ResultVectors[i], out hit, blockLength, layermask))
+            {
+                GameObject target = null;
+                if (hit.transform.GetComponentInParent<WeaponBase>() != null)
+                {
+                    target = hit.transform.GetComponentInParent<WeaponBase>().Owner;
+                }
+                else if (hit.transform.GetComponentInParent<IHittable>() != null)
+                {
+                    target = hit.transform.GetComponentInParent<IHittable>().GetGameObject();
+                }
+                if (target == null) return;
+                // if (_shootTargets.Contains(target)) return;
+                // _shootTargets.Add(target);
+                if (!target.GetComponent<IHittable>().CanBlock(Owner.transform.forward))
+                {
+                    float dist = Vector3.Distance(hit.transform.position, transform.position);
+                    float distPer = dist / _waterGunData.WaterCastDistance;
+                    float forceMultiplier = _waterGunData.WaterForceDecreaseGraph.Evaluate(distPer);
+                    Vector3 force = _waterGunData.WaterForce * forceMultiplier * Owner.transform.forward;
+                    target.GetComponent<IHittable>().OnImpact(force,
+                            ForceMode.VelocityChange,
+                            Owner,
+                            ImpactType.WaterGun);
+                }
+                break;
             }
         }
     }
@@ -105,17 +127,16 @@ public class rtEmit : WeaponBase
     protected override void _onWeaponDespawn()
     {
         _shootCD = 0f;
-        WaterBall.speed = 0f;
         _ammo = _waterGunData.MaxAmmo;
         ChangeAmmoUI();
-        EventManager.Instance.TriggerEvent(new ObjectDespawned(gameObject));
-        gameObject.SetActive(false);
+        base._onWeaponDespawn();
     }
 
-    public override void OnDrop()
+    public override void OnDrop(bool customForce, Vector3 force)
     {
-        base.OnDrop();
-        Fire(false);
+        base.OnDrop(customForce, force);
+        _waterGunState = State.Empty;
+        WaterGunLine.OnFire(false);
         GunUI.SetActive(false);
     }
 }

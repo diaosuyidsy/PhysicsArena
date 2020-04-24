@@ -40,8 +40,33 @@ public class CanonFeelData : MonoBehaviour
     public Color MarkAlertColor;
     public Color MarkFallColor;
 
-    public float BombVerticalSpeedPercentage;
+    public Material WrapRedMat;
+    public Material WrapBlueMat;
+    public Material WrapNMat;
 
+
+
+    public float DeliverFallTime;
+    public float DeliverMoveAcTime;
+    public float DeliverMoveStableTime;
+    public float DeliverMoveDcTime;
+    
+
+    public float CabelFirstSegAcTime;
+    public float CabelFirstSegStableTime;
+    public float CabelFirstSegDcTime;
+
+    public float CabelSecondSegTime;
+
+    public float CabelThirdSegAcTime;
+    public float CabelThirdSegStableTime;
+
+    public float DeliverJumpTime;
+    public float DeliverJumpVerSpeed;
+    public float DeliverJumpEndHoriSpeed;
+    public int DeliverJumpEndExtraSpin;
+
+    public float BombVerticalSpeedPercentage;
 
     // Start is called before the first frame update
     void Start()

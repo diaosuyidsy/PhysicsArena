@@ -1,0 +1,164 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e99ea919a9f09a54881c6d3aef646f08, type: 3}
+  m_Name: ConfigData_BackUP
+  m_EditorClassIdentifier: 
+  PlayerPrefabs:
+  - {fileID: 3011221786973745251, guid: 6b186434db04e3840b24d15ab1afbcd9, type: 3}
+  - {fileID: 689603609705083787, guid: c3a9823089c243046bfb58105832471b, type: 3}
+  - {fileID: 5558427593323527467, guid: 75d5097c695336e4586b61cb6af6c3b9, type: 3}
+  - {fileID: 7756342183198570400, guid: 3ae30e62b2908a64a9309eddf79c1fb7, type: 3}
+  - {fileID: 3447822839309094982, guid: 834b609c100ad3a469c9338c35de6898, type: 3}
+  - {fileID: 4266257263449884574, guid: 9c4c9437c299eba4b9edf9a30a04035e, type: 3}
+  AllPlayerLayer:
+    serializedVersion: 2
+    m_Bits: 105984
+  IndexToName:
+  - Purple
+  - Blue
+  - Green
+  - Yellow
+  - Pink
+  - Orange
+  IndexToColor:
+  - {r: 0.80392164, g: 0.28235295, b: 0.8862746, a: 1}
+  - {r: 0.25490198, g: 0.4039216, b: 1, a: 1}
+  - {r: 0.29411766, g: 1, b: 0.54901963, a: 1}
+  - {r: 1, g: 0.9058824, b: 0.4156863, a: 1}
+  - {r: 1, g: 0.52156866, b: 0.6509804, a: 1}
+  - {r: 1, g: 0.6392157, b: 0.44705886, a: 1}
+  TeamColor:
+  - {r: 0.9607843, g: 0.10588237, b: 0.49995545, a: 1}
+  - {r: 0.25490198, g: 0.4039216, b: 1, a: 1}
+  FrameYPosition:
+  - 356.5
+  - 214.5
+  - 72.5
+  - -69.5
+  - -211.5
+  - -353.5
+  StatsInfo:
+  - StatisticsTitle: The Bungee Lover
+    StatisticsIntro1: 'Wandered Off the Map: '
+    StatisticsIntro2: ' Times!'
+    StatisticIcon: {fileID: 21300000, guid: f8860ada5794f494aae634e02183baff, type: 3}
+    Weight: 15
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: The Hitbird 47
+    StatisticsIntro1: 'Killed: '
+    StatisticsIntro2: ' Other Birdies In Total!'
+    StatisticIcon: {fileID: 21300000, guid: 70251928d34dd1249b988f7262e1d9bd, type: 3}
+    Weight: 15
+    ExcludeFromMVPCalculation: 0
+  - StatisticsTitle: The Spy
+    StatisticsIntro1: 'Murdered: '
+    StatisticsIntro2: ' Teammates!'
+    StatisticIcon: {fileID: 21300000, guid: ad5b43ee9280a53428ee5180d978e116, type: 3}
+    Weight: 30
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: The Driver
+    StatisticsIntro1: 'Stayed Inside the Payload for: '
+    StatisticsIntro2: ' Seconds!'
+    StatisticIcon: {fileID: 21300000, guid: 720cd135189e5474e9454fd18845d06b, type: 3}
+    Weight: 1
+    ExcludeFromMVPCalculation: 0
+  - StatisticsTitle: The Block Master
+    StatisticsIntro1: 'Successfully Blocked: '
+    StatisticsIntro2: ' Attacks!'
+    StatisticIcon: {fileID: 21300000, guid: be07a5862ac7ed04c982f289ae3f72e4, type: 3}
+    Weight: 20
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: The Iron Dumbass
+    StatisticsIntro1: 'Attacks Were Blocked: '
+    StatisticsIntro2: ' Times!'
+    StatisticIcon: {fileID: 21300000, guid: b994ce331b38c214daa50a6ba2e0b83f, type: 3}
+    Weight: 20
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: The Delivery Guy
+    StatisticsIntro1: 'Delivered: '
+    StatisticsIntro2: ' Food!'
+    StatisticIcon: {fileID: 21300000, guid: d19397b424220b743b8f281fba23d5e9, type: 3}
+    Weight: 50
+    ExcludeFromMVPCalculation: 0
+  - StatisticsTitle: 'The Firefighter:'
+    StatisticsIntro1: 'Squirted: '
+    StatisticsIntro2: ' Birdies to Death!'
+    StatisticIcon: {fileID: 21300000, guid: 8d4419e15e39a5f4fa0d273e530a8173, type: 3}
+    Weight: 4
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Hooker:'
+    StatisticsIntro1: 'Hooked: '
+    StatisticsIntro2: ' Birdies with Hook Gun!'
+    StatisticIcon: {fileID: 21300000, guid: bc302ae83af516c46930f34c9b10fec0, type: 3}
+    Weight: 7
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Sucker:'
+    StatisticsIntro1: 'Sucked: '
+    StatisticsIntro2: ' Birdies with Gravity Gun!'
+    StatisticIcon: {fileID: 21300000, guid: cf39f204650f0b84bb1730b4a470858b, type: 3}
+    Weight: 7
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Boxer:'
+    StatisticsIntro1: 'Punched: '
+    StatisticsIntro2: ' Birdies with Fist Gun!'
+    StatisticIcon: {fileID: 21300000, guid: 2cdfa1f0ff1cf334da3290f02dc27230, type: 3}
+    Weight: 3.5
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Terrorist:'
+    StatisticsIntro1: 'Bombed: '
+    StatisticsIntro2: ' Birdies with Bazooka Gun'
+    StatisticIcon: {fileID: 21300000, guid: 6d2a3af924647024784310b70934f0c6, type: 3}
+    Weight: 40
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Greedy:'
+    StatisticsIntro1: 'Picked Up: '
+    StatisticsIntro2: ' Weapons in Total!'
+    StatisticIcon: {fileID: 21300000, guid: edb42ab56c357b7489e1b2fc9872ab67, type: 3}
+    Weight: 0.5
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Victim:'
+    StatisticsIntro1: 'Died to Enemies'' Attacks: '
+    StatisticsIntro2: ' Times!'
+    StatisticIcon: {fileID: 21300000, guid: 3c6a5e67b70cb9444b3ed5101f275dc4, type: 3}
+    Weight: 10
+    ExcludeFromMVPCalculation: 1
+  - StatisticsTitle: 'The Melee Master:'
+    StatisticsIntro1: 'Punched: '
+    StatisticsIntro2: ' Birdies with Their Bare Hands!'
+    StatisticIcon: {fileID: 21300000, guid: c1307b8489b4b854ea540012ae35ad12, type: 3}
+    Weight: 1
+    ExcludeFromMVPCalculation: 1
+  UselessInfo:
+    StatisticsTitle: The Useless
+    StatisticsIntro1: Did Nothing at All
+    StatisticsIntro2: 
+    StatisticIcon: {fileID: 21300000, guid: 149de4bd67d253d48ad427464b09d3e1, type: 3}
+    Weight: 0
+    ExcludeFromMVPCalculation: 1
+  StatisticsTitleAnimationDuration: 1
+  StatisticsNomineeAnimationDuration: 0.5
+  StatisticsRecordAnimationDuration: 1
+  StatisStayTime: 3
+  MVPPodiumMoveDuration: 1
+  MVPPodiumMoveEase: 6
+  MVPSpotLightDuration: 0.2
+  MVPSpotLightIntensity: 5
+  MVPSpotLightEase: 6
+  MVPSpotLightToLandDuration: 0.5
+  MVPLandToWordShowDuration: 0.5
+  MVPToUIMoveInDuration: 0.5
+  MVPScaleDownDuration: 0.5
+  FrameMoveInDuration: 0.2
+  MVPBadgePrefab: {fileID: 3907485087153655307, guid: ccec8092a6e8b984e98aa99ac353102a,
+    type: 3}
+  FightString: FIGHT
+  ReadyString: READY

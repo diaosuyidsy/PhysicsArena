@@ -255,73 +255,73 @@ public class NetworkGameStateManager : NetworkBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
-            EventManager.Instance.AddHandler<ButtonPressed>(_onButtonPressed);
-            Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = false;
-            Context.RpcMVP();
-            for (int i = 0; i < Context._playersHolder.childCount; i++)
-            {
-                PlayerControllerMirror playercontroller = Context._playersHolder.GetChild(i).GetComponentInChildren<PlayerControllerMirror>(true);
-                playercontroller.enabled = false;
-                playercontroller.GetComponent<Rigidbody>().isKinematic = false;
-            }
-            Context._MVPDisplay.gameObject.SetActive(true);
-            Context._MVPCamera.gameObject.SetActive(true);
-            Context._MVPPlayerHolder.gameObject.SetActive(true);
-            Context._MVPSpotLight.gameObject.SetActive(true);
-            Context._MVPPodium.gameObject.SetActive(true);
-            int MVPColorIndex = Context.GetColorIndexFromNetID(NetworkServices.StatisticsManager.GetMVPRewiredID());
-            Transform MVPChicken = Context._MVPPlayerHolder.GetChild(MVPColorIndex);
-            MVPChicken.gameObject.SetActive(true);
-            MVPChicken.GetComponent<Animator>().SetTrigger("Enter");
-            Color MVPColor = _configData.IndexToColor[MVPColorIndex];
-            MVPColor.a = 0f;
-            Context._MVPTitle.GetComponent<TextMeshProUGUI>().color = MVPColor;
-            Sequence seq = DOTween.Sequence();
-            seq.Append(Context._MVPPodium.DOLocalMoveY(0.7f, _configData.MVPPodiumMoveDuration).SetEase(_configData.MVPPodiumMoveEase).SetRelative(true)
-                .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLandRiseAudioClip)));
-            seq.Append(Context._MVPSpotLight.GetComponent<Light>().DOIntensity(_configData.MVPSpotLightIntensity, _configData.MVPSpotLightDuration).SetEase(_configData.MVPSpotLightEase).SetLoops(3, LoopType.Yoyo)
-            .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLightFlickerAudioClip)));
-            seq.AppendInterval(_configData.MVPSpotLightToLandDuration);
-            seq.Append(MVPChicken.DOLocalMoveY(-3.116f, 0.2f).SetEase(Ease.InCirc).SetRelative(true)
-            .OnComplete(() =>
-            {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBirdLandAudioClip);
-                Context._MVPCamera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
-                MVPChicken.GetComponent<Animator>().SetTrigger("Pose");
-            }));
-            seq.AppendInterval(_configData.MVPLandToWordShowDuration);
-            seq.Append(Context._MVPTitle.DOScale(5f, 0.2f).From().SetEase(Ease.OutCirc).SetRelative(true).OnComplete(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBadgeStampAudioClip)));
-            seq.Join(Context._MVPTitle.GetComponent<TextMeshProUGUI>().DOFade(1f, 0.2f));
-            seq.AppendInterval(_configData.MVPToUIMoveInDuration);
-            seq.Append(Context._MVPPlayerHolder.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
-            seq.Join(Context._MVPSpotLight.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
-            seq.Join(Context._MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
-            seq.Join(Context._MVPTitle.DOLocalMove(new Vector3(-587f, 187f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
-            seq.Join(Context._MVPTitle.DOScale(0.6f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
-            var statsresult = NetworkServices.StatisticsManager.GetStatisticResult();
-            /// Move in all players 
-            GameObject.Instantiate(_configData.MVPBadgePrefab, Context._statisticUIHolder.GetChild(MVPColorIndex));
-            for (int i = 0; i < Context._playersHolder.childCount; i++)
-            {
-                int colorindex = Utility.GetColorIndexFromPlayer(Context._playersHolder.GetChild(i).gameObject);
-                int netID = Context._playersHolder.GetChild(i).GetComponent<PlayerControllerMirror>().PlayerNumber;
-                Transform frame = Context._statisticUIHolder.GetChild(colorindex);
-                frame.GetChild(0).GetComponent<Image>().sprite = statsresult[netID].StatisticIcon;
-                frame.GetChild(1).GetComponent<TextMeshProUGUI>().text = statsresult[netID].StatisticName;
-                frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[netID].StatisticsInformation;
-            }
-            for (int i = 0; i < Context._playersHolder.childCount; i++)
-            {
-                int x = Utility.GetColorIndexFromPlayer(Context._playersHolder.GetChild(i).gameObject);
-                Context._statisticUIHolder.GetChild(x).DOLocalMoveY(_configData.FrameYPosition[i], 0f);
-                seq.Append(Context._statisticUIHolder.GetChild(x).DOScale(0.7f, _configData.FrameMoveInDuration)
-                .SetEase(Ease.OutBack)
-                .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
-            }
-            seq.Append(Context._holdAText.DOText("Next Map", 0.2f).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
-            seq.Join(Context._holdBText.DOText("Menu", 0.2f).OnPlay(() => Context._holdBText.gameObject.SetActive(true)));
-            seq.Join(Context._holdYText.DOText("Replay", 0.2f).OnPlay(() => Context._holdYText.gameObject.SetActive(true)));
-            seq.AppendCallback(() => _canHold = true);
+            // EventManager.Instance.AddHandler<ButtonPressed>(_onButtonPressed);
+            // Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = false;
+            // Context.RpcMVP();
+            // for (int i = 0; i < Context._playersHolder.childCount; i++)
+            // {
+            //     PlayerControllerMirror playercontroller = Context._playersHolder.GetChild(i).GetComponentInChildren<PlayerControllerMirror>(true);
+            //     playercontroller.enabled = false;
+            //     playercontroller.GetComponent<Rigidbody>().isKinematic = false;
+            // }
+            // Context._MVPDisplay.gameObject.SetActive(true);
+            // Context._MVPCamera.gameObject.SetActive(true);
+            // Context._MVPPlayerHolder.gameObject.SetActive(true);
+            // Context._MVPSpotLight.gameObject.SetActive(true);
+            // Context._MVPPodium.gameObject.SetActive(true);
+            // int MVPColorIndex = Context.GetColorIndexFromNetID(NetworkServices.StatisticsManager.GetMVPRewiredID());
+            // Transform MVPChicken = Context._MVPPlayerHolder.GetChild(MVPColorIndex);
+            // MVPChicken.gameObject.SetActive(true);
+            // MVPChicken.GetComponent<Animator>().SetTrigger("Enter");
+            // Color MVPColor = _configData.IndexToColor[MVPColorIndex];
+            // MVPColor.a = 0f;
+            // Context._MVPTitle.GetComponent<TextMeshProUGUI>().color = MVPColor;
+            // Sequence seq = DOTween.Sequence();
+            // seq.Append(Context._MVPPodium.DOLocalMoveY(0.7f, _configData.MVPPodiumMoveDuration).SetEase(_configData.MVPPodiumMoveEase).SetRelative(true)
+            //     .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLandRiseAudioClip)));
+            // seq.Append(Context._MVPSpotLight.GetComponent<Light>().DOIntensity(_configData.MVPSpotLightIntensity, _configData.MVPSpotLightDuration).SetEase(_configData.MVPSpotLightEase).SetLoops(3, LoopType.Yoyo)
+            // .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLightFlickerAudioClip)));
+            // seq.AppendInterval(_configData.MVPSpotLightToLandDuration);
+            // seq.Append(MVPChicken.DOLocalMoveY(-3.116f, 0.2f).SetEase(Ease.InCirc).SetRelative(true)
+            // .OnComplete(() =>
+            // {
+            //     Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBirdLandAudioClip);
+            //     Context._MVPCamera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
+            //     MVPChicken.GetComponent<Animator>().SetTrigger("Pose");
+            // }));
+            // seq.AppendInterval(_configData.MVPLandToWordShowDuration);
+            // seq.Append(Context._MVPTitle.DOScale(5f, 0.2f).From().SetEase(Ease.OutCirc).SetRelative(true).OnComplete(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBadgeStampAudioClip)));
+            // seq.Join(Context._MVPTitle.GetComponent<TextMeshProUGUI>().DOFade(1f, 0.2f));
+            // seq.AppendInterval(_configData.MVPToUIMoveInDuration);
+            // seq.Append(Context._MVPPlayerHolder.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+            // seq.Join(Context._MVPSpotLight.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+            // seq.Join(Context._MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+            // seq.Join(Context._MVPTitle.DOLocalMove(new Vector3(-587f, 187f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+            // seq.Join(Context._MVPTitle.DOScale(0.6f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+            // var statsresult = NetworkServices.StatisticsManager.GetStatisticResult();
+            // /// Move in all players 
+            // GameObject.Instantiate(_configData.MVPBadgePrefab, Context._statisticUIHolder.GetChild(MVPColorIndex));
+            // for (int i = 0; i < Context._playersHolder.childCount; i++)
+            // {
+            //     int colorindex = Utility.GetColorIndexFromPlayer(Context._playersHolder.GetChild(i).gameObject);
+            //     int netID = Context._playersHolder.GetChild(i).GetComponent<PlayerControllerMirror>().PlayerNumber;
+            //     Transform frame = Context._statisticUIHolder.GetChild(colorindex);
+            //     frame.GetChild(0).GetComponent<Image>().sprite = statsresult[netID].StatisticIcon;
+            //     frame.GetChild(1).GetComponent<TextMeshProUGUI>().text = statsresult[netID].StatisticName;
+            //     frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[netID].StatisticsInformation;
+            // }
+            // for (int i = 0; i < Context._playersHolder.childCount; i++)
+            // {
+            //     int x = Utility.GetColorIndexFromPlayer(Context._playersHolder.GetChild(i).gameObject);
+            //     Context._statisticUIHolder.GetChild(x).DOLocalMoveY(_configData.FrameYPosition[i], 0f);
+            //     seq.Append(Context._statisticUIHolder.GetChild(x).DOScale(0.7f, _configData.FrameMoveInDuration)
+            //     .SetEase(Ease.OutBack)
+            //     .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
+            // }
+            // seq.Append(Context._holdAText.DOText("Next Map", 0.2f).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
+            // seq.Join(Context._holdBText.DOText("Menu", 0.2f).OnPlay(() => Context._holdBText.gameObject.SetActive(true)));
+            // seq.Join(Context._holdYText.DOText("Replay", 0.2f).OnPlay(() => Context._holdYText.gameObject.SetActive(true)));
+            // seq.AppendCallback(() => _canHold = true);
         }
 
         private void _onButtonPressed(ButtonPressed ev)
@@ -369,70 +369,70 @@ public class NetworkGameStateManager : NetworkBehaviour
     [ClientRpc]
     private void RpcMVP()
     {
-        Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = false;
-        for (int i = 0; i < _playersHolder.childCount; i++)
-        {
-            PlayerControllerMirror playercontroller = _playersHolder.GetChild(i).GetComponentInChildren<PlayerControllerMirror>(true);
-            playercontroller.enabled = false;
-            playercontroller.GetComponent<Rigidbody>().isKinematic = false;
-        }
-        _MVPDisplay.gameObject.SetActive(true);
-        _MVPCamera.gameObject.SetActive(true);
-        _MVPPlayerHolder.gameObject.SetActive(true);
-        _MVPSpotLight.gameObject.SetActive(true);
-        _MVPPodium.gameObject.SetActive(true);
-        int MVPColorIndex = GetColorIndexFromNetID(NetworkServices.StatisticsManager.GetMVPRewiredID());
-        Transform MVPChicken = _MVPPlayerHolder.GetChild(MVPColorIndex);
-        MVPChicken.gameObject.SetActive(true);
-        MVPChicken.GetComponent<Animator>().SetTrigger("Enter");
-        Color MVPColor = _configData.IndexToColor[MVPColorIndex];
-        MVPColor.a = 0f;
-        _MVPTitle.GetComponent<TextMeshProUGUI>().color = MVPColor;
-        Sequence seq = DOTween.Sequence();
-        seq.Append(_MVPPodium.DOLocalMoveY(0.7f, _configData.MVPPodiumMoveDuration).SetEase(_configData.MVPPodiumMoveEase).SetRelative(true)
-            .OnPlay(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLandRiseAudioClip)));
-        seq.Append(_MVPSpotLight.GetComponent<Light>().DOIntensity(_configData.MVPSpotLightIntensity, _configData.MVPSpotLightDuration).SetEase(_configData.MVPSpotLightEase).SetLoops(3, LoopType.Yoyo)
-        .OnPlay(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLightFlickerAudioClip)));
-        seq.AppendInterval(_configData.MVPSpotLightToLandDuration);
-        seq.Append(MVPChicken.DOLocalMoveY(-3.116f, 0.2f).SetEase(Ease.InCirc).SetRelative(true)
-        .OnComplete(() =>
-        {
-            _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBirdLandAudioClip);
-            _MVPCamera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
-            MVPChicken.GetComponent<Animator>().SetTrigger("Pose");
-        }));
-        seq.AppendInterval(_configData.MVPLandToWordShowDuration);
-        seq.Append(_MVPTitle.DOScale(5f, 0.2f).From().SetEase(Ease.OutCirc).SetRelative(true).OnComplete(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBadgeStampAudioClip)));
-        seq.Join(_MVPTitle.GetComponent<TextMeshProUGUI>().DOFade(1f, 0.2f));
-        seq.AppendInterval(_configData.MVPToUIMoveInDuration);
-        seq.Append(_MVPPlayerHolder.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
-        seq.Join(_MVPSpotLight.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
-        seq.Join(_MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
-        seq.Join(_MVPTitle.DOLocalMove(new Vector3(-587f, 187f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
-        seq.Join(_MVPTitle.DOScale(0.6f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
-        var statsresult = NetworkServices.StatisticsManager.GetStatisticResult();
-        /// Move in all players 
-        GameObject.Instantiate(_configData.MVPBadgePrefab, _statisticUIHolder.GetChild(MVPColorIndex));
-        for (int i = 0; i < _playersHolder.childCount; i++)
-        {
-            int colorindex = Utility.GetColorIndexFromPlayer(_playersHolder.GetChild(i).gameObject);
-            int netID = _playersHolder.GetChild(i).GetComponent<PlayerControllerMirror>().PlayerNumber;
-            Transform frame = _statisticUIHolder.GetChild(colorindex);
-            frame.GetChild(0).GetComponent<Image>().sprite = statsresult[netID].StatisticIcon;
-            frame.GetChild(1).GetComponent<TextMeshProUGUI>().text = statsresult[netID].StatisticName;
-            frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[netID].StatisticsInformation;
-        }
-        for (int i = 0; i < _playersHolder.childCount; i++)
-        {
-            int x = Utility.GetColorIndexFromPlayer(_playersHolder.GetChild(i).gameObject);
-            _statisticUIHolder.GetChild(x).DOLocalMoveY(_configData.FrameYPosition[i], 0f);
-            seq.Append(_statisticUIHolder.GetChild(x).DOScale(0.7f, _configData.FrameMoveInDuration)
-            .SetEase(Ease.OutBack)
-            .OnPlay(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
-        }
-        seq.Append(_holdAText.DOText("Next Map", 0.2f).OnPlay(() => _holdAText.gameObject.SetActive(true)));
-        seq.Join(_holdBText.DOText("Menu", 0.2f).OnPlay(() => _holdBText.gameObject.SetActive(true)));
-        seq.Join(_holdYText.DOText("Replay", 0.2f).OnPlay(() => _holdYText.gameObject.SetActive(true)));
+        // Camera.main.GetComponent<NetworkDarkCornerEffect>().enabled = false;
+        // for (int i = 0; i < _playersHolder.childCount; i++)
+        // {
+        //     PlayerControllerMirror playercontroller = _playersHolder.GetChild(i).GetComponentInChildren<PlayerControllerMirror>(true);
+        //     playercontroller.enabled = false;
+        //     playercontroller.GetComponent<Rigidbody>().isKinematic = false;
+        // }
+        // _MVPDisplay.gameObject.SetActive(true);
+        // _MVPCamera.gameObject.SetActive(true);
+        // _MVPPlayerHolder.gameObject.SetActive(true);
+        // _MVPSpotLight.gameObject.SetActive(true);
+        // _MVPPodium.gameObject.SetActive(true);
+        // int MVPColorIndex = GetColorIndexFromNetID(NetworkServices.StatisticsManager.GetMVPRewiredID());
+        // Transform MVPChicken = _MVPPlayerHolder.GetChild(MVPColorIndex);
+        // MVPChicken.gameObject.SetActive(true);
+        // MVPChicken.GetComponent<Animator>().SetTrigger("Enter");
+        // Color MVPColor = _configData.IndexToColor[MVPColorIndex];
+        // MVPColor.a = 0f;
+        // _MVPTitle.GetComponent<TextMeshProUGUI>().color = MVPColor;
+        // Sequence seq = DOTween.Sequence();
+        // seq.Append(_MVPPodium.DOLocalMoveY(0.7f, _configData.MVPPodiumMoveDuration).SetEase(_configData.MVPPodiumMoveEase).SetRelative(true)
+        //     .OnPlay(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLandRiseAudioClip)));
+        // seq.Append(_MVPSpotLight.GetComponent<Light>().DOIntensity(_configData.MVPSpotLightIntensity, _configData.MVPSpotLightDuration).SetEase(_configData.MVPSpotLightEase).SetLoops(3, LoopType.Yoyo)
+        // .OnPlay(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPLightFlickerAudioClip)));
+        // seq.AppendInterval(_configData.MVPSpotLightToLandDuration);
+        // seq.Append(MVPChicken.DOLocalMoveY(-3.116f, 0.2f).SetEase(Ease.InCirc).SetRelative(true)
+        // .OnComplete(() =>
+        // {
+        //     _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBirdLandAudioClip);
+        //     _MVPCamera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
+        //     MVPChicken.GetComponent<Animator>().SetTrigger("Pose");
+        // }));
+        // seq.AppendInterval(_configData.MVPLandToWordShowDuration);
+        // seq.Append(_MVPTitle.DOScale(5f, 0.2f).From().SetEase(Ease.OutCirc).SetRelative(true).OnComplete(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPBadgeStampAudioClip)));
+        // seq.Join(_MVPTitle.GetComponent<TextMeshProUGUI>().DOFade(1f, 0.2f));
+        // seq.AppendInterval(_configData.MVPToUIMoveInDuration);
+        // seq.Append(_MVPPlayerHolder.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+        // seq.Join(_MVPSpotLight.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+        // seq.Join(_MVPPodium.DOLocalMoveX(-1.022f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear).SetRelative(true));
+        // seq.Join(_MVPTitle.DOLocalMove(new Vector3(-587f, 187f), _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+        // seq.Join(_MVPTitle.DOScale(0.6f, _configData.MVPScaleDownDuration).SetEase(Ease.Linear));
+        // var statsresult = NetworkServices.StatisticsManager.GetStatisticResult();
+        // /// Move in all players 
+        // GameObject.Instantiate(_configData.MVPBadgePrefab, _statisticUIHolder.GetChild(MVPColorIndex));
+        // for (int i = 0; i < _playersHolder.childCount; i++)
+        // {
+        //     int colorindex = Utility.GetColorIndexFromPlayer(_playersHolder.GetChild(i).gameObject);
+        //     int netID = _playersHolder.GetChild(i).GetComponent<PlayerControllerMirror>().PlayerNumber;
+        //     Transform frame = _statisticUIHolder.GetChild(colorindex);
+        //     frame.GetChild(0).GetComponent<Image>().sprite = statsresult[netID].StatisticIcon;
+        //     frame.GetChild(1).GetComponent<TextMeshProUGUI>().text = statsresult[netID].StatisticName;
+        //     frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[netID].StatisticsInformation;
+        // }
+        // for (int i = 0; i < _playersHolder.childCount; i++)
+        // {
+        //     int x = Utility.GetColorIndexFromPlayer(_playersHolder.GetChild(i).gameObject);
+        //     _statisticUIHolder.GetChild(x).DOLocalMoveY(_configData.FrameYPosition[i], 0f);
+        //     seq.Append(_statisticUIHolder.GetChild(x).DOScale(0.7f, _configData.FrameMoveInDuration)
+        //     .SetEase(Ease.OutBack)
+        //     .OnPlay(() => _gameManager.GetComponent<AudioSource>().PlayOneShot(NetworkServices.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
+        // }
+        // seq.Append(_holdAText.DOText("Next Map", 0.2f).OnPlay(() => _holdAText.gameObject.SetActive(true)));
+        // seq.Join(_holdBText.DOText("Menu", 0.2f).OnPlay(() => _holdBText.gameObject.SetActive(true)));
+        // seq.Join(_holdYText.DOText("Replay", 0.2f).OnPlay(() => _holdYText.gameObject.SetActive(true)));
     }
 
     private class WinState : GameState

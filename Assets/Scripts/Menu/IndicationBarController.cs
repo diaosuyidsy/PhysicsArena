@@ -23,7 +23,7 @@ public class IndicationBarController : MonoBehaviour
         get
         {
             int result = 0;
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < 2; i++)
             {
                 if (_inTheCircle[i])
                 {
@@ -38,7 +38,7 @@ public class IndicationBarController : MonoBehaviour
         get
         {
             int result = 0;
-            for (int i = 3; i < 6; i++)
+            for (int i = 2; i < 4; i++)
             {
                 if (_inTheCircle[i])
                 {
@@ -54,7 +54,7 @@ public class IndicationBarController : MonoBehaviour
 
     private void Awake()
     {
-        _inTheCircle = new bool[6];
+        _inTheCircle = new bool[4];
     }
 
     private void Update()

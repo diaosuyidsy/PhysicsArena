@@ -125,13 +125,26 @@ public class NetworkRtBazooka : NetworkWeaponBase
                     // ih.OnImpact(_bazookaData.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);
                 }
 
-                EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerControllerMirror>().PlayerNumber, affectedPlayers));
+                CmdTriggerBazookaBombed(gameObject, Owner);
                 Owner.GetComponent<IHittableNetwork>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
                 _resetThrowMark();
                 CmdReset();
                 // _onWeaponUsedOnce();
             }
         }
+    }
+
+    [Command]
+    private void CmdTriggerBazookaBombed(GameObject gun, GameObject owner)
+    {
+        EventManager.Instance.TriggerEvent(new BazookaBombed(gun, owner, owner.GetComponent<PlayerControllerMirror>().PlayerNumber, null));
+        RpcTriggerBazookaBombed(gun, owner);
+    }
+
+    [ClientRpc]
+    private void RpcTriggerBazookaBombed(GameObject gun, GameObject owner)
+    {
+        EventManager.Instance.TriggerEvent(new BazookaBombed(gun, owner, owner.GetComponent<PlayerControllerMirror>().PlayerNumber, null));
     }
 
     [Command]

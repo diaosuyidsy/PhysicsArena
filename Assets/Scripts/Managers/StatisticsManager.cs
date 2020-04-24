@@ -37,7 +37,7 @@ public class StatisticsManager
         }
         EventManager.Instance.AddHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
-        EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);
+        EventManager.Instance.AddHandler<BagelSent>(_onFoodDelievered);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.AddHandler<HookBlocked>(_onHookGUnBlocked);
         EventManager.Instance.AddHandler<FistGunBlocked>(_onFistGunBlocked);
@@ -123,14 +123,19 @@ public class StatisticsManager
     private void _onPlayerDied(PlayerDied pd)
     {
         /// Suicide Record
-        if (!pd.HitterIsValid || pd.PlayerHitter == null || pd.PlayerHitter.GetComponent<PlayerController>() == null)
+        if (!pd.HitterIsValid || pd.PlayerHitter == null)
         {
             AllRecords[0][pd.PlayerNumber]++;
             return;
         }
+        /// SlingShot Record
+        if (pd.PlayerHitter.name.ToLower() == "slingshot")
+        {
+            return;
+        }
 
         /// Teammate Murder Record
-        if (pd.HitterIsValid && pd.Player.tag == pd.PlayerHitter.tag) AllRecords[2][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+        if (pd.HitterIsValid && pd.Player.tag == pd.PlayerHitter.tag && pd.Player != pd.PlayerHitter) AllRecords[2][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
         /// Kill Record
         if (pd.HitterIsValid && pd.Player.tag != pd.PlayerHitter.tag)
         {
@@ -171,9 +176,10 @@ public class StatisticsManager
         }
     }
 
-    private void _onFoodDelievered(FoodDelivered fd)
+    private void _onFoodDelievered(BagelSent ev)
     {
-        AllRecords[6][fd.DeliverPlayerNumber]++;
+        if (ev.Deliverer == null || ev.Deliverer.GetComponent<PlayerController>() == null) return;
+        AllRecords[6][ev.Deliverer.GetComponent<PlayerController>().PlayerNumber]++;
     }
 
     private void _onObjectPickedUp(ObjectPickedUp op)
@@ -185,7 +191,7 @@ public class StatisticsManager
     {
         EventManager.Instance.RemoveHandler<PlayerDied>(_onPlayerDied);
         EventManager.Instance.RemoveHandler<PlayerHit>(_onPlayerHit);
-        EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelievered);
+        EventManager.Instance.RemoveHandler<BagelSent>(_onFoodDelievered);
         EventManager.Instance.RemoveHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.RemoveHandler<HookBlocked>(_onHookGUnBlocked);
         EventManager.Instance.RemoveHandler<FistGunBlocked>(_onFistGunBlocked);

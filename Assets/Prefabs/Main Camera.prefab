@@ -12,12 +12,9 @@ GameObject:
   - component: {fileID: 20459301899154910}
   - component: {fileID: 81368121330123058}
   - component: {fileID: 114089129262350066}
-  - component: {fileID: 114076445684659868}
   - component: {fileID: 114982356382100536}
   - component: {fileID: 82697173938787356}
   - component: {fileID: 114322385920369306}
-  - component: {fileID: 3146859649163388282}
-  - component: {fileID: 6438094797353942965}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -37,7 +34,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 9018456091236032183}
-  - {fileID: 2289988743891982879}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
@@ -106,30 +102,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   FollowTarget: {x: 0, y: 0, z: 0}
   CameraData: {fileID: 11400000, guid: 3ac4fad23cad1e643b8c7c96f8a2e4d5, type: 2}
---- !u!114 &114076445684659868
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1995234145574352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90d1945bbd58b4cf98eb19621dd83cdd, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  particleRenderers:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  autoupdate: 1
-  blurRadius: 0.02
-  thicknessCutoff: 1.2
-  colorMaterial: {fileID: 2100000, guid: d16ca3f3b0ff44edb8bc98af8c286687, type: 2}
-  fluidMaterial: {fileID: 2100000, guid: 0247f7af5bd7d41d7a0a17ab9f40d3be, type: 2}
 --- !u!114 &114982356382100536
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -302,133 +274,6 @@ MonoBehaviour:
   Length: 602.8
   CenterPosition: {x: 524.7, y: 445.5}
   Material: {fileID: 2100000, guid: 4751e4c7a57da8c43af731d393884a25, type: 2}
---- !u!114 &3146859649163388282
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1995234145574352}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5881dffdceecca645bd1b6436ca976e0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  redChannelMove: 0.065
-  blueChannelMove: -0.105
-  greenChannelMove: 0
-  focusDistance: 35
-  focusRange: 7.6
-  bokehRadius: 10
-  dofShader: {fileID: 4800000, guid: e251ee37d0604714abf8af52ca380798, type: 3}
---- !u!114 &6438094797353942965
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1995234145574352}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f400aadd58b106d438941fb6387e365b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  AugmentSceneColor: 1
-  BGColor: {r: 0.75, g: 0.75, b: 0.75, a: 1}
-  SILineEnable: 1
-  SILineThickness: 3
-  SILineThreshold: 0.01
-  SILineColor: {r: 0, g: 0, b: 0, a: 1}
-  CRLineEnable: 1
-  CRLineThickness: 0.13
-  CRLineThreshold: 0.464
-  CRLineColor: {r: 0, g: 0, b: 0, a: 1}
-  SCLineEnable: 1
-  SCLineThickness: 2.61
-  SCLineThreshold: 0.249
-  SCLineColor: {r: 0, g: 0, b: 0, a: 1}
-  SHLineEnable: 1
-  SHLineThickness: 1.85
-  SHLineThreshold: 0.05
-  SHLineColor: {r: 0.125, g: 0.125, b: 0.125, a: 1}
-  defaultNormalTex: {fileID: 2800000, guid: f8ba3850e1fd6f44784a4312f5b63109, type: 3}
-  depthNormalMaterial: {fileID: 2100000, guid: 57598b8b10c798f4d853fde966b38cea, type: 2}
-  lineMaterial: {fileID: 2100000, guid: 78ed859f83d60e2458eabac5e50cb1f2, type: 2}
-  compositeMaterial: {fileID: 2100000, guid: 64c87bc5ae4c47f42bb8845aff812bd6, type: 2}
---- !u!1 &572462663145638943
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2289988743891982879}
-  - component: {fileID: 4212387840270291849}
-  m_Layer: 0
-  m_Name: JiffycrewUtilCam
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2289988743891982879
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 572462663145638943}
-  m_LocalRotation: {x: -0.38268343, y: -0, z: -0, w: 0.92387956}
-  m_LocalPosition: {x: -17.13, y: 11.872322, z: 34.49974}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 4195833958785946}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!20 &4212387840270291849
-Camera:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 572462663145638943}
-  m_Enabled: 0
-  serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
-  m_projectionMatrixMode: 1
-  m_GateFitMode: 2
-  m_FOVAxisMode: 0
-  m_SensorSize: {x: 36, y: 24}
-  m_LensShift: {x: 0, y: 0}
-  m_FocalLength: 50
-  m_NormalizedViewPortRect:
-    serializedVersion: 2
-    x: 0
-    y: 0
-    width: 1
-    height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
-  field of view: 60
-  orthographic: 0
-  orthographic size: 5
-  m_Depth: 0
-  m_CullingMask:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_RenderingPath: -1
-  m_TargetTexture: {fileID: 0}
-  m_TargetDisplay: 0
-  m_TargetEye: 3
-  m_HDR: 1
-  m_AllowMSAA: 1
-  m_AllowDynamicResolution: 0
-  m_ForceIntoRT: 0
-  m_OcclusionCulling: 1
-  m_StereoConvergence: 10
-  m_StereoSeparation: 0.022
 --- !u!1 &7980771049558981269
 GameObject:
   m_ObjectHideFlags: 0

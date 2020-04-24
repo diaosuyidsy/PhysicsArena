@@ -18,6 +18,8 @@ public class FistGunData : WeaponDataBase
     public float FistReboundForce = 100f;
     public float FistHitScanRadius = 0.3f;
     public float FistHitScanDist = 0.1f;
+    public float FistUselessDuration = 1f;
+    public float FistOutDuration = 0.2f;
     public LayerMask AllThingFistCanCollideLayer;
     public float HelpAimAngle = 30f;
     public float HelpAimDistance = 30f;

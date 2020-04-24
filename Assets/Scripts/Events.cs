@@ -80,10 +80,12 @@ public class PlayerDied : GameEvent
 public class BagelSent : GameEvent
 {
     public GameObject Basket;
+    public GameObject Deliverer;
 
-    public BagelSent(GameObject obj)
+    public BagelSent(GameObject obj, GameObject deliverer)
     {
         Basket = obj;
+        Deliverer = deliverer;
     }
 }
 
@@ -339,6 +341,27 @@ public class BagelDespawn : GameEvent
 
 }
 
+public class AmmoExplode : GameEvent
+{
+    public Vector3 Pos;
+    public AmmoExplode(Vector3 P)
+    {
+        Pos = P;
+    }
+}
+
+public class TriggerEmoji : GameEvent
+{
+    public int EmojiType;
+    public GameObject Player;
+
+    public TriggerEmoji(int emojiType, GameObject player)
+    {
+        EmojiType = emojiType;
+        Player = player;
+    }
+}
+
 public class ObjectPickedUp : GameEvent
 {
     public GameObject Player;
@@ -442,6 +465,19 @@ public class HookBlocked : HookGunEvent
         Hook = hook;
         EventManager.Instance.TriggerEvent(new Blocked(HookBlocker, HookBlockerPlayerNumber));
     }
+}
+
+public class HookSlingShot : HookGunEvent
+{
+    public HookSlingShot(GameObject hookGun, GameObject hookGunOwner, int hookGunOwnerPlayerNumber, GameObject hookedObject, Vector3 force) : base(hookGun, hookGunOwner, hookGunOwnerPlayerNumber)
+    {
+        HookedObject = hookedObject;
+        HookedForce = force;
+    }
+
+    public GameObject HookedObject { get; }
+    public Vector3 HookedForce { get; }
+
 }
 
 public class SuckGunFired : GameEvent

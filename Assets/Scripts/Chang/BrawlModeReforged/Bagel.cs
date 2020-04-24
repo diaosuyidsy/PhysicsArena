@@ -7,8 +7,12 @@ public class Bagel : WeaponBase
     public VFXData Data;
 
     public GameObject Entity;
+    public GameObject Effect;
+
     public GameObject RedPointerPrefab;
     public GameObject BluePointerPrefab;
+
+
     public float PointerDis;
 
     public float PointerFarScale;
@@ -34,6 +38,8 @@ public class Bagel : WeaponBase
     private GameObject GameUI;
     private GameObject Pointer;
     private GameObject WorldPointer;
+
+    private GameObject HoleEffect;
 
     private float GuideOffset;
 
@@ -339,6 +345,10 @@ public class Bagel : WeaponBase
     {
         base.OnPickUp(owner);
 
+        GameObject Basket = Owner.tag.Contains("1") ? Team1Basket : Team2Basket;
+        HoleEffect = Basket.GetComponent<CabelBasket>().HoleEffect;
+        HoleEffect.SetActive(true);
+
         Hold = true;
         LastOwner = owner;
     }
@@ -350,6 +360,7 @@ public class Bagel : WeaponBase
         Hold = false;
         Destroy(Guide);
 
+        HoleEffect.SetActive(false);
     }
 
     public override void Fire(bool buttondown)
@@ -375,6 +386,10 @@ public class Bagel : WeaponBase
             WorldPointer.SetActive(false);
         }
         Destroy(Pointer);
+
+        HoleEffect.SetActive(false);
+
+        Effect.SetActive(false);
     }
 
     protected override void _onWeaponDespawn()

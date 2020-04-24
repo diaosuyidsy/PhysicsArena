@@ -5,10 +5,11 @@ using UnityEngine;
 public class AudioManager
 {
     public AudioData AudioDataStore;
-
-    public AudioManager(AudioData _data)
+    private GameObject gameManager;
+    public AudioManager(AudioData _data, GameObject _gameManager)
     {
         AudioDataStore = _data;
+        gameManager = _gameManager;
         OnEnable();
     }
 
@@ -180,7 +181,16 @@ public class AudioManager
     private void _onBazookaFired(BazookaFired bf)
     {
         _playSound(bf.BazookaGun, AudioDataStore.BazookaFiredAudioClip);
+    }
 
+    private void _onBazookaBombed(BazookaBombed ev)
+    {
+        _playSound(ev.BazookaGun, AudioDataStore.ExplosionClip);
+    }
+
+    private void _onBagelExplode(AmmoExplode ev)
+    {
+        _playSound(gameManager, AudioDataStore.ExplosionClip);
     }
 
     private void _onObjectPickedUp(ObjectPickedUp opu)
@@ -267,10 +277,12 @@ public class AudioManager
         EventManager.Instance.AddHandler<FistGunBlocked>(_onFistGunBlocked);
         EventManager.Instance.AddHandler<HookBlocked>(_onHookGunBlocked);
         EventManager.Instance.AddHandler<BazookaFired>(_onBazookaFired);
+        EventManager.Instance.AddHandler<BazookaBombed>(_onBazookaBombed);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);
         EventManager.Instance.AddHandler<PlayerLand>(_onPlayerLand);
         EventManager.Instance.AddHandler<ObjectHitGround>(_onObjectHitGround);
+        EventManager.Instance.AddHandler<AmmoExplode>(_onBagelExplode);
         EventManager.Instance.AddHandler<FistGunStartCharging>(_onFistGunReload);
     }
 
@@ -294,12 +306,14 @@ public class AudioManager
         EventManager.Instance.RemoveHandler<FistGunFired>(_onFistGunFired);
         EventManager.Instance.RemoveHandler<FistGunHit>(_onFistGunHit);
         EventManager.Instance.RemoveHandler<FistGunBlocked>(_onFistGunBlocked);
+        EventManager.Instance.RemoveHandler<BazookaBombed>(_onBazookaBombed);
         EventManager.Instance.RemoveHandler<HookBlocked>(_onHookGunBlocked);
         EventManager.Instance.RemoveHandler<BazookaFired>(_onBazookaFired);
         EventManager.Instance.RemoveHandler<ObjectPickedUp>(_onObjectPickedUp);
         EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelievered);
         EventManager.Instance.RemoveHandler<PlayerLand>(_onPlayerLand);
         EventManager.Instance.RemoveHandler<ObjectHitGround>(_onObjectHitGround);
+        EventManager.Instance.RemoveHandler<AmmoExplode>(_onBagelExplode);
         EventManager.Instance.RemoveHandler<FistGunStartCharging>(_onFistGunReload);
     }
 

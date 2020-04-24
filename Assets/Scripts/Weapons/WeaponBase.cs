@@ -169,6 +169,10 @@ public abstract class WeaponBase : MonoBehaviour
             if (Physics.Raycast(Context.transform.position, Vector3.down, out hit, Mathf.Infinity, WeaponDataBase.OnNoAmmoDropDisappear))
             {
                 Context.Rigidbody.isKinematic = true;
+                foreach (var colls in Context.GetComponents<Collider>())
+                {
+                    colls.isTrigger = true;
+                }
                 Vector3 hitPoint = hit.point;
                 floatingPoint = hitPoint + Vector3.up * WeaponDataBase.YFloatDistance;
                 Context.transform.position = floatingPoint;
@@ -204,6 +208,15 @@ public abstract class WeaponBase : MonoBehaviour
 
     protected class DroppedState : WeaponState
     {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            if (!Context.ShouldFloat) return;
+            foreach (var colls in Context.GetComponents<Collider>())
+            {
+                colls.isTrigger = false;
+            }
+        }
         public override void OnCollisionEnter(Collision other)
         {
             base.OnCollisionEnter(other);

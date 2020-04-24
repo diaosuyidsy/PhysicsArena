@@ -54,4 +54,5 @@ public class AudioData : ScriptableObject
     public AudioClip MVPBirdLandAudioClip;
     public AudioClip MVPBadgeStampAudioClip;
     public AudioClip MVPStatisticPanelBopClip;
+    public AudioClip ExplosionClip;
 }

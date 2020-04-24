@@ -129,10 +129,13 @@ public class StatisticsManager
             return;
         }
         /// SlingShot Record
-        if (pd.PlayerHitter.name.ToLower() == "slingshot") return;
+        if (pd.PlayerHitter.name.ToLower() == "slingshot")
+        {
+            return;
+        }
 
         /// Teammate Murder Record
-        if (pd.HitterIsValid && pd.Player.tag == pd.PlayerHitter.tag) AllRecords[2][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
+        if (pd.HitterIsValid && pd.Player.tag == pd.PlayerHitter.tag && pd.Player != pd.PlayerHitter) AllRecords[2][pd.PlayerHitter.GetComponent<PlayerController>().PlayerNumber]++;
         /// Kill Record
         if (pd.HitterIsValid && pd.Player.tag != pd.PlayerHitter.tag)
         {

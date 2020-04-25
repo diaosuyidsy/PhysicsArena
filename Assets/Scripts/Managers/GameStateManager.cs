@@ -47,7 +47,6 @@ public class GameStateManager : GameStateManagerBase
     private Transform _MVPBackground;
     private Transform _MVPPlayerPortrait;
     private Transform _MVPTitle;
-    private Transform _MVP;
     private Transform _gameUI;
     private int _winner;
     private GameObject _gameManager;
@@ -94,7 +93,6 @@ public class GameStateManager : GameStateManagerBase
         _MVPPlayerPortrait = _statisticPanel.Find("MVPPlayerIcon");
         _MVPTitle = _statisticPanel.Find("MVPTitle");
         _statisticUIHolder = _statisticPanel.Find("StatisticUIHolder");
-        _MVP = GameObject.Find("MVP").transform;
         for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
         {
             GameObject player = GameObject.Instantiate(_configData.PlayerPrefabs[PlayersInformation.ColorIndex[i]]);
@@ -354,7 +352,7 @@ public class GameStateManager : GameStateManagerBase
                 Context._statisticUIHolder.GetChild(x).DOLocalMoveY(_configData.FrameYPosition[i], 0f);
                 sequence.Append(Context._statisticUIHolder.GetChild(x).DOLocalMoveX(_configData.FrameXPosition, _configData.FrameMoveInDuration)
                 .SetEase(Ease.OutBack)
-                .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
+                .OnPlay(() => Services.AudioManager.PlaySound("event:/SFX/Menu/Select")));
             }
             sequence.Append(Context._holdAText.transform.DOScale(1f, 0.2f).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
             sequence.Join(Context._holdBText.transform.DOScale(1f, 0.2f).OnPlay(() => Context._holdBText.gameObject.SetActive(true)));
@@ -489,8 +487,8 @@ public class GameStateManager : GameStateManagerBase
         public override void OnEnter()
         {
             base.OnEnter();
-            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
-            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
         }
         public override void Update()
         {
@@ -542,8 +540,8 @@ public class GameStateManager : GameStateManagerBase
         public override void OnEnter()
         {
             base.OnEnter();
-            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", -10f);
-            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 450f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", -10f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 450f);
             onresume = true;
             Context._pauseBackgroundMask.gameObject.SetActive(true);
             Context._pausePausedText.gameObject.SetActive(true);
@@ -564,34 +562,34 @@ public class GameStateManager : GameStateManagerBase
             base.Update();
             if (_AnyBDown || _AnyPauseDown)
             {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<GameLoop>();
                 return;
             }
             if (onresume && _AnyADown)
             {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<GameLoop>();
                 return;
             }
             if (!onresume && _AnyADown)
             {
                 Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene("ComicMenu"));
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<GameQuitState>();
                 return;
             }
             if (_AnyVLAxisRaw < -0.2f && !_vAxisInUse && !onresume)
             {
                 onresume = true;
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
                 _switchMenu();
                 return;
             }
             else if (_AnyVLAxisRaw > 0.2f && !_vAxisInUse && onresume)
             {
                 onresume = false;
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
                 _switchMenu();
                 return;
             }
@@ -672,21 +670,21 @@ public class GameStateManager : GameStateManagerBase
                 OnComplete(() =>
                 {
                     Services.GameFeelManager.ViberateController(rewiredID, 1f, 0.3f);
-                    _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FirstLandAudioClip);
+                    Services.AudioManager.PlaySound("event:/SFX/Menu/Landing");
                     _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree");
                 }));
             }
             seq.AppendInterval(_GameMapData.FightDelay);
             seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale / 2f, 0.8f).SetEase(Ease.InSine).OnPlay(() =>
             {
-                _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.ReadyAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Ready");
                 Context._countDownText.text = Context._configData.ReadyString;
             }));
             seq.AppendInterval(0.3f);
             seq.Append(Context._countDownText.DOScale(0f, 0.2f));
             seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.FightEase).OnPlay(() =>
             {
-                _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FightAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Fight");
                 Context._countDownText.text = Context._configData.FightString;
             }));
             seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
@@ -725,9 +723,9 @@ public class GameStateManager : GameStateManagerBase
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._cam.GetComponent<AudioSource>().Play();
-            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
-            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
+            // Context._cam.GetComponent<AudioSource>().Play();
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
             Context._tutorialBackgroundMask.gameObject.SetActive(true);
             Sequence seq = DOTween.Sequence();
             seq.Append(Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase));

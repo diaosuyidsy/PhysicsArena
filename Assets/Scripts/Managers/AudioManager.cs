@@ -5,6 +5,7 @@ using FMODUnity;
 
 public class AudioManager
 {
+    private FMOD.Studio.EventInstance bgmEV;
     public AudioManager()
     {
         OnEnable();
@@ -191,6 +192,12 @@ public class AudioManager
             return;
         }
     }
+
+    private void _onGameStart(GameStart ev)
+    {
+        bgmEV = RuntimeManager.CreateInstance("event:/Music/BrawlModeBGM");
+        bgmEV.start();
+    }
     #endregion
 
     private void OnEnable()
@@ -221,6 +228,7 @@ public class AudioManager
         EventManager.Instance.AddHandler<ObjectHitGround>(_onObjectHitGround);
         EventManager.Instance.AddHandler<AmmoExplode>(_onBagelExplode);
         EventManager.Instance.AddHandler<FistGunStartCharging>(_onFistGunReload);
+        EventManager.Instance.AddHandler<GameStart>(_onGameStart);
     }
 
     private void OnDisable()
@@ -252,6 +260,7 @@ public class AudioManager
         EventManager.Instance.RemoveHandler<ObjectHitGround>(_onObjectHitGround);
         EventManager.Instance.RemoveHandler<AmmoExplode>(_onBagelExplode);
         EventManager.Instance.RemoveHandler<FistGunStartCharging>(_onFistGunReload);
+        EventManager.Instance.RemoveHandler<GameStart>(_onGameStart);
     }
 
     public void Destroy()

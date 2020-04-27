@@ -14,12 +14,18 @@ public class GameStateManager : GameStateManagerBase
 {
     private ConfigData _configData;
     private FSM<GameStateManager> _gameStateFSM;
-    private TextMeshProUGUI _holdAText;
+    private GameObject _gameStartAImage;
+    private GameObject _gameStartAButton;
+    private GameObject _gameStartHoldAImage;
+    private GameObject _holdAText;
     private Image _holdAImage;
-    private TextMeshProUGUI _holdBText;
+    private GameObject _holdAButton;
+    private GameObject _holdBText;
     private Image _holdBImage;
-    private TextMeshProUGUI _holdYText;
+    private GameObject _holdBButton;
+    private GameObject _holdYText;
     private Image _holdYImage;
+    private GameObject _holdYButton;
     private Transform _tutorialImage;
     private Transform _tutorialBackgroundMask;
     private Transform _tutorialObjectiveImages;
@@ -41,7 +47,6 @@ public class GameStateManager : GameStateManagerBase
     private Transform _MVPBackground;
     private Transform _MVPPlayerPortrait;
     private Transform _MVPTitle;
-    private Transform _MVP;
     private Transform _gameUI;
     private int _winner;
     private GameObject _gameManager;
@@ -57,11 +62,14 @@ public class GameStateManager : GameStateManagerBase
         _gameUI = GameObject.Find("GameUI").transform;
         _gameEndCanvas = GameObject.Find("GameEndCanvas").transform;
         _gameEndTitleText = _gameEndCanvas.Find("TitleText");
-        _holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").GetComponent<TextMeshProUGUI>();
+        _holdAText = GameObject.Find("HoldCanvas").transform.Find("HoldA").gameObject;
+        _holdAButton = GameObject.Find("HoldCanvas").transform.Find("AButton").gameObject;
         _holdAImage = GameObject.Find("HoldCanvas").transform.Find("HoldAImage").GetComponent<Image>();
-        _holdBText = GameObject.Find("HoldCanvas").transform.Find("HoldB").GetComponent<TextMeshProUGUI>();
+        _holdBText = GameObject.Find("HoldCanvas").transform.Find("HoldB").gameObject;
+        _holdBButton = GameObject.Find("HoldCanvas").transform.Find("BButton").gameObject;
         _holdBImage = GameObject.Find("HoldCanvas").transform.Find("HoldBImage").GetComponent<Image>();
-        _holdYText = GameObject.Find("HoldCanvas").transform.Find("HoldY").GetComponent<TextMeshProUGUI>();
+        _holdYText = GameObject.Find("HoldCanvas").transform.Find("HoldY").gameObject;
+        _holdYButton = GameObject.Find("HoldCanvas").transform.Find("YButton").gameObject;
         _holdYImage = GameObject.Find("HoldCanvas").transform.Find("HoldYImage").GetComponent<Image>();
         PlayersInformation = DataSaver.loadData<PlayerInformation>("PlayersInformation");
         Debug.Assert(PlayersInformation != null, "Unable to load Players information");
@@ -70,6 +78,9 @@ public class GameStateManager : GameStateManagerBase
         _tutorialBackgroundMask = GameObject.Find("TutorialCanvas").transform.Find("BackgroundMask");
         _tutorialObjectiveImages = GameObject.Find("TutorialCanvas").transform.Find("ObjectiveImages");
         Debug.Assert(_tutorialImage != null);
+        _gameStartAImage = GameObject.Find("TutorialCanvas").transform.Find("HoldA").gameObject;
+        _gameStartAButton = GameObject.Find("TutorialCanvas").transform.Find("AButton").gameObject;
+        _gameStartHoldAImage = GameObject.Find("TutorialCanvas").transform.Find("HoldAImage").gameObject;
         _countDownText = GameObject.Find("TutorialCanvas").transform.Find("CountDown").GetComponent<TextMeshProUGUI>();
         _pauseMenu = GameObject.Find("PauseMenu").transform;
         _pauseBackgroundMask = _pauseMenu.Find("BackgroundMask");
@@ -82,7 +93,6 @@ public class GameStateManager : GameStateManagerBase
         _MVPPlayerPortrait = _statisticPanel.Find("MVPPlayerIcon");
         _MVPTitle = _statisticPanel.Find("MVPTitle");
         _statisticUIHolder = _statisticPanel.Find("StatisticUIHolder");
-        _MVP = GameObject.Find("MVP").transform;
         for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
         {
             GameObject player = GameObject.Instantiate(_configData.PlayerPrefabs[PlayersInformation.ColorIndex[i]]);
@@ -297,6 +307,8 @@ public class GameStateManager : GameStateManagerBase
                 playercontroller.enabled = false;
                 playercontroller.GetComponent<Rigidbody>().isKinematic = true;
             }
+            // Disable Game UI
+            Context._gameUI.gameObject.SetActive(false);
             // Get MVP Info
             int MVPRewiredID = Services.StatisticsManager.GetMVPRewiredID();
             int MVPTeamNumber = Utility.GetIdentificationFromRewiredID(MVPRewiredID).PlayerTeamNumber;
@@ -340,11 +352,14 @@ public class GameStateManager : GameStateManagerBase
                 Context._statisticUIHolder.GetChild(x).DOLocalMoveY(_configData.FrameYPosition[i], 0f);
                 sequence.Append(Context._statisticUIHolder.GetChild(x).DOLocalMoveX(_configData.FrameXPosition, _configData.FrameMoveInDuration)
                 .SetEase(Ease.OutBack)
-                .OnPlay(() => Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.MVPStatisticPanelBopClip)));
+                .OnPlay(() => Services.AudioManager.PlaySound("event:/SFX/Menu/Select")));
             }
-            sequence.Append(Context._holdAText.DOText("Next Map", 0.2f).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
-            sequence.Join(Context._holdBText.DOText("Menu", 0.2f).OnPlay(() => Context._holdBText.gameObject.SetActive(true)));
-            sequence.Join(Context._holdYText.DOText("Replay", 0.2f).OnPlay(() => Context._holdYText.gameObject.SetActive(true)));
+            sequence.Append(Context._holdAText.transform.DOScale(1f, 0.2f).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
+            sequence.Join(Context._holdBText.transform.DOScale(1f, 0.2f).OnPlay(() => Context._holdBText.gameObject.SetActive(true)));
+            sequence.Join(Context._holdAButton.transform.DOScale(1f, 0.2f).OnPlay(() => Context._holdAButton.gameObject.SetActive(true)));
+            sequence.Join(Context._holdBButton.transform.DOScale(1f, 0.2f).OnPlay(() => Context._holdBButton.gameObject.SetActive(true)));
+            sequence.Join(Context._holdYButton.transform.DOScale(1f, 0.2f).OnPlay(() => Context._holdYButton.gameObject.SetActive(true)));
+            sequence.Join(Context._holdYText.transform.DOScale(1f, 0.2f).OnPlay(() => Context._holdYText.gameObject.SetActive(true)));
             sequence.AppendCallback(() => _canHold = true);
         }
 
@@ -472,8 +487,8 @@ public class GameStateManager : GameStateManagerBase
         public override void OnEnter()
         {
             base.OnEnter();
-            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
-            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
         }
         public override void Update()
         {
@@ -525,8 +540,8 @@ public class GameStateManager : GameStateManagerBase
         public override void OnEnter()
         {
             base.OnEnter();
-            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", -10f);
-            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 450f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", -10f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 450f);
             onresume = true;
             Context._pauseBackgroundMask.gameObject.SetActive(true);
             Context._pausePausedText.gameObject.SetActive(true);
@@ -547,34 +562,34 @@ public class GameStateManager : GameStateManagerBase
             base.Update();
             if (_AnyBDown || _AnyPauseDown)
             {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<GameLoop>();
                 return;
             }
             if (onresume && _AnyADown)
             {
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<GameLoop>();
                 return;
             }
             if (!onresume && _AnyADown)
             {
                 Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene("ComicMenu"));
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuSelectionAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<GameQuitState>();
                 return;
             }
             if (_AnyVLAxisRaw < -0.2f && !_vAxisInUse && !onresume)
             {
                 onresume = true;
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
                 _switchMenu();
                 return;
             }
             else if (_AnyVLAxisRaw > 0.2f && !_vAxisInUse && onresume)
             {
                 onresume = false;
-                Context._gameManager.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.PauseMenuBrowseAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
                 _switchMenu();
                 return;
             }
@@ -655,21 +670,21 @@ public class GameStateManager : GameStateManagerBase
                 OnComplete(() =>
                 {
                     Services.GameFeelManager.ViberateController(rewiredID, 1f, 0.3f);
-                    _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FirstLandAudioClip);
+                    Services.AudioManager.PlaySound("event:/SFX/Menu/Landing");
                     _cam.transform.parent.GetComponent<DOTweenAnimation>().DORestartById("ShakeFree");
                 }));
             }
             seq.AppendInterval(_GameMapData.FightDelay);
             seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale / 2f, 0.8f).SetEase(Ease.InSine).OnPlay(() =>
             {
-                _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.ReadyAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Ready");
                 Context._countDownText.text = Context._configData.ReadyString;
             }));
             seq.AppendInterval(0.3f);
             seq.Append(Context._countDownText.DOScale(0f, 0.2f));
             seq.Append(Context._countDownText.DOScale(_GameMapData.FightScale, _GameMapData.FightDuration).SetEase(_GameMapData.FightEase).OnPlay(() =>
             {
-                _cam.GetComponent<AudioSource>().PlayOneShot(Services.AudioManager.AudioDataStore.FightAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Fight");
                 Context._countDownText.text = Context._configData.FightString;
             }));
             seq.AppendInterval(_GameMapData.FightStayOnScreenDuration);
@@ -708,9 +723,9 @@ public class GameStateManager : GameStateManagerBase
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._cam.GetComponent<AudioSource>().Play();
-            _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
-            _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
+            // Context._cam.GetComponent<AudioSource>().Play();
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
+            // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
             Context._tutorialBackgroundMask.gameObject.SetActive(true);
             Sequence seq = DOTween.Sequence();
             seq.Append(Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase));
@@ -720,15 +735,16 @@ public class GameStateManager : GameStateManagerBase
                 int x = i;
                 seq.Append(Context._tutorialObjectiveImages.GetChild(x).DOScale(Vector3.one, 0.5f).SetEase(Ease.OutBack));
             }
-            seq.Append(Context._holdAText.DOText("Start Game", _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true).OnPlay(() => Context._holdAText.gameObject.SetActive(true)));
+            seq.Append(Context._gameStartAButton.transform.DOScale(1f, _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay));
+            seq.Join(Context._gameStartAImage.transform.DOScale(1f, _GameMapData.HoldAMoveInDuration).SetDelay(_GameMapData.HoldAMoveInDelay).OnComplete(() => _canHoldA = true));
         }
         public override void Update()
         {
             base.Update();
             if (_canHoldA && _AnyAHolding)
             {
-                Context._holdAImage.fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
-                if (Context._holdAImage.fillAmount >= 1f)
+                Context._gameStartHoldAImage.GetComponent<Image>().fillAmount += Time.deltaTime * _GameMapData.FillASpeed;
+                if (Context._gameStartHoldAImage.GetComponent<Image>().fillAmount >= 1f)
                 {
                     TransitionTo<LandingState>();
                     // TransitionTo<MVPEndPanelState>();
@@ -737,7 +753,7 @@ public class GameStateManager : GameStateManagerBase
             }
             else
             {
-                Context._holdAImage.fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
+                Context._gameStartHoldAImage.GetComponent<Image>().fillAmount -= Time.deltaTime * _GameMapData.FillASpeed;
             }
         }
 
@@ -752,9 +768,9 @@ public class GameStateManager : GameStateManagerBase
             }
             //Context._tutorialImage.DOScale(Vector3.zero, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase).SetDelay(0.5f);
             Context._tutorialImage.DOScale(Vector3.zero, 0f);
-            Context._holdAText.DOText("", 0f);
-            Context._holdAText.gameObject.SetActive(false);
-            Context._holdAImage.fillAmount = 0f;
+            Context._gameStartAImage.SetActive(false);
+            Context._gameStartAButton.SetActive(false);
+            Context._gameStartHoldAImage.SetActive(false);
         }
     }
 }

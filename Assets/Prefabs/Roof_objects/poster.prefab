@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 5220087323618252673}
   - component: {fileID: 8845768014893230809}
   - component: {fileID: 6887015795831352574}
+  - component: {fileID: -5283195867008014465}
+  - component: {fileID: -3487632451484003601}
   m_Layer: 0
   m_Name: poster
   m_TagString: Untagged
@@ -108,3 +110,32 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.0054720216, y: 0.0000697136, z: 0.0045376616}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-5283195867008014465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5786474403212239709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0eccda2266359441b320966e7698b0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectNumber: 7
+  SelfLayer: 0
+--- !u!114 &-3487632451484003601
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5786474403212239709}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e9cf6179ab99674d880d66d601f6571, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplosionForceMultiplier: 0.01
+  SuckForceMultiplier: 0.05
+  OtherForceMultiplier: 0.05

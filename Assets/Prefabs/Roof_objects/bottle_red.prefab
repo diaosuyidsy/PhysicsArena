@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2901407056364095723}
   - component: {fileID: 2117161877536638514}
   - component: {fileID: 3706802200077422364}
+  - component: {fileID: -3835448932513285355}
+  - component: {fileID: 6529921402163064857}
   m_Layer: 0
   m_Name: bottle_red
   m_TagString: Untagged
@@ -108,3 +110,32 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.000757941, y: 0.0023040008, z: 0.0007579398}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-3835448932513285355
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3494520996406688823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0eccda2266359441b320966e7698b0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectNumber: 7
+  SelfLayer: 0
+--- !u!114 &6529921402163064857
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3494520996406688823}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e9cf6179ab99674d880d66d601f6571, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplosionForceMultiplier: 0.01
+  SuckForceMultiplier: 0.05
+  OtherForceMultiplier: 0.05

@@ -597,9 +597,16 @@ public class CabelSwtiching_ThirdSegment : CabelAction
                 TransitionTo<CabelIdle>();
                 Context.CanonFSM.TransitionTo<CanonFiring_Normal>();
 
+                if (Context.Info.Bomb != null)
+                {
+                    EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.Bomb));
+                }
+
                 Context.Info.LockedPlayer = null;
+                GameObject.Destroy(Context.Info.AimedMark);
                 GameObject.Destroy(Context.Info.Mark);
                 GameObject.Destroy(Context.Info.Bomb);
+
 
                 Context.SetWrap();
 

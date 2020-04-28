@@ -1,5 +1,28 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-9001725923898206079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Menu/Fight
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Menu/Fight
+  guid: a39fa5eee83ba3479bb53878555f8945
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 353
 --- !u!114 &-8749847507588994149
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -46,6 +69,98 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 287
+--- !u!114 &-8732265910039924000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Other/WeaponPickedup
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Other/WeaponPickedup
+  guid: ea64f31ffc9a97499cf10b98e92d77f9
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 570
+--- !u!114 &-8681127374746868210
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Other/BagelExplode
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Other/BagelExplode
+  guid: b367018b6b4f9246950ede6c549d8b06
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 2000
+--- !u!114 &-8658383115083130498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Characters/DuckDied
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Characters/DuckDied
+  guid: c0f4a3448b56664e95dd9a1f1b7b874e
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 363
+--- !u!114 &-8635879245326540138
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/FistGun/FistGunFired
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/FistGun/FistGunFired
+  guid: 1eb141f3c1068340b6c659af5391ca4d
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 690
 --- !u!114 &-8341356361763888449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,6 +202,52 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 131200
+--- !u!114 &-8201199505903741844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/FistGun/FistGunReload
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/FistGun/FistGunReload
+  guid: 0d48cf0ee8deb743af4548f78c006c60
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 1874
+--- !u!114 &-8011842467857273159
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/SuckGun/SuckGunFired
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/SuckGun/SuckGunFired
+  guid: 92e5105c128ef34abff4e216fdfb5380
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 630
 --- !u!114 &-7928434061210517708
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,6 +266,52 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &-7837782787552496992
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Characters/FootStepConcrete
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Characters/FootStepConcrete
+  guid: 904018d6e781ef45bba702b9d016f7ce
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 2000
+--- !u!114 &-7753279421774988689
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/SuckGun/SuckGunSuck
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/SuckGun/SuckGunSuck
+  guid: cbd702fd7cda984484f1b0cd9325b384
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 341
 --- !u!114 &-7533310720707992353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -215,6 +422,29 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 570
+--- !u!114 &-6789535314359359227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/Music/BrawlModeBGM
+  m_EditorClassIdentifier: 
+  Path: event:/Music/BrawlModeBGM
+  guid: db2979da72a09845b3751953dbcbe408
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 1
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 131200
 --- !u!114 &-6674593974864041915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -261,6 +491,29 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 1288
+--- !u!114 &-6624003186397144520
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Characters/PlayerRespawned
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Characters/PlayerRespawned
+  guid: 9472b7ddc084f54389697321f6bb96c8
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 287
 --- !u!114 &-6575215416007038338
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -297,6 +550,29 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &-6436933863910567375
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Melee/PlayerPunchReleased
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Melee/PlayerPunchReleased
+  guid: 9a71204129cd344e8823a669309980cd
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 200
 --- !u!114 &-5508002876933116226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -320,6 +596,75 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 492
+--- !u!114 &-5390843893988411055
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Other/BagelPickedup
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Other/BagelPickedup
+  guid: 442d53452f4ccf45bac1960d70052b24
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 570
+--- !u!114 &-5262867962874202682
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Characters/PlayerLand
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Characters/PlayerLand
+  guid: 6e573463d00cd3479b9e1e907c591f67
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 333
+--- !u!114 &-5054899738092914191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Other/BagelHitGround
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Other/BagelHitGround
+  guid: c8db22ce70473145afd83f4553a16b7f
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 1288
 --- !u!114 &-4657998145994523075
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -338,6 +683,29 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &-4635441474768297754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/WaterGun/WaterGunHitGround
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/WaterGun/WaterGunHitGround
+  guid: 46c01f3cd3fcc147941169c3bbbbaadc
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 1288
 --- !u!114 &-4581189221415233361
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -438,6 +806,29 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 24
+--- !u!114 &-3959275349477231436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Bazooka/BazookaBombed
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Bazooka/BazookaBombed
+  guid: e06dce75236bdd47aec23114a5ddfe6e
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 2000
 --- !u!114 &-3687242478999471154
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -479,6 +870,52 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &-3674963143931804349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/FistGun/FistGunHitGround
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/FistGun/FistGunHitGround
+  guid: 53b96ee51549954da40d388a42f36a30
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 1288
+--- !u!114 &-3475529448267138734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Other/WeaponSpawned
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Other/WeaponSpawned
+  guid: 73966cff878303458a78117db2983baa
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 24
 --- !u!114 &-3317109716575365175
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -607,6 +1044,26 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 630
+--- !u!114 &-2890046977212898939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.strings.bank
+  m_EditorClassIdentifier: 
+  Path: FMOD/FMODProject/Build/Desktop/Master.strings.bank
+  SubDir: 
+  lastModified: 637236259256217066
+  LoadResult: 0
+  FileSizes:
+  - Name: Desktop
+    Value: 2672
+  Exists: 1
 --- !u!114 &-2854828612104958470
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -648,6 +1105,70 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &-2797608708792745258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: 
+  Path: FMOD/FMODProject/Build/Desktop/Master.bank
+  SubDir: 
+  lastModified: 637236259256207129
+  LoadResult: 0
+  FileSizes: []
+  Exists: 1
+--- !u!114 &-2407188540550279794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Other/BagelDelivered
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Other/BagelDelivered
+  guid: e9384bfc6b21ed4696a7c043866d6460
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 679
+--- !u!114 &-2303965562217927622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Menu/Ready
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Menu/Ready
+  guid: c1b96ee7c9fae145a6f5e957f426fa51
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 781
 --- !u!114 &-1746317603816641608
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -758,6 +1279,52 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &-1000331534194866286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Melee/PlayerPunchBlocked
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Melee/PlayerPunchBlocked
+  guid: fa9509526753694192182019c23c20b0
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 712
+--- !u!114 &-993596171334424492
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/HookGun/HookGunHitGround
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/HookGun/HookGunHitGround
+  guid: 7e51990fccaf0f4d8a11d3d06178af86
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 1288
 --- !u!114 &-921934587664627892
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -812,6 +1379,52 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 1
+--- !u!114 &-113229993635879272
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/FistGun/FistGunHit
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/FistGun/FistGunHit
+  guid: 5473d1b0e6e19d4ba967cecf75f62c80
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 256
+--- !u!114 &-30067488501735613
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/SuckGun/SuckGunHitGround
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/SuckGun/SuckGunHitGround
+  guid: 12e9626832df3d4a92ee4092b6d1ebcb
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 1288
 --- !u!114 &11400000
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -825,57 +1438,57 @@ MonoBehaviour:
   m_Name: FMODStudioCache
   m_EditorClassIdentifier: 
   EditorBanks:
-  - {fileID: 7152772258292659580}
-  - {fileID: 2198634137297556611}
+  - {fileID: -2890046977212898939}
+  - {fileID: -2797608708792745258}
   EditorEvents:
-  - {fileID: 5047082598799821567}
-  - {fileID: -2854828612104958470}
-  - {fileID: 8225462013823028773}
-  - {fileID: -3009338471787682946}
-  - {fileID: -4581189221415233361}
-  - {fileID: 1097497218054339970}
-  - {fileID: 4321919600829559527}
-  - {fileID: -1634685097747439629}
-  - {fileID: -6653264542674201742}
-  - {fileID: 4455305370385024063}
-  - {fileID: 4481666117642361931}
-  - {fileID: 9139512563222186191}
-  - {fileID: 3918298452313520371}
-  - {fileID: -4026814802434857091}
-  - {fileID: 5172071098314313518}
-  - {fileID: 7881574478104933405}
-  - {fileID: -8749847507588994149}
-  - {fileID: 2746591318087494752}
-  - {fileID: -2919143354482385994}
-  - {fileID: 4391805490925973133}
-  - {fileID: 2618993662014807969}
-  - {fileID: 2904435339315488427}
-  - {fileID: -8742307027517332402}
-  - {fileID: -1653446763684025688}
-  - {fileID: -7036639943334328463}
-  - {fileID: 981305398238570239}
-  - {fileID: 1830244021273163486}
-  - {fileID: -3045859980854256159}
-  - {fileID: -1746317603816641608}
-  - {fileID: -3317109716575365175}
-  - {fileID: -6947238512206211231}
-  - {fileID: -1574261375501058275}
-  - {fileID: -5508002876933116226}
-  - {fileID: 2767352411540929017}
-  - {fileID: 3340947577408029637}
-  - {fileID: -6674593974864041915}
-  - {fileID: 2981964508748856744}
-  - {fileID: 8080471896945025619}
-  - {fileID: -3687242478999471154}
-  - {fileID: -6991568603310053565}
-  - {fileID: -7120921077963991609}
-  - {fileID: -8317480432475924694}
+  - {fileID: 6634922540227492365}
+  - {fileID: -8201199505903741844}
+  - {fileID: -30067488501735613}
+  - {fileID: -8635879245326540138}
+  - {fileID: 5867175193296187092}
+  - {fileID: -5390843893988411055}
+  - {fileID: -4635441474768297754}
+  - {fileID: 8691437636995813690}
+  - {fileID: -3674963143931804349}
+  - {fileID: -113229993635879272}
+  - {fileID: 3253124718688564730}
+  - {fileID: 7585995637830813406}
+  - {fileID: 1737764872487816374}
+  - {fileID: -5262867962874202682}
+  - {fileID: -3475529448267138734}
+  - {fileID: 6322957874425838880}
+  - {fileID: -993596171334424492}
+  - {fileID: 3990300181406706445}
+  - {fileID: -7837782787552496992}
+  - {fileID: -8011842467857273159}
+  - {fileID: -6624003186397144520}
+  - {fileID: -6436933863910567375}
+  - {fileID: -9001725923898206079}
+  - {fileID: -8681127374746868210}
+  - {fileID: 6590753427127211941}
+  - {fileID: -8658383115083130498}
+  - {fileID: -2303965562217927622}
+  - {fileID: 1577157559307269417}
+  - {fileID: 8948227420029111073}
+  - {fileID: -5054899738092914191}
+  - {fileID: -7753279421774988689}
+  - {fileID: 8389740656001710164}
+  - {fileID: -6789535314359359227}
+  - {fileID: 6723055061030582891}
+  - {fileID: -3959275349477231436}
+  - {fileID: -2407188540550279794}
+  - {fileID: -8732265910039924000}
+  - {fileID: 5302131781791181269}
+  - {fileID: 736716539303935333}
+  - {fileID: 6606387149500685293}
+  - {fileID: -1000331534194866286}
+  - {fileID: 8805608379389444149}
   EditorParameters: []
   MasterBanks:
-  - {fileID: 2198634137297556611}
+  - {fileID: -2797608708792745258}
   StringsBanks:
-  - {fileID: 7152772258292659580}
-  stringsBankWriteTime: 637233789734657546
+  - {fileID: -2890046977212898939}
+  stringsBankWriteTime: 637236259256217066
   cacheVersion: 3
 --- !u!114 &231446202932758855
 MonoBehaviour:
@@ -895,6 +1508,29 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &736716539303935333
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/HookGun/HookGunHit
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/HookGun/HookGunHit
+  guid: eefb2c5d5de0fe47a94e7ba5aa13c6d5
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 672
 --- !u!114 &981305398238570239
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -977,6 +1613,52 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &1577157559307269417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/HookGun/HookGunBlocked
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/HookGun/HookGunBlocked
+  guid: c510da040fb14647945b21f0a226c655
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 2000
+--- !u!114 &1737764872487816374
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Menu/Select
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Menu/Select
+  guid: 6b39aedf7b411e49b0f153a3b1e94c4e
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 24
 --- !u!114 &1830244021273163486
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1169,6 +1851,29 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &3253124718688564730
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Bazooka/BazookaFired
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Bazooka/BazookaFired
+  guid: 5d3c01d3c3d68b46b263a596e19f3f26
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 1499
 --- !u!114 &3340947577408029637
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1215,6 +1920,29 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 531
+--- !u!114 &3990300181406706445
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/WaterGun/WaterGunFired
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/WaterGun/WaterGunFired
+  guid: 84ad8166c6d96a42ac017b9909bf7879
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 287
 --- !u!114 &4150875848007550879
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1389,6 +2117,29 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &5302131781791181269
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Menu/ShakeEgg
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Menu/ShakeEgg
+  guid: ea8f31d74c9c39449a666287d32e29dd
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 107
 --- !u!114 &5409328552326049914
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1407,6 +2158,121 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &5867175193296187092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Melee/PlayerPunchStart
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Melee/PlayerPunchStart
+  guid: 2a388137e883b44ca64d7351cfab24e2
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 300
+--- !u!114 &6322957874425838880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Characters/ChickenDied
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Characters/ChickenDied
+  guid: 74131cae1dd3df49a5205ef99a353bb9
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 489
+--- !u!114 &6590753427127211941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Other/ObjectDespawned
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Other/ObjectDespawned
+  guid: bc40287d112a8c4fb229922091f6b76e
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 287
+--- !u!114 &6606387149500685293
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/HookGun/HookGunFired
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/HookGun/HookGunFired
+  guid: f64b83cd45da1a43abc938b3bd1a7c7a
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 492
+--- !u!114 &6634922540227492365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Characters/PlayerJump
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Characters/PlayerJump
+  guid: 03547b0ef5fb8f40bbbd412d8fde0e97
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 400
 --- !u!114 &6677240939083312824
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1425,6 +2291,29 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &6723055061030582891
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Menu/Navigate
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Menu/Navigate
+  guid: df35234ce73fcb42a83af0c36485f578
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 52
 --- !u!114 &7152772258292659580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1445,6 +2334,29 @@ MonoBehaviour:
   - Name: Desktop
     Value: 2672
   Exists: 1
+--- !u!114 &7585995637830813406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/Bazooka/BazookaHitGround
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/Bazooka/BazookaHitGround
+  guid: 5ec3c4c8fd8a9f47924374196ae11a9e
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 531
 --- !u!114 &7881574478104933405
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1514,6 +2426,29 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 400
+--- !u!114 &8389740656001710164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Menu/Xiu
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Menu/Xiu
+  guid: d64ca3e2fe074e49a4a8e244ccf64d4d
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 0
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 0
+  MaxDistance: 0
+  Length: 287
 --- !u!114 &8614008073091533563
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1532,6 +2467,75 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &8691437636995813690
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Melee/PlayerPunched
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Melee/PlayerPunched
+  guid: 492d79b4beb5e348b2ae1578e5ccb9cb
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 2000
+--- !u!114 &8805608379389444149
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Menu/Landing
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Menu/Landing
+  guid: ff07befbab406d4692bff449590eb52f
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 333
+--- !u!114 &8948227420029111073
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ceb653cd98e289a4e8697a1af55201f2, type: 3}
+  m_Name: event:/SFX/Gameplay/Object/FistGun/FistGunBlocked
+  m_EditorClassIdentifier: 
+  Path: event:/SFX/Gameplay/Object/FistGun/FistGunBlocked
+  guid: c56e8dbe437ea34ab92b2553e5aa43a0
+  Banks:
+  - {fileID: -2797608708792745258}
+  IsStream: 0
+  Is3D: 1
+  IsOneShot: 1
+  Parameters: []
+  MinDistance: 1
+  MaxDistance: 35
+  Length: 256
 --- !u!114 &9139512563222186191
 MonoBehaviour:
   m_ObjectHideFlags: 0

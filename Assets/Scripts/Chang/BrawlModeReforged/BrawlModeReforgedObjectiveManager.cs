@@ -19,7 +19,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
     private TextMeshProUGUI Team1ScoreText;
     private TextMeshProUGUI Team2ScoreText;
-    private TextMeshProUGUI TimerText;
+    private GameObject Team1ScorePlusText;
+    private GameObject Team2ScorePlusText;
 
     private GameObject Team1Board;
     private GameObject Team2Board;
@@ -37,6 +38,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     private int Timer;
     private float Team1HopTimer;
     private float Team2HopTimer;
+    private float Team1PlusHopTimer;
+    private float Team2PlusHopTimer;
 
     private Vector3 Team1ShakeTarget;
     private Vector3 Team2ShakeTarget;
@@ -61,14 +64,13 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         GameObject Title = TutorialCanvas.Find("ObjectiveImages").Find("Title").gameObject;
         Title.GetComponent<TextMeshProUGUI>().text = "Score " + ModeData.TargetScore.ToString() + " First";
 
-
-        TimerText = GameUI.Find("TimerText").GetComponent<TextMeshProUGUI>();
-
         Team1Board = GameUI.Find("Team1Background").gameObject;
         Team2Board = GameUI.Find("Team2Background").gameObject;
 
         Team1ScoreText = Team1Board.transform.Find("Team1Score").GetComponent<TextMeshProUGUI>();
         Team2ScoreText = Team2Board.transform.Find("Team2Score").GetComponent<TextMeshProUGUI>();
+        Team1ScorePlusText = Team1Board.transform.Find("Team1ScorePlus").gameObject;
+        Team2ScorePlusText = Team2Board.transform.Find("Team2ScorePlus").gameObject;
 
         Team1ScoreImpact = Team1Board.transform.Find("Team1ScoreImpact").gameObject;
         Team2ScoreImpact = Team2Board.transform.Find("Team2ScoreImpact").gameObject;
@@ -85,8 +87,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         gameEnd = false;
 
         Team1HopTimer =  Team2HopTimer = UIData.ScoreHopFirstPhaseTime + UIData.ScoreHopSecondPhaseTime + 1;
-
-        TimerText.text = TimerToMinute();
+        Team1PlusHopTimer = Team2PlusHopTimer = UI.ScorePlusTextHopScaleUpTime + UI.ScorePlusTextHopScaleDownTime + UI.ScorePlusTextHopStayTime + 1;
     }
 
     public override void Destroy()
@@ -102,48 +103,10 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if (gameEnd || !gameStart) return;
 
-        UpdateTime();
         ScoreHop();
-
-
-    }
-
-    private void UpdateTime()
-    {
-        OneSecTimer += Time.deltaTime;
-        if (OneSecTimer >= 1f)
-        {
-            OneSecTimer = 0f;
-            Timer--;
-        }
-        if (Timer <= 0)
-        {
-            TimerText.text = "0";
-            if (Team1Score != Team2Score)
-            {
-                //EventManager.Instance.TriggerEvent(new GameEnd(winner, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
-                //gameEnd = true;
-                return;
-            }
-        }
-        else
-        {
-
-
-            TimerText.text = TimerToMinute();
-        }
+        ScorePlusHop();
 
     }
-
-    private string TimerToMinute()
-    {
-        int seconds = Timer % 10;
-        int tenseconds = (Timer % 60) / 10;
-        int minute = Timer / 60;
-
-        return minute.ToString("F0") + ":" + tenseconds.ToString("F0") + seconds.ToString("F0");
-    }
-
 
     private void RefreshScore()
     {
@@ -153,15 +116,35 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
     private void CheckWin()
     {
+        Vector3 Position = (Team1Board.transform.position + Team2Board.transform.position) / 2;
+
         if (Team1Score >= ModeData.TargetScore)
         {
             gameEnd = true;
-            EventManager.Instance.TriggerEvent(new GameEnd(1, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+            EventManager.Instance.TriggerEvent(new GameEnd(1, Camera.main.ScreenToWorldPoint(Position), GameWinType.ScoreWin));
         }
         else if(Team2Score >= ModeData.TargetScore)
         {
             gameEnd = true;
-            EventManager.Instance.TriggerEvent(new GameEnd(2, Camera.main.ScreenToWorldPoint(TimerText.transform.position), GameWinType.ScoreWin));
+            EventManager.Instance.TriggerEvent(new GameEnd(2, Camera.main.ScreenToWorldPoint(Position), GameWinType.ScoreWin));
+        }
+    }
+
+    private void GetScore(int amount, bool Team1)
+    {
+        if (Team1)
+        {
+            Team1Score += amount;
+            Team1HopTimer = 0;
+            Team1PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
+            Team1ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
+        }
+        else
+        {
+            Team2Score += amount;
+            Team2HopTimer = 0;
+            Team2PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
+            Team2ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
         }
     }
 
@@ -174,13 +157,11 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if (e.Basket == BrawlModeReforgedArenaManager.Team1Basket)
         {
-            Team1HopTimer = 0;
-            Team1Score += ModeData.DeliveryPoint;
+            GetScore(ModeData.DeliveryPoint, true);
         }
         else
         {
-            Team2HopTimer = 0;
-            Team2Score += ModeData.DeliveryPoint;
+            GetScore(ModeData.DeliveryPoint, false);
         }
 
         RefreshScore();
@@ -196,18 +177,16 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if ((!e.HitterIsValid || e.PlayerHitter == null) && Utility.GetPlayerNumber()<=2)
         {
-            return;
+            //return;
         }
 
         if (e.Player.tag.Contains("1"))
         {
-            Team2HopTimer = 0;
-            Team2Score += ModeData.NormalKillPoint;
+            GetScore(ModeData.NormalKillPoint, false);
         }
         else
         {
-            Team1HopTimer = 0;
-            Team1Score += ModeData.NormalKillPoint;
+            GetScore(ModeData.NormalKillPoint, true);
         }
 
         RefreshScore();
@@ -217,6 +196,52 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     private void OnGameStart(GameStart e)
     {
         gameStart = true;
+    }
+
+    private void ScorePlusHop()
+    {
+        Team1PlusHopTimer += Time.deltaTime;
+        Team2PlusHopTimer += Time.deltaTime;
+
+        Team1ScorePlusText.GetComponent<TextMeshProUGUI>().enabled = true;
+        Team2ScorePlusText.GetComponent<TextMeshProUGUI>().enabled = true;
+
+        if (Team1PlusHopTimer <= UIData.ScorePlusTextHopScaleUpTime)
+        {
+            Team1ScorePlusText.transform.localScale = Mathf.Lerp(UIData.ScorePlusTextHopStartScale, UIData.ScorePlusTextHopBigScale, Team1PlusHopTimer / UIData.ScorePlusTextHopScaleUpTime) * Vector3.one;
+        }
+        else if(Team1PlusHopTimer <= UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime)
+        {
+            float Timer = Team1PlusHopTimer - UIData.ScorePlusTextHopScaleUpTime;
+            Team1ScorePlusText.transform.localScale = Mathf.Lerp(UIData.ScorePlusTextHopBigScale, UIData.ScorePlusTextHopEndScale, Timer / UIData.ScorePlusTextHopScaleDownTime)*Vector3.one;
+
+        }
+        else if(Team1PlusHopTimer <= UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime)
+        {
+            Team1ScorePlusText.transform.localScale = Vector3.one * UIData.ScorePlusTextHopEndScale;
+        }
+        else
+        {
+            Team1ScorePlusText.GetComponent<TextMeshProUGUI>().enabled = false;
+        }
+
+        if (Team2PlusHopTimer <= UIData.ScorePlusTextHopScaleUpTime)
+        {
+            Team2ScorePlusText.transform.localScale = Mathf.Lerp(UIData.ScorePlusTextHopStartScale, UIData.ScorePlusTextHopBigScale, Team2PlusHopTimer / UIData.ScorePlusTextHopScaleUpTime) * Vector3.one;
+        }
+        else if (Team2PlusHopTimer <= UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime)
+        {
+            float Timer = Team2PlusHopTimer - UIData.ScorePlusTextHopScaleUpTime;
+            Team2ScorePlusText.transform.localScale = Mathf.Lerp(UIData.ScorePlusTextHopBigScale, UIData.ScorePlusTextHopEndScale, Timer / UIData.ScorePlusTextHopScaleDownTime) * Vector3.one;
+        }
+        else if (Team2PlusHopTimer <= UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime)
+        {
+            Team2ScorePlusText.transform.localScale = Vector3.one * UIData.ScorePlusTextHopEndScale;
+        }
+        else
+        {
+            Team2ScorePlusText.GetComponent<TextMeshProUGUI>().enabled = false;
+        }
     }
 
     private void ScoreHop()
@@ -271,6 +296,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             {
                 Team1ScoreImpact.GetComponent<Image>().enabled = true;
                 Team1ScoreImpact.GetComponent<Animator>().Play("Team1ScoreImpact", -1, 0);
+                Team1PlusHopTimer = 0;
             }
 
             if (Current < Total/2)
@@ -329,6 +355,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             {
                 Team2ScoreImpact.GetComponent<Image>().enabled = true;
                 Team2ScoreImpact.GetComponent<Animator>().Play("Team2ScoreImpact", -1, 0);
+                Team2PlusHopTimer = 0;
             }
 
             if (Current < Total / 2)

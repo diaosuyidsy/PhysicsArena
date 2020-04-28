@@ -26,6 +26,7 @@ public class CabelBasket : MonoBehaviour
     public float DropAngleTolerance;
 
     public float DoorOpenTime;
+    public float DoorCloseTime;
 
     public float DetectRadius;
     public float AutoDropRadius;
@@ -274,7 +275,17 @@ public class CabelBasket : MonoBehaviour
     {
         float Angle = 0;
 
-        float DoorOpenSpeed = 90f/DoorOpenTime;
+        float DoorOpenSpeed;
+        if (Open)
+        {
+            DoorOpenSpeed = 90f / DoorOpenTime;
+        }
+        else
+        {
+            DoorOpenSpeed = 90f / DoorCloseTime;
+        }
+
+
 
         while (Angle <= 90)
         {
@@ -291,6 +302,17 @@ public class CabelBasket : MonoBehaviour
             }
 
             yield return null;
+        }
+
+        if (Open)
+        {
+            Up.transform.localEulerAngles = new Vector3(90, 0, 0);
+            Down.transform.localEulerAngles = new Vector3(-90, 0, 0);
+        }
+        else
+        {
+            Up.transform.localEulerAngles = new Vector3(0, 0, 0);
+            Down.transform.localEulerAngles = new Vector3(0, 0, 0);
         }
     }
 

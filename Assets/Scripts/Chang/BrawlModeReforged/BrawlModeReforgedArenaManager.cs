@@ -291,11 +291,6 @@ public class CabelSwtiching_DeliverFall : CabelAction
 
 }
 
-public class CabelSwtiching_DeliverToCart : CabelAction
-{
-
-}
-
 public class CabelSwtiching_FirstSegment : CabelAction
 {
     private List<GameObject> Waypoints;
@@ -866,6 +861,9 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             return;
         }
 
+        Context.Info.AimedMark.transform.position = Context.Info.LockedPlayer.transform.position + Context.FeelData.AimedMarkOffset;
+        Context.Info.AimedMark.transform.LookAt(Camera.main.transform);
+
         Vector3 Offset = Context.Info.LockedPlayer.transform.position - Context.Info.Mark.transform.position;
         Offset.y = 0;
 
@@ -925,7 +923,13 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkDefaultColor;
             Mark.transform.position = AvailablePoint[index] + Vector3.up * 0.01f;
 
+            GameObject AimedMark = GameObject.Instantiate(Context.AimedMarkPrefab);
+            Color color = AimedMark.GetComponent<SpriteRenderer>().color;
+            AimedMark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0);
+            AimedMark.transform.position = AvailablePlayer[index].transform.position + Context.FeelData.AimedMarkOffset;
+
             Context.Info.Mark = Mark;
+            Context.Info.AimedMark = AimedMark;
             Context.Info.LockedPlayer = AvailablePlayer[index];
 
             return true;
@@ -1054,7 +1058,7 @@ public class CanonCooldown : CanonAction
 
         Timer = 0;
 
-        EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.CameraFocus));
+        //EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.CameraFocus));
     }
 
     public override void Update()
@@ -1095,7 +1099,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         Timer = 0;
         PlayerLocked = false;
 
-        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.CameraFocus, 1));
+        
     }
 
     public override void Update()
@@ -1116,8 +1120,11 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
 
             if (Context.Info.LockedPlayer == null)
             {
+                EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.Bomb));
+
                 GameObject.Destroy(Context.Info.Bomb);
                 GameObject.Destroy(Context.Info.Mark);
+                GameObject.Destroy(Context.Info.AimedMark);
 
                 TransitionTo<CanonCooldown>();
                 return;
@@ -1125,6 +1132,9 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
 
             Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
             Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime);
+
+            Color Acolor = Context.Info.AimedMark.GetComponent<SpriteRenderer>().color;
+            Context.Info.AimedMark.GetComponent<SpriteRenderer>().color = new Color(Acolor.r, Acolor.g, Acolor.b, Timer / Context.FeelData.MarkAppearTime);
 
             CheckTimer();
 
@@ -1135,6 +1145,8 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
             SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
             if (LockPlayer())
             {
+
+
                 Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
                 Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
                 Context.Info.Bomb.transform.localPosition = Vector3.back * Context.FeelData.AmmoOffset;
@@ -1142,6 +1154,8 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
                 AimingSetCanon();
 
                 PlayerLocked = true;
+
+                EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.Bomb, 1));
             }
         }
 
@@ -1180,8 +1194,11 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
 
         if (Context.Info.LockedPlayer == null)
         {
+            EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.Bomb));
+
             GameObject.Destroy(Context.Info.Bomb);
             GameObject.Destroy(Context.Info.Mark);
+            GameObject.Destroy(Context.Info.AimedMark);
 
             TransitionTo<CanonCooldown>();
             return;
@@ -1237,6 +1254,9 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
     {
         base.Update();
 
+        Context.Info.AimedMark.transform.position = Context.Info.LockedPlayer.transform.position + Context.FeelData.AimedMarkOffset;
+        Context.Info.AimedMark.transform.LookAt(Camera.main.transform);
+
         FireSetCanon();
         if (Context.Info.CurrentPercentage == 0)
         {
@@ -1259,6 +1279,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         Timer += Time.deltaTime;
         if (Timer >= Context.Data.CanonFireFinalTime)
         {
+            EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.Bomb));
             BombFall();
 
             /*if (CheckDelivery())
@@ -1340,6 +1361,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         EventManager.Instance.TriggerEvent(new AmmoExplode(Context.Info.Bomb.transform.position));
         GameObject.Destroy(Context.Info.Bomb);
         GameObject.Destroy(Context.Info.Mark);
+        GameObject.Destroy(Context.Info.AimedMark);
     }
 }
 
@@ -1369,6 +1391,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public GameObject Bomb;
 
         public GameObject Mark;
+        public GameObject AimedMark;
         public GameObject LockedPlayer;
 
 
@@ -1431,6 +1454,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public GameObject BagelPrefab;
     public GameObject MarkPrefab;
+    public GameObject AimedMarkPrefab;
     public GameObject BombPrefab;
     public GameObject ExplosionVFX;
 

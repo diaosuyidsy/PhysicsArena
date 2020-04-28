@@ -700,115 +700,6 @@ public class CabelSwtiching_ThirdSegment : CabelAction
     }
 }
 
-public class CabelSwtiching : CabelAction
-{
-    private float Timer;
-
-    public override void OnEnter()
-    {
-        base.OnEnter();
-        Timer = 0;
-
-        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.CameraFocus, 1));
-
-    }
-
-
-    public override void Update()
-    {
-        base.Update();
-        Timer += Time.deltaTime;
-
-        SetCabel();
-        CheckTimer();
-
-    }
-
-    private void CheckTimer()
-    {
-        if (Timer >= Context.Data.CanonSwitchTime)
-        {
-            if (Context.Info.State != CanonState.Firing)
-            {
-                TransitionTo<CabelIdle>();
-                Context.CanonFSM.TransitionTo<CanonFiring_Normal>();
-
-                Context.Info.LockedPlayer = null;
-                GameObject.Destroy(Context.Info.Mark);
-                GameObject.Destroy(Context.Info.Bomb);
-
-                Context.SetWrap();
-            }
-        }
-    }
-
-    private void SetCabel() // Set cabel appearance
-    {
-        switch (Context.Info.CurrentSide)
-        {
-            case CanonSide.Neutral:
-                if (Context.Info.LastSide == CanonSide.Red)
-                {
-                    CabelChange(Context.Team1Cabel, false, true);
-                }
-                else
-                {
-                    CabelChange(Context.Team2Cabel, false, false);
-                }
-                break;
-            case CanonSide.Red:
-                CabelChange(Context.Team1Cabel, true, true);
-                if (Context.Info.LastSide == CanonSide.Blue)
-                {
-                    CabelChange(Context.Team2Cabel, false, false);
-                }
-                break;
-            case CanonSide.Blue:
-                CabelChange(Context.Team2Cabel, true, false);
-                if (Context.Info.LastSide == CanonSide.Red)
-                {
-                    CabelChange(Context.Team1Cabel, false, true);
-                }
-                break;
-        }
-    }
-
-
-    private void CabelChange(GameObject Cabel, bool Shine, bool Team1)
-    {
-
-        foreach (Transform child in Cabel.transform)
-        {
-            Material mat = child.GetComponent<Renderer>().material;
-            mat.EnableKeyword("_EMISSION");
-
-            Color color;
-
-            float Emission;
-
-            if (Shine)
-            {
-                Emission = Mathf.Lerp(Context.FeelData.CabelStartEmission, Context.FeelData.CabelEndEmission, Timer / Context.FeelData.CabelShineTime);
-            }
-            else
-            {
-                Emission = Mathf.Lerp(Context.FeelData.CabelEndEmission, Context.FeelData.CabelStartEmission, Timer / Context.FeelData.CabelShineTime);
-            }
-
-            if (Team1)
-            {
-                color = Context.FeelData.RedCabelColor;
-            }
-            else
-            {
-                color = Context.FeelData.BlueCabelColor;
-            }
-
-            mat.SetColor("_EmissionColor", color * Emission);
-        }
-    }
-}
-
 public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 {
     public override void OnEnter()
@@ -1155,7 +1046,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
 
                 PlayerLocked = true;
 
-                EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.Bomb, 1));
+                EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.Bomb, Context.FeelData.AimingCameraWeight));
             }
         }
 

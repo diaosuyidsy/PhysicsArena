@@ -46,7 +46,7 @@ public class CanonFeelData : MonoBehaviour
     public Material WrapBlueMat;
     public Material WrapNMat;
 
-
+    public float AimingCameraWeight;
 
     public float DeliverFallTime;
     public float DeliverMoveAcTime;

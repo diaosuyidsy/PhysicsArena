@@ -22,6 +22,7 @@ public class CabelBasket : MonoBehaviour
     public GameObject Up;
     public GameObject Down;
     public GameObject HoleEffect;
+    public GameObject HoleWind;
 
     public float DropAngleTolerance;
 
@@ -278,10 +279,12 @@ public class CabelBasket : MonoBehaviour
         float DoorOpenSpeed;
         if (Open)
         {
+            HoleWind.GetComponent<ParticleSystem>().Play(true);
             DoorOpenSpeed = 90f / DoorOpenTime;
         }
         else
         {
+
             DoorOpenSpeed = 90f / DoorCloseTime;
         }
 
@@ -311,6 +314,7 @@ public class CabelBasket : MonoBehaviour
         }
         else
         {
+            HoleWind.GetComponent<ParticleSystem>().Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             Up.transform.localEulerAngles = new Vector3(0, 0, 0);
             Down.transform.localEulerAngles = new Vector3(0, 0, 0);
         }

@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 2207365969951787868}
   - component: {fileID: 1409772953178780221}
   - component: {fileID: 592003148409491542}
+  - component: {fileID: -5717817922630674897}
+  - component: {fileID: 7810820289410451353}
   m_Layer: 0
   m_Name: bucket_small
   m_TagString: Untagged
@@ -108,3 +110,32 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.0026330613, y: 0.0026731538, z: 0.0025670396}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-5717817922630674897
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477088725970534272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0eccda2266359441b320966e7698b0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectNumber: 7
+  SelfLayer: 0
+--- !u!114 &7810820289410451353
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477088725970534272}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e9cf6179ab99674d880d66d601f6571, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplosionForceMultiplier: 0.01
+  SuckForceMultiplier: 0.05
+  OtherForceMultiplier: 0.05

@@ -106,7 +106,8 @@ public class rtBazooka : WeaponBase
                     IHittable ih = _c.GetComponent<IHittable>();
                     if (ih == null || Owner == _c.gameObject ||
                     Physics.Linecast(_c.transform.position, transform.position, _bazookaData.CanHideLayer)) continue;
-                    affectedPlayers.Add(_c.gameObject);
+                    if (_c.GetComponent<PlayerController>() != null)
+                        affectedPlayers.Add(_c.gameObject);
                     Vector3 dir = _c.transform.position - transform.position;
                     dir.y = 0f;
                     ih.OnImpact(_bazookaData.MaxAffectionForce * dir.normalized, ForceMode.Impulse, Owner, ImpactType.BazookaGun);

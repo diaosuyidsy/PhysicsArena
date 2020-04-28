@@ -284,7 +284,7 @@ public class CabelBasket : MonoBehaviour
         }
         else
         {
-
+            HoleWind.GetComponent<ParticleSystem>().Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             DoorOpenSpeed = 90f / DoorCloseTime;
         }
 
@@ -314,7 +314,7 @@ public class CabelBasket : MonoBehaviour
         }
         else
         {
-            HoleWind.GetComponent<ParticleSystem>().Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
+
             Up.transform.localEulerAngles = new Vector3(0, 0, 0);
             Down.transform.localEulerAngles = new Vector3(0, 0, 0);
         }

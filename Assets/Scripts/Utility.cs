@@ -117,12 +117,12 @@ public static class Utility
         float distance = velocityF * time - 0.5f * frictionCoeffcient * Mathf.Abs(Physics.gravity.y) * time * time;
         // 1. See if there is something behind, blocking
         RaycastHit hit;
-        if (Physics.SphereCast(ev.Hitted.transform.position, 0.2f, ev.Force.normalized, out hit, distance, HitBlockedLayer ^ (1 << ev.Hitted.layer)))
+        if (Physics.SphereCast(ev.Hitted.transform.position, 0.2f, ev.Force.normalized, out hit, distance * 1.2f, HitBlockedLayer ^ (1 << ev.Hitted.layer)))
         {
             return false;
         }
         // 2. See if the destination is beyond cliff
-        if (Physics.SphereCast(ev.Hitted.transform.position + ev.Force.normalized * distance, 0.2f, Vector3.down, out hit, 100f))
+        if (Physics.SphereCast(ev.Hitted.transform.position + ev.Force.normalized * distance * 0.8f, 0.2f, Vector3.down, out hit, 100f))
         {
             if (!hit.transform.CompareTag("DeathZone"))
                 return false;

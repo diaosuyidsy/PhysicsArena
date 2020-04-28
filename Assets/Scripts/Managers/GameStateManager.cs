@@ -101,7 +101,7 @@ public class GameStateManager : GameStateManagerBase
         EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
-        _darkCornerEffect = _cam.GetComponent<DarkCornerEffect>();
+        _darkCornerEffect = _cam.transform.GetChild(0).GetComponent<DarkCornerEffect>();
         _gameStateFSM.TransitionTo<TutorialState>();
         // _gameStateFSM.TransitionTo<MVPEndPanelState>();
     }

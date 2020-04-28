@@ -35,6 +35,8 @@ public class CanonFeelData : MonoBehaviour
     public Color RedCabelColor;
     public Color BlueCabelColor;
 
+    public Vector3 AimedMarkOffset;
+
     public float MarkAppearTime;
     public Color MarkDefaultColor;
     public Color MarkAlertColor;
@@ -44,7 +46,7 @@ public class CanonFeelData : MonoBehaviour
     public Material WrapBlueMat;
     public Material WrapNMat;
 
-
+    public float AimingCameraWeight;
 
     public float DeliverFallTime;
     public float DeliverMoveAcTime;

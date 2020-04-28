@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 4415119794877689007}
   - component: {fileID: 6189945677205704317}
   - component: {fileID: 3295805525317342026}
+  - component: {fileID: 111987771026789883}
+  - component: {fileID: -5276556767981684493}
   m_Layer: 0
   m_Name: bbq_lower
   m_TagString: Untagged
@@ -108,3 +110,32 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.00390437, y: 0.0053082327, z: 0.003603909}
   m_Center: {x: 0, y: 0, z: -0.000028310078}
+--- !u!114 &111987771026789883
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2700328003269351539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0eccda2266359441b320966e7698b0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectNumber: 7
+  SelfLayer: 0
+--- !u!114 &-5276556767981684493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2700328003269351539}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e9cf6179ab99674d880d66d601f6571, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplosionForceMultiplier: 0.01
+  SuckForceMultiplier: 0.05
+  OtherForceMultiplier: 0.05

@@ -13,6 +13,8 @@ GameObject:
   - component: {fileID: 7834223286263885407}
   - component: {fileID: 1884434584750279222}
   - component: {fileID: 8673999820826356566}
+  - component: {fileID: -9099912989670977225}
+  - component: {fileID: 8124414803671607934}
   m_Layer: 0
   m_Name: bag
   m_TagString: Untagged
@@ -108,3 +110,32 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.0024887417, y: 0.003981519, z: 0.0013481801}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &-9099912989670977225
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8395860477234125443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e0eccda2266359441b320966e7698b0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObjectNumber: 7
+  SelfLayer: 0
+--- !u!114 &8124414803671607934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8395860477234125443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e9cf6179ab99674d880d66d601f6571, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ExplosionForceMultiplier: 0.01
+  SuckForceMultiplier: 0.05
+  OtherForceMultiplier: 0.05

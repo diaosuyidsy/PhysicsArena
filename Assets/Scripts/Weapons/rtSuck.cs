@@ -114,8 +114,14 @@ public class rtSuck : WeaponBase
     IEnumerator sucking()
     {
         List<GameObject> gos = _sbc.InRangePlayers;
+        List<GameObject> players = new List<GameObject>();
+        for (int i = 0; i < gos.Count; i++)
+        {
+            if (gos[i].GetComponent<PlayerIdentification>() != null)
+                players.Add(gos[i]);
+        }
         EventManager.Instance.TriggerEvent(new SuckGunSuck(gameObject, _suckBall, Owner, Owner.GetComponent<PlayerController>().PlayerNumber,
-            gos));
+            players));
         // First prototype: let's try adding a force to every object
         foreach (GameObject go in gos)
         {
@@ -144,7 +150,7 @@ public class rtSuck : WeaponBase
         _suckBall.SetActive(false);
         _ballState = State.In;
         // Need a little clean up the line renderer and stuff
-        
+
         _onWeaponUsedOnce();
     }
 

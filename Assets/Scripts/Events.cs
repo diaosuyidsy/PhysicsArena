@@ -686,9 +686,9 @@ public class OnScore : GameEvent
 public class OnAddCameraTargets : GameEvent
 {
     public GameObject Target;
-    public int Weight;
+    public float Weight;
 
-    public OnAddCameraTargets(GameObject target, int weight)
+    public OnAddCameraTargets(GameObject target, float weight)
     {
         Target = target;
         Weight = weight;

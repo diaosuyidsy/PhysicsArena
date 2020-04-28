@@ -457,9 +457,9 @@ public interface IHittableNetwork
 public class CameraTargets
 {
     public GameObject Target;
-    public int Weight;
+    public float Weight;
 
-    public CameraTargets(GameObject target, int weight = 1)
+    public CameraTargets(GameObject target, float weight = 1f)
     {
         Target = target;
         Weight = weight;

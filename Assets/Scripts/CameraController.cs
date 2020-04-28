@@ -79,7 +79,7 @@ public class CameraController : MonoBehaviour
         private void _setCameraFOV()
         {
             Vector3 total = Vector3.zero;
-            int length = 0;
+            float length = 0f;
 
             foreach (CameraTargets ct in Context._cameraTargets)
             {

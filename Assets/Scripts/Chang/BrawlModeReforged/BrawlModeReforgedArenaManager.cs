@@ -111,6 +111,7 @@ public class CabelIdle : CabelAction
         if (e.Basket == Context.Basket1)
         {
             Context.Info.LastSide = Context.Info.CurrentSide;
+            Context.Info.CurrentLockSide = Context.Info.CurrentSide;
             Context.Info.CurrentSide = CanonSide.Red;
 
             TransitionTo<CabelSwtiching_DeliverMove>();
@@ -124,6 +125,7 @@ public class CabelIdle : CabelAction
         else
         {
             Context.Info.LastSide = Context.Info.CurrentSide;
+            Context.Info.CurrentLockSide = Context.Info.CurrentSide;
             Context.Info.CurrentSide = CanonSide.Blue;
 
             TransitionTo<CabelSwtiching_DeliverMove>();
@@ -566,8 +568,11 @@ public class CabelSwtiching_ThirdSegment : CabelAction
         }
         else
         {
+            Context.Info.CurrentLockSide = Context.Info.CurrentSide;
+
             if (Context.Info.LastSide == Context.Info.CurrentSide)
             {
+
                 Context.Bagel.transform.eulerAngles = Vector3.zero;
                 Cart.transform.position = StartPoint;
                 Cart.transform.eulerAngles = Vector3.zero;
@@ -797,7 +802,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
         foreach (Transform child in Context.Players.transform)
         {
-            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Context.Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentSide == CanonSide.Red))
+            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Context.Info.CurrentLockSide== CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentLockSide == CanonSide.Red))
             {
                 RaycastHit hit;
                 if (Physics.Raycast(child.position, Vector3.down, out hit, 5, Context.GroundLayer))
@@ -1152,8 +1157,15 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
     {
         base.Update();
 
-        Context.Info.AimedMark.transform.position = Context.Info.LockedPlayer.transform.position + Context.FeelData.AimedMarkOffset;
-        Context.Info.AimedMark.transform.LookAt(Camera.main.transform);
+        if (Context.Info.LockedPlayer != null)
+        {
+            Context.Info.AimedMark.transform.position = Context.Info.LockedPlayer.transform.position + Context.FeelData.AimedMarkOffset;
+            Context.Info.AimedMark.transform.LookAt(Camera.main.transform);
+        }
+        else
+        {
+            GameObject.Destroy(Context.Info.AimedMark);
+        }
 
         FireSetCanon();
         if (Context.Info.CurrentPercentage == 0)
@@ -1283,6 +1295,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public CanonState State;
         public CanonSide CurrentSide;
         public CanonSide LastSide;
+        public CanonSide CurrentLockSide;
         public float Timer;
         public int FireCount;
 

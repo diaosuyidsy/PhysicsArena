@@ -12,6 +12,7 @@ public class ConfigData : ScriptableObject
     public Color[] TeamColor;
     [Header("Statistics Setting")]
     public Sprite[] TeamNumberToMVPBackground;
+    public Sprite[] TeamNumberToMVPTitleSprite;
     public Sprite[] ColorIndexToMVPPlayerPortrait;
     public Vector3 MVPTitleMoveAmount;
     public float MVPTitleMoveDuration = 0.5f;

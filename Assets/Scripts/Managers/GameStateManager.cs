@@ -319,7 +319,7 @@ public class GameStateManager : GameStateManagerBase
             Context._MVPBackground.gameObject.SetActive(true);
             // 2. Set Up MVP Player Portrait and Title Text
             Context._MVPPlayerPortrait.GetComponent<Image>().sprite = _configData.ColorIndexToMVPPlayerPortrait[MVPColorIndex];
-            Context._MVPTitle.GetComponent<TextMeshProUGUI>().color = _configData.TeamColor[MVPTeamNumber];
+            Context._MVPTitle.GetComponent<Image>().sprite = _configData.TeamNumberToMVPTitleSprite[MVPTeamNumber];
             // 3. Move In MVP Player Portrait and Title Text
             Context._MVPTitle.gameObject.SetActive(true);
             Sequence sequence = DOTween.Sequence();

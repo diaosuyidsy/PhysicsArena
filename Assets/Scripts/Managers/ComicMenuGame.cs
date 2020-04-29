@@ -14,7 +14,7 @@ public class ComicMenuGame : MonoBehaviour
     private void Awake()
     {
         Services.Config = new Config(ConfigData, GameMapData, CharacterData);
-        Services.AudioManager = new AudioManager();
+        Services.AudioManager = new AudioManager(null, null);
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
         Services.GameStateManager = new MenuGameStateManager(GameMapData, ConfigData, gameObject);

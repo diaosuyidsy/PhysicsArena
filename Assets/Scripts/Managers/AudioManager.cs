@@ -6,8 +6,12 @@ using FMODUnity;
 public class AudioManager
 {
     private FMOD.Studio.EventInstance bgmEV;
-    public AudioManager()
+    private ObjectiveManager _mapObjectiveManager;
+    private ModeSepcificData _modeSpecificData;
+    public AudioManager(ObjectiveManager om, ModeSepcificData data)
     {
+        _mapObjectiveManager = om;
+        _modeSpecificData = data;
         OnEnable();
     }
 
@@ -63,7 +67,10 @@ public class AudioManager
             _playSound("event:/SFX/Gameplay/Characters/ChickenDied", ev.Player.transform.position);
         else
             _playSound("event:/SFX/Gameplay/Characters/DuckDied", ev.Player.transform.position);
-
+        if (_mapObjectiveManager != null && _mapObjectiveManager.GetType().Equals(typeof(BrawlModeReforgedObjectiveManager)))
+        {
+            _brawlModeOnScore(Mathf.Max((_mapObjectiveManager as BrawlModeReforgedObjectiveManager).Team1Score, (_mapObjectiveManager as BrawlModeReforgedObjectiveManager).Team2Score));
+        }
     }
 
     private void _onObjectDespawned(ObjectDespawned ev)
@@ -157,6 +164,7 @@ public class AudioManager
     private void _onFoodDelievered(BagelSent ev)
     {
         _playSound("event:/SFX/Gameplay/Object/Other/BagelDelivered", ev.Basket.transform.position);
+        _brawlModeOnScore(Mathf.Max((_mapObjectiveManager as BrawlModeReforgedObjectiveManager).Team1Score, (_mapObjectiveManager as BrawlModeReforgedObjectiveManager).Team2Score));
     }
 
     private void _onPlayerLand(PlayerLand ev)
@@ -195,9 +203,26 @@ public class AudioManager
 
     private void _onGameStart(GameStart ev)
     {
-        bgmEV = RuntimeManager.CreateInstance("event:/Music/BrawlModeBGM");
-        bgmEV.start();
+
+        if (_mapObjectiveManager != null && _mapObjectiveManager.GetType().Equals(typeof(BrawlModeReforgedObjectiveManager)))
+        {
+            bgmEV = RuntimeManager.CreateInstance("event:/Music/BrawlModeBGM");
+            bgmEV.start();
+        }
     }
+
+    private void _brawlModeOnScore(int maxTeamScore)
+    {
+        int targetScore = (_modeSpecificData as BrawlModeReforgedModeData).TargetScore;
+        int closeScore = (_modeSpecificData as BrawlModeReforgedModeData).CloseScore;
+        float speed = 0f;
+        if (maxTeamScore > closeScore)
+        {
+            speed = (1f * maxTeamScore - closeScore) / targetScore;
+        }
+        bgmEV.setParameterByName("Speed", speed);
+    }
+
     #endregion
 
     private void OnEnable()

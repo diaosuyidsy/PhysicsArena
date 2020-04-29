@@ -21,7 +21,7 @@ public class ScorePlusText : MonoBehaviour
     public Color RedColor;
     public Color BlueColor;
 
-    public Vector3 StartOffset;
+    public Vector3 FadeOffset;
 
     private float Timer;
 
@@ -81,7 +81,7 @@ public class ScorePlusText : MonoBehaviour
             GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, 1-t);
 
             CurrentOffset = Mathf.Lerp(0, 1, t);
-            transform.parent.position = OriOffset + StartOffset * CurrentOffset + Holder.transform.position;
+            transform.parent.position = OriOffset + FadeOffset * CurrentOffset + Holder.transform.position;
         }
         else
         {

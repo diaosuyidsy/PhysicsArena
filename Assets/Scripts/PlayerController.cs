@@ -597,16 +597,17 @@ public class PlayerController : MonoBehaviour, IHittable
         public override void FixedUpdate()
         {
             base.FixedUpdate();
-            Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context._walkSpeed;
-            Vector3 velocityChange = targetVelocity - Context._rb.velocity;
-            velocityChange.x = Mathf.Clamp(velocityChange.x, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
-            velocityChange.z = Mathf.Clamp(velocityChange.z, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
-            velocityChange.y = 0f;
 
-            Context._rb.AddForce(velocityChange * Context.CharacterDataStore.InAirSpeedMultiplier, ForceMode.VelocityChange);
-
-            if (_HLAxis != 0f && _VLAxis != 0f)
+            if (_HLAxis != 0f || _VLAxis != 0f)
             {
+                Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context._walkSpeed;
+                Vector3 velocityChange = targetVelocity - Context._rb.velocity;
+                velocityChange.x = Mathf.Clamp(velocityChange.x, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
+                velocityChange.z = Mathf.Clamp(velocityChange.z, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
+                velocityChange.y = 0f;
+
+                Context._rb.AddForce(velocityChange * Context.CharacterDataStore.InAirSpeedMultiplier, ForceMode.VelocityChange);
+
                 Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
                 Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
                 Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed * Context._rotationSpeedMultiplier);
@@ -1452,7 +1453,7 @@ public class PlayerController : MonoBehaviour, IHittable
             myLayer = Context.gameObject.layer;
             Context.gameObject.layer = 19;
             Context._rb.AddForce(Context._hitForceTuple.Force, Context._hitForceTuple.ForceMode);
-            _sweepInHitDirection();
+            // _sweepInHitDirection();
         }
 
         public override void OnExit()

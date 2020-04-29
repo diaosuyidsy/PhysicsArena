@@ -350,6 +350,15 @@ public class AmmoExplode : GameEvent
     }
 }
 
+public class ScoreEffectTrigger : GameEvent
+{
+    public bool Team1;
+    public ScoreEffectTrigger (bool b)
+    {
+        Team1 = b;
+    }
+}
+
 public class TriggerEmoji : GameEvent
 {
     public int EmojiType;

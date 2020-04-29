@@ -12,6 +12,7 @@ public class ScorePlusText : MonoBehaviour
     public float HugeScale;
     public float EndScale;
 
+    public float MoveTime;
     public float FadeTime;
     public float ScaleUpTime;
     public float ScaleDownTime;
@@ -27,6 +28,9 @@ public class ScorePlusText : MonoBehaviour
 
     private float CurrentOffset;
     private Vector3 OriOffset;
+    private GameObject GameUI;
+    private Vector3 MoveTarget;
+    private Vector3 MoveStart;
 
     // Start is called before the first frame update
     void Start()
@@ -48,6 +52,8 @@ public class ScorePlusText : MonoBehaviour
         OriOffset = transform.parent.position - Holder.transform.position;
 
         CurrentOffset = 1;
+
+        GameUI = GameObject.Find("GameUI").gameObject;
     }
 
     // Update is called once per frame
@@ -57,11 +63,10 @@ public class ScorePlusText : MonoBehaviour
 
         Timer += Time.deltaTime;
 
-
         if (Timer <= ScaleUpTime)
         {
             transform.parent.position = OriOffset + Holder.transform.position;
-            transform.localScale = Mathf.Lerp(StartScale, BigScale, Timer/ ScaleUpTime) * Vector3.one;
+            transform.localScale = Mathf.Lerp(StartScale, BigScale, Timer / ScaleUpTime) * Vector3.one;
         }
         else if (Timer <= ScaleUpTime + ScaleDownTime)
         {
@@ -73,12 +78,12 @@ public class ScorePlusText : MonoBehaviour
         {
             transform.localScale = Vector3.one * EndScale;
         }
-        else if(Timer <= ScaleUpTime + ScaleDownTime + StayTime + FadeTime)
+        else if (Timer <= ScaleUpTime + ScaleDownTime + StayTime + FadeTime)
         {
-            float t = (Timer - ScaleUpTime - ScaleDownTime - StayTime)/FadeTime;
+            float t = (Timer - ScaleUpTime - ScaleDownTime - StayTime) / FadeTime;
 
             Color color = GetComponent<TextMeshProUGUI>().color;
-            GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, 1-t);
+            GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, 1 - t);
 
             CurrentOffset = Mathf.Lerp(0, 1, t);
             transform.parent.position = OriOffset + FadeOffset * CurrentOffset + Holder.transform.position;

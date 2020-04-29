@@ -248,7 +248,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
                 }
             }*/
 
-            if(e.PlayerHitter !=null && e.HitterIsValid)
+            if(e.PlayerHitter !=null && e.HitterIsValid && e.PlayerHitter.GetComponent<PlayerController>() && e.PlayerHitter.tag.Contains("2"))
             {
                 GenerateScorePlus(e.PlayerHitter, true, false, ModeData.NormalKillPoint);
             }
@@ -269,7 +269,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
                     GenerateScorePlus(child.gameObject, true, true, ModeData.NormalKillPoint);
                 }
             }*/
-            if (e.PlayerHitter != null && e.HitterIsValid)
+            if (e.PlayerHitter != null && e.HitterIsValid&& e.PlayerHitter.GetComponent<PlayerController>() && e.PlayerHitter.tag.Contains("1"))
             {
                 GenerateScorePlus(e.PlayerHitter, true, true, ModeData.NormalKillPoint);
             }

@@ -101,10 +101,12 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     {
         CloseScoreShake();
 
-        if (gameEnd || !gameStart) return;
-
         ScoreHop();
         ScorePlusHop();
+
+        if (gameEnd || !gameStart) return;
+
+
 
     }
 
@@ -182,10 +184,32 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if (e.Player.tag.Contains("1"))
         {
+            if(e.PlayerHitter!=null && e.HitterIsValid)
+            {
+                GameObject Plus = GameObject.Instantiate(UIData.ScorePlusTextPrefab);
+                Plus.transform.position = UIData.ScorePlusTextCharacterOffset + e.PlayerHitter.transform.position;
+                Plus.transform.localScale = UIData.ScorePlusTextCharacterScale * Vector3.one;
+                Plus.transform.SetParent(e.PlayerHitter.transform);
+
+                Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Holder = e.PlayerHitter;
+                Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Team1 = false;
+            }
+
             GetScore(ModeData.NormalKillPoint, false);
         }
         else
         {
+            if (e.PlayerHitter != null && e.HitterIsValid)
+            {
+                GameObject Plus = GameObject.Instantiate(UIData.ScorePlusTextPrefab);
+                Plus.transform.position = UIData.ScorePlusTextCharacterOffset + e.PlayerHitter.transform.position;
+                Plus.transform.localScale = UIData.ScorePlusTextCharacterScale * Vector3.one;
+                Plus.transform.SetParent(e.PlayerHitter.transform);
+
+                Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Holder = e.PlayerHitter;
+                Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Team1 = true;
+            }
+
             GetScore(ModeData.NormalKillPoint, true);
         }
 
@@ -376,7 +400,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
     private void CloseScoreShake()
     {
-        if(Team1Score < ModeData.TargetScore && Team1Score >= ModeData.CloseScore)
+        if(Team1Score >= ModeData.CloseScore)
         {
             Team1Board.transform.localPosition += Team1ShakeDir * UIData.ShakeSpeed * Time.deltaTime;
             if(Vector3.Dot(Team1Board.GetComponent<RectTransform>().localPosition - Team1ShakeTarget, Team1ShakeDir) > 0)
@@ -390,7 +414,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             Team1Board.GetComponent<RectTransform>().localPosition = Team1BoardOriPos;
         }
 
-        if (Team2Score < ModeData.TargetScore && Team2Score >= ModeData.CloseScore)
+        if (Team2Score >= ModeData.CloseScore)
         {
             Team2Board.transform.localPosition += Team2ShakeDir * UIData.ShakeSpeed * Time.deltaTime;
             if (Vector3.Dot(Team2Board.GetComponent<RectTransform>().localPosition - Team2ShakeTarget, Team2ShakeDir) > 0)

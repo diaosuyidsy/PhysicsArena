@@ -24,6 +24,12 @@ public class BrawlModeReforgedUIData : UIData
     public float ScorePlusTextHopScaleDownTime;
     public float ScorePlusTextHopStayTime;
 
+    public Vector3 ScorePlusTextCharacterOffset;
+    public float ScorePlusTextCharacterScale;
+    public Vector3 ScorePlusTextBasketOffset;
+    public float ScorePlusTextBasketScale;
+    public GameObject ScorePlusTextPrefab;
+
     public float ShakeRadius;
     public float ShakeSpeed;
 }

@@ -414,6 +414,15 @@ public class WaterGunFired : GameEvent
         WaterGunOwnerPlayerNumber = _watergunownerplayernumber;
     }
 }
+public class WaterGunStopped : GameEvent
+{
+    public GameObject WaterGun { get; }
+
+    public WaterGunStopped(GameObject _watergun)
+    {
+        WaterGun = _watergun;
+    }
+}
 
 public abstract class HookGunEvent : GameEvent
 {

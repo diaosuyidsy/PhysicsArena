@@ -122,7 +122,7 @@ public class AudioManager
     {
         if (_waterGunAudio.ContainsKey(ev.WaterGun))
         {
-            _waterGunAudio[ev.WaterGun].stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
+            _waterGunAudio[ev.WaterGun].stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
             _waterGunAudio.Remove(ev.WaterGun);
         }
     }

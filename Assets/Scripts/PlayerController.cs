@@ -208,7 +208,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
                 _hitStopFrames = CharacterDataStore.HitStopFramesBig;
             }
-            if ((_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
+            if (_movementFSM.CurrentState != null && (_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
                 // if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
                 //     _movementFSM.TransitionTo<PunchHittedStopMovementState>();
@@ -217,7 +217,7 @@ public class PlayerController : MonoBehaviour, IHittable
                 _movementFSM.TransitionTo<HitUncontrollableState>();
             }
 
-            if ((_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
+            if (_actionFSM.CurrentState != null && (_actionFSM.CurrentState as ActionState).ShouldOnHitTransitToUncontrollableState)
             {
                 // if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
                 //     _actionFSM.TransitionTo<PunchHittedStopActionState>();

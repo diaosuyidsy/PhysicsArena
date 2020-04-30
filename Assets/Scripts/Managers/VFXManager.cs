@@ -71,10 +71,48 @@ public class VFXManager
 
     private void _onPlayerDied(PlayerDied pd)
     {
-        if (pd.Player.layer < 13)
-            _instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 9].transform.rotation);
+        int playerColorIndex = pd.Player.GetComponent<PlayerIdentification>().ColorIndex;
+
+        if (Utility.IsPositionInCameraView(pd.Player.transform.position, Camera.main))
+        {
+            _instantiateVFX(VFXDataStore.DeathVFX[playerColorIndex], pd.Player.transform.position, VFXDataStore.DeathVFX[playerColorIndex].transform.rotation);
+        }
         else
-            _instantiateVFX(VFXDataStore.DeathVFX[pd.Player.layer - 11], pd.Player.transform.position, VFXDataStore.DeathVFX[pd.Player.layer - 11].transform.rotation);
+        {
+            Vector3 worldCenter = Services.Config.GameMapData.WorldCenter;
+            Vector3 deadPlayerPos = pd.Player.transform.position;
+            Vector3 deadRelativePosition = deadPlayerPos - worldCenter;
+            int relativePosition = 0;
+            Vector3 VFXtoCameraRelativePosition = VFXDataStore.HugeDeathXYZ;
+            if (deadRelativePosition.x > 0 && Mathf.Abs(deadRelativePosition.x) > Mathf.Abs(deadRelativePosition.z))
+            {
+                // It's right
+                relativePosition = 3;
+                VFXtoCameraRelativePosition.y = (-deadRelativePosition).normalized.z;
+            }
+            else if (deadRelativePosition.z > 0 && Mathf.Abs(deadRelativePosition.z) > Mathf.Abs(deadRelativePosition.x))
+            {
+                // It's up
+                relativePosition = 2;
+                VFXtoCameraRelativePosition.x = (-deadRelativePosition).normalized.x;
+            }
+            else if (deadRelativePosition.x <= 0 && Mathf.Abs(deadRelativePosition.x) > Mathf.Abs(deadRelativePosition.z))
+            {
+                // It's Left
+                relativePosition = 1;
+                VFXtoCameraRelativePosition.x *= -1;
+                VFXtoCameraRelativePosition.y = (-deadRelativePosition).normalized.z;
+            }
+            else
+            {
+                // It's down
+                VFXtoCameraRelativePosition.y *= -1;
+                VFXtoCameraRelativePosition.x = (-deadRelativePosition).normalized.x;
+            }
+            GameObject hugeDeathVFX = GameObject.Instantiate(VFXDataStore.HugeDeathVFX[playerColorIndex], Camera.main.transform);
+            hugeDeathVFX.transform.eulerAngles = Vector3.forward * -90f * relativePosition;
+            hugeDeathVFX.transform.localPosition = VFXtoCameraRelativePosition;
+        }
 
         // if (pd.Player.layer < 13)
         //     _instantiateVFX(VFXDataStore.HugeDeathVFX[pd.Player.layer - 9], pd.Player.transform.position, VFXDataStore.HugeDeathVFX[pd.Player.layer - 9].transform.rotation);

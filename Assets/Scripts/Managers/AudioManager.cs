@@ -1,265 +1,257 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FMODUnity;
 
 public class AudioManager
 {
-    public AudioData AudioDataStore;
-    private GameObject gameManager;
-    public AudioManager(AudioData _data, GameObject _gameManager)
+    private FMOD.Studio.EventInstance bgmEV;
+    private ObjectiveManager _mapObjectiveManager;
+    private ModeSepcificData _modeSpecificData;
+    private Dictionary<GameObject, FMOD.Studio.EventInstance> _waterGunAudio;
+    public AudioManager(ObjectiveManager om, ModeSepcificData data)
     {
-        AudioDataStore = _data;
-        gameManager = _gameManager;
+        _mapObjectiveManager = om;
+        _modeSpecificData = data;
+        _waterGunAudio = new Dictionary<GameObject, FMOD.Studio.EventInstance>();
         OnEnable();
     }
 
-    /// <summary>
-    /// Play clip Sound at obj
-    /// </summary>
-    /// <param name="obj"></param>
-    /// <param name="clip"></param>
-    /// <param name="oneshot"></param>
-    private void _playSound(GameObject obj, AudioClip clip, bool oneshot = true, float volume = 1)
+    public void PlaySound(string path, Vector3 position = default(Vector3))
     {
-        if (clip == null) return;
-        AudioSource objas = obj.GetComponent<AudioSource>();
-        if (objas == null) objas = obj.AddComponent<AudioSource>();
-        Debug.Assert(objas != null);
-
-        if (oneshot)
-            objas.PlayOneShot(clip, volume);
-        else
-        {
-            objas.Stop();
-            objas.clip = clip;
-            objas.Play();
-        }
+        _playSound(path, position);
     }
 
-    /// <summary>
-    /// Play sound randomly from given clips
-    /// </summary>
-    /// <param name="obj"></param>
-    /// <param name="clips"></param>
-    /// <param name="oneshot"></param>
-    private void _playSound(GameObject obj, AudioClip[] clips, bool oneshot = true, float volume = 1)
+    /// FMOD play sound
+    private void _playSound(string path, Vector3 position = default(Vector3))
     {
-        if (clips.Length == 0) return;
-        int rand = Random.Range(0, clips.Length);
-        _playSound(obj, clips[rand], oneshot, volume);
+        RuntimeManager.PlayOneShot(path, position);
     }
 
     #region Event Handlers
-    private void _onPlayerHit(PlayerHit ph)
+    private void _onPlayerHit(PlayerHit ev)
     {
-        if (ph.IsABlock)
+        if (ev.IsABlock)
         {
             ///If hiter is null, then it's a block
-            _playSound(ph.Hitted, AudioDataStore.BlockAudioClip);
+            _playSound("event:/SFX/Gameplay/Melee/PlayerPunchBlocked", ev.Hitted.transform.position);
         }
         else
         {
-            if (ph.MeleeCharge > 0.1f)
-                ///If it's not null, then it's a hit
-                _playSound(ph.Hitted, AudioDataStore.PlayerHitAudioClip);
+            ///If it's not null, then it's a hit
+            _playSound("event:/SFX/Gameplay/Melee/PlayerPunched", ev.Hiter.transform.position);
         }
     }
 
-    private void _onHookGunFired(HookGunFired hgf)
+    private void _onHookGunFired(HookGunFired ev)
     {
-        _playSound(hgf.HookGun, AudioDataStore.HookGunFiredAudioClip);
+        _playSound("event:/SFX/Gameplay/Object/HookGun/HookGunFired", ev.HookGun.transform.position);
     }
 
-    private void _onHookGunHit(HookHit hh)
+    private void _onHookGunHit(HookHit ev)
     {
-        _playSound(hh.Hook, AudioDataStore.HookGunHitAudioClip);
+        _playSound("event:/SFX/Gameplay/Object/HookGun/HookGunHit", ev.HookGun.transform.position);
     }
 
-    private void _onSuckGunFired(SuckGunFired sgf)
+    private void _onSuckGunFired(SuckGunFired ev)
     {
-        _playSound(sgf.SuckGun, AudioDataStore.SuckGunFiredAudioClip);
+        _playSound("event:/SFX/Gameplay/Object/SuckGun/SuckGunFired", ev.SuckGun.transform.position);
     }
 
-    private void _onSuckGunSuck(SuckGunSuck sgs)
+    private void _onSuckGunSuck(SuckGunSuck ev)
     {
-        _playSound(sgs.SuckBall, AudioDataStore.SuckGunSuckAudioClip);
+        _playSound("event:/SFX/Gameplay/Object/SuckGun/SuckGunSuck", ev.SuckGun.transform.position);
     }
 
-    private void _onPlayerDied(PlayerDied pd)
+    private void _onPlayerDied(PlayerDied ev)
     {
-        if (pd.Player.tag.Contains("Team1"))
-            _playSound(pd.Player, AudioDataStore.ChickenDeathAudioClip);
+        if (ev.Player.tag.Contains("Team1"))
+            _playSound("event:/SFX/Gameplay/Characters/ChickenDied", ev.Player.transform.position);
         else
-            _playSound(pd.Player, AudioDataStore.DuckDeathAudioClip);
-
-    }
-
-    private void _onObjectDespawned(ObjectDespawned od)
-    {
-        if (od.Despawner != null && od.Despawner.GetComponent<ResourceCollector>() != null)
+            _playSound("event:/SFX/Gameplay/Characters/DuckDied", ev.Player.transform.position);
+        if (_mapObjectiveManager != null && _mapObjectiveManager.GetType().Equals(typeof(BrawlModeReforgedObjectiveManager)))
         {
-            _playSound(od.Obj, AudioDataStore.WrongFoodAudioClip);
-        }
-        else
-            _playSound(od.Obj, AudioDataStore.ObjectDespawnedAudioClip);
-    }
-
-    private void _onPlayerRespawned(PlayerRespawned pr)
-    {
-        _playSound(pr.Player, AudioDataStore.PlayerRespawnedAudioClip);
-    }
-
-    private void _onWeaponSpawned(WeaponSpawned ws)
-    {
-        _playSound(ws.Weapon, AudioDataStore.WeaponSpawnedAudioClip);
-    }
-
-    private void _onPunchStart(PunchStart ph)
-    {
-        _playSound(ph.Player, AudioDataStore.PunchChargingAudioClip, false);
-    }
-
-    private void _onPunchReleased(PunchReleased pr)
-    {
-        _playSound(pr.Player, AudioDataStore.PunchReleasedAudioClip, false);
-    }
-
-    private void _onFootStep(FootStep fs)
-    {
-        switch (fs.GroundTag)
-        {
-            case "Ground_Concrete":
-                _playSound(fs.PlayerFeet, AudioDataStore.FootstepConcreteAudioClip, true, Random.Range(0.2f, 0.3f));
-                break;
-            case "Ground_YellowStone":
-                _playSound(fs.PlayerFeet, AudioDataStore.FootstepYellowStoneAudioClip, true, Random.Range(0.2f, 0.3f));
-                break;
-            case "Ground_Grass":
-                _playSound(fs.PlayerFeet, AudioDataStore.FootstepGrassAudioClip, true, Random.Range(0.2f, 0.3f));
-                break;
-            default:
-                _playSound(fs.PlayerFeet, AudioDataStore.FootstepConcreteAudioClip, true, Random.Range(0.2f, 0.3f));
-                break;
+            _brawlModeOnScore(Mathf.Max((_mapObjectiveManager as BrawlModeReforgedObjectiveManager).Team1Score, (_mapObjectiveManager as BrawlModeReforgedObjectiveManager).Team2Score));
         }
     }
 
-    private void _onPlayerJump(PlayerJump pj)
+    private void _onObjectDespawned(ObjectDespawned ev)
     {
-        _playSound(pj.PlayerFeet, AudioDataStore.JumpAudioClip);
+        _playSound("event:/SFX/Gameplay/Object/Other/ObjectDespawned", ev.Obj.transform.position);
     }
 
-    private void _onWaterGunFired(WaterGunFired wf)
+    private void _onPlayerRespawned(PlayerRespawned ev)
     {
-        _playSound(wf.WaterGun, AudioDataStore.WaterGunFiredAudioClip);
+        _playSound("event:/SFX/Gameplay/Characters/PlayerRespawned", ev.Player.transform.position);
     }
 
-    private void _onFistGunFired(FistGunFired ff)
+    private void _onWeaponSpawned(WeaponSpawned ev)
     {
-        _playSound(ff.Fist, AudioDataStore.FistGunFiredAudioClip, false);
+        _playSound("event:/SFX/Gameplay/Object/Other/WeaponSpawned", ev.Weapon.transform.position);
     }
 
-    private void _onFistGunHit(FistGunHit ff)
+    private void _onPunchStart(PunchStart ev)
     {
-        _playSound(ff.Fist, AudioDataStore.FistGunHitAudioClip, false);
+        _playSound("event:/SFX/Gameplay/Melee/PlayerPunchStart", ev.Player.transform.position);
     }
 
-    private void _onFistGunBlocked(FistGunBlocked ff)
+    private void _onPunchReleased(PunchReleased ev)
     {
-        _playSound(ff.Fist, AudioDataStore.FistGunBlockedAudioClip, true);
+        _playSound("event:/SFX/Gameplay/Melee/PlayerPunchReleased", ev.Player.transform.position);
+    }
+
+    private void _onFootStep(FootStep ev)
+    {
+        _playSound("event:/SFX/Gameplay/Characters/FootStepConcrete", ev.PlayerFeet.transform.position);
+    }
+
+    private void _onPlayerJump(PlayerJump ev)
+    {
+        _playSound("event:/SFX/Gameplay/Characters/PlayerJump", ev.PlayerFeet.transform.position);
+    }
+
+    private void _onWaterGunFired(WaterGunFired ev)
+    {
+        var a = RuntimeManager.CreateInstance("event:/SFX/Gameplay/Object/WaterGun/WaterGunFired");
+        a.start();
+        _waterGunAudio.Add(ev.WaterGun, a);
+        // _playSound("event:/SFX/Gameplay/Object/WaterGun/WaterGunFired", ev.WaterGun.transform.position);
+    }
+
+    private void _onWaterGunStopped(WaterGunStopped ev)
+    {
+        if (_waterGunAudio.ContainsKey(ev.WaterGun))
+        {
+            _waterGunAudio[ev.WaterGun].stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            _waterGunAudio.Remove(ev.WaterGun);
+        }
+    }
+
+    private void _onFistGunFired(FistGunFired ev)
+    {
+        _playSound("event:/SFX/Gameplay/Object/FistGun/FistGunFired", ev.FistGun.transform.position);
+    }
+
+    private void _onFistGunHit(FistGunHit ev)
+    {
+        _playSound("event:/SFX/Gameplay/Object/FistGun/FistGunHit", ev.FistGun.transform.position);
+    }
+
+    private void _onFistGunBlocked(FistGunBlocked ev)
+    {
+        _playSound("event:/SFX/Gameplay/Object/FistGun/FistGunBlocked", ev.FistGun.transform.position);
     }
 
     private void _onFistGunReload(FistGunStartCharging ev)
     {
-        _playSound(ev.FistGun, AudioDataStore.FistGunChargeAudioClip, false);
+        _playSound("event:/SFX/Gameplay/Object/FistGun/FistGunReload", ev.FistGun.transform.position);
     }
 
-    private void _onHookGunBlocked(HookBlocked bh)
+    private void _onHookGunBlocked(HookBlocked ev)
     {
-        _playSound(bh.Hook, AudioDataStore.HookGunBlockedAudioClip);
+        _playSound("event:/SFX/Gameplay/Object/HookGun/HookGunBlocked", ev.HookGun.transform.position);
     }
 
-    private void _onBazookaFired(BazookaFired bf)
+    private void _onBazookaFired(BazookaFired ev)
     {
-        _playSound(bf.BazookaGun, AudioDataStore.BazookaFiredAudioClip);
+        _playSound("event:/SFX/Gameplay/Object/Bazooka/BazookaFired", ev.BazookaGun.transform.position);
     }
 
     private void _onBazookaBombed(BazookaBombed ev)
     {
-        _playSound(ev.BazookaGun, AudioDataStore.ExplosionClip);
+        _playSound("event:/SFX/Gameplay/Object/Bazooka/BazookaBombed", ev.BazookaGun.transform.position);
     }
 
     private void _onBagelExplode(AmmoExplode ev)
     {
-        _playSound(gameManager, AudioDataStore.ExplosionClip);
+        _playSound("event:/SFX/Gameplay/Object/Other/BagelExplode", ev.Pos);
     }
 
-    private void _onObjectPickedUp(ObjectPickedUp opu)
+    private void _onObjectPickedUp(ObjectPickedUp ev)
     {
-        if (opu.Obj.GetComponent<rtBirdFood>() != null && ((opu.Player.tag.Contains("1") && opu.Obj.tag.Contains("1"))
-        || (opu.Player.tag.Contains("2") && opu.Obj.tag.Contains("2"))))
+        if (ev.Obj.GetComponent<WeaponBase>() != null)
         {
-            _playSound(opu.Obj, AudioDataStore.FoodPickedUpCorrectAudioClip);
-        }
-        else if (opu.Obj.GetComponent<rtBirdFood>() != null && ((opu.Player.tag.Contains("1") && opu.Obj.tag.Contains("2"))
-       || (opu.Player.tag.Contains("2") && opu.Obj.tag.Contains("1"))))
-        {
-            _playSound(opu.Obj, AudioDataStore.FoodPickedUpWrongAudioClip);
-        }
-        else if (opu.Obj.GetComponent<WeaponBase>() != null)
-        {
-            _playSound(opu.Obj, AudioDataStore.WeaponPickedUpAudioClip);
+            if (ev.Obj.GetComponent<Bagel>() != null)
+                _playSound("event:/SFX/Gameplay/Object/Other/BagelPickedup", ev.Obj.transform.position);
+            else
+                _playSound("event:/SFX/Gameplay/Object/Other/WeaponPickedup", ev.Obj.transform.position);
         }
     }
 
-    private void _onFoodDelievered(FoodDelivered fs)
+    private void _onFoodDelievered(BagelSent ev)
     {
-        _playSound(fs.Food, AudioDataStore.FoodDeliveredAudioClip);
+        _playSound("event:/SFX/Gameplay/Object/Other/BagelDelivered", ev.Basket.transform.position);
+        _brawlModeOnScore(Mathf.Max((_mapObjectiveManager as BrawlModeReforgedObjectiveManager).Team1Score, (_mapObjectiveManager as BrawlModeReforgedObjectiveManager).Team2Score));
     }
 
     private void _onPlayerLand(PlayerLand ev)
     {
-        _playSound(ev.PlayerFeet, AudioDataStore.LandAudioClip);
+        _playSound("event:/SFX/Gameplay/Characters/PlayerLand", ev.PlayerFeet.transform.position);
     }
 
     private void _onObjectHitGround(ObjectHitGround ev)
     {
         if (ev.Obj.GetComponent<rtBazooka>() != null)
         {
-            _playSound(ev.Obj, AudioDataStore.BazookaGunHitGroundAudioClip);
-            return;
-        }
-        if (ev.Obj.GetComponent<rtBirdFood>() != null)
-        {
-            _playSound(ev.Obj, AudioDataStore.FoodHitGroundAudioClip);
+            _playSound("event:/SFX/Gameplay/Object/Bazooka/BazookaHitGround", ev.Obj.transform.position);
             return;
         }
         if (ev.Obj.GetComponent<rtEmit>() != null)
         {
-            _playSound(ev.Obj, AudioDataStore.WaterGunHitGroundAudioClip);
+            _playSound("event:/SFX/Gameplay/Object/WaterGun/WaterGunHitGround", ev.Obj.transform.position);
             return;
         }
         if (ev.Obj.GetComponent<rtFist>() != null)
         {
-            _playSound(ev.Obj, AudioDataStore.FistGunHitGroundAudioClip);
+            _playSound("event:/SFX/Gameplay/Object/FistGun/FistGunHitGround", ev.Obj.transform.position);
             return;
         }
         if (ev.Obj.GetComponent<rtHook>() != null)
         {
-            _playSound(ev.Obj, AudioDataStore.HookGunHitGroundAudioClip);
+            _playSound("event:/SFX/Gameplay/Object/HookGun/HookGunHitGround", ev.Obj.transform.position);
             return;
         }
         if (ev.Obj.GetComponent<rtSuck>() != null)
         {
-            _playSound(ev.Obj, AudioDataStore.SuckGunHitGroundAudioClip);
+            _playSound("event:/SFX/Gameplay/Object/SuckGun/SuckGunHitGround", ev.Obj.transform.position);
             return;
         }
     }
+
+    private void _onGameStart(GameStart ev)
+    {
+
+        if (_mapObjectiveManager != null && _mapObjectiveManager.GetType().Equals(typeof(BrawlModeReforgedObjectiveManager)))
+        {
+            bgmEV = RuntimeManager.CreateInstance("event:/Music/BrawlModeBGM");
+            bgmEV.start();
+        }
+    }
+
+    private void _brawlModeOnScore(int maxTeamScore)
+    {
+        int targetScore = (_modeSpecificData as BrawlModeReforgedModeData).TargetScore;
+        int closeScore = (_modeSpecificData as BrawlModeReforgedModeData).CloseScore;
+        float speed = 0f;
+        if (maxTeamScore >= closeScore)
+        {
+            speed = 1f + ((1f * maxTeamScore - closeScore) / targetScore);
+        }
+        bgmEV.setParameterByName("SpeedUp", speed);
+    }
+
+    private void _onGameEnd(GameEnd ev)
+    {
+        bgmEV.setParameterByName("IsEnd", 1f);
+    }
+
     #endregion
 
     private void OnEnable()
     {
         EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
         EventManager.Instance.AddHandler<WaterGunFired>(_onWaterGunFired);
+        EventManager.Instance.AddHandler<WaterGunStopped>(_onWaterGunStopped);
         EventManager.Instance.AddHandler<HookGunFired>(_onHookGunFired);
         EventManager.Instance.AddHandler<HookHit>(_onHookGunHit);
         EventManager.Instance.AddHandler<SuckGunFired>(_onSuckGunFired);
@@ -279,17 +271,20 @@ public class AudioManager
         EventManager.Instance.AddHandler<BazookaFired>(_onBazookaFired);
         EventManager.Instance.AddHandler<BazookaBombed>(_onBazookaBombed);
         EventManager.Instance.AddHandler<ObjectPickedUp>(_onObjectPickedUp);
-        EventManager.Instance.AddHandler<FoodDelivered>(_onFoodDelievered);
+        EventManager.Instance.AddHandler<BagelSent>(_onFoodDelievered);
         EventManager.Instance.AddHandler<PlayerLand>(_onPlayerLand);
         EventManager.Instance.AddHandler<ObjectHitGround>(_onObjectHitGround);
         EventManager.Instance.AddHandler<AmmoExplode>(_onBagelExplode);
         EventManager.Instance.AddHandler<FistGunStartCharging>(_onFistGunReload);
+        EventManager.Instance.AddHandler<GameStart>(_onGameStart);
+        EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
     }
 
     private void OnDisable()
     {
         EventManager.Instance.RemoveHandler<PlayerHit>(_onPlayerHit);
         EventManager.Instance.RemoveHandler<WaterGunFired>(_onWaterGunFired);
+        EventManager.Instance.RemoveHandler<WaterGunStopped>(_onWaterGunStopped);
         EventManager.Instance.RemoveHandler<HookGunFired>(_onHookGunFired);
         EventManager.Instance.RemoveHandler<HookHit>(_onHookGunHit);
         EventManager.Instance.RemoveHandler<SuckGunFired>(_onSuckGunFired);
@@ -310,11 +305,13 @@ public class AudioManager
         EventManager.Instance.RemoveHandler<HookBlocked>(_onHookGunBlocked);
         EventManager.Instance.RemoveHandler<BazookaFired>(_onBazookaFired);
         EventManager.Instance.RemoveHandler<ObjectPickedUp>(_onObjectPickedUp);
-        EventManager.Instance.RemoveHandler<FoodDelivered>(_onFoodDelievered);
+        EventManager.Instance.RemoveHandler<BagelSent>(_onFoodDelievered);
         EventManager.Instance.RemoveHandler<PlayerLand>(_onPlayerLand);
         EventManager.Instance.RemoveHandler<ObjectHitGround>(_onObjectHitGround);
         EventManager.Instance.RemoveHandler<AmmoExplode>(_onBagelExplode);
         EventManager.Instance.RemoveHandler<FistGunStartCharging>(_onFistGunReload);
+        EventManager.Instance.RemoveHandler<GameStart>(_onGameStart);
+        EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
     }
 
     public void Destroy()

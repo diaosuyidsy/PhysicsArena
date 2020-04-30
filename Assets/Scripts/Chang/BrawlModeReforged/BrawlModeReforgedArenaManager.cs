@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using FMODUnity;
 
 public enum CanonState
 {
@@ -111,6 +112,7 @@ public class CabelIdle : CabelAction
         if (e.Basket == Context.Basket1)
         {
             Context.Info.LastSide = Context.Info.CurrentSide;
+            Context.Info.CurrentLockSide = Context.Info.CurrentSide;
             Context.Info.CurrentSide = CanonSide.Red;
 
             TransitionTo<CabelSwtiching_DeliverMove>();
@@ -124,6 +126,7 @@ public class CabelIdle : CabelAction
         else
         {
             Context.Info.LastSide = Context.Info.CurrentSide;
+            Context.Info.CurrentLockSide = Context.Info.CurrentSide;
             Context.Info.CurrentSide = CanonSide.Blue;
 
             TransitionTo<CabelSwtiching_DeliverMove>();
@@ -291,11 +294,6 @@ public class CabelSwtiching_DeliverFall : CabelAction
 
 }
 
-public class CabelSwtiching_DeliverToCart : CabelAction
-{
-
-}
-
 public class CabelSwtiching_FirstSegment : CabelAction
 {
     private List<GameObject> Waypoints;
@@ -355,6 +353,8 @@ public class CabelSwtiching_FirstSegment : CabelAction
         offset.y = 0;
 
         Cart.transform.forward = offset.normalized;
+
+        RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/BagelMovingInCart", Cart.transform.position);
     }
 
     public override void Update()
@@ -571,8 +571,11 @@ public class CabelSwtiching_ThirdSegment : CabelAction
         }
         else
         {
+            Context.Info.CurrentLockSide = Context.Info.CurrentSide;
+
             if (Context.Info.LastSide == Context.Info.CurrentSide)
             {
+
                 Context.Bagel.transform.eulerAngles = Vector3.zero;
                 Cart.transform.position = StartPoint;
                 Cart.transform.eulerAngles = Vector3.zero;
@@ -602,9 +605,16 @@ public class CabelSwtiching_ThirdSegment : CabelAction
                 TransitionTo<CabelIdle>();
                 Context.CanonFSM.TransitionTo<CanonFiring_Normal>();
 
+                if (Context.Info.Bomb != null)
+                {
+                    EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.Bomb));
+                }
+
                 Context.Info.LockedPlayer = null;
+                GameObject.Destroy(Context.Info.AimedMark);
                 GameObject.Destroy(Context.Info.Mark);
                 GameObject.Destroy(Context.Info.Bomb);
+
 
                 Context.SetWrap();
 
@@ -705,115 +715,6 @@ public class CabelSwtiching_ThirdSegment : CabelAction
     }
 }
 
-public class CabelSwtiching : CabelAction
-{
-    private float Timer;
-
-    public override void OnEnter()
-    {
-        base.OnEnter();
-        Timer = 0;
-
-        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.CameraFocus, 1));
-
-    }
-
-
-    public override void Update()
-    {
-        base.Update();
-        Timer += Time.deltaTime;
-
-        SetCabel();
-        CheckTimer();
-
-    }
-
-    private void CheckTimer()
-    {
-        if (Timer >= Context.Data.CanonSwitchTime)
-        {
-            if (Context.Info.State != CanonState.Firing)
-            {
-                TransitionTo<CabelIdle>();
-                Context.CanonFSM.TransitionTo<CanonFiring_Normal>();
-
-                Context.Info.LockedPlayer = null;
-                GameObject.Destroy(Context.Info.Mark);
-                GameObject.Destroy(Context.Info.Bomb);
-
-                Context.SetWrap();
-            }
-        }
-    }
-
-    private void SetCabel() // Set cabel appearance
-    {
-        switch (Context.Info.CurrentSide)
-        {
-            case CanonSide.Neutral:
-                if (Context.Info.LastSide == CanonSide.Red)
-                {
-                    CabelChange(Context.Team1Cabel, false, true);
-                }
-                else
-                {
-                    CabelChange(Context.Team2Cabel, false, false);
-                }
-                break;
-            case CanonSide.Red:
-                CabelChange(Context.Team1Cabel, true, true);
-                if (Context.Info.LastSide == CanonSide.Blue)
-                {
-                    CabelChange(Context.Team2Cabel, false, false);
-                }
-                break;
-            case CanonSide.Blue:
-                CabelChange(Context.Team2Cabel, true, false);
-                if (Context.Info.LastSide == CanonSide.Red)
-                {
-                    CabelChange(Context.Team1Cabel, false, true);
-                }
-                break;
-        }
-    }
-
-
-    private void CabelChange(GameObject Cabel, bool Shine, bool Team1)
-    {
-
-        foreach (Transform child in Cabel.transform)
-        {
-            Material mat = child.GetComponent<Renderer>().material;
-            mat.EnableKeyword("_EMISSION");
-
-            Color color;
-
-            float Emission;
-
-            if (Shine)
-            {
-                Emission = Mathf.Lerp(Context.FeelData.CabelStartEmission, Context.FeelData.CabelEndEmission, Timer / Context.FeelData.CabelShineTime);
-            }
-            else
-            {
-                Emission = Mathf.Lerp(Context.FeelData.CabelEndEmission, Context.FeelData.CabelStartEmission, Timer / Context.FeelData.CabelShineTime);
-            }
-
-            if (Team1)
-            {
-                color = Context.FeelData.RedCabelColor;
-            }
-            else
-            {
-                color = Context.FeelData.BlueCabelColor;
-            }
-
-            mat.SetColor("_EmissionColor", color * Emission);
-        }
-    }
-}
-
 public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 {
     public override void OnEnter()
@@ -866,6 +767,9 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             return;
         }
 
+        Context.Info.AimedMark.transform.position = Context.Info.LockedPlayer.transform.position + Context.FeelData.AimedMarkOffset;
+        Context.Info.AimedMark.transform.LookAt(Camera.main.transform);
+
         Vector3 Offset = Context.Info.LockedPlayer.transform.position - Context.Info.Mark.transform.position;
         Offset.y = 0;
 
@@ -901,7 +805,7 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
 
         foreach (Transform child in Context.Players.transform)
         {
-            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Context.Info.CurrentSide == CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentSide == CanonSide.Red))
+            if (child.GetComponent<PlayerController>().enabled && (child.tag.Contains("1") && Context.Info.CurrentLockSide== CanonSide.Blue || child.tag.Contains("2") && Context.Info.CurrentLockSide == CanonSide.Red))
             {
                 RaycastHit hit;
                 if (Physics.Raycast(child.position, Vector3.down, out hit, 5, Context.GroundLayer))
@@ -925,7 +829,13 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
             Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkDefaultColor;
             Mark.transform.position = AvailablePoint[index] + Vector3.up * 0.01f;
 
+            GameObject AimedMark = GameObject.Instantiate(Context.AimedMarkPrefab);
+            Color color = AimedMark.GetComponent<SpriteRenderer>().color;
+            AimedMark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 0);
+            AimedMark.transform.position = AvailablePlayer[index].transform.position + Context.FeelData.AimedMarkOffset;
+
             Context.Info.Mark = Mark;
+            Context.Info.AimedMark = AimedMark;
             Context.Info.LockedPlayer = AvailablePlayer[index];
 
             return true;
@@ -1054,7 +964,7 @@ public class CanonCooldown : CanonAction
 
         Timer = 0;
 
-        EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.CameraFocus));
+        //EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.CameraFocus));
     }
 
     public override void Update()
@@ -1095,7 +1005,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         Timer = 0;
         PlayerLocked = false;
 
-        EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.CameraFocus, 1));
+        RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/RubberBandStretch", Context.Info.CameraFocus.transform.position);
     }
 
     public override void Update()
@@ -1116,8 +1026,11 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
 
             if (Context.Info.LockedPlayer == null)
             {
+                EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.Bomb));
+
                 GameObject.Destroy(Context.Info.Bomb);
                 GameObject.Destroy(Context.Info.Mark);
+                GameObject.Destroy(Context.Info.AimedMark);
 
                 TransitionTo<CanonCooldown>();
                 return;
@@ -1125,6 +1038,9 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
 
             Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
             Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime);
+
+            Color Acolor = Context.Info.AimedMark.GetComponent<SpriteRenderer>().color;
+            Context.Info.AimedMark.GetComponent<SpriteRenderer>().color = new Color(Acolor.r, Acolor.g, Acolor.b, Timer / Context.FeelData.MarkAppearTime);
 
             CheckTimer();
 
@@ -1135,6 +1051,8 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
             SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
             if (LockPlayer())
             {
+
+
                 Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
                 Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
                 Context.Info.Bomb.transform.localPosition = Vector3.back * Context.FeelData.AmmoOffset;
@@ -1142,6 +1060,8 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
                 AimingSetCanon();
 
                 PlayerLocked = true;
+
+                EventManager.Instance.TriggerEvent(new OnAddCameraTargets(Context.Info.Bomb, Context.FeelData.AimingCameraWeight));
             }
         }
 
@@ -1180,8 +1100,11 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
 
         if (Context.Info.LockedPlayer == null)
         {
+            EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.Bomb));
+
             GameObject.Destroy(Context.Info.Bomb);
             GameObject.Destroy(Context.Info.Mark);
+            GameObject.Destroy(Context.Info.AimedMark);
 
             TransitionTo<CanonCooldown>();
             return;
@@ -1231,11 +1154,23 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
 
 
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkFallColor;
+
+        RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/BagelFly", Context.Info.CameraFocus.transform.position);
     }
 
     public override void Update()
     {
         base.Update();
+
+        if (Context.Info.LockedPlayer != null)
+        {
+            Context.Info.AimedMark.transform.position = Context.Info.LockedPlayer.transform.position + Context.FeelData.AimedMarkOffset;
+            Context.Info.AimedMark.transform.LookAt(Camera.main.transform);
+        }
+        else
+        {
+            GameObject.Destroy(Context.Info.AimedMark);
+        }
 
         FireSetCanon();
         if (Context.Info.CurrentPercentage == 0)
@@ -1259,6 +1194,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         Timer += Time.deltaTime;
         if (Timer >= Context.Data.CanonFireFinalTime)
         {
+            EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(Context.Info.Bomb));
             BombFall();
 
             /*if (CheckDelivery())
@@ -1331,6 +1267,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
                     Offset.z = Mathf.Cos(angle);
                 }
 
+                Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
                 Player.GetComponent<IHittable>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Context.Info.Entity, ImpactType.BazookaGun);
             }
         }
@@ -1340,6 +1277,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
         EventManager.Instance.TriggerEvent(new AmmoExplode(Context.Info.Bomb.transform.position));
         GameObject.Destroy(Context.Info.Bomb);
         GameObject.Destroy(Context.Info.Mark);
+        GameObject.Destroy(Context.Info.AimedMark);
     }
 }
 
@@ -1363,12 +1301,14 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
         public CanonState State;
         public CanonSide CurrentSide;
         public CanonSide LastSide;
+        public CanonSide CurrentLockSide;
         public float Timer;
         public int FireCount;
 
         public GameObject Bomb;
 
         public GameObject Mark;
+        public GameObject AimedMark;
         public GameObject LockedPlayer;
 
 
@@ -1431,6 +1371,7 @@ public class BrawlModeReforgedArenaManager : MonoBehaviour
 
     public GameObject BagelPrefab;
     public GameObject MarkPrefab;
+    public GameObject AimedMarkPrefab;
     public GameObject BombPrefab;
     public GameObject ExplosionVFX;
 

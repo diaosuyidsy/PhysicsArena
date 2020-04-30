@@ -414,6 +414,15 @@ public class WaterGunFired : GameEvent
         WaterGunOwnerPlayerNumber = _watergunownerplayernumber;
     }
 }
+public class WaterGunStopped : GameEvent
+{
+    public GameObject WaterGun { get; }
+
+    public WaterGunStopped(GameObject _watergun)
+    {
+        WaterGun = _watergun;
+    }
+}
 
 public abstract class HookGunEvent : GameEvent
 {
@@ -686,9 +695,9 @@ public class OnScore : GameEvent
 public class OnAddCameraTargets : GameEvent
 {
     public GameObject Target;
-    public int Weight;
+    public float Weight;
 
-    public OnAddCameraTargets(GameObject target, int weight)
+    public OnAddCameraTargets(GameObject target, float weight)
     {
         Target = target;
         Weight = weight;

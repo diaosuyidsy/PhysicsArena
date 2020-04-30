@@ -24,6 +24,7 @@ public class rtHook : WeaponBase
         {
             return _hookGunFSM != null &&
                 _hookGunFSM.CurrentState != null &&
+                Owner != null &&
                 _hookGunFSM.CurrentState.GetType().Equals(typeof(HookFlyingOutState));
         }
     }
@@ -84,6 +85,11 @@ public class rtHook : WeaponBase
     public override void OnDrop(bool customForce, Vector3 force)
     {
         base.OnDrop(customForce, force);
+        if (_hookDup != null)
+        {
+            Destroy(_hookDup);
+            _hookDup = null;
+        }
         if (Hooked != null)
         {
             foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())

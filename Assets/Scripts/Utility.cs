@@ -38,6 +38,15 @@ public static class Utility
         return maxLength;
     }
 
+    public static bool IsPositionInCameraView(Vector3 position, Camera camera)
+    {
+        Vector3 viewPoint = camera.WorldToViewportPoint(position);
+        return viewPoint.x >= 0f &&
+        viewPoint.x <= 1f &&
+        viewPoint.y >= 0f &&
+        viewPoint.y <= 1f && viewPoint.z >= 0f;
+    }
+
     // Sequence example, bubbly fade-in + bounce
     public static Sequence BubbleFadeIn(CharTweener _tweener, int start, int end, float amplitude = 100f, float duration = 0.5f)
     {
@@ -117,12 +126,12 @@ public static class Utility
         float distance = velocityF * time - 0.5f * frictionCoeffcient * Mathf.Abs(Physics.gravity.y) * time * time;
         // 1. See if there is something behind, blocking
         RaycastHit hit;
-        if (Physics.SphereCast(ev.Hitted.transform.position, 0.2f, ev.Force.normalized, out hit, distance, HitBlockedLayer ^ (1 << ev.Hitted.layer)))
+        if (Physics.SphereCast(ev.Hitted.transform.position, 0.2f, ev.Force.normalized, out hit, distance * 1.2f, HitBlockedLayer ^ (1 << ev.Hitted.layer)))
         {
             return false;
         }
         // 2. See if the destination is beyond cliff
-        if (Physics.SphereCast(ev.Hitted.transform.position + ev.Force.normalized * distance, 0.2f, Vector3.down, out hit, 100f))
+        if (Physics.SphereCast(ev.Hitted.transform.position + ev.Force.normalized * distance * 0.8f, 0.2f, Vector3.down, out hit, 100f))
         {
             if (!hit.transform.CompareTag("DeathZone"))
                 return false;
@@ -215,7 +224,7 @@ public class StatsTuple
 
 public class StatisticsRecord
 {
-    public StatisticsRecord(string statisticName, string statisticsInformation, Sprite statisticIcon)
+    public StatisticsRecord(string statisticName, string statisticsInformation, Sprite[] statisticIcon)
     {
         StatisticName = statisticName;
         StatisticsInformation = statisticsInformation;
@@ -224,7 +233,7 @@ public class StatisticsRecord
 
     public string StatisticName { get; }
     public string StatisticsInformation { get; }
-    public Sprite StatisticIcon { get; }
+    public Sprite[] StatisticIcon { get; }
 
 }
 
@@ -253,7 +262,7 @@ public class StatisticsInformation
     public string StatisticsTitle;
     public string StatisticsIntro1;
     public string StatisticsIntro2;
-    public Sprite StatisticIcon;
+    public Sprite[] StatisticIcon;
     public float Weight;
     public bool ExcludeFromMVPCalculation = false;
 }
@@ -457,9 +466,9 @@ public interface IHittableNetwork
 public class CameraTargets
 {
     public GameObject Target;
-    public int Weight;
+    public float Weight;
 
-    public CameraTargets(GameObject target, int weight = 1)
+    public CameraTargets(GameObject target, float weight = 1f)
     {
         Target = target;
         Weight = weight;

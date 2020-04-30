@@ -130,8 +130,16 @@ public class WeaponGenerationManager
     // Also, clamp the weeaponspawn area to not let it exceed the boundaries of the world
     private void _setWeaponSpawn()
     {
-        _weaponSpawnerCenter.x = _cc.FollowTarget.x;
-        _weaponSpawnerCenter.z = _cc.FollowTarget.z;
+        if (_cc != null)
+        {
+            _weaponSpawnerCenter.x = _cc.FollowTarget.x;
+            _weaponSpawnerCenter.z = _cc.FollowTarget.z;
+        }
+        else
+        {
+            _weaponSpawnerCenter.x = GameMapData.WorldCenter.x;
+            _weaponSpawnerCenter.z = GameMapData.WorldCenter.z;
+        }
 
         Vector3 WorldCenter = GameMapData.WorldCenter;
         Vector3 WorldSize = GameMapData.WorldSize;

@@ -71,6 +71,7 @@ public class rtEmit : WeaponBase
         {
             _waterGunState = State.Empty;
             WaterGunLine.OnFire(false);
+            EventManager.Instance.TriggerEvent(new WaterGunStopped(gameObject));
         }
     }
 
@@ -137,6 +138,7 @@ public class rtEmit : WeaponBase
         base.OnDrop(customForce, force);
         _waterGunState = State.Empty;
         WaterGunLine.OnFire(false);
+        EventManager.Instance.TriggerEvent(new WaterGunStopped(gameObject));
         GunUI.SetActive(false);
     }
 }

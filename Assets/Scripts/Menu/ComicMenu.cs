@@ -44,6 +44,7 @@ public class ComicMenu : MonoBehaviour
     public Transform[] _3rdMenuIndicators;
     public Transform[] _3rdMenuPrompts;
     public TextMeshPro _hintText;
+    public GameObject _tutorialText;
     private Vector3[] _3rdMenuCursorsOriginalLocalPosition;
     private Vector3[] _chickenOriginalLocalPosition;
     private Vector3[] _eggsOriginalLocalPosition;
@@ -663,23 +664,43 @@ public class ComicMenu : MonoBehaviour
             ((SelectedState)_playersFSM[_getGamePlayerIDFromRewiredId(rewiredID)].CurrentState).OnPlayerRechoose();
         }
 
+        public void OnPlayerEggStateChange(int previousSelectedPlayerCount)
+        {
+            if (previousSelectedPlayerCount != 0 && _eggsSelectedAmount == 0)
+            {
+                Context._hintText.DOKill();
+                Context._hintText.DOText("Crack An Egg to select a character", 1f);
+                Context._tutorialText.SetActive(false);
+            }
+            else if (previousSelectedPlayerCount == 0 && _eggsSelectedAmount != 0)
+            {
+                Context._hintText.DOKill();
+                Context._hintText.DOText("Stand in circle to start", 1f);
+                Context._tutorialText.SetActive(true);
+                EventManager.Instance.TriggerEvent(new GameStart());
+            }
+        }
+
         public void OnPlayerEggStateChange(int chickenInCircle, int duckInCircle)
         {
             Context._hintText.DOKill();
+
             if ((chickenInCircle + duckInCircle) == 1)
             {
-                Context._hintText.DOText("Need More Players", 1f).SetDelay(2f);
+                Context._hintText.DOText("Need More Players", 1f);
             }
             else if (_playerMap.Count > 1 && (chickenInCircle == 0 || duckInCircle == 0))
             {
-                Context._hintText.DOText("Need Players On Both Teams", 1f).SetDelay(2f);
+                Context._hintText.DOText("Need Players On Both Teams", 1f);
             }
             else if (_playerMap.Count > 1 && _playerMap.Count > (chickenInCircle + duckInCircle))
             {
-                Context._hintText.DOText("Everybody in Circle", 1f);
+                Context._hintText.DOText("Everybody in Circle", 0.5f);
             }
             else
-                Context._hintText.DOText("Stand in Circle", 0f);
+            {
+                Context._hintText.DOText("Crack An Egg to start", 0f);
+            }
         }
 
         private bool _isRewiredPlayerInGame(int rewiredID)
@@ -1123,6 +1144,7 @@ public class ComicMenu : MonoBehaviour
                 int castedEggIndex = Context._cursorSelectedEggIndex[_gamePlayerIndex];
                 Context._eggsFSM[Context._cursorSelectedEggIndex[_gamePlayerIndex]].TransitionTo<EggNormalState>();
                 Context._eggSelected[Context._cursorSelectedEggIndex[_gamePlayerIndex]] = false;
+                Context.OnPlayerEggStateChange(Context._eggsSelectedAmount + 1);
                 (Services.GameStateManager as MenuGameStateManager).ClearPlayerInformation(castedEggIndex);
                 // Context._onPlayerEggStateChange();
                 Context.Context.IndicationBars.transform.GetChild(castedEggIndex).gameObject.SetActive(false);
@@ -1233,7 +1255,7 @@ public class ComicMenu : MonoBehaviour
                 /// Switch Cursor to Selected state
                 int playerindex = Context._eggSelectedCursorIndex[_eggIndex];
                 Context._eggSelected[_eggIndex] = true;
-                // Context._onPlayerEggStateChange();
+                Context.OnPlayerEggStateChange(Context._eggsSelectedAmount - 1);
                 Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().enabled = true;
                 Context.Context._chickens[_eggIndex].GetComponent<Rigidbody>().isKinematic = false;
                 Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().Init(Context._getRewiredIDFromGameplayerId(playerindex));

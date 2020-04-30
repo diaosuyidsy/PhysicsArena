@@ -64,6 +64,25 @@ public class CameraController : MonoBehaviour
     {
     }
 
+    private class AnyBigDeadState : CameraState
+    {
+        private float deadTimer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            deadTimer = Time.timeSinceLevelLoad;
+        }
+        public override void Update()
+        {
+            base.Update();
+            if (deadTimer + _CameraData.AnyDeadPause < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<TrackingState>();
+                return;
+            }
+        }
+    }
+
     private class TrackingState : CameraState
     {
         private Vector3 _targetOnGround;
@@ -99,9 +118,8 @@ public class CameraController : MonoBehaviour
             _desiredPosition.x = _targetOnGround.x;
             _desiredPosition.y = _targetOnGround.y + Mathf.Sin(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
             _desiredPosition.z = _targetOnGround.z - Mathf.Cos(Context.transform.localEulerAngles.x * Mathf.Deg2Rad) * _CameraData.CameraDistance;
-            // _desiredPosition.x = Mathf.Clamp(_desiredPosition.x, Context._minPosition.x, Context._maxPosition.x);
-            // _desiredPosition.y = Mathf.Clamp(_desiredPosition.y, Context._minPosition.y, Context._maxPosition.y);
-            // _desiredPosition.z = Mathf.Clamp(_desiredPosition.z, Context._minPosition.z, Context._maxPosition.z);
+            _desiredPosition.x = Mathf.Clamp(_desiredPosition.x, Context._minPosition.x, Context._maxPosition.x);
+            _desiredPosition.z = Mathf.Clamp(_desiredPosition.z, Context._minPosition.z, Context._maxPosition.z);
             Context.transform.position = Vector3.Lerp(Context.transform.position, _desiredPosition, _CameraData.SmoothSpeed);
 
             float _desiredFOV = 2f * _getMaxDistance() + 5f;
@@ -152,11 +170,13 @@ public class CameraController : MonoBehaviour
     {
         EventManager.Instance.TriggerEvent(new OnRemoveCameraTargets(pd.Player));
         /// If all players are dead, transition to all dead state
+        bool alldead = true;
         for (int i = 0; i < _cameraTargets.Count; i++)
         {
-            if (_cameraTargets[i].Target.GetComponent<PlayerController>() != null) return;
+            if (_cameraTargets[i].Target.GetComponent<PlayerController>() != null) alldead = false;
         }
-        if (_camFSM.CurrentState.GetType().Equals(typeof(TrackingState))) _camFSM.TransitionTo<AllDeadState>();
+        if (alldead && _camFSM.CurrentState.GetType().Equals(typeof(TrackingState))) _camFSM.TransitionTo<AllDeadState>();
+        if (!alldead && !Utility.IsPositionInCameraView(pd.Player.transform.position, _cam) && _camFSM.CurrentState.GetType().Equals(typeof(TrackingState))) _camFSM.TransitionTo<AnyBigDeadState>();
     }
 
     private void _onPlayerRespawn(PlayerRespawned pr)

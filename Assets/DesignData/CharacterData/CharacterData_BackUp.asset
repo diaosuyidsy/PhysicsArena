@@ -12,13 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77f59a2ecbe94604094d30020f1b14bd, type: 3}
   m_Name: CharacterData_BackUp
   m_EditorClassIdentifier: 
-  WalkSpeed: 6
+  WalkSpeed: 8
   MaxVelocityChange: 12
   InAirSpeedMultiplier: 0.1
   FacingCliffMultiplier: 1
   PickupSpeed: 2
   JumpCD: 0
-  JumpForce: 230
+  JumpForce: 3
   JumpMask:
     serializedVersion: 2
     m_Bits: 286720
@@ -38,10 +38,11 @@ MonoBehaviour:
   MinBlockUpTime: 0.3
   BlockPushForce: 30
   ClockFistTime: 0.3
+  HoldEventTriggerDuration: 0.1
   FistReleaseTime: 0.25
   PunchActivateTime: 0.25
-  SelfPushForce: 75
-  IdleSelfPushForce: 75
+  SelfPushForce: 50
+  IdleSelfPushForce: 50
   FistHoldSpeedMultiplier: 0.6
   FistHoldRotationMutiplier: 2
   PunchBackwardCastDistance: 0.3
@@ -63,8 +64,9 @@ MonoBehaviour:
   CanHitLayer:
     serializedVersion: 2
     m_Bits: 16883200
-  Radius: 0.25
-  PickUpCD: 0
+  PickupRadius: 1
+  PickupDownDistance: 1
+  PickupUpDistance: 0.3
   PickUpLayer:
     serializedVersion: 2
     m_Bits: 1048576

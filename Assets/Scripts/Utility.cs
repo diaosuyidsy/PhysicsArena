@@ -38,6 +38,15 @@ public static class Utility
         return maxLength;
     }
 
+    public static bool IsPositionInCameraView(Vector3 position, Camera camera)
+    {
+        Vector3 viewPoint = camera.WorldToViewportPoint(position);
+        return viewPoint.x >= 0f &&
+        viewPoint.x <= 1f &&
+        viewPoint.y >= 0f &&
+        viewPoint.y <= 1f && viewPoint.z >= 0f;
+    }
+
     // Sequence example, bubbly fade-in + bounce
     public static Sequence BubbleFadeIn(CharTweener _tweener, int start, int end, float amplitude = 100f, float duration = 0.5f)
     {
@@ -215,7 +224,7 @@ public class StatsTuple
 
 public class StatisticsRecord
 {
-    public StatisticsRecord(string statisticName, string statisticsInformation, Sprite statisticIcon)
+    public StatisticsRecord(string statisticName, string statisticsInformation, Sprite[] statisticIcon)
     {
         StatisticName = statisticName;
         StatisticsInformation = statisticsInformation;
@@ -224,7 +233,7 @@ public class StatisticsRecord
 
     public string StatisticName { get; }
     public string StatisticsInformation { get; }
-    public Sprite StatisticIcon { get; }
+    public Sprite[] StatisticIcon { get; }
 
 }
 
@@ -253,7 +262,7 @@ public class StatisticsInformation
     public string StatisticsTitle;
     public string StatisticsIntro1;
     public string StatisticsIntro2;
-    public Sprite StatisticIcon;
+    public Sprite[] StatisticIcon;
     public float Weight;
     public bool ExcludeFromMVPCalculation = false;
 }

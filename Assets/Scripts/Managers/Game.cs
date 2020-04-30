@@ -17,7 +17,6 @@ public class Game : MonoBehaviour
     private void Awake()
     {
         Services.Config = new Config(ConfigData, GameMapData, CharacterData);
-        Services.AudioManager = new AudioManager();
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
         Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData);
@@ -50,6 +49,8 @@ public class Game : MonoBehaviour
                 Services.GameObjectiveManager = new EmptyObjectiveManager();
                 break;
         }
+        Services.AudioManager = new AudioManager(Services.GameObjectiveManager, Utility.GetPlayerNumber() <= 2 ? ModeSpecificData_2Player : ModeSpecificData);
+
     }
 
     // Update is called once per frame

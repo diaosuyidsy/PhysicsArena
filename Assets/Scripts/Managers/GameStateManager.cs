@@ -337,7 +337,7 @@ public class GameStateManager : GameStateManagerBase
                 int rewiredID = _PlayersInformation.RewiredID[i];
                 int colorindex = Context.GetColorIndexFromRewiredID(rewiredID);
                 Transform frame = Context._statisticUIHolder.GetChild(colorindex);
-                frame.GetChild(0).GetComponent<Image>().sprite = statsresult[rewiredID].StatisticIcon;
+                frame.GetChild(0).GetComponent<Image>().sprite = statsresult[rewiredID].StatisticIcon[colorindex];
                 frame.GetChild(1).GetComponent<Image>().sprite = _configData.ColorIndexToStatisticPlayerIcon[colorindex];
                 frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticName;
                 frame.GetChild(3).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticsInformation;

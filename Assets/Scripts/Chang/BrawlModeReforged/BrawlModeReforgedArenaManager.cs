@@ -1262,6 +1262,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
                     Offset.z = Mathf.Cos(angle);
                 }
 
+                Player.GetComponent<Rigidbody>().velocity = Vector3.zero;
                 Player.GetComponent<IHittable>().OnImpact(Context.Data.CanonPower * Offset.normalized, ForceMode.Impulse, Context.Info.Entity, ImpactType.BazookaGun);
             }
         }

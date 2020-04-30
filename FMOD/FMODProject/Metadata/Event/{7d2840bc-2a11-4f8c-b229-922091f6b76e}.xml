@@ -5,7 +5,7 @@
 			<value>ObjectDespawned</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{c365f461-aee9-40fd-856c-bd11a7bafd3f}</destination>
@@ -116,7 +116,6 @@
 	<object class="MixerBusEffectChain" id="{7ef572bb-79ee-4904-a292-e185d54cd039}">
 		<relationship name="effects">
 			<destination>{cb250a99-f1ff-4d86-afb0-e6bf1bd24be8}</destination>
-			<destination>{3f4cc78c-7ac6-4669-834f-1de5bc4d665a}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{cca367db-34c1-4326-b365-74473703cd56}" />
@@ -128,10 +127,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{a5e56b9d-05cf-4829-880d-88c44b0f86c8}" />
 	<object class="MixerBusFader" id="{cb250a99-f1ff-4d86-afb0-e6bf1bd24be8}" />
-	<object class="SpatialiserEffect" id="{3f4cc78c-7ac6-4669-834f-1de5bc4d665a}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{a1c573c2-b9e7-4406-9e7b-b4463045d4a2}" />
 </objects>

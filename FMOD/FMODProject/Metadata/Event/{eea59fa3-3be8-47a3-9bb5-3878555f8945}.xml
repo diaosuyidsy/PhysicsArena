@@ -5,7 +5,7 @@
 			<value>Fight</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{5d54b69f-5674-4336-9370-0f0ddc35fe38}</destination>
@@ -113,7 +113,6 @@
 	<object class="MixerBusEffectChain" id="{ac909555-b1ef-4464-aa76-719e485b73c3}">
 		<relationship name="effects">
 			<destination>{2eab600c-1d25-4b4f-a6f2-06cf3bc5b539}</destination>
-			<destination>{07a1f2ac-b0f0-40c0-99fd-18336251f58b}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{b1cd7959-58ee-4c73-adfe-81473d0bdc9d}" />
@@ -125,13 +124,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{0b19cb2d-1e56-440b-941b-2b390662d213}" />
 	<object class="MixerBusFader" id="{2eab600c-1d25-4b4f-a6f2-06cf3bc5b539}" />
-	<object class="SpatialiserEffect" id="{07a1f2ac-b0f0-40c0-99fd-18336251f58b}">
-		<property name="distanceRolloffType">
-			<value>4</value>
-		</property>
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{7dee4e2f-afa6-4705-b71a-e8612096e1c0}" />
 </objects>

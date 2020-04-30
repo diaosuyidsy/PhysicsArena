@@ -5,7 +5,7 @@
 			<value>WeaponSpawned</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>0</value>
 		</property>
 		<relationship name="folder">
 			<destination>{c365f461-aee9-40fd-856c-bd11a7bafd3f}</destination>
@@ -98,7 +98,6 @@
 	<object class="MixerBusEffectChain" id="{a5be7a15-f0a8-46c1-aa8d-bdba6e0bb34b}">
 		<relationship name="effects">
 			<destination>{0c2602c5-3fb2-4ed6-af47-228e4cf24dc3}</destination>
-			<destination>{ce8ed3db-9285-43b7-ae86-4a91bb674778}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{ad9819be-9704-4e09-827c-e0322ae6c9df}" />
@@ -110,10 +109,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{98edab92-6406-445d-9c34-4571ecadd8e3}" />
 	<object class="MixerBusFader" id="{0c2602c5-3fb2-4ed6-af47-228e4cf24dc3}" />
-	<object class="SpatialiserEffect" id="{ce8ed3db-9285-43b7-ae86-4a91bb674778}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{dc28de23-5ce8-4ecc-bda7-ed269a1cbb59}" />
 </objects>

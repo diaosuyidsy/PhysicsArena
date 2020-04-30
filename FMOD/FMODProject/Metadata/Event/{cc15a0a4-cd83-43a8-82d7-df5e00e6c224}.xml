@@ -5,7 +5,7 @@
 			<value>BagelFly</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{c365f461-aee9-40fd-856c-bd11a7bafd3f}</destination>
@@ -30,6 +30,9 @@
 		</relationship>
 		<relationship name="timeline">
 			<destination>{14dd39ef-95b3-468c-958c-b946db30eed0}</destination>
+		</relationship>
+		<relationship name="banks">
+			<destination>{19c5cefa-c897-4e93-8f61-9a0586a68daf}</destination>
 		</relationship>
 	</object>
 	<object class="EventMixer" id="{372fe9ce-e6ad-4f1a-8aa9-ff50b55ba6bd}">
@@ -110,7 +113,6 @@
 	<object class="MixerBusEffectChain" id="{d569728e-fc97-4fb2-a013-118eee5b8f7b}">
 		<relationship name="effects">
 			<destination>{1166bd3d-3969-414f-984f-88d0495b8b1a}</destination>
-			<destination>{f1293848-1d6a-43b6-947a-a4d2a768e6c9}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{616e088e-45d8-4c5c-b3cd-ce44e30e2415}" />
@@ -122,6 +124,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{343825a5-66d0-4f08-95a7-5061723e9769}" />
 	<object class="MixerBusFader" id="{1166bd3d-3969-414f-984f-88d0495b8b1a}" />
-	<object class="SpatialiserEffect" id="{f1293848-1d6a-43b6-947a-a4d2a768e6c9}" />
 	<object class="MixerBusFader" id="{85dc27e3-e7c3-4693-bc7f-a9bc06971042}" />
 </objects>

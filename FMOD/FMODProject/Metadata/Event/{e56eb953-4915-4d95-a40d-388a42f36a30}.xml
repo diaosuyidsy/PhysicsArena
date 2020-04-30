@@ -5,7 +5,7 @@
 			<value>FistGunHitGround</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{ceca1755-2a2c-4638-a317-1f34268319ad}</destination>
@@ -113,7 +113,6 @@
 	<object class="MixerBusEffectChain" id="{f28afdfe-4665-4328-9a23-e0bd358187e8}">
 		<relationship name="effects">
 			<destination>{1b13ae5e-b43b-4c3a-ba91-98f142f714c8}</destination>
-			<destination>{e5cf60db-20ff-4fb4-abc0-8dac820e1844}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{bb735236-cb79-440b-9391-cf619ccb96e4}" />
@@ -125,10 +124,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{5450f337-3405-46d0-bab8-ae852b9c7076}" />
 	<object class="MixerBusFader" id="{1b13ae5e-b43b-4c3a-ba91-98f142f714c8}" />
-	<object class="SpatialiserEffect" id="{e5cf60db-20ff-4fb4-abc0-8dac820e1844}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{026a6fb0-9147-4474-993e-f07e94194d2c}" />
 </objects>

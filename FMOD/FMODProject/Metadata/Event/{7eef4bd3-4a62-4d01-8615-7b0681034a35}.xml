@@ -5,7 +5,7 @@
 			<value>BagelMovingInCart</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{c365f461-aee9-40fd-856c-bd11a7bafd3f}</destination>
@@ -30,6 +30,9 @@
 		</relationship>
 		<relationship name="timeline">
 			<destination>{20f0ff9f-e2ff-44dc-b02e-cc21bcb84025}</destination>
+		</relationship>
+		<relationship name="banks">
+			<destination>{19c5cefa-c897-4e93-8f61-9a0586a68daf}</destination>
 		</relationship>
 	</object>
 	<object class="EventMixer" id="{27caf095-c4d8-40a1-9702-6d5a791963ec}">
@@ -87,13 +90,16 @@
 	<object class="MixerBusPanner" id="{260141ee-19a4-40a5-85c3-958905c759dd}" />
 	<object class="SingleSound" id="{5aa6bd14-3344-42a6-bd1d-379578bdcf5f}">
 		<property name="length">
-			<value>9</value>
+			<value>3.2000000000000002</value>
 		</property>
 		<relationship name="audioFile">
 			<destination>{f550718f-977f-4524-868e-8a18c4ae0f0d}</destination>
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{d2fe4ca7-ab5b-411e-b3a8-e16bf357b273}">
+		<property name="volume">
+			<value>-7.5</value>
+		</property>
 		<property name="name">
 			<value>Audio 1</value>
 		</property>
@@ -110,7 +116,6 @@
 	<object class="MixerBusEffectChain" id="{c4af39b5-4d3e-4940-8f54-724165d5a3bb}">
 		<relationship name="effects">
 			<destination>{f6b03eea-0657-442b-93b5-3fd7398859cf}</destination>
-			<destination>{5b681fdf-4a4f-4f96-8e41-a24c8be50cdf}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{89d69933-29a0-4051-bee5-242bad89bd12}" />
@@ -122,6 +127,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{329a7ef0-b273-425d-85b6-c50a9fae4774}" />
 	<object class="MixerBusFader" id="{f6b03eea-0657-442b-93b5-3fd7398859cf}" />
-	<object class="SpatialiserEffect" id="{5b681fdf-4a4f-4f96-8e41-a24c8be50cdf}" />
 	<object class="MixerBusFader" id="{7ad193be-e787-4abe-ba3f-cdbe3f53cdb3}" />
 </objects>

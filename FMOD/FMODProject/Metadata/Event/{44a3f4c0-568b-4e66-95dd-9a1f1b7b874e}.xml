@@ -5,7 +5,7 @@
 			<value>DuckDied</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{a7bfb485-87ae-40d2-bff6-3d0ab8285477}</destination>
@@ -113,7 +113,6 @@
 	<object class="MixerBusEffectChain" id="{8dc4023a-9183-47bb-b75a-ed33120a6887}">
 		<relationship name="effects">
 			<destination>{8aa7546c-4739-4053-abb9-5db673e6078b}</destination>
-			<destination>{1aff6929-81ac-4973-952b-3f8dd550c97e}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{99eb1e34-6083-47f8-bcec-2b410c4bd1f0}" />
@@ -125,10 +124,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{3cb4e979-064b-47a2-918f-023598ee23be}" />
 	<object class="MixerBusFader" id="{8aa7546c-4739-4053-abb9-5db673e6078b}" />
-	<object class="SpatialiserEffect" id="{1aff6929-81ac-4973-952b-3f8dd550c97e}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{26603660-8f70-4135-92c2-fcba92fa0a1d}" />
 </objects>

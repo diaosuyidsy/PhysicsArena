@@ -216,11 +216,16 @@ public class AudioManager
         int targetScore = (_modeSpecificData as BrawlModeReforgedModeData).TargetScore;
         int closeScore = (_modeSpecificData as BrawlModeReforgedModeData).CloseScore;
         float speed = 0f;
-        if (maxTeamScore > closeScore)
+        if (maxTeamScore >= closeScore)
         {
-            speed = (1f * maxTeamScore - closeScore) / targetScore;
+            speed = 1f + ((1f * maxTeamScore - closeScore) / targetScore);
         }
-        bgmEV.setParameterByName("Speed", speed);
+        bgmEV.setParameterByName("SpeedUp", speed);
+    }
+
+    private void _onGameEnd(GameEnd ev)
+    {
+        bgmEV.setParameterByName("IsEnd", 1f);
     }
 
     #endregion
@@ -254,6 +259,7 @@ public class AudioManager
         EventManager.Instance.AddHandler<AmmoExplode>(_onBagelExplode);
         EventManager.Instance.AddHandler<FistGunStartCharging>(_onFistGunReload);
         EventManager.Instance.AddHandler<GameStart>(_onGameStart);
+        EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
     }
 
     private void OnDisable()
@@ -286,6 +292,7 @@ public class AudioManager
         EventManager.Instance.RemoveHandler<AmmoExplode>(_onBagelExplode);
         EventManager.Instance.RemoveHandler<FistGunStartCharging>(_onFistGunReload);
         EventManager.Instance.RemoveHandler<GameStart>(_onGameStart);
+        EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
     }
 
     public void Destroy()

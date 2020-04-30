@@ -677,6 +677,7 @@ public class ComicMenu : MonoBehaviour
                 Context._hintText.DOKill();
                 Context._hintText.DOText("Stand in circle to start", 1f);
                 Context._tutorialText.SetActive(true);
+                EventManager.Instance.TriggerEvent(new GameStart());
             }
         }
 

@@ -171,7 +171,10 @@ public class AudioManager
     {
         if (ev.Obj.GetComponent<WeaponBase>() != null)
         {
-            _playSound("event:/SFX/Gameplay/Object/Other/WeaponPickedup", ev.Obj.transform.position);
+            if (ev.Obj.GetComponent<Bagel>() != null)
+                _playSound("event:/SFX/Gameplay/Object/Other/BagelPickedup", ev.Obj.transform.position);
+            else
+                _playSound("event:/SFX/Gameplay/Object/Other/WeaponPickedup", ev.Obj.transform.position);
         }
     }
 

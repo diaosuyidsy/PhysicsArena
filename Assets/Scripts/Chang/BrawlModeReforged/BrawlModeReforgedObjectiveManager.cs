@@ -100,9 +100,11 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     public override void Update()
     {
         CloseScoreShake();
-
-        ScoreHop();
-        ScorePlusHop();
+        if (gameStart)
+        {
+            ScoreHop();
+            ScorePlusHop();
+        }
 
         if (gameEnd || !gameStart) return;
 

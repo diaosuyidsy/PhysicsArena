@@ -25,8 +25,10 @@ public class BrawlModeReforgedUIData : UIData
     public float ScorePlusTextHopStayTime;
 
     public Vector3 ScorePlusTextCharacterOffset;
+    public Vector3 ScorePlusTextCharacterFadeOffset;
     public float ScorePlusTextCharacterScale;
     public Vector3 ScorePlusTextBasketOffset;
+    public Vector3 ScorePlusTextBasketFadeOffset;
     public float ScorePlusTextBasketScale;
     public GameObject ScorePlusTextPrefab;
 

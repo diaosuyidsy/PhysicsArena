@@ -49,6 +49,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     private Vector3 Team1BoardOriPos;
     private Vector3 Team2BoardOriPos;
 
+    private GameObject Players;
+
     public BrawlModeReforgedObjectiveManager(BrawlModeReforgedModeData Data,BrawlModeReforgedUIData UI) : base()
     {
 
@@ -88,6 +90,8 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         Team1HopTimer =  Team2HopTimer = UIData.ScoreHopFirstPhaseTime + UIData.ScoreHopSecondPhaseTime + 1;
         Team1PlusHopTimer = Team2PlusHopTimer = UI.ScorePlusTextHopScaleUpTime + UI.ScorePlusTextHopScaleDownTime + UI.ScorePlusTextHopStayTime + 1;
+
+        Players = GameObject.Find("Players").gameObject;
     }
 
     public override void Destroy()
@@ -100,6 +104,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     public override void Update()
     {
         CloseScoreShake();
+
         if (gameStart)
         {
             ScoreHop();
@@ -140,15 +145,15 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
         {
             Team1Score += amount;
             Team1HopTimer = 0;
-            Team1PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
-            Team1ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
+            //Team1PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
+            //Team1ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
         }
         else
         {
             Team2Score += amount;
             Team2HopTimer = 0;
-            Team2PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
-            Team2ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
+            //Team2PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
+            //Team2ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
         }
     }
 
@@ -161,15 +166,64 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if (e.Basket == BrawlModeReforgedArenaManager.Team1Basket)
         {
+            /*foreach (Transform child in Players.transform)
+            {
+                if (child.gameObject.tag.Contains("1"))
+                {
+                    GenerateScorePlus(child.gameObject, true, true, ModeData.DeliveryPoint);
+                }
+            }*/
+
+            GenerateScorePlus(e.Basket, false, true, ModeData.DeliveryPoint);
+
             GetScore(ModeData.DeliveryPoint, true);
         }
         else
         {
+            /*foreach (Transform child in Players.transform)
+            {
+                if (child.gameObject.tag.Contains("2"))
+                {
+                    GenerateScorePlus(child.gameObject, true, false, ModeData.DeliveryPoint);
+                }
+            }*/
+
+            GenerateScorePlus(e.Basket, false, false, ModeData.DeliveryPoint);
+
             GetScore(ModeData.DeliveryPoint, false);
         }
 
         RefreshScore();
         CheckWin();
+    }
+
+    private void GenerateScorePlus(GameObject Holder,bool Character,bool Team1, int amount)
+    {
+        Vector3 Offset;
+        Vector3 FadeOffset;
+        float Scale;
+        if (Character)
+        {
+            Offset = UIData.ScorePlusTextCharacterOffset;
+            FadeOffset = UIData.ScorePlusTextCharacterFadeOffset;
+            Scale = UIData.ScorePlusTextCharacterScale;
+        }
+        else
+        {
+            Offset = UIData.ScorePlusTextBasketOffset;
+            FadeOffset = UIData.ScorePlusTextBasketFadeOffset;
+            Scale = UIData.ScorePlusTextBasketScale;
+        }
+
+        GameObject Plus = GameObject.Instantiate(UIData.ScorePlusTextPrefab);
+        Plus.transform.position = Offset + Holder.transform.position;
+        Plus.transform.localScale = Scale * Vector3.one;
+        Plus.transform.SetParent(Holder.transform);
+
+        Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Holder = Holder;
+        Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Team1 = Team1;
+        Plus.transform.Find("ScorePlus").GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
+        Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().FadeOffset = FadeOffset;
     }
 
     private void OnPlayerDied(PlayerDied e)
@@ -186,31 +240,45 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
 
         if (e.Player.tag.Contains("1"))
         {
-            if(e.PlayerHitter!=null && e.HitterIsValid)
+            /*foreach(Transform child in Players.transform)
             {
-                GameObject Plus = GameObject.Instantiate(UIData.ScorePlusTextPrefab);
-                Plus.transform.position = UIData.ScorePlusTextCharacterOffset + e.PlayerHitter.transform.position;
-                Plus.transform.localScale = UIData.ScorePlusTextCharacterScale * Vector3.one;
-                Plus.transform.SetParent(e.PlayerHitter.transform);
+                if (child.gameObject.tag.Contains("2"))
+                {
+                    GenerateScorePlus(child.gameObject, true, false, ModeData.NormalKillPoint);
+                }
+            }*/
 
-                Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Holder = e.PlayerHitter;
-                Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Team1 = false;
+            if(e.PlayerHitter !=null && e.HitterIsValid && e.PlayerHitter.GetComponent<PlayerController>() && e.PlayerHitter.tag.Contains("2"))
+            {
+                GenerateScorePlus(e.PlayerHitter, true, false, ModeData.NormalKillPoint);
+            }
+            else
+            {
+                Team2PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
+                Team2ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + ModeData.NormalKillPoint.ToString();
             }
 
             GetScore(ModeData.NormalKillPoint, false);
         }
         else
         {
-            if (e.PlayerHitter != null && e.HitterIsValid)
+            /*foreach (Transform child in Players.transform)
             {
-                GameObject Plus = GameObject.Instantiate(UIData.ScorePlusTextPrefab);
-                Plus.transform.position = UIData.ScorePlusTextCharacterOffset + e.PlayerHitter.transform.position;
-                Plus.transform.localScale = UIData.ScorePlusTextCharacterScale * Vector3.one;
-                Plus.transform.SetParent(e.PlayerHitter.transform);
-
-                Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Holder = e.PlayerHitter;
-                Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Team1 = true;
+                if (child.gameObject.tag.Contains("1"))
+                {
+                    GenerateScorePlus(child.gameObject, true, true, ModeData.NormalKillPoint);
+                }
+            }*/
+            if (e.PlayerHitter != null && e.HitterIsValid&& e.PlayerHitter.GetComponent<PlayerController>() && e.PlayerHitter.tag.Contains("1"))
+            {
+                GenerateScorePlus(e.PlayerHitter, true, true, ModeData.NormalKillPoint);
             }
+            else
+            {
+                Team1PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
+                Team1ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + ModeData.NormalKillPoint.ToString();
+            }
+
 
             GetScore(ModeData.NormalKillPoint, true);
         }

@@ -5,17 +5,8 @@ using TMPro;
 
 public class CabelBasket : MonoBehaviour
 {
-    private enum ScoreTextState
-    {
-        Hide,
-        Appear,
-        Show,
-        Disappear
-    }
 
     public int TeamNumber;
-
-    public GameObject ScoreText;
 
     public float Size;
 
@@ -52,8 +43,6 @@ public class CabelBasket : MonoBehaviour
     private bool InCamera;
 
     private GameObject Bagel;
-    private float ScoreTextTimer;
-    private ScoreTextState TextState;
 
     private float InCameraTimer;
 
@@ -65,7 +54,6 @@ public class CabelBasket : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        TextState = ScoreTextState.Hide;
 
         EventManager.Instance.AddHandler<GameStart>(OnGameStart);
     }
@@ -82,44 +70,7 @@ public class CabelBasket : MonoBehaviour
         CheckCharacter();
         CheckAutoDrop();
         CheckBagel();
-        CheckScoreText();
-    }
-
-    private void CheckScoreText() //Score text pop up
-    {
-        Color color = ScoreText.GetComponent<TextMeshProUGUI>().color;
-        switch (TextState)
-        {
-            case ScoreTextState.Appear:
-                ScoreTextTimer += Time.deltaTime;
-                ScoreText.GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, Mathf.Lerp(ScoreTextStartAlpha, ScoreTextEndAlpha, ScoreTextTimer / ScoreTextAppearTime));
-                ScoreText.transform.localScale = Vector3.Lerp(Vector3.one * ScoreTextStartScale, Vector3.one * ScoreTextEndScale, ScoreTextTimer / ScoreTextAppearTime);
-                if (ScoreTextTimer >= ScoreTextAppearTime)
-                {
-                    TextState = ScoreTextState.Show;
-                    ScoreTextTimer = 0;
-                }
-                break;
-            case ScoreTextState.Disappear:
-                ScoreTextTimer += Time.deltaTime;
-                ScoreText.GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, Mathf.Lerp(ScoreTextEndAlpha, 0, ScoreTextTimer / ScoreTextDisappearTime));
-                if (ScoreTextTimer >= ScoreTextDisappearTime)
-                {
-                    ScoreText.GetComponent<TextMeshProUGUI>().enabled = false;
-                    TextState = ScoreTextState.Hide;
-                    ScoreTextTimer = 0;
-                }
-                break;
-            case ScoreTextState.Show:
-                ScoreTextTimer += Time.deltaTime;
-                if (ScoreTextTimer >= ScoreTextShowTime)
-                {
-                    TextState = ScoreTextState.Disappear;
-                    ScoreTextTimer = 0;
-                    ScoreText.transform.localScale = Vector3.zero;
-                }
-                break;
-        }
+        //CheckScoreText();
     }
 
     private void CheckAutoDrop()
@@ -255,9 +206,6 @@ public class CabelBasket : MonoBehaviour
             if(Bagel.transform.position.y < Target.y)
             {
                 Bagel.transform.eulerAngles = Vector3.zero;
-                ScoreTextTimer = 0;
-                ScoreText.GetComponent<TextMeshProUGUI>().enabled = true;
-                TextState = ScoreTextState.Appear;
 
                 StartCoroutine(DoorOpenClose(false));
                 EventManager.Instance.TriggerEvent(new BagelSent(gameObject,Bagel.GetComponent<Bagel>().GetLastOwner()));

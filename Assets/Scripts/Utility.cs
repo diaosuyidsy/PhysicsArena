@@ -224,7 +224,7 @@ public class StatsTuple
 
 public class StatisticsRecord
 {
-    public StatisticsRecord(string statisticName, string statisticsInformation, Sprite statisticIcon)
+    public StatisticsRecord(string statisticName, string statisticsInformation, Sprite[] statisticIcon)
     {
         StatisticName = statisticName;
         StatisticsInformation = statisticsInformation;
@@ -233,7 +233,7 @@ public class StatisticsRecord
 
     public string StatisticName { get; }
     public string StatisticsInformation { get; }
-    public Sprite StatisticIcon { get; }
+    public Sprite[] StatisticIcon { get; }
 
 }
 
@@ -262,7 +262,7 @@ public class StatisticsInformation
     public string StatisticsTitle;
     public string StatisticsIntro1;
     public string StatisticsIntro2;
-    public Sprite StatisticIcon;
+    public Sprite[] StatisticIcon;
     public float Weight;
     public bool ExcludeFromMVPCalculation = false;
 }

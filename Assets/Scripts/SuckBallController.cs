@@ -14,6 +14,7 @@ public class SuckBallController : MonoBehaviour
         }
     }
 
+    public Material lineMat;
     public GameObject lineEndPrefab;
     public SuckGunData SuckGunData;
     public Transform LineRendererContainer;
@@ -58,7 +59,7 @@ public class SuckBallController : MonoBehaviour
         LineRendererObject.transform.localScale = Vector3.one;
         // Add and setup Linerenderer Component to the object
         LineRenderer lr = LineRendererObject.AddComponent<LineRenderer>();
-        lr.material = new Material(Shader.Find("SuckGunLine"));
+        lr.material = lineMat;
         lr.widthCurve = AnimationCurve.Linear(0, 0.05f, 1, 0.1f);
         lr.positionCount = 2;
         lr.numCapVertices = 90;

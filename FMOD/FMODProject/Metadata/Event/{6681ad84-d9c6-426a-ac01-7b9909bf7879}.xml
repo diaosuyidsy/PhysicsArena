@@ -5,7 +5,7 @@
 			<value>WaterGunFired</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{6ab75954-869a-49b8-bdba-9d5452753025}</destination>
@@ -130,7 +130,6 @@
 	<object class="MixerBusEffectChain" id="{f6a96f59-4741-4526-8d10-2038733be144}">
 		<relationship name="effects">
 			<destination>{393a9e82-bd44-4df9-853e-8a765284d724}</destination>
-			<destination>{e772ccd2-ef55-49e6-8c33-6e48cda03a1f}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{085b3cd7-268f-43ab-a02e-23da9b253ed7}" />
@@ -142,10 +141,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{fd24910e-6e16-4e00-9d44-b37f70139cd0}" />
 	<object class="MixerBusFader" id="{393a9e82-bd44-4df9-853e-8a765284d724}" />
-	<object class="SpatialiserEffect" id="{e772ccd2-ef55-49e6-8c33-6e48cda03a1f}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{fa1a2701-1817-4aed-9b55-6fe99480d682}" />
 </objects>

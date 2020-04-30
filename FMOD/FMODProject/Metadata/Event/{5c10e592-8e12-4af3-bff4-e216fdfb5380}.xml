@@ -5,7 +5,7 @@
 			<value>SuckGunFired</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{a41d87e3-06e6-4d66-a5cf-ff75fd6b1fd5}</destination>
@@ -113,7 +113,6 @@
 	<object class="MixerBusEffectChain" id="{c867ff05-9b37-47e6-9c8d-59f0732a5eb4}">
 		<relationship name="effects">
 			<destination>{d0b6019d-74fc-484e-869a-6250f8cc1e53}</destination>
-			<destination>{715c80a0-ea4c-4f98-8c13-80dfa1f8b2fe}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{705e2ea8-ece8-4043-86d4-2b5f82c011ad}" />
@@ -125,10 +124,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{4d002c74-203f-400f-8f1b-f9a6df2432c6}" />
 	<object class="MixerBusFader" id="{d0b6019d-74fc-484e-869a-6250f8cc1e53}" />
-	<object class="SpatialiserEffect" id="{715c80a0-ea4c-4f98-8c13-80dfa1f8b2fe}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{8c6d3a8e-c2e4-4cce-8eb9-e19930f30618}" />
 </objects>

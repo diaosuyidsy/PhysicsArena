@@ -5,7 +5,7 @@
 			<value>HookGunBlocked</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{ad101fd2-cef4-4da0-bced-0dc54dd80eb2}</destination>
@@ -117,7 +117,6 @@
 	<object class="MixerBusEffectChain" id="{26d0a08a-d5eb-4df1-a0e5-8b72ddd979e8}">
 		<relationship name="effects">
 			<destination>{17f10bb3-c86e-4bb1-af5a-43ac28b92ca6}</destination>
-			<destination>{3e13fffd-c850-4ea3-b5e9-99a251b3b700}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{237852c4-5ed0-4f1d-91ba-80bfa4ac77e5}" />
@@ -142,10 +141,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{4d78d3dd-fcfd-444e-9df3-21d49dc53286}" />
 	<object class="MixerBusFader" id="{17f10bb3-c86e-4bb1-af5a-43ac28b92ca6}" />
-	<object class="SpatialiserEffect" id="{3e13fffd-c850-4ea3-b5e9-99a251b3b700}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{5c2c96e0-3840-43a9-a12e-23b7f5b4f392}" />
 </objects>

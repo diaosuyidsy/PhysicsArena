@@ -5,7 +5,7 @@
 			<value>BazookaBombed</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{a0a47348-f5bd-4be7-8a66-a8db4ff77f4a}</destination>
@@ -116,7 +116,6 @@
 	<object class="MixerBusEffectChain" id="{87464dab-757b-49db-ba4f-24d6df2806d9}">
 		<relationship name="effects">
 			<destination>{ab497186-e2fc-4120-a924-d8967adbe220}</destination>
-			<destination>{e44ebb86-11fa-45fe-8e24-749e6f1eff69}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{28e701c1-a793-4c3f-8f2f-e8f1aab273e9}" />
@@ -128,10 +127,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{49fccd32-9318-4efe-bf1a-14b036a7a1a1}" />
 	<object class="MixerBusFader" id="{ab497186-e2fc-4120-a924-d8967adbe220}" />
-	<object class="SpatialiserEffect" id="{e44ebb86-11fa-45fe-8e24-749e6f1eff69}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{154eef1c-903b-4530-b4a4-7b1b6f641f0c}" />
 </objects>

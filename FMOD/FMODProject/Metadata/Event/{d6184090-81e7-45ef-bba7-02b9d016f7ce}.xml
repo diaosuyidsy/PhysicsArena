@@ -5,7 +5,7 @@
 			<value>FootStepConcrete</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{a7bfb485-87ae-40d2-bff6-3d0ab8285477}</destination>
@@ -118,7 +118,6 @@
 	<object class="MixerBusEffectChain" id="{6c029de3-e2f6-4e1a-92dc-1439126a9b65}">
 		<relationship name="effects">
 			<destination>{44090891-5a4d-408d-b2d4-8ada92648727}</destination>
-			<destination>{79753a42-564e-4a4d-9588-bdfea993c515}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{0bdeeaa7-4b5c-4ce7-bd0e-292479392bb6}" />
@@ -160,10 +159,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{0c400b7c-1145-43e4-a8f2-55523e9191e6}" />
 	<object class="MixerBusFader" id="{44090891-5a4d-408d-b2d4-8ada92648727}" />
-	<object class="SpatialiserEffect" id="{79753a42-564e-4a4d-9588-bdfea993c515}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{b63b8af6-d66d-4c73-986f-4d7b72c47962}" />
 </objects>

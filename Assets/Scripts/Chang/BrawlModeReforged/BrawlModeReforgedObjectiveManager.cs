@@ -248,7 +248,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
                 }
             }*/
 
-            if(e.PlayerHitter !=null && e.HitterIsValid && e.PlayerHitter.GetComponent<PlayerController>() && e.PlayerHitter.tag.Contains("2"))
+            /*if(e.PlayerHitter !=null && e.HitterIsValid && e.PlayerHitter.GetComponent<PlayerController>() && e.PlayerHitter.tag.Contains("2"))
             {
                 GenerateScorePlus(e.PlayerHitter, true, false, ModeData.NormalKillPoint);
             }
@@ -256,7 +256,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             {
                 Team2PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
                 Team2ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + ModeData.NormalKillPoint.ToString();
-            }
+            }*/
 
             GetScore(ModeData.NormalKillPoint, false);
         }
@@ -269,7 +269,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
                     GenerateScorePlus(child.gameObject, true, true, ModeData.NormalKillPoint);
                 }
             }*/
-            if (e.PlayerHitter != null && e.HitterIsValid&& e.PlayerHitter.GetComponent<PlayerController>() && e.PlayerHitter.tag.Contains("1"))
+            /*if (e.PlayerHitter != null && e.HitterIsValid&& e.PlayerHitter.GetComponent<PlayerController>() && e.PlayerHitter.tag.Contains("1"))
             {
                 GenerateScorePlus(e.PlayerHitter, true, true, ModeData.NormalKillPoint);
             }
@@ -277,7 +277,7 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             {
                 Team1PlusHopTimer = UIData.ScorePlusTextHopScaleUpTime + UIData.ScorePlusTextHopScaleDownTime + UIData.ScorePlusTextHopStayTime + 1;
                 Team1ScorePlusText.GetComponent<TextMeshProUGUI>().text = "+" + ModeData.NormalKillPoint.ToString();
-            }
+            }*/
 
 
             GetScore(ModeData.NormalKillPoint, true);

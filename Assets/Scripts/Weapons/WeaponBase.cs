@@ -141,6 +141,17 @@ public abstract class WeaponBase : MonoBehaviour
             Context.Rigidbody.isKinematic = false;
         }
 
+        public override void Update()
+        {
+            base.Update();
+            RaycastHit hit;
+            if (Physics.SphereCast(Context.transform.position, 0.2f, Vector3.down, out hit, Context.WeaponDataBase.YFloatDistance, WeaponDataBase.OnNoAmmoDropDisappear))
+            {
+                TransitionTo<PickupableState>();
+                return;
+            }
+        }
+
         public override void OnCollisionEnter(Collision other)
         {
             base.OnCollisionEnter(other);
@@ -150,11 +161,11 @@ public abstract class WeaponBase : MonoBehaviour
                 return;
             }
 
-            if ((WeaponDataBase.OnNoAmmoDropDisappear == (WeaponDataBase.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
-            {
-                TransitionTo<PickupableState>();
-                return;
-            }
+            // if ((WeaponDataBase.OnNoAmmoDropDisappear == (WeaponDataBase.OnNoAmmoDropDisappear | (1 << other.gameObject.layer))))
+            // {
+            //     TransitionTo<PickupableState>();
+            //     return;
+            // }
         }
     }
 

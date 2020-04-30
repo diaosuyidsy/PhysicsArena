@@ -38,6 +38,15 @@ public static class Utility
         return maxLength;
     }
 
+    public static bool IsPositionInCameraView(Vector3 position, Camera camera)
+    {
+        Vector3 viewPoint = camera.WorldToViewportPoint(position);
+        return viewPoint.x >= 0f &&
+        viewPoint.x <= 1f &&
+        viewPoint.y >= 0f &&
+        viewPoint.y <= 1f && viewPoint.z >= 0f;
+    }
+
     // Sequence example, bubbly fade-in + bounce
     public static Sequence BubbleFadeIn(CharTweener _tweener, int start, int end, float amplitude = 100f, float duration = 0.5f)
     {

@@ -11,4 +11,5 @@ public class CameraData : ScriptableObject
     public float FOVSizeMax = 35f;
     public float CameraDistance = 20f;
     public float WonFOVSize = 6f;
+    public float AnyDeadPause = 0.2f;
 }

@@ -32,6 +32,9 @@ public class BrawlModeReforgedUIData : UIData
     public float ScorePlusTextBasketScale;
     public GameObject ScorePlusTextPrefab;
 
+    public Sprite RedScorePlusImage;
+    public Sprite BlueScorePlusImage;
+
     public float ShakeRadius;
     public float ShakeSpeed;
 }

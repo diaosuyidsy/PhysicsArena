@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class ScorePlusText : MonoBehaviour
 {
@@ -31,14 +32,14 @@ public class ScorePlusText : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (Team1)
+        /*if (Team1)
         {
             GetComponent<TextMeshProUGUI>().color = RedColor;
         }
         else
         {
             GetComponent<TextMeshProUGUI>().color = BlueColor;
-        }
+        }*/
 
         //Color color = GetComponent<TextMeshProUGUI>().color;
         //GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, 0);
@@ -77,11 +78,16 @@ public class ScorePlusText : MonoBehaviour
         {
             float t = (Timer - ScaleUpTime - ScaleDownTime - StayTime)/FadeTime;
 
-            Color color = GetComponent<TextMeshProUGUI>().color;
-            GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, 1-t);
+            //Color color = GetComponent<TextMeshProUGUI>().color;
+            //GetComponent<TextMeshProUGUI>().color = new Color(color.r, color.g, color.b, 1-t);
 
-            CurrentOffset = Mathf.Lerp(0, 1, t);
-            transform.parent.position = OriOffset + FadeOffset * CurrentOffset + Holder.transform.position;
+            //Color color = GetComponent<SpriteRenderer>().color;
+            //GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 1 - t);
+
+            transform.localScale = Vector3.one * Mathf.Lerp(EndScale, 0, t);
+
+            //CurrentOffset = Mathf.Lerp(0, 1, t);
+            //transform.parent.position = OriOffset + FadeOffset * CurrentOffset + Holder.transform.position;
         }
         else
         {

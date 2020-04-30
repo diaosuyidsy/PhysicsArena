@@ -201,12 +201,16 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
     {
         Vector3 Offset;
         Vector3 FadeOffset;
+        Sprite sprite;
+
+
         float Scale;
         if (Character)
         {
             Offset = UIData.ScorePlusTextCharacterOffset;
             FadeOffset = UIData.ScorePlusTextCharacterFadeOffset;
             Scale = UIData.ScorePlusTextCharacterScale;
+            
         }
         else
         {
@@ -215,15 +219,31 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             Scale = UIData.ScorePlusTextBasketScale;
         }
 
+        if (Team1)
+        {
+            sprite = UIData.RedScorePlusImage;
+        }
+        else
+        {
+            sprite = UIData.BlueScorePlusImage;
+        }
+
         GameObject Plus = GameObject.Instantiate(UIData.ScorePlusTextPrefab);
         Plus.transform.position = Offset + Holder.transform.position;
         Plus.transform.localScale = Scale * Vector3.one;
         Plus.transform.SetParent(Holder.transform);
 
-        Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Holder = Holder;
-        Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Team1 = Team1;
-        Plus.transform.Find("ScorePlus").GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
+        Plus.transform.Find("ScorePlusImage").GetComponent<ScorePlusText>().Holder = Holder;
+        Plus.transform.Find("ScorePlusImage").GetComponent<ScorePlusText>().Team1 = Team1;
         Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().FadeOffset = FadeOffset;
+        Plus.transform.Find("ScorePlusImage").GetComponent<SpriteRenderer>().sprite = sprite;
+
+
+
+        //Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Holder = Holder;
+        //Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().Team1 = Team1;
+        //Plus.transform.Find("ScorePlus").GetComponent<TextMeshProUGUI>().text = "+" + amount.ToString();
+        //Plus.transform.Find("ScorePlus").GetComponent<ScorePlusText>().FadeOffset = FadeOffset;
     }
 
     private void OnPlayerDied(PlayerDied e)

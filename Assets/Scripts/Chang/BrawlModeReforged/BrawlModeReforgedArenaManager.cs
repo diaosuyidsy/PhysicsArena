@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using FMODUnity;
 
 public enum CanonState
 {
@@ -352,6 +353,8 @@ public class CabelSwtiching_FirstSegment : CabelAction
         offset.y = 0;
 
         Cart.transform.forward = offset.normalized;
+
+        RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/BagelMovingInCart", Cart.transform.position);
     }
 
     public override void Update()
@@ -1002,7 +1005,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         Timer = 0;
         PlayerLocked = false;
 
-        
+        RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/RubberBandStretch", Context.Info.CameraFocus.transform.position);
     }
 
     public override void Update()
@@ -1151,6 +1154,8 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
 
 
         Context.Info.Mark.GetComponent<SpriteRenderer>().color = Context.FeelData.MarkFallColor;
+
+        RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/BagelFly", Context.Info.CameraFocus.transform.position);
     }
 
     public override void Update()

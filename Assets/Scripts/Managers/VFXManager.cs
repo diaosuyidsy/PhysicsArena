@@ -112,7 +112,8 @@ public class VFXManager
                 VFXtoCameraRelativePosition.x = (deadRelativeCameraVector.x / -deadRelativeCameraVector.z) * Mathf.Sqrt(VFXtoCameraRelativePosition.y * VFXtoCameraRelativePosition.y + VFXtoCameraRelativePosition.z + VFXtoCameraRelativePosition.x);
             }
             GameObject hugeDeathVFX = GameObject.Instantiate(VFXDataStore.HugeDeathVFX[playerColorIndex], Camera.main.transform);
-            hugeDeathVFX.transform.localEulerAngles = Vector3.forward * -90f * relativePosition;
+            // hugeDeathVFX.transform.localEulerAngles = Vector3.forward * -90f * relativePosition;
+            hugeDeathVFX.transform.up = deadRelativeCameraVector;
             hugeDeathVFX.transform.localPosition = VFXtoCameraRelativePosition;
         }
 

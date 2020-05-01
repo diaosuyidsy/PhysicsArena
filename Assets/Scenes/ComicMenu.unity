@@ -2187,7 +2187,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1995234145574352, guid: f8d6c631da37749db9f9744813be0f39, type: 3}
       propertyPath: m_TagString
-      value: Untagged
+      value: MainCamera
       objectReference: {fileID: 0}
     - target: {fileID: 20459301899154910, guid: f8d6c631da37749db9f9744813be0f39,
         type: 3}
@@ -6256,6 +6256,7 @@ MonoBehaviour:
   PlayerHolder: {fileID: 364539683}
   CharacterImageHolder: {fileID: 1606822212}
   SceneCamera: {fileID: 172688638}
+  MenuCamera: {fileID: 20459300367384186}
   IndicationBars: {fileID: 773084091}
   SelectionPageComic1: {fileID: 63503163}
   SelectionPageComic3: {fileID: 1984811733}
@@ -7007,7 +7008,7 @@ GameObject:
   - component: {fileID: 773084095}
   - component: {fileID: 773084094}
   - component: {fileID: 773084093}
-  m_Layer: 24
+  m_Layer: 22
   m_Name: IndicationBars
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -21674,7 +21675,7 @@ GameObject:
   - component: {fileID: 1995235021330037}
   m_Layer: 0
   m_Name: Main Camera
-  m_TagString: MainCamera
+  m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -21959,7 +21960,7 @@ Camera:
   field of view: 30
   orthographic: 0
   orthographic size: 10
-  m_Depth: -1
+  m_Depth: 1
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295

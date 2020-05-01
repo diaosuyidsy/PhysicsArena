@@ -21,6 +21,7 @@ public class ComicMenu : MonoBehaviour
     public GameObject PlayerHolder;
     public GameObject CharacterImageHolder;
     public Camera SceneCamera;
+    public Camera MenuCamera;
     public GameObject IndicationBars;
     public GameObject SelectionPageComic1;
     public GameObject SelectionPageComic3;
@@ -100,7 +101,8 @@ public class ComicMenu : MonoBehaviour
     /// <param name="duckInCircle"></param>
     public void PlayerInCircleChange(int chickenInCircle, int duckInCircle)
     {
-        ((CharacterSelectionState)ComicMenuFSM.CurrentState).OnPlayerEggStateChange(chickenInCircle, duckInCircle);
+        if (ComicMenuFSM.CurrentState != null && (ComicMenuFSM.CurrentState as CharacterSelectionState) != null)
+            ((CharacterSelectionState)ComicMenuFSM.CurrentState).OnPlayerEggStateChange(chickenInCircle, duckInCircle);
     }
 
     private abstract class MenuState : FSM<ComicMenu>.State
@@ -160,7 +162,7 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
-            _MainCamera = Camera.main;
+            _MainCamera = Context.MenuCamera;
             _vAxisInUse = true;
             _hAxisInUse = true;
         }
@@ -566,7 +568,7 @@ public class ComicMenu : MonoBehaviour
         {
             base.Init();
             _playerMap = new List<PlayerMap>();
-            _mainCamera = Camera.main;
+            _mainCamera = Context.MenuCamera;
 
             _playersFSM = new FSM<CharacterSelectionState>[MAXPLAYERCOUNT];
             _eggsFSM = new FSM<CharacterSelectionState>[MAXPLAYERCOUNT];
@@ -1294,6 +1296,13 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            GameObject players = GameObject.Find("Players");
+            for (int i = 0; i < players.transform.childCount; i++)
+            {
+                players.transform.GetChild(i).GetComponent<PlayerController>().enabled = false;
+                players.transform.GetChild(i).GetComponent<Rigidbody>().isKinematic = true;
+                players.SetActive(false);
+            }
             Context.LoadingPageLoop1.transform.GetChild(2).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopCharacterSpritePool[Context._finalPlayerInformation.ColorIndex[0]];
             Sequence sequence = DOTween.Sequence();
             Context.SceneCamera.enabled = false;

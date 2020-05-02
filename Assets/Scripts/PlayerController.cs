@@ -1184,7 +1184,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.Update();
             if (_BDown)
             {
-                TransitionTo<DroppingState>();
+                TransitionTo<DroppedRecoveryState>();
                 return;
             }
             if (_RightTriggerDown)
@@ -1227,34 +1227,6 @@ public class PlayerController : MonoBehaviour, IHittable
             base.OnExit();
             Context._animator.SetBool("PickUpFull", false);
             Context._animator.SetBool("PickUpHalf", false);
-        }
-    }
-
-    private class DroppingState : ActionState
-    {
-        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
-
-        public override void OnEnter()
-        {
-            base.OnEnter();
-            Context._animator.SetBool("Dropping", true);
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
-            Context._dropHandObject();
-            Context._animator.SetBool("Dropping", false);
-        }
-
-        public override void Update()
-        {
-            base.Update();
-            if (_BUp)
-            {
-                TransitionTo<DroppedRecoveryState>();
-                return;
-            }
         }
     }
 

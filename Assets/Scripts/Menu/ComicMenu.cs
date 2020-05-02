@@ -6,6 +6,7 @@ using Rewired;
 using TMPro;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using FMODUnity;
 
 public class ComicMenu : MonoBehaviour
 {
@@ -21,6 +22,7 @@ public class ComicMenu : MonoBehaviour
     public GameObject PlayerHolder;
     public GameObject CharacterImageHolder;
     public Camera SceneCamera;
+    public Camera MenuCamera;
     public GameObject IndicationBars;
     public GameObject SelectionPageComic1;
     public GameObject SelectionPageComic3;
@@ -52,6 +54,7 @@ public class ComicMenu : MonoBehaviour
 
     private FSM<ComicMenu> ComicMenuFSM;
     private const int MAXPLAYERCOUNT = 4;
+    private FMOD.Studio.EventInstance bgmEV;
 
     private void Awake()
     {
@@ -74,6 +77,8 @@ public class ComicMenu : MonoBehaviour
             _eggsOriginalLocalPosition[i] = new Vector3(_eggs[i].localPosition.x, _eggs[i].localPosition.y, _eggs[i].localPosition.z);
             _eggsOriginalLocalScale[i] = new Vector3(_eggs[i].localScale.x, _eggs[i].localScale.y, _eggs[i].localScale.z);
         }
+        bgmEV = RuntimeManager.CreateInstance("event:/Music/MenuBGM");
+        bgmEV.start();
     }
 
 
@@ -100,7 +105,8 @@ public class ComicMenu : MonoBehaviour
     /// <param name="duckInCircle"></param>
     public void PlayerInCircleChange(int chickenInCircle, int duckInCircle)
     {
-        ((CharacterSelectionState)ComicMenuFSM.CurrentState).OnPlayerEggStateChange(chickenInCircle, duckInCircle);
+        if (ComicMenuFSM.CurrentState != null && (ComicMenuFSM.CurrentState as CharacterSelectionState) != null)
+            ((CharacterSelectionState)ComicMenuFSM.CurrentState).OnPlayerEggStateChange(chickenInCircle, duckInCircle);
     }
 
     private abstract class MenuState : FSM<ComicMenu>.State
@@ -160,7 +166,7 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
-            _MainCamera = Camera.main;
+            _MainCamera = Context.MenuCamera;
             _vAxisInUse = true;
             _hAxisInUse = true;
         }
@@ -223,6 +229,7 @@ public class ComicMenu : MonoBehaviour
                 switch (_index)
                 {
                     case 0:
+                        Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                         TransitionTo<FirstMenuToSecondMenuTransition>();
                         break;
                     case 1:
@@ -248,6 +255,7 @@ public class ComicMenu : MonoBehaviour
             // 1. Set fill color to red
             // 2. Set Text Color to White
             // 3. Enlarge Menu Item
+            Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
             menuItem.GetChild(0).GetComponent<SpriteRenderer>().color = _MenuData.SelectedFillColor;
             menuItem.GetChild(1).GetComponent<TextMeshPro>().color = _MenuData.SelectedTextColor;
             menuItem.DOScale(_MenuData.SelectedMenuItemScale, _MenuData.SelectedMenuItemDuration).SetEase(_MenuData.SelectedMenuItemEase)
@@ -394,11 +402,13 @@ public class ComicMenu : MonoBehaviour
             base.Update();
             if (_HLAxisRaw > 0.2f && !_hAxisInUse)
             {
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
                 BlinkLeftRight(false);
                 return;
             }
             if (_HLAxisRaw < -0.2f && !_hAxisInUse)
             {
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
                 BlinkLeftRight(true);
                 return;
             }
@@ -411,6 +421,7 @@ public class ComicMenu : MonoBehaviour
                 //     i.DOPlayById("Selected");
                 // }
                 // Destroy(textDup, 0.4f);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<MapToCharacterTransition>();
                 return;
             }
@@ -566,7 +577,7 @@ public class ComicMenu : MonoBehaviour
         {
             base.Init();
             _playerMap = new List<PlayerMap>();
-            _mainCamera = Camera.main;
+            _mainCamera = Context.MenuCamera;
 
             _playersFSM = new FSM<CharacterSelectionState>[MAXPLAYERCOUNT];
             _eggsFSM = new FSM<CharacterSelectionState>[MAXPLAYERCOUNT];
@@ -778,6 +789,7 @@ public class ComicMenu : MonoBehaviour
             _playersFSM[gamePlayerId].TransitionTo<UnselectingState>();
             Player rewiredPlayer = ReInput.players.GetPlayer(rewiredPlayerId);
             // Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuJoinGameAudioClip);
+            Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
             rewiredPlayer.controllers.maps.SetMapsEnabled(false, "Assignment");
             Context.IndicationBarController.MaxPlayers = _playerMap.Count;
             // _onPlayerEggStateChange();
@@ -798,6 +810,7 @@ public class ComicMenu : MonoBehaviour
             }
             if (gamePlayerId == -1) return;
             // Context._audioSource.PlayOneShot(_MenuData.MenuAudioData.ThirdMenuUnJoinGameAudioClip);
+            Services.AudioManager.PlaySound("event:/SFX/Menu/Xiu");
 
             ReInput.players.GetPlayer(rewiredPlayerId).controllers.maps.SetMapsEnabled(true, "Assignment");
             _playerMap.RemoveAt(playerMapIndex);
@@ -962,6 +975,7 @@ public class ComicMenu : MonoBehaviour
             {
                 base.OnEnter();
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuEggJiggleAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/ShakeEgg");
                 Context.Context._3rdMenuIndicators[_gamePlayerIndex].gameObject.SetActive(false);
 
                 RaycastHit hit;
@@ -1215,6 +1229,7 @@ public class ComicMenu : MonoBehaviour
                 Context.Context._hoverEggCharacterImages[_eggIndex].GetComponent<DOTweenAnimation>().DOPlayBackwards();
                 _sequence = DOTween.Sequence();
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuEggSelectedAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
 
                 _sequence.Append(Context.Context._eggs[_eggIndex].DOShakeRotation(Context._MenuData.ETC_EggShakeDuration, Context._MenuData.ETC_EggShakeStrength, Context._MenuData.ETC_EggShakeVibrato));
                 _sequence.Append(Context.Context._eggs[_eggIndex].DOScale(Context._MenuData.ETC_EggScaleAmount, Context._MenuData.ETC_EggScaleDuration).SetEase(Context._MenuData.ETC_EggScaleAnimationCurve));
@@ -1227,6 +1242,7 @@ public class ComicMenu : MonoBehaviour
                     // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuChickenLandAudioClip);
                     // Context.Context._camera.GetComponent<DOTweenAnimation>().DORestartAllById("Land");
                     // Instantiate(Context._MenuData.ETC_ChickenLandVFX, Context.Context._chickens[_eggIndex].position + Context._MenuData.ETC_ChickenLandVFXOffset, Context._MenuData.ETC_ChickenLandVFX.transform.rotation);
+                    Services.AudioManager.PlaySound("event:/SFX/Menu/Landing");
                     TransitionTo<ChickenState>();
                     return;
                 });
@@ -1278,6 +1294,7 @@ public class ComicMenu : MonoBehaviour
                 /// Reset Egg Children Scale, Shader Color
                 /// Reset _eggCursors
                 // Context.Context._audioSource.PlayOneShot(Context._MenuData.MenuAudioData.ThirdMenuChickenToEggAudioClip);
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Xiu");
                 Context.Context._chickens[_eggIndex].localPosition = Context.Context._chickenOriginalLocalPosition[_eggIndex];
                 Context.Context._chickens[_eggIndex].GetComponent<PlayerController>().enabled = false;
                 Context.Context._chickens[_eggIndex].GetComponent<Rigidbody>().isKinematic = true;
@@ -1294,6 +1311,13 @@ public class ComicMenu : MonoBehaviour
         public override void OnEnter()
         {
             base.OnEnter();
+            GameObject players = GameObject.Find("Players");
+            for (int i = 0; i < players.transform.childCount; i++)
+            {
+                players.transform.GetChild(i).GetComponent<PlayerController>().enabled = false;
+                players.transform.GetChild(i).GetComponent<Rigidbody>().isKinematic = true;
+                players.SetActive(false);
+            }
             Context.LoadingPageLoop1.transform.GetChild(2).GetComponent<SpriteRenderer>().sprite = _MenuData.LoopCharacterSpritePool[Context._finalPlayerInformation.ColorIndex[0]];
             Sequence sequence = DOTween.Sequence();
             Context.SceneCamera.enabled = false;
@@ -1356,6 +1380,12 @@ public class ComicMenu : MonoBehaviour
             _switchRandomBackground(_middleLoop);
             _switchRandomBackground(_upperLoop);
             _travelDistance = 0f;
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            Context.bgmEV.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
         }
 
         private void _switchRandomBackground(GameObject loop)

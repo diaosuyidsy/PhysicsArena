@@ -37,6 +37,7 @@ public class ShieldController : MonoBehaviour
             {
                 _instantiatedShieldCrack = Instantiate(ShieldCrack, transform.parent, true);
                 _instantiatedShieldCrack.SetActive(true);
+                Destroy(_instantiatedShieldCrack, 0.5f);
                 _instantiatedShieldCrack.transform.parent = null;
                 StartCoroutine(increaseShieldCraftDistance(0.5f));
             }
@@ -48,11 +49,12 @@ public class ShieldController : MonoBehaviour
         float elapsedTime = 0f;
         while (elapsedTime < time)
         {
-            _instantiatedShieldCrack.GetComponent<Renderer>().material.SetFloat("_Distance", elapsedTime / time);
+            if (_instantiatedShieldCrack != null)
+                _instantiatedShieldCrack.GetComponent<Renderer>().material.SetFloat("_Distance", elapsedTime / time);
             elapsedTime += Time.deltaTime;
             yield return null;
         }
-        Destroy(_instantiatedShieldCrack);
-        _instantiatedShieldCrack = null;
+        if (_instantiatedShieldCrack != null)
+            _instantiatedShieldCrack = null;
     }
 }

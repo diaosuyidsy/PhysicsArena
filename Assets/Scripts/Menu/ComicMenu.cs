@@ -67,6 +67,7 @@ public class ComicMenu : MonoBehaviour
         _chickenOriginalLocalPosition = new Vector3[MAXPLAYERCOUNT];
         _eggsOriginalLocalPosition = new Vector3[MAXPLAYERCOUNT];
         _eggsOriginalLocalScale = new Vector3[MAXPLAYERCOUNT];
+        Cursor.lockState = CursorLockMode.Locked;
         for (int i = 0; i < MAXPLAYERCOUNT; i++)
         {
             _eggs[i] = EggHolder.transform.GetChild(i);

@@ -5,7 +5,7 @@
 			<value>PlayerPunchStart</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{cc0edd42-d38d-45ce-9be2-f56c8160ec69}</destination>
@@ -116,7 +116,6 @@
 	<object class="MixerBusEffectChain" id="{ba02430e-a108-4c54-adb0-7bdba7bdf815}">
 		<relationship name="effects">
 			<destination>{35c0e55e-b8dd-47db-b26d-e2c5e63b1d79}</destination>
-			<destination>{53906710-1acc-44c1-b5a0-4f002268206f}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{5a13024e-2a41-4da0-9133-e275c9dd2846}" />
@@ -128,10 +127,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{c3ac7169-120b-4777-a72c-13699adbb2ff}" />
 	<object class="MixerBusFader" id="{35c0e55e-b8dd-47db-b26d-e2c5e63b1d79}" />
-	<object class="SpatialiserEffect" id="{53906710-1acc-44c1-b5a0-4f002268206f}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{09dde2e0-8f48-4185-99c6-53873cdd7d14}" />
 </objects>

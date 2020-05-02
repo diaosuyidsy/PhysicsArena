@@ -24,6 +24,7 @@ public class rtHook : WeaponBase
         {
             return _hookGunFSM != null &&
                 _hookGunFSM.CurrentState != null &&
+                Owner != null &&
                 _hookGunFSM.CurrentState.GetType().Equals(typeof(HookFlyingOutState));
         }
     }

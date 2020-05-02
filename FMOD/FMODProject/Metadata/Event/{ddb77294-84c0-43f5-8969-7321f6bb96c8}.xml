@@ -5,7 +5,7 @@
 			<value>PlayerRespawned</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{a7bfb485-87ae-40d2-bff6-3d0ab8285477}</destination>
@@ -72,6 +72,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerMaster" id="{8ee8edf7-86b0-48de-9907-df4aa37a6d8b}">
+		<property name="pitch">
+			<value>1.80000007</value>
+		</property>
 		<relationship name="effectChain">
 			<destination>{a9b80ce2-41a7-47a0-9a99-d847950e2bd0}</destination>
 		</relationship>
@@ -113,7 +116,6 @@
 	<object class="MixerBusEffectChain" id="{a9b80ce2-41a7-47a0-9a99-d847950e2bd0}">
 		<relationship name="effects">
 			<destination>{2d764795-c7be-4355-b586-7e5bed776cc6}</destination>
-			<destination>{1829b501-7ea8-488b-85ce-4bb9da28114b}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{02a0d879-e75b-41f8-b150-2cced017afa7}" />
@@ -125,10 +127,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{d4e06242-f167-412c-9aa7-c0f1d074d4fc}" />
 	<object class="MixerBusFader" id="{2d764795-c7be-4355-b586-7e5bed776cc6}" />
-	<object class="SpatialiserEffect" id="{1829b501-7ea8-488b-85ce-4bb9da28114b}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{3b8a5ce5-5467-4a00-9607-3a80808e5aaf}" />
 </objects>

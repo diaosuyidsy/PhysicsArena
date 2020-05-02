@@ -5,7 +5,7 @@
 			<value>PlayerJump</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{a7bfb485-87ae-40d2-bff6-3d0ab8285477}</destination>
@@ -97,6 +97,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{dcdcfe6a-9685-4da0-a4ef-ec78380820a8}">
+		<property name="volume">
+			<value>-11.5</value>
+		</property>
 		<property name="name">
 			<value>Audio 1</value>
 		</property>
@@ -113,7 +116,6 @@
 	<object class="MixerBusEffectChain" id="{71a9b87e-069e-40b4-a50a-5d1ab60e7709}">
 		<relationship name="effects">
 			<destination>{0f8b2f25-df52-42a5-87ec-6a3799e0a383}</destination>
-			<destination>{a97c44fa-178e-48f7-8692-2852414361a6}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{71362dfb-3af1-4981-b21d-32e4711a2026}" />
@@ -125,10 +127,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{73dad194-73fa-491e-a482-5fec2c91c330}" />
 	<object class="MixerBusFader" id="{0f8b2f25-df52-42a5-87ec-6a3799e0a383}" />
-	<object class="SpatialiserEffect" id="{a97c44fa-178e-48f7-8692-2852414361a6}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{2e68784c-02c4-49ae-b14d-64b68aa1bf98}" />
 </objects>

@@ -5,7 +5,7 @@
 			<value>BagelExplode</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{c365f461-aee9-40fd-856c-bd11a7bafd3f}</destination>
@@ -116,7 +116,6 @@
 	<object class="MixerBusEffectChain" id="{d388366c-fbb8-4bd5-a48c-d11ebd0fb161}">
 		<relationship name="effects">
 			<destination>{e93d3317-d246-4f69-84a3-76b259ed0260}</destination>
-			<destination>{d9d1c5f3-8369-4f75-9918-470c36159ac3}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{e1904f25-5a90-48f6-851b-1a6c3a935867}" />
@@ -128,10 +127,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{ac5c1e2a-f376-4fa4-8adf-2e96aa762430}" />
 	<object class="MixerBusFader" id="{e93d3317-d246-4f69-84a3-76b259ed0260}" />
-	<object class="SpatialiserEffect" id="{d9d1c5f3-8369-4f75-9918-470c36159ac3}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{3b26c480-e2b2-45f1-9565-70592a50b52c}" />
 </objects>

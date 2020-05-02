@@ -5,7 +5,7 @@
 			<value>SuckGunSuck</value>
 		</property>
 		<property name="outputFormat">
-			<value>2</value>
+			<value>1</value>
 		</property>
 		<relationship name="folder">
 			<destination>{a41d87e3-06e6-4d66-a5cf-ff75fd6b1fd5}</destination>
@@ -97,6 +97,9 @@
 		</relationship>
 	</object>
 	<object class="EventMixerGroup" id="{daef50f0-6cbe-4f2a-bf58-caf1912a486d}">
+		<property name="volume">
+			<value>-7.5</value>
+		</property>
 		<property name="name">
 			<value>Audio 1</value>
 		</property>
@@ -113,7 +116,6 @@
 	<object class="MixerBusEffectChain" id="{99dd7ca1-707c-408b-86c7-7366c7245fd6}">
 		<relationship name="effects">
 			<destination>{aa99ce65-29ef-432d-863c-0205341e9b87}</destination>
-			<destination>{e140b949-9ca4-4bff-9bb2-c659b4235d86}</destination>
 		</relationship>
 	</object>
 	<object class="MixerBusPanner" id="{d9a81be0-7925-4d94-99b3-10d0cec9ba38}" />
@@ -125,10 +127,5 @@
 	</object>
 	<object class="MixerBusPanner" id="{b4a530e7-f235-426d-85a2-5320156477c9}" />
 	<object class="MixerBusFader" id="{aa99ce65-29ef-432d-863c-0205341e9b87}" />
-	<object class="SpatialiserEffect" id="{e140b949-9ca4-4bff-9bb2-c659b4235d86}">
-		<property name="maximumDistance">
-			<value>35</value>
-		</property>
-	</object>
 	<object class="MixerBusFader" id="{77493777-3822-488e-8393-44cbc15ed51a}" />
 </objects>

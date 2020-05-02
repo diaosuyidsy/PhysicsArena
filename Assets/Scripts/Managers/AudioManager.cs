@@ -8,10 +8,12 @@ public class AudioManager
     private FMOD.Studio.EventInstance bgmEV;
     private ObjectiveManager _mapObjectiveManager;
     private ModeSepcificData _modeSpecificData;
+    private Dictionary<GameObject, FMOD.Studio.EventInstance> _waterGunAudio;
     public AudioManager(ObjectiveManager om, ModeSepcificData data)
     {
         _mapObjectiveManager = om;
         _modeSpecificData = data;
+        _waterGunAudio = new Dictionary<GameObject, FMOD.Studio.EventInstance>();
         OnEnable();
     }
 
@@ -110,7 +112,19 @@ public class AudioManager
 
     private void _onWaterGunFired(WaterGunFired ev)
     {
-        _playSound("event:/SFX/Gameplay/Object/WaterGun/WaterGunFired", ev.WaterGun.transform.position);
+        var a = RuntimeManager.CreateInstance("event:/SFX/Gameplay/Object/WaterGun/WaterGunFired");
+        a.start();
+        _waterGunAudio.Add(ev.WaterGun, a);
+        // _playSound("event:/SFX/Gameplay/Object/WaterGun/WaterGunFired", ev.WaterGun.transform.position);
+    }
+
+    private void _onWaterGunStopped(WaterGunStopped ev)
+    {
+        if (_waterGunAudio.ContainsKey(ev.WaterGun))
+        {
+            _waterGunAudio[ev.WaterGun].stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            _waterGunAudio.Remove(ev.WaterGun);
+        }
     }
 
     private void _onFistGunFired(FistGunFired ev)
@@ -157,7 +171,10 @@ public class AudioManager
     {
         if (ev.Obj.GetComponent<WeaponBase>() != null)
         {
-            _playSound("event:/SFX/Gameplay/Object/Other/WeaponPickedup", ev.Obj.transform.position);
+            if (ev.Obj.GetComponent<Bagel>() != null)
+                _playSound("event:/SFX/Gameplay/Object/Other/BagelPickedup", ev.Obj.transform.position);
+            else
+                _playSound("event:/SFX/Gameplay/Object/Other/WeaponPickedup", ev.Obj.transform.position);
         }
     }
 
@@ -234,6 +251,7 @@ public class AudioManager
     {
         EventManager.Instance.AddHandler<PlayerHit>(_onPlayerHit);
         EventManager.Instance.AddHandler<WaterGunFired>(_onWaterGunFired);
+        EventManager.Instance.AddHandler<WaterGunStopped>(_onWaterGunStopped);
         EventManager.Instance.AddHandler<HookGunFired>(_onHookGunFired);
         EventManager.Instance.AddHandler<HookHit>(_onHookGunHit);
         EventManager.Instance.AddHandler<SuckGunFired>(_onSuckGunFired);
@@ -266,6 +284,7 @@ public class AudioManager
     {
         EventManager.Instance.RemoveHandler<PlayerHit>(_onPlayerHit);
         EventManager.Instance.RemoveHandler<WaterGunFired>(_onWaterGunFired);
+        EventManager.Instance.RemoveHandler<WaterGunStopped>(_onWaterGunStopped);
         EventManager.Instance.RemoveHandler<HookGunFired>(_onHookGunFired);
         EventManager.Instance.RemoveHandler<HookHit>(_onHookGunHit);
         EventManager.Instance.RemoveHandler<SuckGunFired>(_onSuckGunFired);

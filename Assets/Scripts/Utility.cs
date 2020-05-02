@@ -224,17 +224,18 @@ public class StatsTuple
 
 public class StatisticsRecord
 {
-    public StatisticsRecord(string statisticName, string statisticsInformation, Sprite[] statisticIcon)
+    public StatisticsRecord(string statisticName, string statisticsInformation, Sprite[] statisticIcon, Color statisticColor)
     {
         StatisticName = statisticName;
         StatisticsInformation = statisticsInformation;
         StatisticIcon = statisticIcon;
+        StatisticColor = statisticColor;
     }
 
     public string StatisticName { get; }
     public string StatisticsInformation { get; }
     public Sprite[] StatisticIcon { get; }
-
+    public Color StatisticColor { get; }
 }
 
 public class ImpactMarker
@@ -263,6 +264,7 @@ public class StatisticsInformation
     public string StatisticsIntro1;
     public string StatisticsIntro2;
     public Sprite[] StatisticIcon;
+    public Color StatisticColor;
     public float Weight;
     public bool ExcludeFromMVPCalculation = false;
 }

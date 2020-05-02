@@ -341,6 +341,7 @@ public class GameStateManager : GameStateManagerBase
                 frame.GetChild(1).GetComponent<Image>().sprite = _configData.ColorIndexToStatisticPlayerIcon[colorindex];
                 frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticName;
                 frame.GetChild(3).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticsInformation;
+                frame.GetChild(3).GetComponent<TextMeshProUGUI>().color = statsresult[rewiredID].StatisticColor;
             }
 
             // 6. Move In All Statistic display

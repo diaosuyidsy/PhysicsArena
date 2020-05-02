@@ -83,7 +83,8 @@ public class NetworkStatisticManager
                     _configData.StatsInfo[record.Index].StatisticsIntro1 +
                         record.RawData.ToString("F0") +
                             _configData.StatsInfo[record.Index].StatisticsIntro2,
-                            _configData.StatsInfo[record.Index].StatisticIcon
+                            _configData.StatsInfo[record.Index].StatisticIcon,
+                            _configData.StatsInfo[record.Index].StatisticColor
                 ));
             }
         }
@@ -94,7 +95,8 @@ public class NetworkStatisticManager
             if (!result.ContainsKey(rewiredID)) result.Add(rewiredID, new StatisticsRecord(
                  _configData.UselessInfo.StatisticsTitle,
                 _configData.UselessInfo.StatisticsIntro1 + _configData.UselessInfo.StatisticsIntro2,
-                 _configData.UselessInfo.StatisticIcon
+                 _configData.UselessInfo.StatisticIcon,
+                _configData.UselessInfo.StatisticColor
              ));
         }
         return result;

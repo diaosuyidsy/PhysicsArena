@@ -1379,13 +1379,8 @@ public class ComicMenu : MonoBehaviour
             _switchRandomBackground(_lowerLoop);
             _switchRandomBackground(_middleLoop);
             _switchRandomBackground(_upperLoop);
-            _travelDistance = 0f;
-        }
-
-        public override void OnExit()
-        {
-            base.OnExit();
             Context.bgmEV.stop(FMOD.Studio.STOP_MODE.ALLOWFADEOUT);
+            _travelDistance = 0f;
         }
 
         private void _switchRandomBackground(GameObject loop)

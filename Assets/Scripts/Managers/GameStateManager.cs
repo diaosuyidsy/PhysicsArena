@@ -425,8 +425,8 @@ public class GameStateManager : GameStateManagerBase
         {
             get
             {
-                if (Context._winner == 1) return "CHICKENS WIN";
-                else if (Context._winner == 2) return "DUCKS WIN";
+                if (Context._winner == 1) return "TEAM Red WIN";
+                else if (Context._winner == 2) return "Team Blue WIN";
                 else return "DRAW";
             }
         }

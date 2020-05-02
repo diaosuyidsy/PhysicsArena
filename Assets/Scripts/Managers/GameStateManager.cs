@@ -726,6 +726,7 @@ public class GameStateManager : GameStateManagerBase
             // Context._cam.GetComponent<AudioSource>().Play();
             // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
             // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
+            Context._darkCornerEffect.Length = 0f;
             Context._tutorialBackgroundMask.gameObject.SetActive(true);
             Sequence seq = DOTween.Sequence();
             seq.Append(Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase));

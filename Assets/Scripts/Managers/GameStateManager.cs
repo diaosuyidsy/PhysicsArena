@@ -341,6 +341,7 @@ public class GameStateManager : GameStateManagerBase
                 frame.GetChild(1).GetComponent<Image>().sprite = _configData.ColorIndexToStatisticPlayerIcon[colorindex];
                 frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticName;
                 frame.GetChild(3).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticsInformation;
+                frame.GetChild(3).GetComponent<TextMeshProUGUI>().color = statsresult[rewiredID].StatisticColor;
             }
 
             // 6. Move In All Statistic display
@@ -425,8 +426,8 @@ public class GameStateManager : GameStateManagerBase
         {
             get
             {
-                if (Context._winner == 1) return "CHICKENS WIN";
-                else if (Context._winner == 2) return "DUCKS WIN";
+                if (Context._winner == 1) return "TEAM Red WIN";
+                else if (Context._winner == 2) return "Team Blue WIN";
                 else return "DRAW";
             }
         }

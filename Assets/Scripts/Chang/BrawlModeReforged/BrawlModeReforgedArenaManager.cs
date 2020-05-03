@@ -616,9 +616,11 @@ public class CabelSwtiching_ThirdSegment : CabelAction
                 GameObject.Destroy(Context.Info.Bomb);
 
 
+                RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/RubberBandStretch", Context.Info.CameraFocus.transform.position);
+
                 Context.SetWrap();
 
-                Context.CanonEntity.GetComponent<AudioSource>().Play();
+                //Context.CanonEntity.GetComponent<AudioSource>().Play();
             }
 
             return;
@@ -1005,7 +1007,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         Timer = 0;
         PlayerLocked = false;
 
-        RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/RubberBandStretch", Context.Info.CameraFocus.transform.position);
+
     }
 
     public override void Update()

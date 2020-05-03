@@ -124,6 +124,11 @@ public class rtHook : WeaponBase
     protected override void _onWeaponDespawn()
     {
         _hookGunFSM.TransitionTo<HookInState>();
+        if (_hookDup != null)
+        {
+            Destroy(_hookDup);
+            _hookDup = null;
+        }
         _ammo = _hookGunData.MaxHookTimes;
         base._onWeaponDespawn();
     }

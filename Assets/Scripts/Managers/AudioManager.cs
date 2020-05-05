@@ -312,6 +312,7 @@ public class AudioManager
         EventManager.Instance.RemoveHandler<FistGunStartCharging>(_onFistGunReload);
         EventManager.Instance.RemoveHandler<GameStart>(_onGameStart);
         EventManager.Instance.RemoveHandler<GameEnd>(_onGameEnd);
+        bgmEV.stop(FMOD.Studio.STOP_MODE.IMMEDIATE);
     }
 
     public void Destroy()

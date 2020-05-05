@@ -85,11 +85,6 @@ public class rtHook : WeaponBase
     public override void OnDrop(bool customForce, Vector3 force)
     {
         base.OnDrop(customForce, force);
-        if (_hookDup != null)
-        {
-            Destroy(_hookDup);
-            _hookDup = null;
-        }
         if (Hooked != null)
         {
             foreach (var rb in Hooked.GetComponentsInChildren<Rigidbody>())
@@ -126,8 +121,11 @@ public class rtHook : WeaponBase
         _hookGunFSM.TransitionTo<HookInState>();
         if (_hookDup != null)
         {
-            Destroy(_hookDup);
-            _hookDup = null;
+            _hookDup.SetActive(false);
+        }
+        if (_hook.activeSelf)
+        {
+            _hook.SetActive(false);
         }
         _ammo = _hookGunData.MaxHookTimes;
         base._onWeaponDespawn();

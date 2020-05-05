@@ -417,9 +417,10 @@ public class GameStateManager : GameStateManagerBase
         {
             get
             {
-                Vector3 _temp = Camera.main.WorldToScreenPoint(Context._endFocusPosition);
-                _temp.y = Screen.height - _temp.y;
-                return _temp;
+                // Vector3 _temp = Camera.main.WorldToScreenPoint(Context._endFocusPosition);
+                // _temp.y = Screen.height - _temp.y;
+                // return _temp;
+                return Camera.main.ViewportToScreenPoint(Vector2.one * 0.5f);
             }
         }
         private string _victoryTeam

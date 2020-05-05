@@ -145,7 +145,7 @@ public abstract class WeaponBase : MonoBehaviour
         {
             base.Update();
             RaycastHit hit;
-            if (Physics.SphereCast(Context.transform.position, 0.2f, Vector3.down, out hit, Context.WeaponDataBase.YFloatDistance, WeaponDataBase.OnNoAmmoDropDisappear))
+            if (Physics.SphereCast(Context.transform.position, 0.2f, Vector3.down, out hit, Context.WeaponDataBase.YFloatDistance, WeaponDataBase.Ground))
             {
                 TransitionTo<PickupableState>();
                 return;

@@ -124,6 +124,11 @@ public class rtHook : WeaponBase
     protected override void _onWeaponDespawn()
     {
         _hookGunFSM.TransitionTo<HookInState>();
+        if (_hookDup != null)
+        {
+            Destroy(_hookDup);
+            _hookDup = null;
+        }
         _ammo = _hookGunData.MaxHookTimes;
         base._onWeaponDespawn();
     }
@@ -143,7 +148,11 @@ public class rtHook : WeaponBase
         public override void OnEnter()
         {
             base.OnEnter();
-            Context._hookDup = null;
+            if (Context._hookDup != null)
+            {
+                Destroy(Context._hookDup);
+                Context._hookDup = null;
+            }
             Context._hook.SetActive(true);
             Context._hook.transform.parent = Context.transform;
             Context._hook.transform.localScale = Context._hookinitlocalScale;

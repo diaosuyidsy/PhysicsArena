@@ -341,6 +341,7 @@ public class GameStateManager : GameStateManagerBase
                 frame.GetChild(1).GetComponent<Image>().sprite = _configData.ColorIndexToStatisticPlayerIcon[colorindex];
                 frame.GetChild(2).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticName;
                 frame.GetChild(3).GetComponent<TextMeshProUGUI>().text = statsresult[rewiredID].StatisticsInformation;
+                frame.GetChild(3).GetComponent<TextMeshProUGUI>().color = statsresult[rewiredID].StatisticColor;
             }
 
             // 6. Move In All Statistic display
@@ -416,17 +417,18 @@ public class GameStateManager : GameStateManagerBase
         {
             get
             {
-                Vector3 _temp = Camera.main.WorldToScreenPoint(Context._endFocusPosition);
-                _temp.y = Screen.height - _temp.y;
-                return _temp;
+                // Vector3 _temp = Camera.main.WorldToScreenPoint(Context._endFocusPosition);
+                // _temp.y = Screen.height - _temp.y;
+                // return _temp;
+                return Camera.main.ViewportToScreenPoint(Vector2.one * 0.5f);
             }
         }
         private string _victoryTeam
         {
             get
             {
-                if (Context._winner == 1) return "CHICKENS WIN";
-                else if (Context._winner == 2) return "DUCKS WIN";
+                if (Context._winner == 1) return "TEAM Red WIN";
+                else if (Context._winner == 2) return "Team Blue WIN";
                 else return "DRAW";
             }
         }
@@ -726,6 +728,7 @@ public class GameStateManager : GameStateManagerBase
             // Context._cam.GetComponent<AudioSource>().Play();
             // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", 0f);
             // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 22000f);
+            Context._darkCornerEffect.Length = 0f;
             Context._tutorialBackgroundMask.gameObject.SetActive(true);
             Sequence seq = DOTween.Sequence();
             seq.Append(Context._tutorialImage.DOScale(Vector3.one, _GameMapData.TutorialImageMoveInDuration).SetEase(_GameMapData.TutorialImageMoveInEase));

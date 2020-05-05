@@ -616,9 +616,11 @@ public class CabelSwtiching_ThirdSegment : CabelAction
                 GameObject.Destroy(Context.Info.Bomb);
 
 
+                RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/RubberBandStretch", Context.Info.CameraFocus.transform.position);
+
                 Context.SetWrap();
 
-                Context.CanonEntity.GetComponent<AudioSource>().Play();
+                //Context.CanonEntity.GetComponent<AudioSource>().Play();
             }
 
             return;
@@ -927,9 +929,14 @@ public abstract class CanonAction : FSM<BrawlModeReforgedArenaManager>.State
         }
     }
 
-    protected void SetBombRotation()
+    protected void BombRotationAimPlayer()
     {
         Context.Info.Bomb.transform.forward = Context.Info.Mark.transform.position - Context.Info.Bomb.transform.position;
+    }
+
+    protected void BombRotationFollowSling()
+    {
+        Context.Info.Bomb.transform.forward = -Context.Info.Entity.transform.forward;
     }
 }
 
@@ -1005,7 +1012,7 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         Timer = 0;
         PlayerLocked = false;
 
-        RuntimeManager.PlayOneShot("event:/SFX/Gameplay/Object/Other/RubberBandStretch", Context.Info.CameraFocus.transform.position);
+
     }
 
     public override void Update()
@@ -1022,7 +1029,16 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
         if (PlayerLocked)
         {
             AimingSetCanon();
-            MarkFollow(true);
+
+            if(Timer >= Context.Data.MarkLockTime)
+            {
+                Context.Info.Mark.transform.localScale = Vector3.one;
+                MarkFollow(true);
+            }
+            else
+            {
+                MarkLock();
+            }
 
             if (Context.Info.LockedPlayer == null)
             {
@@ -1036,22 +1052,21 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
                 return;
             }
 
-            Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
-            Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, Timer / Context.FeelData.MarkAppearTime);
+
 
             Color Acolor = Context.Info.AimedMark.GetComponent<SpriteRenderer>().color;
             Context.Info.AimedMark.GetComponent<SpriteRenderer>().color = new Color(Acolor.r, Acolor.g, Acolor.b, Timer / Context.FeelData.MarkAppearTime);
 
             CheckTimer();
 
-            SetBombRotation();
+            BombRotationFollowSling();
+
         }
         else
         {
             SetCanon(0, 0, Context.FeelData.AimingPercentageFollowSpeed);
             if (LockPlayer())
             {
-
 
                 Context.Info.Bomb = GameObject.Instantiate(Context.BombPrefab);
                 Context.Info.Bomb.transform.parent = Context.CanonPad.transform;
@@ -1077,6 +1092,22 @@ public class CanonFiring_Normal : CanonAction // Lock and follow player (white m
             TransitionTo<CanonFiring_Alert>();
         }
     }
+
+    private void MarkLock()
+    {
+        if (Context.Info.LockedPlayer == null)
+        {
+            return;
+        }
+
+        Context.Info.Mark.transform.position = new Vector3(Context.Info.LockedPlayer.transform.position.x, Context.Info.Mark.transform.position.y, Context.Info.LockedPlayer.transform.position.z);
+
+        Context.Info.Mark.transform.localScale = Vector3.one * Mathf.Lerp(0, 1, Timer / Context.Data.MarkLockTime);
+
+        Color color = Context.Info.Mark.GetComponent<SpriteRenderer>().color;
+        Context.Info.Mark.GetComponent<SpriteRenderer>().color = new Color(color.r, color.g, color.b, 1);
+
+    }
 }
 
 public class CanonFiring_Alert : CanonAction // Purple mark follows target
@@ -1096,7 +1127,7 @@ public class CanonFiring_Alert : CanonAction // Purple mark follows target
 
         AimingSetCanon();
         MarkFollow(false);
-        SetBombRotation();
+        BombRotationFollowSling();
 
         if (Context.Info.LockedPlayer == null)
         {
@@ -1182,7 +1213,7 @@ public class CanonFiring_Fall : CanonAction // Shoot ammo
                 GetBombFlyInfo();
             }
             BombFly();
-            SetBombRotation();
+            BombRotationAimPlayer();
         }
 
 

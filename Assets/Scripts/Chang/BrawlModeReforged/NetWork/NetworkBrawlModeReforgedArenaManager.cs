@@ -79,37 +79,37 @@ public class NetworkCabelSwtiching : NetworkCabelAction
 
     private void CheckTimer()
     {
-        if (Timer >= Context.Data.CanonSwitchTime)
-        {
-            if (Context.Info.State != CanonState.Firing)
-            {
-                TransitionTo<NetworkCabelIdle>();
-                Context.CanonFSM.TransitionTo<NetworkCanonFiring_Normal>();
+        //if (Timer >= Context.Data.CanonSwitchTime)
+        //{
+        //    if (Context.Info.State != CanonState.Firing)
+        //    {
+        //        TransitionTo<NetworkCabelIdle>();
+        //        Context.CanonFSM.TransitionTo<NetworkCanonFiring_Normal>();
 
-                Context.Info.LockedPlayer = null;
+        //        Context.Info.LockedPlayer = null;
 
-                NetworkServer.UnSpawn(Context.Info.Mark);
-                GameObject.Destroy(Context.Info.Mark);
+        //        NetworkServer.UnSpawn(Context.Info.Mark);
+        //        GameObject.Destroy(Context.Info.Mark);
 
-                NetworkServer.UnSpawn(Context.Info.Bomb);
-                GameObject.Destroy(Context.Info.Bomb);
+        //        NetworkServer.UnSpawn(Context.Info.Bomb);
+        //        GameObject.Destroy(Context.Info.Bomb);
 
-                Context.SetWrap();
-                switch (Context.Info.CurrentSide)
-                {
-                    case CanonSide.Neutral:
-                        Context.RpcSetWrap(0);
-                        break;
-                    case CanonSide.Red:
-                        Context.RpcSetWrap(1);
-                        break;
-                    case CanonSide.Blue:
-                        Context.RpcSetWrap(2);
-                        break;
-                }
+        //        Context.SetWrap();
+        //        switch (Context.Info.CurrentSide)
+        //        {
+        //            case CanonSide.Neutral:
+        //                Context.RpcSetWrap(0);
+        //                break;
+        //            case CanonSide.Red:
+        //                Context.RpcSetWrap(1);
+        //                break;
+        //            case CanonSide.Blue:
+        //                Context.RpcSetWrap(2);
+        //                break;
+        //        }
                 
-            }
-        }
+        //    }
+        //}
     }
 
     private void SetCabel() // Set cabel appearance

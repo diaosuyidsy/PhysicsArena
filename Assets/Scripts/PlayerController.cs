@@ -1184,6 +1184,7 @@ public class PlayerController : MonoBehaviour, IHittable
             base.Update();
             if (_BDown)
             {
+                Context._dropHandObject();
                 TransitionTo<DroppedRecoveryState>();
                 return;
             }

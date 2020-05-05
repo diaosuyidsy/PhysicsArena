@@ -620,6 +620,15 @@ public class CabelSwtiching_ThirdSegment : CabelAction
 
                 Context.SetWrap();
 
+                if(Context.Info.CurrentSide == CanonSide.Red)
+                {
+                    GameObject WrapChange = GameObject.Instantiate(Context.FeelData.WrapChangeRed);
+                }
+                else
+                {
+                    GameObject WrapChange = GameObject.Instantiate(Context.FeelData.WrapChangeBlue);
+                }
+
                 //Context.CanonEntity.GetComponent<AudioSource>().Play();
             }
 

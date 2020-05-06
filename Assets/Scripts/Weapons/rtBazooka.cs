@@ -115,7 +115,7 @@ public class rtBazooka : WeaponBase
                 EventManager.Instance.TriggerEvent(new BazookaBombed(gameObject, Owner, Owner.GetComponent<PlayerController>().PlayerNumber, affectedPlayers));
                 Owner.GetComponent<IHittable>().OnImpact(new StunEffect(_bazookaData.SelfStunTime, 0f));
                 _resetThrowMark();
-                _onWeaponUsedOnce();
+                _onWeaponDespawn();
             }
         }
     }

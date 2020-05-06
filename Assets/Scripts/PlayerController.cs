@@ -1380,10 +1380,6 @@ public class PlayerController : MonoBehaviour, IHittable
                 else return;
                 if (target == null) return;
                 _hitOnce = true;
-                foreach (var rb in target.GetComponentsInChildren<Rigidbody>(true))
-                {
-                    rb.velocity = Vector3.zero;
-                }
                 Vector3 force = Context.transform.forward * Context.CharacterDataStore.PunchForce;
                 Context._hitStopFrames = Context.CharacterDataStore.HitStopFramesSmall;
                 if (target.GetComponent<IHittable>().CanBlock(Context.transform.forward))
@@ -1391,6 +1387,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     force *= (-Context.CharacterDataStore.BlockMultiplier);
                     // EventManager.Instance.TriggerEvent(new PlayerHit(target, Context.gameObject, force, target.GetComponent<PlayerController>().PlayerNumber, Context.PlayerNumber, 1f, true));
                     // Context.OnImpact(force, ForceMode.Impulse, target, ImpactType.Block);
+                    Context.GetComponent<IHittable>().SetVelocity(Vector3.zero);
                     Services.ActionManager.RegisterAction(Time.frameCount, new MeleeHitAction(Context.gameObject, target, force, ForceMode.Impulse, ImpactType.Block));
                 }
                 else
@@ -1399,6 +1396,7 @@ public class PlayerController : MonoBehaviour, IHittable
                     // if (Time.time > Context._impactMarker.PlayerMarkedTime + Context.CharacterDataStore.PunchResetVelocityBeforeHitDuration)
                     //     Context.SetVelocity(Vector3.zero);
                     // target.GetComponent<IHittable>().OnImpact(force, ForceMode.Impulse, Context.gameObject, ImpactType.Melee);
+                    target.GetComponent<IHittable>().SetVelocity(Vector3.zero);
                     Services.ActionManager.RegisterAction(Time.frameCount, new MeleeHitAction(target, Context.gameObject, force, ForceMode.Impulse, ImpactType.Melee));
                 }
                 // TransitionTo<PunchHitStopActionState>();

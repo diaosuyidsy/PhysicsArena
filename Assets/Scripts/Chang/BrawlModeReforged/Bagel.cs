@@ -120,11 +120,14 @@ public class Bagel : WeaponBase
             Vector3 OwnerScreenPos = Camera.main.WorldToScreenPoint(Owner.transform.position);
 
             ScreenPos.z = 0;
+            OwnerScreenPos.z = 0;
 
             if(Pointer == null)
             {
                 Pointer = Owner.tag.Contains("1") ? GameObject.Instantiate(RedPointerPrefab,GameUI.transform) : GameObject.Instantiate(BluePointerPrefab, GameUI.transform);
             }
+
+
 
             Pointer.transform.right = (ScreenPos - OwnerScreenPos).normalized;
 

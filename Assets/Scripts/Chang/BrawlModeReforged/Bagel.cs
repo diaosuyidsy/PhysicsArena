@@ -67,6 +67,14 @@ public class Bagel : WeaponBase
     protected override void Update()
     {
         base.Update();
+
+        BrawlModeReforgedObjectiveManager Manager = (BrawlModeReforgedObjectiveManager)Services.GameObjectiveManager;
+        if (Manager.IsEnd())
+        {
+            Destroy(Pointer);
+            return;
+        }
+
         SetGuide();
         GuideHop();
         SetPointer();

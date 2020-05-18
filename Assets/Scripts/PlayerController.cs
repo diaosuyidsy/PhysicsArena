@@ -1773,6 +1773,10 @@ public class PlayerController : MonoBehaviour, IHittable
                 TransitionTo<IdleActionState>();
                 return;
             }
+            if (Time.time > _startTime + Services.Config.GameMapData.RespawnTime)
+            {
+                _pickupcheck();
+            }
         }
 
         public override void OnExit()
@@ -1788,6 +1792,28 @@ public class PlayerController : MonoBehaviour, IHittable
                 }
             }
             Context._permaSlow = 0;
+        }
+        private void _pickupcheck()
+        {
+            Collider[] colliders = Physics.OverlapSphere(Context.transform.position, Context.CharacterDataStore.PickupRadius,
+            Context.CharacterDataStore.PickUpLayer);
+            GameObject target = null;
+            float minDistance = Mathf.Infinity;
+            foreach (Collider coll in colliders)
+            {
+                float dist = Vector3.Distance(coll.transform.position, Context.transform.position);
+                if (dist < minDistance)
+                {
+                    target = coll.gameObject;
+                    minDistance = dist;
+                }
+            }
+            if (target == null) return;
+            if (Context.HandObject == null && target.GetComponent<WeaponBase>() != null && target.GetComponent<WeaponBase>().CanBePickedUp)
+            {
+                TransitionTo<IdleActionState>();
+                return;
+            }
         }
     }
     #endregion

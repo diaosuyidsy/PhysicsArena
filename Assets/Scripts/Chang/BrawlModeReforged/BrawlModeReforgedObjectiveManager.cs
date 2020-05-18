@@ -536,4 +536,9 @@ public class BrawlModeReforgedObjectiveManager : ObjectiveManager
             Team2ShakeDir = (Team2ShakeTarget - Team2Board.GetComponent<RectTransform>().localPosition).normalized;
         }
     }
+
+    public bool IsEnd()
+    {
+        return gameEnd;
+    }
 }

@@ -15,7 +15,7 @@ MonoBehaviour:
   Path: event:/SFX/Menu/Fight
   guid: a39fa5eee83ba3479bb53878555f8945
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -84,7 +84,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/WeaponPickedup
   guid: ea64f31ffc9a97499cf10b98e92d77f9
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -107,7 +107,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/BagelExplode
   guid: b367018b6b4f9246950ede6c549d8b06
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -130,7 +130,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Characters/DuckDied
   guid: c0f4a3448b56664e95dd9a1f1b7b874e
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -153,7 +153,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/FistGun/FistGunFired
   guid: 1eb141f3c1068340b6c659af5391ca4d
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -161,6 +161,23 @@ MonoBehaviour:
   MinDistance: 0
   MaxDistance: 0
   Length: 690
+--- !u!114 &-8631788318231387058
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/BrawlModeBGM/IsEnd
+  m_EditorClassIdentifier: 
+  Name: IsEnd
+  Min: 0
+  Max: 2
+  Default: 0
+  Exists: 1
 --- !u!114 &-8341356361763888449
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -217,7 +234,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/FistGun/FistGunReload
   guid: 0d48cf0ee8deb743af4548f78c006c60
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -240,7 +257,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/SuckGun/SuckGunFired
   guid: 92e5105c128ef34abff4e216fdfb5380
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -281,7 +298,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Characters/FootStepConcrete
   guid: 904018d6e781ef45bba702b9d016f7ce
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -304,7 +321,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/SuckGun/SuckGunSuck
   guid: cbd702fd7cda984484f1b0cd9325b384
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -437,13 +454,13 @@ MonoBehaviour:
   Path: event:/Music/BrawlModeBGM
   guid: db2979da72a09845b3751953dbcbe408
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 1
   Is3D: 0
   IsOneShot: 0
   Parameters:
-  - {fileID: 678925499959923542}
-  - {fileID: -4008102675638758349}
+  - {fileID: -4524904799166397986}
+  - {fileID: -8631788318231387058}
   MinDistance: 0
   MaxDistance: 0
   Length: 131187
@@ -508,7 +525,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Characters/PlayerRespawned
   guid: 9472b7ddc084f54389697321f6bb96c8
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -567,7 +584,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Melee/PlayerPunchReleased
   guid: 9a71204129cd344e8823a669309980cd
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -613,7 +630,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/BagelPickedup
   guid: 442d53452f4ccf45bac1960d70052b24
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -636,7 +653,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Characters/PlayerLand
   guid: 6e573463d00cd3479b9e1e907c591f67
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -659,7 +676,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/BagelHitGround
   guid: c8db22ce70473145afd83f4553a16b7f
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -682,7 +699,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/RubberBandStretch
   guid: 35b5ebcc2d5356449e331ed106009293
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -723,7 +740,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/WaterGun/WaterGunHitGround
   guid: 46c01f3cd3fcc147941169c3bbbbaadc
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -772,6 +789,23 @@ MonoBehaviour:
   LoadResult: 0
   FileSizes: []
   Exists: 0
+--- !u!114 &-4524904799166397986
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fecb8ef7f94ca804a8ab72049b86782e, type: 3}
+  m_Name: parameter:/BrawlModeBGM/SpeedUp
+  m_EditorClassIdentifier: 
+  Name: SpeedUp
+  Min: 0
+  Max: 2
+  Default: 0
+  Exists: 1
 --- !u!114 &-4222446456161040418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -847,7 +881,7 @@ MonoBehaviour:
   Min: 0
   Max: 2
   Default: 0
-  Exists: 1
+  Exists: 0
 --- !u!114 &-3959275349477231436
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -863,7 +897,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Bazooka/BazookaBombed
   guid: e06dce75236bdd47aec23114a5ddfe6e
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -927,7 +961,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/FistGun/FistGunHitGround
   guid: 53b96ee51549954da40d388a42f36a30
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -950,7 +984,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/WeaponSpawned
   guid: 73966cff878303458a78117db2983baa
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -981,6 +1015,24 @@ MonoBehaviour:
   MinDistance: 1
   MaxDistance: 35
   Length: 679
+--- !u!114 &-3312091715605721204
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c18180ecb35941f4682ae60107b85b7c, type: 3}
+  m_Name: bank:/Master.bank
+  m_EditorClassIdentifier: 
+  Path: FMOD/FMODProject/Build/Desktop/Master.bank
+  SubDir: 
+  lastModified: 637261323862971455
+  LoadResult: 0
+  FileSizes: []
+  Exists: 1
 --- !u!114 &-3203175100010905247
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1100,7 +1152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Path: FMOD/FMODProject/Build/Desktop/Master.strings.bank
   SubDir: 
-  lastModified: 637240159187527788
+  lastModified: 637242901391926446
   LoadResult: 0
   FileSizes:
   - Name: Desktop
@@ -1180,7 +1232,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/BagelDelivered
   guid: e9384bfc6b21ed4696a7c043866d6460
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1203,7 +1255,7 @@ MonoBehaviour:
   Path: event:/SFX/Menu/Ready
   guid: c1b96ee7c9fae145a6f5e957f426fa51
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1336,7 +1388,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Melee/PlayerPunchBlocked
   guid: fa9509526753694192182019c23c20b0
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1359,7 +1411,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/HookGun/HookGunHitGround
   guid: 7e51990fccaf0f4d8a11d3d06178af86
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1436,7 +1488,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/FistGun/FistGunHit
   guid: 5473d1b0e6e19d4ba967cecf75f62c80
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1459,7 +1511,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/SuckGun/SuckGunHitGround
   guid: 12e9626832df3d4a92ee4092b6d1ebcb
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1481,7 +1533,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EditorBanks:
   - {fileID: -2890046977212898939}
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   EditorEvents:
   - {fileID: 6634922540227492365}
   - {fileID: -8201199505903741844}
@@ -1531,10 +1583,10 @@ MonoBehaviour:
   - {fileID: 405327657024675805}
   EditorParameters: []
   MasterBanks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   StringsBanks:
   - {fileID: -2890046977212898939}
-  stringsBankWriteTime: 637240159187527788
+  stringsBankWriteTime: 637242901391926446
   cacheVersion: 3
 --- !u!114 &231446202932758855
 MonoBehaviour:
@@ -1569,7 +1621,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/BagelMovingInCart
   guid: d34bef7e624a014d86157b0681034a35
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1593,7 +1645,7 @@ MonoBehaviour:
   Min: 0
   Max: 2
   Default: 0
-  Exists: 1
+  Exists: 0
 --- !u!114 &736716539303935333
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1609,7 +1661,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/HookGun/HookGunHit
   guid: eefb2c5d5de0fe47a94e7ba5aa13c6d5
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1714,7 +1766,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/HookGun/HookGunBlocked
   guid: c510da040fb14647945b21f0a226c655
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1737,7 +1789,7 @@ MonoBehaviour:
   Path: event:/SFX/Menu/Select
   guid: 6b39aedf7b411e49b0f153a3b1e94c4e
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -1785,7 +1837,7 @@ MonoBehaviour:
   lastModified: 637240456155044247
   LoadResult: 0
   FileSizes: []
-  Exists: 1
+  Exists: 0
 --- !u!114 &2198634137297556611
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1970,7 +2022,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Bazooka/BazookaFired
   guid: 5d3c01d3c3d68b46b263a596e19f3f26
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2039,7 +2091,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/WaterGun/WaterGunFired
   guid: 84ad8166c6d96a42ac017b9909bf7879
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 0
@@ -2236,7 +2288,7 @@ MonoBehaviour:
   Path: event:/SFX/Menu/ShakeEgg
   guid: ea8f31d74c9c39449a666287d32e29dd
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2277,7 +2329,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/BagelFly
   guid: a4a015cc83cda84382d7df5e00e6c224
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2300,7 +2352,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Melee/PlayerPunchStart
   guid: 2a388137e883b44ca64d7351cfab24e2
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2323,7 +2375,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Characters/ChickenDied
   guid: 74131cae1dd3df49a5205ef99a353bb9
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2346,7 +2398,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Other/ObjectDespawned
   guid: bc40287d112a8c4fb229922091f6b76e
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2369,7 +2421,7 @@ MonoBehaviour:
   Path: event:/Music/MenuBGM
   guid: 5741b245068980469c786b1b4b656b5a
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 1
   Is3D: 0
   IsOneShot: 0
@@ -2392,7 +2444,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/HookGun/HookGunFired
   guid: f64b83cd45da1a43abc938b3bd1a7c7a
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2415,7 +2467,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Characters/PlayerJump
   guid: 03547b0ef5fb8f40bbbd412d8fde0e97
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2456,7 +2508,7 @@ MonoBehaviour:
   Path: event:/SFX/Menu/Navigate
   guid: df35234ce73fcb42a83af0c36485f578
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2499,7 +2551,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/Bazooka/BazookaHitGround
   guid: 5ec3c4c8fd8a9f47924374196ae11a9e
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2609,7 +2661,7 @@ MonoBehaviour:
   Path: event:/SFX/Menu/Xiu
   guid: d64ca3e2fe074e49a4a8e244ccf64d4d
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2667,7 +2719,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Melee/PlayerPunched
   guid: 492d79b4beb5e348b2ae1578e5ccb9cb
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2690,7 +2742,7 @@ MonoBehaviour:
   Path: event:/SFX/Menu/Landing
   guid: ff07befbab406d4692bff449590eb52f
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1
@@ -2713,7 +2765,7 @@ MonoBehaviour:
   Path: event:/SFX/Gameplay/Object/FistGun/FistGunBlocked
   guid: c56e8dbe437ea34ab92b2553e5aa43a0
   Banks:
-  - {fileID: 1938758545435069869}
+  - {fileID: -3312091715605721204}
   IsStream: 0
   Is3D: 0
   IsOneShot: 1

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using TMPro;
 
 [CreateAssetMenu(fileName = "ConfigData", menuName = "ScriptableObjects/ConfigData", order = 1)]
 public class ConfigData : ScriptableObject
@@ -28,6 +29,14 @@ public class ConfigData : ScriptableObject
     public StatisticsInformation UselessInfo;
 
     public float FrameMoveInDuration = 0.2f;
+    [Header("Pause Menu Related")]
+    public Sprite PauseNormalDialogue;
+    public Sprite PauseSelectedDialogue;
+    public Vector3 PauseSelectedScale;
+    public Vector3 PauseNormalScale;
+    public TMP_FontAsset PauseNormalFontAsset;
+    public TMP_FontAsset PauseSelectedFontAsset;
+
     [Header("Misc")]
     public string FightString = "FIGHT!";
     public string ReadyString = "READY?";

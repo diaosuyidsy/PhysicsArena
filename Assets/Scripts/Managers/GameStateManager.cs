@@ -40,6 +40,7 @@ public class GameStateManager : GameStateManagerBase
     private Transform _pauseBackgroundMask;
     private Transform _pausePausedText;
     private Transform _pauseResume;
+    private Transform _pauseRestart;
     private Transform _pauseQuit;
     private Transform _pauseWholeMask;
     private Transform _statisticPanel;
@@ -85,6 +86,7 @@ public class GameStateManager : GameStateManagerBase
         _pauseMenu = GameObject.Find("PauseMenu").transform;
         _pauseBackgroundMask = _pauseMenu.Find("BackgroundMask");
         _pausePausedText = _pauseMenu.Find("Paused");
+        _pauseRestart = _pauseMenu.Find("Restart");
         _pauseResume = _pauseMenu.Find("Resume");
         _pauseQuit = _pauseMenu.Find("Quit");
         _pauseWholeMask = _pauseMenu.Find("WholeMask");
@@ -538,16 +540,17 @@ public class GameStateManager : GameStateManagerBase
 
     private class PauseState : GameState
     {
-        private bool onresume;
+        private int menuIndex;
         public override void OnEnter()
         {
             base.OnEnter();
             // _GameMapData.BackgroundMusicMixer.SetFloat("Vol", -10f);
             // _GameMapData.BackgroundMusicMixer.SetFloat("Cutoff", 450f);
-            onresume = true;
+            menuIndex = 0;
             Context._pauseBackgroundMask.gameObject.SetActive(true);
             Context._pausePausedText.gameObject.SetActive(true);
             Context._pauseResume.gameObject.SetActive(true);
+            Context._pauseRestart.gameObject.SetActive(true);
             Context._pauseQuit.gameObject.SetActive(true);
             _switchMenu();
             for (int i = 0; i < Context._playersHolder.childCount; i++)
@@ -568,29 +571,38 @@ public class GameStateManager : GameStateManagerBase
                 TransitionTo<GameLoop>();
                 return;
             }
-            if (onresume && _AnyADown)
+            if (menuIndex == 0 && _AnyADown)
             {
                 Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<GameLoop>();
                 return;
             }
-            if (!onresume && _AnyADown)
+            if (menuIndex == 1 && _AnyADown)
+            {
+                Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex));
+                Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
+                TransitionTo<GameQuitState>();
+                return;
+            }
+            if (menuIndex == 2 && _AnyADown)
             {
                 Context._pauseWholeMask.GetComponent<Image>().DOFade(1f, 1f).OnComplete(() => SceneManager.LoadScene("ComicMenu"));
                 Services.AudioManager.PlaySound("event:/SFX/Menu/Select");
                 TransitionTo<GameQuitState>();
                 return;
             }
-            if (_AnyVLAxisRaw < -0.2f && !_vAxisInUse && !onresume)
+            if (_AnyVLAxisRaw < -0.2f && !_vAxisInUse && menuIndex != 0)
             {
-                onresume = true;
+                menuIndex--;
+                _vAxisInUse = true;
                 Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
                 _switchMenu();
                 return;
             }
-            else if (_AnyVLAxisRaw > 0.2f && !_vAxisInUse && onresume)
+            else if (_AnyVLAxisRaw > 0.2f && !_vAxisInUse && menuIndex != 2)
             {
-                onresume = false;
+                menuIndex++;
+                _vAxisInUse = true;
                 Services.AudioManager.PlaySound("event:/SFX/Menu/Navigate");
                 _switchMenu();
                 return;
@@ -599,23 +611,38 @@ public class GameStateManager : GameStateManagerBase
 
         private void _switchMenu()
         {
-            if (onresume)
+            Context._pauseResume.GetComponentInChildren<TextMeshProUGUI>().color = Color.black;
+            Context._pauseRestart.GetComponentInChildren<TextMeshProUGUI>().color = Color.black;
+            Context._pauseQuit.GetComponentInChildren<TextMeshProUGUI>().color = Color.black;
+            Context._pauseResume.GetComponentInChildren<TextMeshProUGUI>().font = Services.Config.ConfigData.PauseNormalFontAsset;
+            Context._pauseRestart.GetComponentInChildren<TextMeshProUGUI>().font = Services.Config.ConfigData.PauseNormalFontAsset;
+            Context._pauseQuit.GetComponentInChildren<TextMeshProUGUI>().font = Services.Config.ConfigData.PauseNormalFontAsset;
+            Context._pauseResume.localScale = Services.Config.ConfigData.PauseNormalScale;
+            Context._pauseRestart.localScale = Services.Config.ConfigData.PauseNormalScale;
+            Context._pauseQuit.localScale = Services.Config.ConfigData.PauseNormalScale;
+            Context._pauseResume.GetComponent<Image>().sprite = Services.Config.ConfigData.PauseNormalDialogue;
+            Context._pauseRestart.GetComponent<Image>().sprite = Services.Config.ConfigData.PauseNormalDialogue;
+            Context._pauseQuit.GetComponent<Image>().sprite = Services.Config.ConfigData.PauseNormalDialogue;
+            if (menuIndex == 0)
             {
-                Color temp = Context._pauseResume.GetComponent<Image>().color;
-                temp.a = 1f;
-                Context._pauseResume.GetComponent<Image>().color = temp;
-                temp = Context._pauseQuit.GetComponent<Image>().color;
-                temp.a = 0.66f;
-                Context._pauseQuit.GetComponent<Image>().color = temp;
+                Context._pauseResume.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+                Context._pauseResume.GetComponentInChildren<TextMeshProUGUI>().font = Services.Config.ConfigData.PauseSelectedFontAsset;
+                Context._pauseResume.localScale = Services.Config.ConfigData.PauseSelectedScale;
+                Context._pauseResume.GetComponent<Image>().sprite = Services.Config.ConfigData.PauseSelectedDialogue;
+            }
+            else if (menuIndex == 1)
+            {
+                Context._pauseRestart.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+                Context._pauseRestart.GetComponentInChildren<TextMeshProUGUI>().font = Services.Config.ConfigData.PauseSelectedFontAsset;
+                Context._pauseRestart.localScale = Services.Config.ConfigData.PauseSelectedScale;
+                Context._pauseRestart.GetComponent<Image>().sprite = Services.Config.ConfigData.PauseSelectedDialogue;
             }
             else
             {
-                Color temp = Context._pauseResume.GetComponent<Image>().color;
-                temp.a = 0.66f;
-                Context._pauseResume.GetComponent<Image>().color = temp;
-                temp = Context._pauseQuit.GetComponent<Image>().color;
-                temp.a = 1f;
-                Context._pauseQuit.GetComponent<Image>().color = temp;
+                Context._pauseQuit.GetComponentInChildren<TextMeshProUGUI>().color = Color.white;
+                Context._pauseQuit.GetComponentInChildren<TextMeshProUGUI>().font = Services.Config.ConfigData.PauseSelectedFontAsset;
+                Context._pauseQuit.localScale = Services.Config.ConfigData.PauseSelectedScale;
+                Context._pauseQuit.GetComponent<Image>().sprite = Services.Config.ConfigData.PauseSelectedDialogue;
             }
         }
 
@@ -626,6 +653,7 @@ public class GameStateManager : GameStateManagerBase
             Context._pauseBackgroundMask.gameObject.SetActive(false);
             Context._pausePausedText.gameObject.SetActive(false);
             Context._pauseResume.gameObject.SetActive(false);
+            Context._pauseRestart.gameObject.SetActive(false);
             Context._pauseQuit.gameObject.SetActive(false);
             for (int i = 0; i < Context._playersHolder.childCount; i++)
             {

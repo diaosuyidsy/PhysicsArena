@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Observation deck
+  m_Name: Cart
   m_Shader: {fileID: 4800000, guid: 03f07ed366daef04da6bce04d9f48994, type: 3}
   m_ShaderKeywords: _USE_SCREEN_SPACE_ON
   m_LightmapFlags: 4
@@ -20,7 +20,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _Albedo:
-        m_Texture: {fileID: 2800000, guid: 23d081e2d908a6d4c96f94f408a511bf, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BumpMap:
@@ -48,15 +48,15 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _HalftoneTexture:
-        m_Texture: {fileID: 2800000, guid: 6e1b83121839a5d48b3a21c79d494184, type: 3}
+        m_Texture: {fileID: 10300, guid: 0000000000000000f000000000000000, type: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _LineHalfTone:
-        m_Texture: {fileID: 2800000, guid: 800e6de20ccc0ba45b38523ba2b7c593, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MainTex:
-        m_Texture: {fileID: 2800000, guid: f07b43b2899b7b34984a0e0ef1a8bc14, type: 3}
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _MetallicGlossMap:
@@ -75,7 +75,7 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
-    - _TextureSample0:
+    - _Ramp:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -84,7 +84,7 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
-    - _ASEOutlineWidth: 0.0005
+    - _ASEOutlineWidth: 0.0002
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
@@ -93,23 +93,19 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HalftonePower: 7.8
     - _HalftoneRangeMax: 2
     - _HalftoneRangeMin: 0.3
-    - _HalftoneScale: 1.53
     - _HalftoneShadowTiling: 8
-    - _LineHalftonePower: 0.6
     - _Metallic: 0
     - _Mode: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.02
-    - _RimOffset: 0.877
-    - _RimPower: 1
-    - _ShadeEdgeBlur: 0.6320428
-    - _ShadeEdgeOffset: 0
-    - _ShadeEdgeWidth: 0.03294117
+    - _RimOffset: 0.751
+    - _RimPower: 0.648
+    - _ShadeEdgeBlur: 0.066
+    - _ShadeEdgeOffset: -0.04
+    - _ShadeEdgeWidth: 0.009
     - _ShadowOffset: 6.35
-    - _ShadowStrength: 0.941
     - _SmoothnessTextureChannel: 0
     - _SpecIntensity: 0
     - _SpecTransition: 0.453
@@ -117,15 +113,14 @@ Material:
     - _SrcBlend: 1
     - _UVSec: 0
     - _UseLightmap: 0
+    - _UseRampAsAlbedo: 0
     - _Use_Screen_Space: 1
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:
     - _ASEOutlineColor: {r: 0, g: 0, b: 0, a: 0}
-    - _Color: {r: 1, g: 1, b: 1, a: 0}
-    - _Color3: {r: 0.7607843, g: 0.5921568, b: 0.8862745, a: 1}
+    - _Color: {r: 0.12749197, g: 0.13349944, b: 0.14150941, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _LineHalfToneColor: {r: 0.6737328, g: 0.5859292, b: 0.7264151, a: 1}
     - _RimColor: {r: 0.7490196, g: 0.9529411, b: 1, a: 0}
-    - _ShadowColor: {r: 0.7607843, g: 0.5921568, b: 0.8862745, a: 1}
     - _SpecTint: {r: 1, g: 1, b: 1, a: 0}

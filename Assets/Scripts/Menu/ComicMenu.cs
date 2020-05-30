@@ -681,7 +681,7 @@ public class ComicMenu : MonoBehaviour
             if (previousSelectedPlayerCount != 0 && _eggsSelectedAmount == 0)
             {
                 Context._hintText.DOKill();
-                Context._hintText.DOText("Crack An Egg to select a character", 1f);
+                Context._hintText.DOText("Crack An Egg to start", 1f);
                 Context._tutorialText.SetActive(false);
             }
             else if (previousSelectedPlayerCount == 0 && _eggsSelectedAmount != 0)

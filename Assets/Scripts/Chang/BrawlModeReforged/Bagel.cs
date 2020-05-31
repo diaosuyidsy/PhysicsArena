@@ -145,7 +145,7 @@ public class Bagel : WeaponBase
 
             float Scale = Mathf.Lerp(PointerCloseScale, PointerFarScale, t);
 
-            Pointer.transform.localScale = new Vector3(Scale/GameUI.transform.localScale.x, Scale / GameUI.transform.localScale.y, Scale / GameUI.transform.localScale.z);
+            Pointer.transform.localScale = Vector3.one * Scale;
 
 
             if (ScreenPos.x <= Screen.width && ScreenPos.x >=0  && ScreenPos.y<=Screen.height && ScreenPos.y >=0)
@@ -271,7 +271,7 @@ public class Bagel : WeaponBase
 
                 Pointer.transform.position = new Vector3(x, y, 0);
 
-                Pointer.transform.position -= Pointer.transform.right * PointerDis * Scale * PointerPercent;
+                Pointer.transform.position -= Pointer.transform.right * PointerDis * Scale * PointerPercent*GameUI.transform.localScale.x;
 
                 WorldPointer.transform.localScale = WorldPointerScale * Vector3.one * WorldPointerPercent;
 

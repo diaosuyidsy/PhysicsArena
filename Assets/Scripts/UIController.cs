@@ -23,7 +23,7 @@ public class UIController : MonoBehaviour
         RaycastHit hit;
         if (Physics.Raycast(transform.parent.position, Vector3.down, out hit, 10f, UILayers))
         {
-            _pos.y = hit.transform.position.y;
+            _pos.y = hit.collider.bounds.center.y;
             _pos.y += hit.collider.bounds.extents.y + YOffset;
             float yDiff = Mathf.Abs(_pos.y - transform.parent.position.y);
             Color temp = GetComponent<SpriteRenderer>().color;

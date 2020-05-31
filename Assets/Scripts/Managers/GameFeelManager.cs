@@ -19,20 +19,18 @@ public class GameFeelManager
     #region Event Handlers
     private void _onPlayerHit(PlayerHit ph)
     {
-        float charge = ph.MeleeCharge;
-        if (charge <= 0.3f) charge = 0f;
-        CameraShake.CS.Shake(0.1f * charge, 0.1f * charge);
-        _vibrateController(ph.HittedPlayerNumber, 1.0f * charge, 0.25f * charge);
+        CameraShake.CS.Shake(0.1f, 0.1f);
+        _vibrateController(ph.HittedPlayerNumber, 1.0f, 0.25f);
 
         /// If the hiter number is below 0, means it's a block
         /// and blocked attack don't have a hitter
-        _vibrateController(ph.HiterPlayerNumber, 1.0f * charge, 0.15f * charge);
+        _vibrateController(ph.HiterPlayerNumber, 1.0f, 0.15f);
         // Also Shake the hitted
-        ph.Hitted.transform.DOShakePosition(GameFeelData.MeleeHitStopInformation.Frames * Time.unscaledDeltaTime,
-        GameFeelData.MeleeHitStopInformation.Viberation,
-        GameFeelData.MeleeHitStopInformation.Vibrato,
-        GameFeelData.MeleeHitStopInformation.Randomness).SetUpdate(true).SetEase(GameFeelData.MeleeHitStopInformation.ViberationEase);
-        EventManager.Instance.TriggerEvent(new HitStopEvent(GameFeelData.MeleeHitStopInformation.Frames, GameFeelData.MeleeHitStopInformation.TimeScale));
+        // ph.Hitted.transform.DOShakePosition(GameFeelData.MeleeHitStopInformation.Frames * Time.unscaledDeltaTime,
+        // GameFeelData.MeleeHitStopInformation.Viberation,
+        // GameFeelData.MeleeHitStopInformation.Vibrato,
+        // GameFeelData.MeleeHitStopInformation.Randomness).SetUpdate(true).SetEase(GameFeelData.MeleeHitStopInformation.ViberationEase);
+        // EventManager.Instance.TriggerEvent(new HitStopEvent(GameFeelData.MeleeHitStopInformation.Frames, GameFeelData.MeleeHitStopInformation.TimeScale));
     }
 
     private void _onPlayerDied(PlayerDied pd)

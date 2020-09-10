@@ -188,18 +188,18 @@ public class VFXManager
     private void _onPunchStart(PunchStart ps)
     {
         GameObject VFX = ps.Player.CompareTag("Team1") ? VFXDataStore.ChickenMeleeChargingVFX : VFXDataStore.DuckMeleeChargingVFX;
-        GameObject MeleeVFXHolder = ps.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
+        GameObject MeleeVFXHolder = ps.Player.GetComponent<IVFXHolder>().MeleeVFXHolder2;
         if (MeleeVFXHolder != null) GameObject.Destroy(MeleeVFXHolder);
-        ps.Player.GetComponent<PlayerController>().MeleeVFXHolder2 = GameObject.Instantiate(VFX, ps.PlayerRightHand, false);
+        ps.Player.GetComponent<IVFXHolder>().MeleeVFXHolder2 = GameObject.Instantiate(VFX, ps.PlayerRightHand, false);
 
     }
 
     private void _onPunchHolding(PunchHolding ph)
     {
         GameObject VFX = ph.Player.CompareTag("Team1") ? VFXDataStore.ChickenUltimateVFX : VFXDataStore.DuckUltimateVFX;
-        GameObject MeleeVFXHolder = ph.Player.GetComponent<PlayerController>().MeleeVFXHolder;
+        GameObject MeleeVFXHolder = ph.Player.GetComponent<IVFXHolder>().MeleeVFXHolder;
         if (MeleeVFXHolder != null) GameObject.Destroy(MeleeVFXHolder);
-        ph.Player.GetComponent<PlayerController>().MeleeVFXHolder = GameObject.Instantiate(VFX, ph.PlayerRightHand, false);
+        ph.Player.GetComponent<IVFXHolder>().MeleeVFXHolder = GameObject.Instantiate(VFX, ph.PlayerRightHand, false);
     }
 
     private void _onPunchInterrupted(PunchInterruptted ev)
@@ -211,17 +211,17 @@ public class VFXManager
 
     private void _onPunchReleased(PunchReleased pr)
     {
-        GameObject MeleeVFXHolder2 = pr.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
+        GameObject MeleeVFXHolder2 = pr.Player.GetComponent<IVFXHolder>().MeleeVFXHolder2;
         if (MeleeVFXHolder2 != null) GameObject.Destroy(MeleeVFXHolder2);
         if (pr.Player.CompareTag("Team1"))
         {
-            _instantiateVFX(VFXDataStore.ChickenReleasePunchHandVFX, pr.Player.GetComponent<PlayerController>().RightHand.transform);
-            _instantiateVFX(VFXDataStore.ChickenReleasePunchFootVFX, pr.Player.GetComponent<PlayerController>().PlayerFeet);
+            _instantiateVFX(VFXDataStore.ChickenReleasePunchHandVFX, pr.Player.GetComponent<IBodyConfiguration>().RightHand.transform);
+            _instantiateVFX(VFXDataStore.ChickenReleasePunchFootVFX, pr.Player.GetComponent<IBodyConfiguration>().PlayerFeet);
         }
         else
         {
-            _instantiateVFX(VFXDataStore.DuckReleasePunchHandVFX, pr.Player.GetComponent<PlayerController>().RightHand.transform);
-            _instantiateVFX(VFXDataStore.DuckReleasePunchFootVFX, pr.Player.GetComponent<PlayerController>().PlayerFeet);
+            _instantiateVFX(VFXDataStore.DuckReleasePunchHandVFX, pr.Player.GetComponent<IBodyConfiguration>().RightHand.transform);
+            _instantiateVFX(VFXDataStore.DuckReleasePunchFootVFX, pr.Player.GetComponent<IBodyConfiguration>().PlayerFeet);
         }
         GameObject[] ReleaseBodyVFX = pr.Player.CompareTag("Team1") ? VFXDataStore.ChickenReleaseBodyVFX : VFXDataStore.DuckReleaseBodyVFX;
         for (int i = 0; i < ReleaseBodyVFX.Length; i++)
@@ -241,8 +241,8 @@ public class VFXManager
 
     private void _onPunchDone(PunchDone pd)
     {
-        GameObject MeleeVFXHolder = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder;
-        GameObject MeleeVFXHolder2 = pd.Player.GetComponent<PlayerController>().MeleeVFXHolder2;
+        GameObject MeleeVFXHolder = pd.Player.GetComponent<IVFXHolder>().MeleeVFXHolder;
+        GameObject MeleeVFXHolder2 = pd.Player.GetComponent<IVFXHolder>().MeleeVFXHolder2;
         if (MeleeVFXHolder != null) GameObject.Destroy(MeleeVFXHolder);
         if (MeleeVFXHolder2 != null) GameObject.Destroy(MeleeVFXHolder2);
     }

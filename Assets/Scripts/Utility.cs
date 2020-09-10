@@ -488,3 +488,28 @@ public class ForceTuple
         ForceMode = forceMode;
     }
 }
+
+public interface IVFXHolder
+{
+    [HideInInspector] GameObject HandObject { get; set; }
+    [HideInInspector] GameObject EquipmentObject { get; set; }
+    [HideInInspector] GameObject MeleeVFXHolder { get; set; }
+    [HideInInspector] GameObject MeleeVFXHolder2 { get; set; }
+    [HideInInspector] GameObject BlockVFXHolder { get; set; }
+    [HideInInspector] GameObject StunVFXHolder { get; set; }
+    [HideInInspector] GameObject SlowVFXHolder { get; set; }
+    [HideInInspector] GameObject FoodTraverseVFXHolder { get; set; }
+}
+
+public interface IBodyConfiguration
+{
+    GameObject Chest { get; }
+    GameObject Head { get; }
+    GameObject[] LeftArms { get; }
+    GameObject[] RightArms { get; }
+    GameObject LeftHand { get; }
+    GameObject RightHand { get; }
+    GameObject LeftFoot { get; }
+    GameObject RightFoot { get; }
+    Transform PlayerFeet { get; }
+}

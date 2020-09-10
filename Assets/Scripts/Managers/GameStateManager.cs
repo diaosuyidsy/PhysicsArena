@@ -95,17 +95,17 @@ public class GameStateManager : GameStateManagerBase
         _MVPPlayerPortrait = _statisticPanel.Find("MVPPlayerIcon");
         _MVPTitle = _statisticPanel.Find("MVPTitle");
         _statisticUIHolder = _statisticPanel.Find("StatisticUIHolder");
-        for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
+        /*for (int i = 0; i < PlayersInformation.ColorIndex.Length; i++)
         {
             GameObject player = GameObject.Instantiate(_configData.PlayerPrefabs[PlayersInformation.ColorIndex[i]]);
             player.transform.parent = _playersHolder;
-        }
+        }*/
         EventManager.Instance.AddHandler<GameEnd>(_onGameEnd);
         EventManager.Instance.AddHandler<HitStopEvent>(_onHitStop);
         _cam = Camera.main;
         _darkCornerEffect = _cam.transform.GetChild(0).GetComponent<DarkCornerEffect>();
-        _gameStateFSM.TransitionTo<TutorialState>();
-        // _gameStateFSM.TransitionTo<MVPEndPanelState>();
+        // _gameStateFSM.TransitionTo<TutorialState>();
+        _gameStateFSM.TransitionTo<GameLoop>();
     }
 
     public int GetColorIndexFromRewiredID(int rewiredID)

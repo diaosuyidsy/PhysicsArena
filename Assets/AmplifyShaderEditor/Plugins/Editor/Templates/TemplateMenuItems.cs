@@ -46,15 +46,15 @@ namespace AmplifyShaderEditor
 		{
 			AmplifyShaderEditorWindow.CreateNewTemplateShader( "e1de45c0d41f68c41b2cc20c8b9c05ef" );
 		}
-		[MenuItem( "Assets/Create/Amplify Shader/Legacy/Samples/DoublePassUnlit", false, 85 )]
+		[MenuItem( "Assets/Create/Amplify Shader/Legacy/DoFMultiPass", false, 85 )]
 		public static void ApplyTemplate8()
 		{
-			AmplifyShaderEditorWindow.CreateNewTemplateShader( "003dfa9c16768d048b74f75c088119d8" );
+			AmplifyShaderEditorWindow.CreateNewTemplateShader( "ca5196d2b87315949a20b4e2139d10c4" );
 		}
-		[MenuItem( "Assets/Create/Amplify Shader/Legacy/DoFMultiPass", false, 85 )]
+		[MenuItem( "Assets/Create/Amplify Shader/Legacy/Samples/DoublePassUnlit", false, 85 )]
 		public static void ApplyTemplate9()
 		{
-			AmplifyShaderEditorWindow.CreateNewTemplateShader( "ca5196d2b87315949a20b4e2139d10c4" );
+			AmplifyShaderEditorWindow.CreateNewTemplateShader( "003dfa9c16768d048b74f75c088119d8" );
 		}
 	}
 }

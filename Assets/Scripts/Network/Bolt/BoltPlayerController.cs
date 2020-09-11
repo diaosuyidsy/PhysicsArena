@@ -115,6 +115,21 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
 
     GameObject IBodyConfiguration.RightFoot => this.RightFoot;
 
+    #region  Controller Variable
+    float HA;
+    float VA;
+    float HAR;
+    float VAR;
+    bool JUM;
+    bool RT;
+    bool RTD;
+    bool RTU;
+    bool BB;
+    bool BD;
+    bool BU;
+    bool QD;
+    #endregion
+
     private ForceTuple _hitForceTuple;
     #endregion
 
@@ -122,6 +137,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
     {
         state.SetTransforms(state.MainTransform, transform);
         state.SetAnimator(GetComponent<Animator>());
+        entity.TakeControl();
     }
 
     private void Awake()
@@ -166,12 +182,55 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
         _actionFSM.LateUpdate();
     }
 
+    public override void SimulateController()
+    {
+        _pollKeys();
+        IBirfiaPlayerCommandInput input = BirfiaPlayerCommand.Create();
+
+        input.HorizontalAxis = HA;
+        input.VerticalAxis = VA;
+        input.HorizontalAxisRaw = HAR;
+        input.VerticalAxisRaw = VAR;
+        input.Jump = JUM;
+        input.RightTrigger = RT;
+        input.RightTriggerDown = RTD;
+        input.RightTriggerUp = RTU;
+        input.B = BB;
+        input.BDown = BD;
+        input.BUp = BU;
+        input.QDown = QD;
+        entity.QueueInput(input);
+    }
+
+    private void _pollKeys()
+    {
+        HA = _player.GetAxis("Move Horizontal");
+        VA = _player.GetAxis("Move Vertical");
+        HAR = _player.GetAxisRaw("Move Horizontal");
+        VAR = _player.GetAxisRaw("Move Vertical");
+        JUM = _player.GetButtonDown("Jump");
+        RT = _player.GetButton("Attack");
+        RTD = _player.GetButtonDown("Attack");
+        RTU = _player.GetButtonUp("Attack");
+        BB = _player.GetButton("Block");
+        BD = _player.GetButtonDown("Block");
+        BU = _player.GetButtonUp("Block");
+        QD = _player.GetButtonDown("QuestionMark");
+    }
+
+    public override void ExecuteCommand(Command command, bool resetState)
+    {
+        ((MovementState)_movementFSM.CurrentState).ExecuteCommand(command, resetState);
+        ((ActionState)_actionFSM.CurrentState).ExecuteCommand(command, resetState);
+    }
+
     // Update is called once per frame
-    // private void Update()
-    // {
-    //     _movementFSM.Update();
-    //     _actionFSM.Update();
-    // }
+    private void Update()
+    {
+        // _movementFSM.Update();
+        // _actionFSM.Update();
+        _pollKeys();
+    }
 
     // private void FixedUpdate()
     // {
@@ -526,12 +585,12 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
     #region Movment States
     private class MovementState : FSM<BoltPlayerController>.State
     {
-        protected float _HLAxis { get { return Context._player.GetAxis("Move Horizontal"); } }
-        protected float _VLAxis { get { return Context._player.GetAxis("Move Vertical"); } }
-        protected float _HLAxisRaw { get { return Context._player.GetAxisRaw("Move Horizontal"); } }
-        protected float _VLAxisRaw { get { return Context._player.GetAxisRaw("Move Vertical"); } }
-        protected bool _jump { get { return Context._player.GetButtonDown("Jump"); } }
-        protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Attack"); } }
+        protected float _HLAxis;
+        protected float _VLAxis;
+        protected float _HLAxisRaw;
+        protected float _VLAxisRaw;
+        protected bool _jump;
+        protected bool _RightTriggerUp;
         public virtual bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
         public void OnEnterDeathZone()
         {
@@ -541,6 +600,17 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
         public virtual void OnCollisionEnter(Collision other)
         {
 
+        }
+
+        public virtual void ExecuteCommand(Command command, bool resetState)
+        {
+            BirfiaPlayerCommand cmd = (BirfiaPlayerCommand)command;
+            _HLAxis = cmd.Input.HorizontalAxis;
+            _VLAxis = cmd.Input.VerticalAxis;
+            _HLAxisRaw = cmd.Input.HorizontalAxisRaw;
+            _VLAxisRaw = cmd.Input.VerticalAxisRaw;
+            _jump = cmd.Input.Jump;
+            _RightTriggerUp = cmd.Input.RightTriggerUp;
         }
 
         public override void OnEnter()
@@ -1047,15 +1117,15 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
     #region Action States
     private class ActionState : FSM<BoltPlayerController>.State
     {
-        protected bool _RightTrigger { get { return Context._player.GetButton("Attack"); } }
-        protected bool _RightTriggerDown { get { return Context._player.GetButtonDown("Attack"); } }
-        protected bool _RightTriggerUp { get { return Context._player.GetButtonUp("Attack"); } }
+        protected bool _RightTrigger;
+        protected bool _RightTriggerDown;
+        protected bool _RightTriggerUp;
 
-        protected bool _B { get { return Context._player.GetButton("Block"); } }
-        protected bool _BDown { get { return Context._player.GetButtonDown("Block"); } }
-        protected bool _BUp { get { return Context._player.GetButtonUp("Block"); } }
+        protected bool _B;
+        protected bool _BDown;
+        protected bool _BUp;
 
-        protected bool _QDown { get { return Context._player.GetButtonDown("QuestionMark"); } }
+        protected bool _QDown;
 
         public virtual bool ShouldOnHitTransitToUncontrollableState { get { return false; } }
         public virtual bool ShouldDropHandObjectWhenForced { get { return false; } }
@@ -1065,7 +1135,17 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
         //     base.OnEnter();
         //     print(GetType().Name);
         // }
-
+        public virtual void ExecuteCommand(Command command, bool resetState)
+        {
+            BirfiaPlayerCommand cmd = (BirfiaPlayerCommand)command;
+            _RightTrigger = cmd.Input.RightTrigger;
+            _RightTriggerDown = cmd.Input.RightTriggerDown;
+            _RightTriggerUp = cmd.Input.RightTriggerUp;
+            _B = cmd.Input.B;
+            _BDown = cmd.Input.BDown;
+            _BUp = cmd.Input.BUp;
+            _QDown = cmd.Input.QDown;
+        }
         public override void Update()
         {
             base.Update();

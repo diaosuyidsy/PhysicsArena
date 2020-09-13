@@ -29,12 +29,12 @@ namespace Obi{
 
 				TerrainData data = terrain.terrainData;
 	
-				float[,] heights = data.GetHeights(0,0,data.heightmapWidth,data.heightmapHeight);
+				float[,] heights = data.GetHeights(0,0,data.heightmapResolution,data.heightmapResolution);
 				
-				float[] buffer = new float[data.heightmapWidth * data.heightmapHeight];
-				for (int y = 0; y < data.heightmapHeight; ++y)
-					for (int x = 0; x < data.heightmapWidth; ++x)
-						buffer[y*data.heightmapWidth+x] = heights[y,x];
+				float[] buffer = new float[data.heightmapResolution * data.heightmapResolution];
+				for (int y = 0; y < data.heightmapResolution; ++y)
+					for (int x = 0; x < data.heightmapResolution; ++x)
+						buffer[y*data.heightmapResolution+x] = heights[y,x];
 				
 				Oni.UnpinMemory(dataHandle);
 	
@@ -53,13 +53,13 @@ namespace Obi{
 				TerrainData data = terrain.terrainData;
 
 				if (data != null && (data.size != size || 
-									 data.heightmapWidth != resolutionU ||
-									 data.heightmapHeight != resolutionV || 
+									 data.heightmapResolution != resolutionU ||
+									 data.heightmapResolution != resolutionV || 
 									 heightmapDataHasChanged)){
 
 					size = data.size;
-					resolutionU = data.heightmapWidth;
-					resolutionV = data.heightmapHeight;
+					resolutionU = data.heightmapResolution;
+					resolutionV = data.heightmapResolution;
 					heightmapDataHasChanged = false;
 					adaptor.Set(size,resolutionU,resolutionV,dataHandle.AddrOfPinnedObject());
 					Oni.UpdateShape(oniShape,ref adaptor);

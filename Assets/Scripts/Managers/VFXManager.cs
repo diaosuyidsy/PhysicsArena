@@ -204,7 +204,7 @@ public class VFXManager
 
     private void _onPunchInterrupted(PunchInterruptted ev)
     {
-        PlayerController pc = ev.Player.GetComponent<PlayerController>();
+        IVFXHolder pc = ev.Player.GetComponent<IVFXHolder>();
         if (pc.MeleeVFXHolder != null) GameObject.Destroy(pc.MeleeVFXHolder);
         if (pc.MeleeVFXHolder2 != null) GameObject.Destroy(pc.MeleeVFXHolder2);
     }

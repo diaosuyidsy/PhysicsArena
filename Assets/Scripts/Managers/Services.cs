@@ -143,4 +143,18 @@ public static class Services
             _actionManager = value;
         }
     }
+
+    private static BoltEventBroadcaster _eventbroadcaster;
+    public static BoltEventBroadcaster BoltEventBroadcaster
+    {
+        get
+        {
+            Debug.Assert(_eventbroadcaster != null);
+            return _eventbroadcaster;
+        }
+        set
+        {
+            _eventbroadcaster = value;
+        }
+    }
 }

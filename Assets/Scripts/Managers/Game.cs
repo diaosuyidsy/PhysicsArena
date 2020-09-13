@@ -17,6 +17,7 @@ public class Game : MonoBehaviour
     private void Awake()
     {
         Services.Config = new Config(ConfigData, GameMapData, CharacterData);
+        Services.BoltEventBroadcaster = new BoltEventBroadcaster();
         Services.GameFeelManager = new GameFeelManager(GameFeelData);
         Services.VisualEffectManager = new VFXManager(VFXData);
         Services.WeaponGenerationManager = new WeaponGenerationManager(GameMapData);
@@ -112,5 +113,8 @@ public class Game : MonoBehaviour
 
         Services.GameObjectiveManager.Destroy();
         Services.GameObjectiveManager = null;
+
+        Services.BoltEventBroadcaster.Destroy();
+        Services.BoltEventBroadcaster = null;
     }
 }

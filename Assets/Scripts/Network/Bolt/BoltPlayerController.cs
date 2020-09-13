@@ -5,7 +5,7 @@ using Rewired;
 using DG.Tweening;
 using Bolt;
 
-public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IHittable, IVFXHolder, IBodyConfiguration
+public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>, IHittable, IVFXHolder, IBodyConfiguration
 {
     [Header("Player Data Section")]
     public CharacterData CharacterDataStore;
@@ -137,7 +137,10 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
     {
         state.SetTransforms(state.MainTransform, transform);
         state.SetAnimator(GetComponent<Animator>());
-        entity.TakeControl();
+        if (entity.IsOwner)
+        {
+            entity.TakeControl();
+        }
     }
 
     private void Awake()
@@ -220,17 +223,35 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
 
     public override void ExecuteCommand(Command command, bool resetState)
     {
+        if (resetState) return;
         ((MovementState)_movementFSM.CurrentState).ExecuteCommand(command, resetState);
         ((ActionState)_actionFSM.CurrentState).ExecuteCommand(command, resetState);
     }
 
-    // Update is called once per frame
-    private void Update()
+    public override void OnEvent(PunchEvent ev)
     {
-        // _movementFSM.Update();
-        // _actionFSM.Update();
-        _pollKeys();
+        OnImpact(ev.PunchForce, ForceMode.Impulse, gameObject, ImpactType.Melee);
     }
+
+    private void _onPunchForceChanged()
+    {
+        OnImpact(state.PunchForce, ForceMode.Impulse, gameObject, ImpactType.Melee);
+    }
+
+    public void OnPunch(Vector3 force)
+    {
+        // state.PunchForce = force;
+        OnImpact(force, ForceMode.Impulse, gameObject, ImpactType.Melee);
+        _rb.AddForce(force, ForceMode.Impulse);
+    }
+
+    // Update is called once per frame
+    // private void Update()
+    // {
+    //     _movementFSM.Update();
+    //     _actionFSM.Update();
+    //     _pollKeys();
+    // }
 
     // private void FixedUpdate()
     // {
@@ -275,10 +296,11 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
     /// <returns></returns>
     public bool CanBlock(Vector3 forwardAngle)
     {
-        if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
-            _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle))
-            return true;
-        return false;
+        // if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
+        //     _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle))
+        //     return true;
+        // return false;
+        return state.Blocking && _angleWithin(state.MainTransform.Transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle);
     }
 
     /// <summary>
@@ -289,6 +311,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
     /// <param name="enforcer">who is the impactor</param>
     public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType)
     {
+        Debug.Log("Onimpact called");
         OnImpact(enforcer, impactType);
 
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)
@@ -301,12 +324,16 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
                 _hitUncontrollableTimer = CharacterDataStore.HitUncontrollableTimeBig;
                 _hitStopFrames = CharacterDataStore.HitStopFramesBig;
             }
+            // Debug.Log("Is FSM null: " + _movementFSM.CurrentState == null);
+            // Debug.Log("Second Check: " + (entity.GetComponent<BoltPlayerController>()._movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState);
+            // Debug.Log("Third Check: " + entity.GetComponent<BoltPlayerController>()._movementFSM.CurrentState.GetType().ToString());
             if (_movementFSM.CurrentState != null && (_movementFSM.CurrentState as MovementState).ShouldOnHitTransitToUncontrollableState)
             {
                 // if (impactType == ImpactType.Melee || impactType == ImpactType.Block)
                 //     _movementFSM.TransitionTo<PunchHittedStopMovementState>();
                 // else
                 // _isHit = true;
+                // Debug.Log("On Impact actually impacted");
                 _movementFSM.TransitionTo<HitUncontrollableState>();
             }
 
@@ -1404,7 +1431,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
             Context._permaSlow++;
             Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.FistHoldSpeedMultiplier;
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.FistHoldRotationMutiplier;
-            EventManager.Instance.TriggerEvent(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            Services.BoltEventBroadcaster.OnPunchStart(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             _holding = false;
             _triggerdHoldingEvent = false;
             _startHoldingTime = Time.time;
@@ -1416,7 +1443,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
             if (!_triggerdHoldingEvent && Time.time > _startHoldingTime + Context.CharacterDataStore.HoldEventTriggerDuration)
             {
                 _triggerdHoldingEvent = true;
-                EventManager.Instance.TriggerEvent(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                Services.BoltEventBroadcaster.OnPunchHolding(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             }
             if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
@@ -1425,7 +1452,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
 
             if (_holding && _BDown)
             {
-                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                Services.BoltEventBroadcaster.OnPunchDone(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<BlockingState>();
                 return;
             }
@@ -1457,6 +1484,18 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
         private float _time;
         private bool _hitOnce;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
+        // private BirfiaPlayerCommand _cmd;
+
+        public override void ExecuteCommand(Command command, bool resetState)
+        {
+            base.ExecuteCommand(command, resetState);
+            if (Time.time < _time + Context.CharacterDataStore.PunchActivateTime)
+            {
+                // _checkHit();
+                _checkHitBolt((BirfiaPlayerCommand)command);
+            }
+            // _cmd = (BirfiaPlayerCommand)command;
+        }
 
         public override void OnEnter()
         {
@@ -1472,7 +1511,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
-            EventManager.Instance.TriggerEvent(new PunchReleased(Context.gameObject, Context.PlayerNumber));
+            Services.BoltEventBroadcaster.OnPunchReleased(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
         }
 
@@ -1481,14 +1520,15 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
             base.Update();
             if (Time.time > _time + Context.CharacterDataStore.FistReleaseTime)
             {
-                EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                Services.BoltEventBroadcaster.OnPunchDone(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
                 TransitionTo<IdleActionState>();
                 return;
             }
-            if (Time.time < _time + Context.CharacterDataStore.PunchActivateTime)
-            {
-                _checkHit();
-            }
+            // if (Time.time < _time + Context.CharacterDataStore.PunchActivateTime)
+            // {
+            //     // _checkHit();
+            //     _checkHitBolt();
+            // }
         }
 
         public override void OnExit()
@@ -1498,6 +1538,39 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
             // Context._animator.SetBool("PunchReleased", false);
             Context.state.PunchReleased = false;
             Context._rotationSpeedMultiplier = 1f;
+        }
+
+        private void _checkHitBolt(BirfiaPlayerCommand cmd)
+        {
+            if (_hitOnce) return;
+            // Bolt Hitscan
+            using (var hits = BoltNetwork.OverlapSphereAll(Context.entity.transform.position, Context.CharacterDataStore.PunchRadius, cmd.ServerFrame))
+            {
+                for (int i = 0; i < hits.count; i++)
+                {
+                    var hit = hits.GetHit(i);
+                    if (Vector3.Angle(Context.entity.transform.forward, hit.body.transform.position - Context.entity.transform.position) < 30f)
+                    {
+                        // Hit,  TODO: convert to single hit TODO: detect teammate
+                        Vector3 force = Context.entity.transform.forward * Context.CharacterDataStore.PunchForce;
+
+                        var serializer = hit.body.GetComponent<BoltPlayerController>();
+                        if (serializer != null && serializer != Context.entity.GetComponent<BoltPlayerController>())
+                        // if (serializer != null)
+                        {
+                            Context.GetComponent<BoltPlayerController>().SetVelocity(Vector3.zero);
+                            Debug.Log("OnImpact: " + force);
+                            // serializer.OnImpact(force, ForceMode.Impulse, Context.entity.gameObject, ImpactType.Melee);
+                            serializer.OnPunch(force);
+                            var punchev = PunchEvent.Create(serializer.entity);
+                            punchev.PunchForce = force;
+                            punchev.Send();
+                            Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, false));
+                            _hitOnce = true;
+                        }
+                    }
+                }
+            }
         }
 
         private void _checkHit()
@@ -1559,7 +1632,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
             Context._dropHandObject();
             _sweepedObjects = new HashSet<GameObject>();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
-            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
             myLayer = Context.gameObject.layer;
             Context.gameObject.layer = 19;
             Context._rb.AddForce(Context._hitForceTuple.Force, Context._hitForceTuple.ForceMode);
@@ -1659,7 +1732,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
                 Context._allPlayerRBs[i].velocity = _storedVelocity[i];
                 Context._allPlayerRBs[i].isKinematic = false;
             }
-            EventManager.Instance.TriggerEvent(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            Services.BoltEventBroadcaster.OnPunchDone(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
         }
     }
 
@@ -1877,7 +1950,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
             Context._dropHandObject();
             // Context._animator.SetBool("IdleUpper", true);
             Context.state.IdleUpper = true;
-            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
 
         public override void Update()
@@ -1902,7 +1975,7 @@ public class BoltPlayerController : Bolt.EntityBehaviour<IBirfiaPlayerState>, IH
             Context._drainStamina(-5f);
             // Context._animator.SetBool("IdleUpper", true);
             Context.state.IdleUpper = true;
-            EventManager.Instance.TriggerEvent(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
             Context._dropHandObject();
             if (Context.MeleeVFXHolder != null) Destroy(Context.MeleeVFXHolder);
         }

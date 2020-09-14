@@ -72,7 +72,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         set
         {
             _permaSlowWalkSpeedMultiplierSub = value;
-            state.RunningSpeed = _walkSpeed;
+            if (entity.IsControllerOrOwner)
+                state.RunningSpeed = _walkSpeed;
             // _animator.SetFloat("RunningSpeed", _walkSpeed);
         }
     }
@@ -147,8 +148,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     {
         _movementFSM = new FSM<BoltPlayerController>(this);
         _actionFSM = new FSM<BoltPlayerController>(this);
-        _player = ReInput.players.GetPlayer(PlayerNumber);
         _rb = GetComponent<Rigidbody>();
+        _player = ReInput.players.GetPlayer(PlayerNumber);
         _distToGround = GetComponent<CapsuleCollider>().bounds.extents.y;
         _freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
         _movementFSM.TransitionTo<IdleState>();
@@ -175,15 +176,15 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         _player = ReInput.players.GetPlayer(controllernumber);
     }
 
-    public override void SimulateOwner()
-    {
-        _movementFSM.Update();
-        _actionFSM.Update();
-        _movementFSM.FixedUpdate();
-        _actionFSM.FixedUpdate();
-        _movementFSM.LateUpdate();
-        _actionFSM.LateUpdate();
-    }
+    // public override void SimulateOwner()
+    // {
+    //     _movementFSM.Update();
+    //     _actionFSM.Update();
+    //     _movementFSM.FixedUpdate();
+    //     _actionFSM.FixedUpdate();
+    //     _movementFSM.LateUpdate();
+    //     _actionFSM.LateUpdate();
+    // }
 
     public override void SimulateController()
     {
@@ -246,24 +247,25 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     }
 
     // Update is called once per frame
-    // private void Update()
-    // {
-    //     _movementFSM.Update();
-    //     _actionFSM.Update();
-    //     _pollKeys();
-    // }
+    private void Update()
+    {
+        _movementFSM.Update();
+        _actionFSM.Update();
+        if (entity.IsControllerOrOwner)
+            _pollKeys();
+    }
 
-    // private void FixedUpdate()
-    // {
-    //     _movementFSM.FixedUpdate();
-    //     _actionFSM.FixedUpdate();
-    // }
+    private void FixedUpdate()
+    {
+        _movementFSM.FixedUpdate();
+        _actionFSM.FixedUpdate();
+    }
 
-    // private void LateUpdate()
-    // {
-    //     _movementFSM.LateUpdate();
-    //     _actionFSM.LateUpdate();
-    // }
+    private void LateUpdate()
+    {
+        _movementFSM.LateUpdate();
+        _actionFSM.LateUpdate();
+    }
 
     private void OnTriggerEnter(Collider other)
     {
@@ -662,7 +664,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.state.IdleDowner = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleDowner = true;
             // Context._animator.SetBool("IdleDowner", true);
         }
 
@@ -704,7 +707,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnExit()
         {
             base.OnExit();
-            Context.state.IdleDowner = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleDowner = false;
             // Context._animator.SetBool("IdleDowner", false);
         }
     }
@@ -760,7 +764,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.state.Running = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.Running = true;
             // Context._animator.SetBool("Running", true);
             _runTowardsCliffTime = 0f;
         }
@@ -822,7 +827,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnExit()
         {
             base.OnExit();
-            Context.state.Running = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.Running = false;
             // Context._animator.SetBool("Running", false);
         }
     }
@@ -977,14 +983,16 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.state.IdleDowner = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleDowner = true;
             // Context._animator.SetBool("IdleDowner", true);
         }
 
         public override void OnExit()
         {
             base.OnExit();
-            Context.state.IdleDowner = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleDowner = false;
             // Context._animator.SetBool("IdleDowner", false);
         }
     }
@@ -993,7 +1001,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.state.IdleDowner = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleDowner = true;
             // Context._animator.SetBool("IdleDowner", true);
             EventManager.Instance.TriggerEvent(new PlayerStunned(Context.gameObject, Context.PlayerNumber, Context.Head.transform, Context._stunTimer - Time.time));
         }
@@ -1021,7 +1030,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.state.IdleDowner = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleDowner = true;
             // Context._animator.SetBool("IdleDowner", true);
         }
         public override void Update()
@@ -1036,7 +1046,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnExit()
         {
             base.OnExit();
-            Context.state.IdleDowner = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleDowner = false;
             // Context._animator.SetBool("IdleDowner", false);
         }
     }
@@ -1055,8 +1066,12 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         {
             base.Update();
             bool isrunning = (!Mathf.Approximately(_HLAxis, 0f) || !Mathf.Approximately(0f, _VLAxis));
-            Context.state.Running = isrunning;
-            Context.state.IdleDowner = !isrunning;
+            if (Context.entity.IsControllerOrOwner)
+            {
+                Context.state.Running = isrunning;
+                Context.state.IdleDowner = !isrunning;
+            }
+
             // Context._animator.SetBool("Running", isrunning);
             // Context._animator.SetBool("IdleDowner", !isrunning);
             Context.transform.position = Context.HandObject.transform.position - _diff;
@@ -1065,7 +1080,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnExit()
         {
             base.OnExit();
-            Context.state.Running = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.Running = false;
             // Context._animator.SetBool("Running", false);
         }
     }
@@ -1111,7 +1127,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             _startTime = Time.time;
             Context._rb.isKinematic = true;
             Context._setToSpawn(10f);
-            Context.state.IdleDowner = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleDowner = true;
             // Context._animator.SetBool("IdleDowner", true);
             foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
             if (Context._deadInvincible != null)
@@ -1200,7 +1217,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         {
             base.OnEnter();
             Context._dropHandObject();
-            Context.state.IdleUpper = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleUpper = true;
             // Context._animator.SetBool("IdleUpper", true);
             Context._permaSlow = 0;
             Context._permaSlowWalkSpeedMultiplier = 1f;
@@ -1301,7 +1319,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnExit()
         {
             base.OnExit();
-            Context.state.IdleUpper = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleUpper = false;
             // Context._animator.SetBool("IdleUpper", false);
         }
     }
@@ -1318,17 +1337,20 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             switch (Context.HandObject.tag)
             {
                 case "Weapon_OnChest":
-                    Context.state.PickUpHalf = true;
+                    if (Context.entity.IsControllerOrOwner)
+                        Context.state.PickUpHalf = true;
                     // Context._animator.SetBool("PickUpHalf", true);
                     break;
                 case "Team1Resource":
                 case "Team2Resource":
                 case "Weapon_OnHead":
-                    Context.state.PickUpFull = true;
+                    if (Context.entity.IsControllerOrOwner)
+                        Context.state.PickUpFull = true;
                     // Context._animator.SetBool("PickUpFull", true);
                     break;
                 default:
-                    Context.state.IdleUpper = true;
+                    if (Context.entity.IsControllerOrOwner)
+                        Context.state.IdleUpper = true;
                     // Context._animator.SetBool("IdleUpper", true);
                     break;
             }
@@ -1383,8 +1405,11 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnExit()
         {
             base.OnExit();
-            Context.state.PickUpFull = false;
-            Context.state.PickUpHalf = false;
+            if (Context.entity.IsControllerOrOwner)
+            {
+                Context.state.PickUpFull = false;
+                Context.state.PickUpHalf = false;
+            }
             // Context._animator.SetBool("PickUpFull", false);
             // Context._animator.SetBool("PickUpHalf", false);
         }
@@ -1398,7 +1423,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.state.IdleUpper = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleUpper = true;
             // Context._animator.SetBool("IdleUpper", true);
             _timer = Time.timeSinceLevelLoad + Context.CharacterDataStore.DropRecoveryTime;
         }
@@ -1424,8 +1450,11 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.state.ClockFistTime = 1f / Context.CharacterDataStore.ClockFistTime;
-            Context.state.PunchHolding = true;
+            if (Context.entity.IsControllerOrOwner)
+            {
+                Context.state.ClockFistTime = 1f / Context.CharacterDataStore.ClockFistTime;
+                Context.state.PunchHolding = true;
+            }
             // Context._animator.SetFloat("ClockFistTime", 1f / Context.CharacterDataStore.ClockFistTime);
             // Context._animator.SetBool("PunchHolding", true);
             Context._permaSlow++;
@@ -1471,7 +1500,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnExit()
         {
             base.OnExit();
-            Context.state.PunchHolding = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.PunchHolding = false;
             // Context._animator.SetBool("PunchHolding", false);
             Context._permaSlow--;
             Context._permaSlowWalkSpeedMultiplier = 1f;
@@ -1500,8 +1530,11 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            Context.state.FistReleaseTime = 1f / Context.CharacterDataStore.FistReleaseTime;
-            Context.state.PunchReleased = true;
+            if (Context.entity.IsControllerOrOwner)
+            {
+                Context.state.FistReleaseTime = 1f / Context.CharacterDataStore.FistReleaseTime;
+                Context.state.PunchReleased = true;
+            }
             // Context._animator.SetFloat("FistReleaseTime", 1f / Context.CharacterDataStore.FistReleaseTime);
             // Context._animator.SetBool("PunchReleased", true);
             _time = Time.time;
@@ -1536,7 +1569,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             base.OnExit();
             // _checkHit();
             // Context._animator.SetBool("PunchReleased", false);
-            Context.state.PunchReleased = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.PunchReleased = false;
             Context._rotationSpeedMultiplier = 1f;
         }
 
@@ -1797,7 +1831,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             base.OnEnter();
             EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             // Context._animator.SetBool("Blocking", true);
-            Context.state.Blocking = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.Blocking = true;
             Context.BlockShield.SetShield(true);
         }
 
@@ -1856,7 +1891,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         {
             base.OnExit();
             // Context._animator.SetBool("Blocking", false);
-            Context.state.Blocking = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.Blocking = false;
             Context.BlockShield.SetShield(false);
             EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
@@ -1912,7 +1948,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         {
             base.OnEnter();
             // Context._animator.SetBool("PickUpHalf", true);
-            Context.state.PickUpHalf = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.PickUpHalf = true;
             WaterGunData data = Context.HandObject.GetComponent<WeaponBase>().WeaponDataBase as WaterGunData;
             Context._permaSlow++;
             Context._permaSlowWalkSpeedMultiplier = data.FireWalkSpeedMultiplier;
@@ -1937,7 +1974,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             Context._walkSpeedMultiplier = 1f;
             Context._rotationSpeedMultiplier = 1f;
             // Context._animator.SetBool("PickUpHalf", false);
-            Context.state.PickUpHalf = false;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.PickUpHalf = false;
         }
     }
     private class StunActionState : ActionState
@@ -1949,7 +1987,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             base.OnEnter();
             Context._dropHandObject();
             // Context._animator.SetBool("IdleUpper", true);
-            Context.state.IdleUpper = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleUpper = true;
             Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
 
@@ -1974,7 +2013,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             _startTime = Time.time;
             Context._drainStamina(-5f);
             // Context._animator.SetBool("IdleUpper", true);
-            Context.state.IdleUpper = true;
+            if (Context.entity.IsControllerOrOwner)
+                Context.state.IdleUpper = true;
             Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
             Context._dropHandObject();
             if (Context.MeleeVFXHolder != null) Destroy(Context.MeleeVFXHolder);

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using Obi;
 using UnityEngine;
 
 public class rtEmit : WeaponBase

@@ -313,7 +313,6 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     /// <param name="enforcer">who is the impactor</param>
     public void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType)
     {
-        Debug.Log("Onimpact called");
         OnImpact(enforcer, impactType);
 
         if (force.magnitude > CharacterDataStore.HitSmallThreshold)

@@ -512,4 +512,5 @@ public interface IBodyConfiguration
     GameObject LeftFoot { get; }
     GameObject RightFoot { get; }
     Transform PlayerFeet { get; }
+    Transform PlayerUITransform { get; }
 }

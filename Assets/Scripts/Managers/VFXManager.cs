@@ -25,7 +25,7 @@ public class VFXManager
             _instantiateVFX(CameraVFX, _mainCameraTransform);
 
             GameObject[] HittedFeetVFX = ph.Hitted.CompareTag("Team1") ? VFXDataStore.ChickenHittedFeetVFX : VFXDataStore.DuckHittedFeetVFX;
-            _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<PlayerController>().PlayerUITransform);
+            _instantiateVFX(HittedFeetVFX, ph.Hitted.GetComponent<IBodyConfiguration>().PlayerUITransform);
         }
         if (!ph.IsABlock)
         {

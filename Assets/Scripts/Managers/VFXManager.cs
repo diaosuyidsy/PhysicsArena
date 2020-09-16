@@ -374,14 +374,14 @@ public class VFXManager
     private void _onBlocked(Blocked ev)
     {
         GameObject[] parryvfx = ev.Blocker.tag.Contains("Team1") ? VFXDataStore.ChickenBlockParryVFX : VFXDataStore.DuckBlockParryVFX;
-        PlayerController pc = ev.Blocker.GetComponent<PlayerController>();
+        IBodyConfiguration pc = ev.Blocker.GetComponent<IBodyConfiguration>();
         if (parryvfx != null)
         {
             for (int i = 0; i < parryvfx.Length; i++)
             {
                 GameObject VFX = parryvfx[i];
                 _instantiateVFX(VFX, pc.BlockShield.transform.position, Quaternion.Euler(0f,
-                                                    VFX.transform.eulerAngles.y + pc.transform.eulerAngles.y,
+                                                    VFX.transform.eulerAngles.y + pc.Chest.transform.eulerAngles.y,
                                                     0f));
             }
         }

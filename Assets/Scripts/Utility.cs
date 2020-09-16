@@ -513,4 +513,5 @@ public interface IBodyConfiguration
     GameObject RightFoot { get; }
     Transform PlayerFeet { get; }
     Transform PlayerUITransform { get; }
+    ShieldController BlockShield { get; }
 }

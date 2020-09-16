@@ -117,6 +117,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     GameObject IBodyConfiguration.RightFoot => this.RightFoot;
 
     Transform IBodyConfiguration.PlayerUITransform => this.PlayerUITransform;
+    ShieldController IBodyConfiguration.BlockShield => this.BlockShield;
 
     #region  Controller Variable
     float HA;
@@ -235,16 +236,16 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         BirfiaPlayerCommand cmd = (BirfiaPlayerCommand)command;
         if (resetState)
         {
-            // transform.position = cmd.Result.Position;
-            // _rb.velocity = cmd.Result.Velocity;
+            transform.position = cmd.Result.Position;
+            _rb.velocity = cmd.Result.Velocity;
         }
         else
         {
             ((MovementState)_movementFSM.CurrentState).ExecuteCommand(command, resetState);
             ((ActionState)_actionFSM.CurrentState).ExecuteCommand(command, resetState);
 
-            // cmd.Result.Position = transform.position;
-            // cmd.Result.Velocity = _rb.velocity;
+            cmd.Result.Position = transform.position;
+            cmd.Result.Velocity = _rb.velocity;
         }
 
     }
@@ -429,11 +430,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     /// <returns></returns>
     public bool CanBlock(Vector3 forwardAngle)
     {
-        // if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
-        //     _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle))
-        //     return true;
-        // return false;
-        return state.Blocking && _angleWithin(state.MainTransform.Transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle);
+        // return true;
+        return state.ActionStateIndex == 8 && _angleWithin(state.MainTransform.Transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle);
     }
 
     /// <summary>
@@ -1704,20 +1702,30 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
                 for (int i = 0; i < hits.count; i++)
                 {
                     var hit = hits.GetHit(i);
-                    if (Vector3.Angle(Context.entity.transform.forward, hit.body.transform.position - Context.entity.transform.position) < 30f)
+                    if (Vector3.Angle(Context.entity.transform.forward, hit.body.transform.position - Context.entity.transform.position) < 60f)
                     {
                         // Hit,  TODO: convert to single hit TODO: detect teammate
                         Vector3 force = Context.entity.transform.forward * Context.CharacterDataStore.PunchForce;
 
                         var serializer = hit.body.GetComponent<BoltPlayerController>();
                         if (serializer != null && serializer != Context.entity.GetComponent<BoltPlayerController>())
-                        // if (serializer != null)
                         {
                             Context.SetVelocity(Vector3.zero);
-                            PunchEvent.Post(serializer.entity, force, Context.entity);
-                            if (Context.entity.IsOwner)
-                                Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, false));
                             _hitOnce = true;
+                            if (serializer.CanBlock(Context.state.MainTransform.Transform.forward))
+                            {
+                                force *= (-Context.CharacterDataStore.BlockMultiplier);
+                                PunchEvent.Post(Context.entity, force, serializer.entity);
+                                if (Context.entity.IsOwner)
+                                    Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(serializer.gameObject, Context.entity.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, true));
+                            }
+                            else
+                            {
+                                PunchEvent.Post(serializer.entity, force, Context.entity);
+                                if (Context.entity.IsOwner)
+                                    Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, false));
+                            }
+
                         }
                     }
                 }

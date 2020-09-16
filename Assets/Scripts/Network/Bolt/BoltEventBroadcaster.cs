@@ -12,9 +12,9 @@ public class BoltEventBroadcaster
 
     public void OnPlayerHit(PlayerHit ev)
     {
-        var hitEvent = PlayerHitEvent.Post(GlobalTargets.Everyone,
-        ev.Hiter.GetComponent<BoltPlayerController>().entity,
-        ev.Hitted.GetComponent<BoltPlayerController>().entity,
+        PlayerHitEvent.Post(GlobalTargets.Everyone,
+        ev.Hiter.GetComponent<BoltEntity>(),
+        ev.Hitted.GetComponent<BoltEntity>(),
         ev.Force,
         ev.HiterPlayerNumber,
         ev.HittedPlayerNumber);
@@ -22,37 +22,84 @@ public class BoltEventBroadcaster
 
     public void OnPunchStart(PunchStart ev)
     {
-        var fireevent = PunchStartEvent.Post(GlobalTargets.Everyone,
-        ev.Player.GetComponent<BoltPlayerController>().entity,
+        PunchStartEvent.Post(GlobalTargets.Everyone,
+        ev.Player.GetComponent<BoltEntity>(),
         ev.PlayerNumber);
     }
 
     public void OnPunchHolding(PunchHolding ev)
     {
-        var fireevent = PunchHoldingEvent.Post(GlobalTargets.Everyone,
-                ev.Player.GetComponent<BoltPlayerController>().entity,
+        PunchHoldingEvent.Post(GlobalTargets.Everyone,
+                ev.Player.GetComponent<BoltEntity>(),
                 ev.PlayerNumber);
     }
 
     public void OnPunchDone(PunchDone ev)
     {
-        var fireevent = PunchDoneEvent.Post(GlobalTargets.Everyone,
-                ev.Player.GetComponent<BoltPlayerController>().entity,
+        PunchDoneEvent.Post(GlobalTargets.Everyone,
+                ev.Player.GetComponent<BoltEntity>(),
                 ev.PlayerNumber);
     }
 
     public void OnPunchReleased(PunchReleased ev)
     {
-        var fireevent = PunchReleasedEvent.Post(GlobalTargets.Everyone,
-                ev.Player.GetComponent<BoltPlayerController>().entity,
+        PunchReleasedEvent.Post(GlobalTargets.Everyone,
+                ev.Player.GetComponent<BoltEntity>(),
                 ev.PlayerNumber);
     }
 
     public void OnPunchInterrepted(PunchInterruptted ev)
     {
-        var fireevent = PunchInterrupttedEvent.Post(GlobalTargets.Everyone,
-                ev.Player.GetComponent<BoltPlayerController>().entity,
+        PunchInterrupttedEvent.Post(GlobalTargets.Everyone,
+                ev.Player.GetComponent<BoltEntity>(),
                 ev.PlayerNumber);
+    }
+
+    public void OnBlockEnd(BlockEnd ev)
+    {
+        BlockEndEvent.Post(GlobalTargets.Everyone,
+        ev.Player.GetComponent<BoltEntity>(),
+        ev.PlayerNumber);
+    }
+
+    public void OnBlockStart(BlockStart ev)
+    {
+        BlockStartEvent.Post(GlobalTargets.Everyone,
+        ev.Player.GetComponent<BoltEntity>(),
+        ev.PlayerNumber);
+    }
+
+    public void OnPlayerDied(PlayerDied ev)
+    {
+        PlayerDiedEvent.Post(GlobalTargets.Everyone,
+        ev.Player.GetComponent<BoltEntity>(),
+        ev.PlayerNumber,
+        ev.PlayerHitter.GetComponent<BoltEntity>(),
+        ev.HitterIsValid,
+        (int)ev.ImpactType
+        );
+    }
+
+    public void OnPlayerJump(PlayerJump ev)
+    {
+        PlayerJumpEvent.Post(GlobalTargets.Everyone,
+        ev.Player.GetComponent<BoltEntity>(),
+        ev.PlayerNumber,
+        ev.GroundTag);
+    }
+
+    public void OnPlayerLand(PlayerLand ev)
+    {
+        PlayerLandEvent.Post(GlobalTargets.Everyone,
+        ev.Player.GetComponent<BoltEntity>(),
+        ev.PlayerNumber,
+        ev.GroundTag);
+    }
+
+    public void OnPlayerRespawned(PlayerRespawned ev)
+    {
+        PlayerRespawnedEvent.Post(GlobalTargets.Everyone,
+        ev.Player.GetComponent<BoltEntity>());
     }
 
     public void Destroy()

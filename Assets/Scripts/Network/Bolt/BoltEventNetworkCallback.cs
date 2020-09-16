@@ -48,4 +48,39 @@ public class BoltEventNetworkCallback : GlobalEventListener
         EventManager.Instance.TriggerEvent(new PunchInterruptted(ev.Player.gameObject,
         ev.PlayerNumber));
     }
+
+    public override void OnEvent(BlockEndEvent ev)
+    {
+        EventManager.Instance.TriggerEvent(new BlockEnd(ev.Player.gameObject, ev.PN));
+    }
+
+    public override void OnEvent(BlockStartEvent ev)
+    {
+        EventManager.Instance.TriggerEvent(new BlockStart(ev.Player.gameObject, ev.PN));
+    }
+
+    public override void OnEvent(PlayerDiedEvent ev)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerDied(ev.Player.gameObject, ev.PN, ev.Enemy.gameObject,
+        ev.HItterIsValid, ev.ImpactTypeIndex));
+    }
+
+    public override void OnEvent(PlayerJumpEvent ev)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerJump(ev.Player.gameObject,
+        ev.Player.GetComponent<IBodyConfiguration>().PlayerFeet.gameObject,
+        ev.PN, ev.GroundTag));
+    }
+
+    public override void OnEvent(PlayerLandEvent ev)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerLand(ev.Player.gameObject,
+        ev.Player.GetComponent<IBodyConfiguration>().PlayerFeet.gameObject,
+        ev.PN, ev.GroundTag));
+    }
+
+    public override void OnEvent(PlayerRespawnedEvent ev)
+    {
+        EventManager.Instance.TriggerEvent(new PlayerRespawned(ev.Player.gameObject));
+    }
 }

@@ -163,7 +163,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         _freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
         _movementFSM.TransitionTo<IdleState>();
         _actionFSM.TransitionTo<IdleActionState>();
-        _impactMarker = new ImpactMarker(null, Time.time, ImpactType.Self);
+        _impactMarker = new ImpactMarker(gameObject, Time.time, ImpactType.Self);
         _animator = GetComponent<Animator>();
         _playerBodies = new List<Rigidbody>();
         _currentStamina = CharacterDataStore.MaxStamina;
@@ -405,7 +405,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         {
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
-            EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
+            if (entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPlayerDied(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
         }
     }
 
@@ -844,7 +845,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         {
             base.OnEnter();
             Context._rb.AddForce(new Vector3(0, Context.CharacterDataStore.JumpForce, 0), ForceMode.Impulse);
-            EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
+            if (Context.entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPlayerJump(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
         }
 
         public override void OnCollisionEnter(Collision other)
@@ -853,9 +855,9 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             {
                 if (Context.entity.IsOwner)
                 {
+                    Services.BoltEventBroadcaster.OnPlayerLand(new PlayerLand(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
                     TransitionTo<IdleState>();
                 }
-                EventManager.Instance.TriggerEvent(new PlayerLand(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
             }
         }
         public override void FixedUpdate()
@@ -1236,7 +1238,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             {
                 if (Context.entity.IsOwner)
                 {
-                    EventManager.Instance.TriggerEvent(new PlayerRespawned(Context.gameObject));
+                    Services.BoltEventBroadcaster.OnPlayerRespawned(new PlayerRespawned(Context.gameObject));
                     TransitionTo<IdleState>();
                     return;
                 }
@@ -1976,10 +1978,12 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             // Context._animator.SetBool("Blocking", true);
             if (Context.entity.IsOwner)
+            {
                 Context.state.Blocking = true;
+                Services.BoltEventBroadcaster.OnBlockStart(new BlockStart(Context.gameObject, Context.PlayerNumber));
+            }
             Context.BlockShield.SetShield(true);
         }
 
@@ -2049,9 +2053,11 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             base.OnExit();
             // Context._animator.SetBool("Blocking", false);
             if (Context.entity.IsOwner)
+            {
                 Context.state.Blocking = false;
+                Services.BoltEventBroadcaster.OnBlockEnd(new BlockEnd(Context.gameObject, Context.PlayerNumber));
+            }
             Context.BlockShield.SetShield(false);
-            EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
     }
 

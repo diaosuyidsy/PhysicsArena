@@ -3544,6 +3544,7 @@
                 "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
                 "Shift": 1024.0,
@@ -3553,6 +3554,7 @@
                 "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
                 "Shift": 1024.0,
@@ -3562,6 +3564,7 @@
                 "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
                 "Shift": 1024.0,
@@ -3595,6 +3598,7 @@
               "MinValue": -1,
               "MaxValue": 1,
               "Accuracy": 0.01,
+              "Enabled": true,
               "Pack": 100.0,
               "Read": 0.01,
               "Shift": 1.0,
@@ -3801,6 +3805,7 @@
               "MinValue": -2048,
               "MaxValue": 2048,
               "Accuracy": 0.01,
+              "Enabled": true,
               "Pack": 100.0,
               "Read": 0.01,
               "Shift": 2048.0,
@@ -3828,6 +3833,7 @@
               "MinValue": -2048,
               "MaxValue": 2048,
               "Accuracy": 0.01,
+              "Enabled": true,
               "Pack": 100.0,
               "Read": 0.01,
               "Shift": 2048.0,
@@ -3848,6 +3854,7 @@
           "Name": "ForceResetUpper",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeTrigger, bolt.compiler"
@@ -3927,6 +3934,7 @@
               "MinValue": -2048,
               "MaxValue": 2048,
               "Accuracy": 0.01,
+              "Enabled": true,
               "Pack": 100.0,
               "Read": 0.01,
               "Shift": 2048.0,
@@ -3944,43 +3952,34 @@
           }
         },
         {
-          "Name": "PunchForce",
+          "Name": "MovementStateIndex",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 2,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
-            "$type": "Bolt.Compiler.PropertyTypeVector, bolt.compiler",
-            "Selection": 14,
-            "Compression": [
-              {
-                "MinValue": -1024,
-                "MaxValue": 1024,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
-              },
-              {
-                "MinValue": -1024,
-                "MaxValue": 1024,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
-              },
-              {
-                "MinValue": -1024,
-                "MaxValue": 1024,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
-              }
-            ]
+            "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 255,
+            "CompressionEnabled": true
+          },
+          "AssetSettings": {
+            "$type": "Bolt.Compiler.PropertyStateSettings, bolt.compiler",
+            "ExtrapolationErrorTolerance": 0.25,
+            "_ExtrapolationCorrectionFrames": 6,
+            "ExtrapolationMaxFrames": 9,
+            "SnapMagnitude": 10.0
+          }
+        },
+        {
+          "Name": "ActionStateIndex",
+          "Enabled": true,
+          "Expanded": true,
+          "ReplicationMode": 1,
+          "Priority": 1,
+          "PropertyType": {
+            "$type": "Bolt.Compiler.PropertyTypeInteger, bolt.compiler",
+            "MaxValue": 255,
+            "CompressionEnabled": true
           },
           "AssetSettings": {
             "$type": "Bolt.Compiler.PropertyStateSettings, bolt.compiler",
@@ -4326,20 +4325,7 @@
           }
         }
       ],
-      "Result": [
-        {
-          "Name": "asd",
-          "Enabled": true,
-          "ReplicationMode": 1,
-          "Priority": 1,
-          "PropertyType": {
-            "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
-          },
-          "AssetSettings": {
-            "$type": "Bolt.Compiler.PropertyCommandSettings, bolt.compiler"
-          }
-        }
-      ],
+      "Result": [],
       "SmoothFrames": 30,
       "Properties": [],
       "Name": "BirfiaPlayerCommand",

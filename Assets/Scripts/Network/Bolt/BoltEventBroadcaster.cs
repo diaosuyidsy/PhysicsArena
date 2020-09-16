@@ -12,6 +12,7 @@ public class BoltEventBroadcaster
 
     public void OnPlayerHit(PlayerHit ev)
     {
+        if (!BoltNetwork.IsServer) return;
         var hitEvent = PlayerHitEvent.Post(GlobalTargets.Everyone,
         ev.Hiter.GetComponent<BoltPlayerController>().entity,
         ev.Hitted.GetComponent<BoltPlayerController>().entity,
@@ -22,6 +23,8 @@ public class BoltEventBroadcaster
 
     public void OnPunchStart(PunchStart ev)
     {
+        if (!BoltNetwork.IsServer) return;
+
         var fireevent = PunchStartEvent.Post(GlobalTargets.Everyone,
         ev.Player.GetComponent<BoltPlayerController>().entity,
         ev.PlayerNumber);
@@ -29,6 +32,8 @@ public class BoltEventBroadcaster
 
     public void OnPunchHolding(PunchHolding ev)
     {
+        if (!BoltNetwork.IsServer) return;
+
         var fireevent = PunchHoldingEvent.Post(GlobalTargets.Everyone,
                 ev.Player.GetComponent<BoltPlayerController>().entity,
                 ev.PlayerNumber);
@@ -36,6 +41,8 @@ public class BoltEventBroadcaster
 
     public void OnPunchDone(PunchDone ev)
     {
+        if (!BoltNetwork.IsServer) return;
+
         var fireevent = PunchDoneEvent.Post(GlobalTargets.Everyone,
                 ev.Player.GetComponent<BoltPlayerController>().entity,
                 ev.PlayerNumber);
@@ -43,6 +50,8 @@ public class BoltEventBroadcaster
 
     public void OnPunchReleased(PunchReleased ev)
     {
+        if (!BoltNetwork.IsServer) return;
+
         var fireevent = PunchReleasedEvent.Post(GlobalTargets.Everyone,
                 ev.Player.GetComponent<BoltPlayerController>().entity,
                 ev.PlayerNumber);
@@ -50,6 +59,8 @@ public class BoltEventBroadcaster
 
     public void OnPunchInterrepted(PunchInterruptted ev)
     {
+        if (!BoltNetwork.IsServer) return;
+
         var fireevent = PunchInterrupttedEvent.Post(GlobalTargets.Everyone,
                 ev.Player.GetComponent<BoltPlayerController>().entity,
                 ev.PlayerNumber);

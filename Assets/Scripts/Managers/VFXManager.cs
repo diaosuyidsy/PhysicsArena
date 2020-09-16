@@ -396,7 +396,7 @@ public class VFXManager
 
             if (r != null && r.material.name.Contains("CustomComic"))
             {
-                ev.Player.GetComponent<PlayerController>().StartCoroutine(_startBlinking(_blinkTime, r));
+                ev.Player.GetComponent<MonoBehaviour>().StartCoroutine(_startBlinking(_blinkTime, r));
             }
         }
     }

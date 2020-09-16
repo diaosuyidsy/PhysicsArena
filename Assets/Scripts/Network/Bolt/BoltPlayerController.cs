@@ -1206,10 +1206,11 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         }
     }
 
-    private class DeadState : FSM<BoltPlayerController>.State
+    private class DeadState : MovementState
     {
         private float _startTime;
         private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
+        protected override int _stateIndex { get { return 10; } }
 
         public override void OnEnter()
         {
@@ -1220,7 +1221,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             if (Context.entity.IsOwner)
             {
                 Context.state.IdleDowner = true;
-                Context.state.MovementStateIndex = 10;
+                // Context.state.MovementStateIndex = 10;
             }
             // Context._animator.SetBool("IdleDowner", true);
             foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }

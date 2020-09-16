@@ -75,6 +75,15 @@ public class PlayerDied : GameEvent
         ImpactType = impactMarker.ImpactType;
         ImpactObject = impactObject;
     }
+
+    public PlayerDied(GameObject player, int playerNumber, GameObject playerHitter, bool hitterIsValid, int impactType)
+    {
+        Player = player;
+        PlayerNumber = playerNumber;
+        PlayerHitter = playerHitter;
+        HitterIsValid = hitterIsValid;
+        ImpactType = (ImpactType)impactType;
+    }
 }
 
 public class BagelSent : GameEvent

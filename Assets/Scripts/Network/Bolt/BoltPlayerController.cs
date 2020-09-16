@@ -117,6 +117,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     GameObject IBodyConfiguration.RightFoot => this.RightFoot;
 
     Transform IBodyConfiguration.PlayerUITransform => this.PlayerUITransform;
+    ShieldController IBodyConfiguration.BlockShield => this.BlockShield;
 
     #region  Controller Variable
     float HA;
@@ -162,7 +163,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         _freezeBody = new Vector3(0, transform.localEulerAngles.y, 0);
         _movementFSM.TransitionTo<IdleState>();
         _actionFSM.TransitionTo<IdleActionState>();
-        _impactMarker = new ImpactMarker(null, Time.time, ImpactType.Self);
+        _impactMarker = new ImpactMarker(gameObject, Time.time, ImpactType.Self);
         _animator = GetComponent<Animator>();
         _playerBodies = new List<Rigidbody>();
         _currentStamina = CharacterDataStore.MaxStamina;
@@ -235,16 +236,16 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         BirfiaPlayerCommand cmd = (BirfiaPlayerCommand)command;
         if (resetState)
         {
-            // transform.position = cmd.Result.Position;
-            // _rb.velocity = cmd.Result.Velocity;
+            transform.position = cmd.Result.Position;
+            _rb.velocity = cmd.Result.Velocity;
         }
         else
         {
             ((MovementState)_movementFSM.CurrentState).ExecuteCommand(command, resetState);
             ((ActionState)_actionFSM.CurrentState).ExecuteCommand(command, resetState);
 
-            // cmd.Result.Position = transform.position;
-            // cmd.Result.Velocity = _rb.velocity;
+            cmd.Result.Position = transform.position;
+            cmd.Result.Velocity = _rb.velocity;
         }
 
     }
@@ -404,7 +405,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         {
             ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
             ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
-            EventManager.Instance.TriggerEvent(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
+            if (entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPlayerDied(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
         }
     }
 
@@ -429,11 +431,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     /// <returns></returns>
     public bool CanBlock(Vector3 forwardAngle)
     {
-        // if (_actionFSM.CurrentState.GetType().Equals(typeof(BlockingState)) &&
-        //     _angleWithin(transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle))
-        //     return true;
-        // return false;
-        return state.Blocking && _angleWithin(state.MainTransform.Transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle);
+        // return true;
+        return state.ActionStateIndex == 8 && _angleWithin(state.MainTransform.Transform.forward, forwardAngle, 180f - CharacterDataStore.BlockAngle);
     }
 
     /// <summary>
@@ -846,7 +845,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         {
             base.OnEnter();
             Context._rb.AddForce(new Vector3(0, Context.CharacterDataStore.JumpForce, 0), ForceMode.Impulse);
-            EventManager.Instance.TriggerEvent(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
+            if (Context.entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPlayerJump(new PlayerJump(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
         }
 
         public override void OnCollisionEnter(Collision other)
@@ -855,9 +855,9 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             {
                 if (Context.entity.IsOwner)
                 {
+                    Services.BoltEventBroadcaster.OnPlayerLand(new PlayerLand(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
                     TransitionTo<IdleState>();
                 }
-                EventManager.Instance.TriggerEvent(new PlayerLand(Context.gameObject, Context.OnDeathHidden[1], Context.PlayerNumber, Context._getGroundTag()));
             }
         }
         public override void FixedUpdate()
@@ -1208,10 +1208,11 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         }
     }
 
-    private class DeadState : FSM<BoltPlayerController>.State
+    private class DeadState : MovementState
     {
         private float _startTime;
         private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
+        protected override int _stateIndex { get { return 10; } }
 
         public override void OnEnter()
         {
@@ -1222,7 +1223,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             if (Context.entity.IsOwner)
             {
                 Context.state.IdleDowner = true;
-                Context.state.MovementStateIndex = 10;
+                // Context.state.MovementStateIndex = 10;
             }
             // Context._animator.SetBool("IdleDowner", true);
             foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(false); }
@@ -1237,7 +1238,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             {
                 if (Context.entity.IsOwner)
                 {
-                    EventManager.Instance.TriggerEvent(new PlayerRespawned(Context.gameObject));
+                    Services.BoltEventBroadcaster.OnPlayerRespawned(new PlayerRespawned(Context.gameObject));
                     TransitionTo<IdleState>();
                     return;
                 }
@@ -1704,20 +1705,30 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
                 for (int i = 0; i < hits.count; i++)
                 {
                     var hit = hits.GetHit(i);
-                    if (Vector3.Angle(Context.entity.transform.forward, hit.body.transform.position - Context.entity.transform.position) < 30f)
+                    if (Vector3.Angle(Context.entity.transform.forward, hit.body.transform.position - Context.entity.transform.position) < 60f)
                     {
                         // Hit,  TODO: convert to single hit TODO: detect teammate
                         Vector3 force = Context.entity.transform.forward * Context.CharacterDataStore.PunchForce;
 
                         var serializer = hit.body.GetComponent<BoltPlayerController>();
                         if (serializer != null && serializer != Context.entity.GetComponent<BoltPlayerController>())
-                        // if (serializer != null)
                         {
                             Context.SetVelocity(Vector3.zero);
-                            PunchEvent.Post(serializer.entity, force, Context.entity);
-                            if (Context.entity.IsOwner)
-                                Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, false));
                             _hitOnce = true;
+                            if (serializer.CanBlock(Context.state.MainTransform.Transform.forward))
+                            {
+                                force *= (-Context.CharacterDataStore.BlockMultiplier);
+                                PunchEvent.Post(Context.entity, force, serializer.entity);
+                                if (Context.entity.IsOwner)
+                                    Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(serializer.gameObject, Context.entity.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, true));
+                            }
+                            else
+                            {
+                                PunchEvent.Post(serializer.entity, force, Context.entity);
+                                if (Context.entity.IsOwner)
+                                    Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, false));
+                            }
+
                         }
                     }
                 }
@@ -1967,10 +1978,12 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         public override void OnEnter()
         {
             base.OnEnter();
-            EventManager.Instance.TriggerEvent(new BlockStart(Context.gameObject, Context.PlayerNumber));
             // Context._animator.SetBool("Blocking", true);
             if (Context.entity.IsOwner)
+            {
                 Context.state.Blocking = true;
+                Services.BoltEventBroadcaster.OnBlockStart(new BlockStart(Context.gameObject, Context.PlayerNumber));
+            }
             Context.BlockShield.SetShield(true);
         }
 
@@ -2040,9 +2053,11 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             base.OnExit();
             // Context._animator.SetBool("Blocking", false);
             if (Context.entity.IsOwner)
+            {
                 Context.state.Blocking = false;
+                Services.BoltEventBroadcaster.OnBlockEnd(new BlockEnd(Context.gameObject, Context.PlayerNumber));
+            }
             Context.BlockShield.SetShield(false);
-            EventManager.Instance.TriggerEvent(new BlockEnd(Context.gameObject, Context.PlayerNumber));
         }
     }
 

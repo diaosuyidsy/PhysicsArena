@@ -73,6 +73,7 @@ public class GameFeelManager
 
     private void _onPlayerRespawned(PlayerRespawned ev)
     {
+        if (ev.Player.GetComponent<PlayerController>() == null) return;
         _vibrateController(ev.Player.GetComponent<PlayerController>().PlayerNumber
         , GameFeelData.PlayerRespawnViberationInformation.MotorLevel
         , GameFeelData.PlayerRespawnViberationInformation.Duration);

@@ -3534,6 +3534,7 @@
           "Name": "MainTransform",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeTransform, bolt.compiler",
@@ -3544,6 +3545,7 @@
                 "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
                 "Shift": 1024.0,
@@ -3553,6 +3555,7 @@
                 "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
                 "Shift": 1024.0,
@@ -3562,6 +3565,7 @@
                 "MinValue": -1024,
                 "MaxValue": 1024,
                 "Accuracy": 0.01,
+                "Enabled": true,
                 "Pack": 100.0,
                 "Read": 0.01,
                 "Shift": 1024.0,
@@ -3614,6 +3618,7 @@
           "Name": "Running",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3632,6 +3637,7 @@
           "Name": "IdleDowner",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3650,6 +3656,7 @@
           "Name": "IdleUpper",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3668,6 +3675,7 @@
           "Name": "Picking",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3686,6 +3694,7 @@
           "Name": "PickUpFull",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3704,6 +3713,7 @@
           "Name": "PickUpHalf",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3722,6 +3732,7 @@
           "Name": "Dropping",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3740,6 +3751,7 @@
           "Name": "PunchHolding",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3758,6 +3770,7 @@
           "Name": "PunchReleased",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3776,6 +3789,7 @@
           "Name": "Blocking",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3794,6 +3808,7 @@
           "Name": "ClockFistTime",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeFloat, bolt.compiler",
@@ -3821,6 +3836,7 @@
           "Name": "FistReleaseTime",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeFloat, bolt.compiler",
@@ -3848,6 +3864,7 @@
           "Name": "ForceResetUpper",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeTrigger, bolt.compiler"
@@ -3866,6 +3883,7 @@
           "Name": "ButtAnticipation",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3884,6 +3902,7 @@
           "Name": "ButtStrike",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3902,6 +3921,7 @@
           "Name": "SideStep",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3920,6 +3940,7 @@
           "Name": "RunningSpeed",
           "Enabled": true,
           "Expanded": true,
+          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeFloat, bolt.compiler",
@@ -3940,53 +3961,6 @@
             "ExtrapolationMaxFrames": 9,
             "MecanimMode": 1,
             "MecanimDirection": 1,
-            "SnapMagnitude": 10.0
-          }
-        },
-        {
-          "Name": "PunchForce",
-          "Enabled": true,
-          "Expanded": true,
-          "ReplicationMode": 2,
-          "Priority": 1,
-          "PropertyType": {
-            "$type": "Bolt.Compiler.PropertyTypeVector, bolt.compiler",
-            "Selection": 14,
-            "Compression": [
-              {
-                "MinValue": -1024,
-                "MaxValue": 1024,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
-              },
-              {
-                "MinValue": -1024,
-                "MaxValue": 1024,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
-              },
-              {
-                "MinValue": -1024,
-                "MaxValue": 1024,
-                "Accuracy": 0.01,
-                "Pack": 100.0,
-                "Read": 0.01,
-                "Shift": 1024.0,
-                "BitsRequired": 18
-              }
-            ]
-          },
-          "AssetSettings": {
-            "$type": "Bolt.Compiler.PropertyStateSettings, bolt.compiler",
-            "ExtrapolationErrorTolerance": 0.25,
-            "_ExtrapolationCorrectionFrames": 6,
-            "ExtrapolationMaxFrames": 9,
             "SnapMagnitude": 10.0
           }
         }
@@ -4326,20 +4300,7 @@
           }
         }
       ],
-      "Result": [
-        {
-          "Name": "asd",
-          "Enabled": true,
-          "ReplicationMode": 1,
-          "Priority": 1,
-          "PropertyType": {
-            "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
-          },
-          "AssetSettings": {
-            "$type": "Bolt.Compiler.PropertyCommandSettings, bolt.compiler"
-          }
-        }
-      ],
+      "Result": [],
       "SmoothFrames": 30,
       "Properties": [],
       "Name": "BirfiaPlayerCommand",

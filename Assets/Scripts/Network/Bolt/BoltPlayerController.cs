@@ -142,17 +142,14 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         state.SetAnimator(GetComponent<Animator>());
         if (entity.IsOwner)
         {
-            if (BoltNetwork.IsServer)
-            {
-                entity.TakeControl();
-            }
+            entity.TakeControl();
+            _rb.isKinematic = false;
         }
         else
         {
             state.AddCallback("MovementStateIndex", _onMovementStateIndexChange);
             state.AddCallback("ActionStateIndex", _onActionStateIndexChange);
         }
-        if (BoltNetwork.IsServer) _rb.isKinematic = false;
     }
 
     private void Awake()
@@ -235,7 +232,6 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
 
     public override void ExecuteCommand(Command command, bool resetState)
     {
-        if (!BoltNetwork.IsServer) return;
         BirfiaPlayerCommand cmd = (BirfiaPlayerCommand)command;
         if (resetState)
         {
@@ -1566,7 +1562,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             Context._permaSlow++;
             Context._permaSlowWalkSpeedMultiplier = Context.CharacterDataStore.FistHoldSpeedMultiplier;
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.FistHoldRotationMutiplier;
-            Services.BoltEventBroadcaster.OnPunchStart(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            if (Context.entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPunchStart(new PunchStart(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             _holding = false;
             _triggerdHoldingEvent = false;
             _startHoldingTime = Time.time;
@@ -1578,7 +1575,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             if (!_triggerdHoldingEvent && Time.time > _startHoldingTime + Context.CharacterDataStore.HoldEventTriggerDuration)
             {
                 _triggerdHoldingEvent = true;
-                Services.BoltEventBroadcaster.OnPunchHolding(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+                if (Context.entity.IsOwner)
+                    Services.BoltEventBroadcaster.OnPunchHolding(new PunchHolding(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
             }
             if (!_holding && Time.time > _startHoldingTime + Context.CharacterDataStore.ClockFistTime)
             {
@@ -1662,7 +1660,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.IdleSelfPushForce, ForceMode.VelocityChange);
             else
                 Context._rb.AddForce(Context.transform.forward * Context.CharacterDataStore.SelfPushForce, ForceMode.VelocityChange);
-            Services.BoltEventBroadcaster.OnPunchReleased(new PunchReleased(Context.gameObject, Context.PlayerNumber));
+            if (Context.entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPunchReleased(new PunchReleased(Context.gameObject, Context.PlayerNumber));
             Context._rotationSpeedMultiplier = Context.CharacterDataStore.PunchReleaseRotationMultiplier;
         }
 
@@ -1716,7 +1715,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
                         {
                             Context.SetVelocity(Vector3.zero);
                             PunchEvent.Post(serializer.entity, force, Context.entity);
-                            Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, false));
+                            if (Context.entity.IsOwner)
+                                Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, false));
                             _hitOnce = true;
                         }
                     }
@@ -1785,7 +1785,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             Context._dropHandObject();
             _sweepedObjects = new HashSet<GameObject>();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
-            Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            if (Context.entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
             myLayer = Context.gameObject.layer;
             Context.gameObject.layer = 19;
             Context._rb.AddForce(Context._hitForceTuple.Force, Context._hitForceTuple.ForceMode);
@@ -1895,7 +1896,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
                 Context._allPlayerRBs[i].velocity = _storedVelocity[i];
                 Context._allPlayerRBs[i].isKinematic = false;
             }
-            Services.BoltEventBroadcaster.OnPunchDone(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
+            if (Context.entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPunchDone(new PunchDone(Context.gameObject, Context.PlayerNumber, Context.RightHand.transform));
         }
     }
 
@@ -2120,7 +2122,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             // Context._animator.SetBool("IdleUpper", true);
             if (Context.entity.IsOwner)
                 Context.state.IdleUpper = true;
-            Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            if (Context.entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
         }
 
         public override void Update()
@@ -2150,7 +2153,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             // Context._animator.SetBool("IdleUpper", true);
             if (Context.entity.IsOwner)
                 Context.state.IdleUpper = true;
-            Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+            if (Context.entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
             Context._dropHandObject();
             if (Context.MeleeVFXHolder != null) Destroy(Context.MeleeVFXHolder);
         }

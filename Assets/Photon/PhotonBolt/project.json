@@ -3534,7 +3534,6 @@
           "Name": "MainTransform",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeTransform, bolt.compiler",
@@ -3619,7 +3618,6 @@
           "Name": "Running",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3638,7 +3636,6 @@
           "Name": "IdleDowner",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3657,7 +3654,6 @@
           "Name": "IdleUpper",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3676,7 +3672,6 @@
           "Name": "Picking",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3695,7 +3690,6 @@
           "Name": "PickUpFull",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3714,7 +3708,6 @@
           "Name": "PickUpHalf",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3733,7 +3726,6 @@
           "Name": "Dropping",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3752,7 +3744,6 @@
           "Name": "PunchHolding",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3771,7 +3762,6 @@
           "Name": "PunchReleased",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3790,7 +3780,6 @@
           "Name": "Blocking",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3809,7 +3798,6 @@
           "Name": "ClockFistTime",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeFloat, bolt.compiler",
@@ -3838,7 +3826,6 @@
           "Name": "FistReleaseTime",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeFloat, bolt.compiler",
@@ -3886,7 +3873,6 @@
           "Name": "ButtAnticipation",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3905,7 +3891,6 @@
           "Name": "ButtStrike",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3924,7 +3909,6 @@
           "Name": "SideStep",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeBool, bolt.compiler"
@@ -3943,7 +3927,6 @@
           "Name": "RunningSpeed",
           "Enabled": true,
           "Expanded": true,
-          "ReplicationMode": 1,
           "Priority": 1,
           "PropertyType": {
             "$type": "Bolt.Compiler.PropertyTypeFloat, bolt.compiler",
@@ -4454,7 +4437,6 @@
           }
         }
       ],
-      "GlobalSenders": 1,
       "Name": "PlayerHitEvent",
       "Guid": "8e6d9aa9-0d28-43ef-88bb-2538b83a4af9",
       "Groups": [
@@ -4493,7 +4475,6 @@
           }
         }
       ],
-      "GlobalSenders": 1,
       "Name": "PunchStartEvent",
       "Guid": "faa476bf-9078-486f-90cd-7c6b9c68f4c0",
       "Groups": [
@@ -4531,7 +4512,6 @@
           }
         }
       ],
-      "GlobalSenders": 1,
       "Name": "PunchHoldingEvent",
       "Guid": "19664733-280d-4bab-a9a1-7106f1ff7522",
       "Groups": [
@@ -4570,7 +4550,6 @@
           }
         }
       ],
-      "GlobalSenders": 1,
       "Name": "PunchReleasedEvent",
       "Guid": "f900c04d-8bdc-40a0-b6f7-0eaf35ab9913",
       "Groups": [
@@ -4609,7 +4588,6 @@
           }
         }
       ],
-      "GlobalSenders": 1,
       "Name": "PunchDoneEvent",
       "Guid": "e8f1e86f-63a9-4195-a19b-94332d293ae7",
       "Groups": [
@@ -4648,7 +4626,6 @@
           }
         }
       ],
-      "GlobalSenders": 1,
       "Name": "PunchInterrupttedEvent",
       "Guid": "91704c2c-7c2c-415e-be1e-65a5ccbf4a59",
       "Groups": [

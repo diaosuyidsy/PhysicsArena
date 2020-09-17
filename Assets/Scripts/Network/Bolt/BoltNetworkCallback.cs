@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Bolt;
 
-[BoltGlobalBehaviour]
+[BoltGlobalBehaviour("BrawlModeReforgedBolt")]
 public class BoltNetworkCallback : GlobalEventListener
 {
     public override void SceneLoadLocalDone(string scene)

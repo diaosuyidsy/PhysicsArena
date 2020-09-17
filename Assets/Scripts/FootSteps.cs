@@ -4,16 +4,8 @@ using UnityEngine;
 
 public class FootSteps : MonoBehaviour
 {
-	private PlayerController _playerController;
-
-	private void Awake()
-	{
-		_playerController = transform.parent.GetComponentInChildren<PlayerController>();
-		Debug.Assert(_playerController != null);
-	}
-
-	public void OnLegStraight()
-	{
-		_playerController.FootStep();
-	}
+    public void FootStep(int foot = 0)
+    {
+        GetComponentInParent<BoltPlayerView>().FootStep(foot);
+    }
 }

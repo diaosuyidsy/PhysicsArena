@@ -135,12 +135,13 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     #endregion
 
     private ForceTuple _hitForceTuple;
+    private BoltPlayerView _playerview;
     #endregion
 
     public override void Attached()
     {
         state.SetTransforms(state.MainTransform, transform);
-        state.SetAnimator(GetComponent<Animator>());
+        state.SetAnimator(GetComponentInChildren<Animator>());
         if (entity.IsOwner)
         {
             entity.TakeControl();
@@ -151,10 +152,12 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
             state.AddCallback("MovementStateIndex", _onMovementStateIndexChange);
             state.AddCallback("ActionStateIndex", _onActionStateIndexChange);
         }
+        _playerview.transform.SetParent(null);
     }
 
     private void Awake()
     {
+        _playerview = GetComponentInChildren<BoltPlayerView>();
         _movementFSM = new FSM<BoltPlayerController>(this);
         _actionFSM = new FSM<BoltPlayerController>(this);
         _rb = GetComponent<Rigidbody>();
@@ -164,7 +167,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         _movementFSM.TransitionTo<IdleState>();
         _actionFSM.TransitionTo<IdleActionState>();
         _impactMarker = new ImpactMarker(gameObject, Time.time, ImpactType.Self);
-        _animator = GetComponent<Animator>();
+        _animator = GetComponentInChildren<Animator>();
         _playerBodies = new List<Rigidbody>();
         _currentStamina = CharacterDataStore.MaxStamina;
         _staminaUISize = BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
@@ -172,7 +175,8 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         _allPlayerRBs = GetComponentsInChildren<Rigidbody>(true);
         foreach (Rigidbody rb in GetComponentsInChildren<Rigidbody>(true))
         {
-            if (rb.gameObject.layer != LayerMask.NameToLayer("NoCollision"))
+            if (rb.gameObject.layer != LayerMask.NameToLayer("NoCollision") &&
+            rb.gameObject.layer != LayerMask.NameToLayer("PlayerBodyOnHit"))
             {
                 _playerBodies.Add(rb);
             }
@@ -1724,6 +1728,7 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
                             }
                             else
                             {
+                                serializer._playerview.OnForceImpact(0.5f, force);
                                 PunchEvent.Post(serializer.entity, force, Context.entity);
                                 if (Context.entity.IsOwner)
                                     Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, false));

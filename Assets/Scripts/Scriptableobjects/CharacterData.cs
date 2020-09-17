@@ -19,6 +19,8 @@ public class CharacterData : ScriptableObject
     public float FrontIsCliff = 0.2f;
     public float CliffPreventionForce = 100f;
     public float CliffPreventionTimer = 0.4f;
+    public float MovementInterpolation = 0.9f;
+    public float InterpolationRecoveryTime = 0.5f;
 
     [Header("Character Defend Related Settings")]
     public float MaxStamina = 1.5f;

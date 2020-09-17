@@ -12,20 +12,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77f59a2ecbe94604094d30020f1b14bd, type: 3}
   m_Name: CharacterDataBolt
   m_EditorClassIdentifier: 
-  WalkSpeed: 6
+  WalkSpeed: 5
   MaxVelocityChange: 16
   InAirSpeedMultiplier: 0.1
   FacingCliffMultiplier: 1
   PickupSpeed: 2
   JumpCD: 0
-  JumpForce: 230
+  JumpForce: 10
   JumpMask:
     serializedVersion: 2
     m_Bits: 286720
-  MinRotationSpeed: 16
+  MinRotationSpeed: 25
   FrontIsCliff: 0.2
-  CliffPreventionForce: 100
+  CliffPreventionForce: 20
   CliffPreventionTimer: 0.4
+  MovementInterpolation: 0.9
+  InterpolationRecoveryTime: 0.5
   MaxStamina: 1.5
   StaminaRegenInterval: 3
   StaminaRegenRate: 1
@@ -41,8 +43,8 @@ MonoBehaviour:
   HoldEventTriggerDuration: 0.05
   FistReleaseTime: 0.35
   PunchActivateTime: 0.25
-  SelfPushForce: 84.375
-  IdleSelfPushForce: 84.375
+  SelfPushForce: 40
+  IdleSelfPushForce: 10
   FistHoldSpeedMultiplier: 0.7
   FistHoldRotationMutiplier: 2
   PunchBackwardCastDistance: 0.3
@@ -51,13 +53,13 @@ MonoBehaviour:
   MeleeChargeThreshold: 0.75
   PunchRadius: 0.3
   PunchDistance: 0.4
-  PunchForce: 950
+  PunchForce: 95
   MeleeHoldTime: Infinity
   HitUncontrollableTimeSmall: 0.4
   HitStopFramesSmall: 6
-  HitSmallThreshold: 562.5
+  HitSmallThreshold: 56
   HitUncontrollableTimeBig: 0.6
-  HitBigThreshold: 1012.5
+  HitBigThreshold: 101
   HitStopFramesBig: 12
   PunchReleaseRotationMultiplier: 0.3
   PunchResetVelocityBeforeHitDuration: 0.5

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class BoltPlayerView : MonoBehaviour
 {
-    private BoltPlayerController _controllerRef;
+    private BoltPlayerControllerBase _controllerRef;
     private Transform _controllerTransform;
     private CharacterData _characterData;
     private float _interpolationMultiplication = 1f;
@@ -13,7 +13,7 @@ public class BoltPlayerView : MonoBehaviour
 
     private void Awake()
     {
-        _controllerRef = GetComponentInParent<BoltPlayerController>();
+        _controllerRef = GetComponentInParent<BoltPlayerControllerBase>();
         _characterData = _controllerRef.CharacterDataStore;
         _controllerTransform = _controllerRef.transform;
         _rb = GetComponent<Rigidbody>();
@@ -55,13 +55,13 @@ public class BoltPlayerView : MonoBehaviour
         float ping = 0f;
         if (BoltNetwork.IsConnected && BoltNetwork.IsClient)
             ping = BoltNetwork.Server.PingAliased / 1000f;
-        while (elapsedTime < ping)
-        {
-            elapsedTime += Time.deltaTime;
-            _interpolationMultiplication = elapsedTime / ping;
-            yield return null;
-        }
-        _interpolationMultiplication = 1f;
+        // while (elapsedTime < 5f * ping)
+        // {
+        //     elapsedTime += Time.deltaTime;
+        //     _interpolationMultiplication = elapsedTime / (5f * ping);
+        //     yield return null;
+        // }
+        _interpolationMultiplication = 0.1f;
         // _interpolate = true;
     }
 }

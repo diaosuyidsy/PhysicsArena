@@ -492,7 +492,6 @@ public class ForceTuple
 public interface IVFXHolder
 {
     [HideInInspector] GameObject HandObject { get; set; }
-    [HideInInspector] GameObject EquipmentObject { get; set; }
     [HideInInspector] GameObject MeleeVFXHolder { get; set; }
     [HideInInspector] GameObject MeleeVFXHolder2 { get; set; }
     [HideInInspector] GameObject BlockVFXHolder { get; set; }

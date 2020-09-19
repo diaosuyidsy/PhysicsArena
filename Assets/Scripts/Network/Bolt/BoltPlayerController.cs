@@ -1637,7 +1637,6 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
         private float _time;
         private bool _hitOnce;
         public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
-        // private BirfiaPlayerCommand _cmd;
 
         public override void ExecuteCommand(Command command, bool resetState)
         {

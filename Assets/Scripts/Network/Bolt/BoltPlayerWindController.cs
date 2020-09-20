@@ -136,6 +136,18 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
         _movementFSM.LateUpdate();
         _actionFSM.LateUpdate();
     }
+
+    protected override void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("DeathZone") || other.CompareTag("DeathModeTrapZone"))
+        {
+            ((MovementState)_movementFSM.CurrentState).OnEnterDeathZone();
+            ((ActionState)_actionFSM.CurrentState).OnEnterDeathZone();
+            if (entity.IsOwner)
+                Services.BoltEventBroadcaster.OnPlayerDied(new PlayerDied(gameObject, PlayerNumber, _impactMarker, other.gameObject));
+        }
+    }
+
     #region General Movement States
     protected class MovementState : FSM<BoltPlayerWindController>.State
     {
@@ -351,7 +363,8 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
         public override void OnExit()
         {
             base.OnExit();
-            Context._rb.isKinematic = false;
+            if (Context.entity.IsOwner)
+                Context._rb.isKinematic = false;
             Context._setToSpawn(0f);
             foreach (GameObject go in Context.OnDeathHidden) { go.SetActive(true); }
             Context._deadInvincible = Context._deadInvincibleIenumerator(Services.Config.GameMapData.InvincibleTime);
@@ -631,8 +644,8 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
         public override void ExecuteCommand(Command command, bool resetState)
         {
             base.ExecuteCommand(command, resetState);
-            if (!resetState)
-                _checkFanHit((BirfiaPlayerCommand)command);
+            // if (!resetState)
+            _checkFanHit((BirfiaPlayerCommand)command);
         }
 
         private void _checkFanHit(BirfiaPlayerCommand cmd)
@@ -643,9 +656,9 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
             float totalAngle = Context.PlayerClassData_Wind.FanStrikeStartRotationAngle + Context.PlayerClassData_Wind.FanStrikeEndRotationAngle;
             float currentAngle = totalAngle * ((Time.timeSinceLevelLoad - (_timer - Context.PlayerClassData_Wind.FanStrikeDuration)) / Context.PlayerClassData_Wind.FanStrikeDuration);
             Vector3 fanCurrentforward = Quaternion.AngleAxis(-currentAngle, Vector3.up) * fanStartforward;
-
+            if (currentAngle < Context.PlayerClassData_Wind.FanStrikeInitialIgnoreAngle) return;
             // Bolt Hitscan
-            using (var hits = BoltNetwork.OverlapSphereAll(Context.entity.transform.position, Context.CharacterDataStore.PunchRadius, cmd.ServerFrame))
+            using (var hits = BoltNetwork.OverlapSphereAll(Context.entity.transform.position, Context.PlayerClassData_Wind.FanStrikeRadius, cmd.ServerFrame))
             {
                 for (int i = 0; i < hits.count; i++)
                 {

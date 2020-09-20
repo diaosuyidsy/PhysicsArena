@@ -18,5 +18,5 @@ public class PlayerClassData_Wind : ScriptableObject
     public float FanStrikeEndRotationAngle = 90f;
     public float FanStrikeGreyAngle = 30f;
     public float FanStrikeForce = 50f;
-
+    public float FanStrikeInitialIgnoreAngle = 10f;
 }

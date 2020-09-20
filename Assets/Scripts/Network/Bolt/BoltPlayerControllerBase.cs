@@ -5,7 +5,11 @@ using Rewired;
 using DG.Tweening;
 using Bolt;
 
-public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfiaPlayerBaseState>, IHittable, IVFXHolder, IBodyConfiguration
+public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfiaPlayerBaseState>,
+IHittable,
+IVFXHolder,
+IBodyConfiguration,
+IEffectable
 {
     [Header("Player Data Section")]
     public CharacterData CharacterDataStore;
@@ -53,40 +57,22 @@ public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfi
     #endregion
 
     #region Status Variables
-    protected float _stunTimer;
-    protected float _slowTimer;
     protected float _hitUncontrollableTimer;
-    protected float _walkSpeedMultiplier = 1f;
-    protected float _permaSlowWalkSpeedMultiplierSub = 1f;
-    protected float _permaSlowWalkSpeedMultiplier
-    {
-        get
-        {
-            return _permaSlowWalkSpeedMultiplierSub;
-        }
-        set
-        {
-            _permaSlowWalkSpeedMultiplierSub = value;
-            if (entity.IsOwner)
-                state.RunningSpeed = _walkSpeed;
-        }
-    }
-    protected int _permaSlow;
-    protected float _walkSpeed
-    {
-        get
-        {
-            if (_permaSlow > 0 && Time.time > _slowTimer)
-                return _permaSlowWalkSpeedMultiplier;
-            else if (_permaSlow > 0 && Time.time < _slowTimer)
-                return Mathf.Max(_permaSlowWalkSpeedMultiplier, _walkSpeedMultiplier);
-            else if (_permaSlow == 0 && Time.time > _slowTimer)
-                return 1f;
-            else return _walkSpeedMultiplier;
-        }
-    }
-    protected float _rotationSpeedMultiplier = 1f;
+
     protected ForceTuple _hitForceTuple;
+
+    private float _ws = 1f;
+    public float WalkSpeedMultiplier
+    {
+        get => _ws; set
+        {
+            _ws = value;
+            if (entity.IsOwner)
+                state.RunningSpeed = value;
+        }
+    }
+    private float _rs = 1f;
+    public float RotationSpeedMultiplier { get => _rs; set => _rs = value; }
 
     #endregion
 
@@ -108,6 +94,7 @@ public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfi
     GameObject IBodyConfiguration.RightFoot => this.RightFoot;
 
     Transform IBodyConfiguration.PlayerUITransform => this.PlayerUITransform;
+
     ShieldController IBodyConfiguration.BlockShield => this.BlockShield;
 
     #region  Controller Variable
@@ -126,7 +113,7 @@ public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfi
     #endregion
 
     protected BoltPlayerView _playerview;
-
+    protected EffectController _effectController;
     #region setup
     public override void Attached()
     {
@@ -143,11 +130,13 @@ public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfi
             state.AddCallback("ActionStateIndex", _onActionStateIndexChange);
         }
         _playerview.transform.SetParent(null);
+        state.RunningSpeed = 1f;
     }
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _playerview = GetComponentInChildren<BoltPlayerView>();
+        _effectController = GetComponent<EffectController>();
         SetupStateMachine();
         _rb = GetComponent<Rigidbody>();
         _player = ReInput.players.GetPlayer(PlayerNumber);
@@ -158,7 +147,9 @@ public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfi
         _currentStamina = CharacterDataStore.MaxStamina;
         _staminaUISize = BlockUIVFXHolder.transform.GetChild(0).GetComponent<SpriteRenderer>().size;
         _playerBodiesLayer = gameObject.layer;
+        // WalkSpeedMultiplier = 1f;
     }
+
 
     protected abstract void SetupStateMachine();
     #endregion
@@ -320,7 +311,7 @@ public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfi
 
     public void OnImpact(Status status)
     {
-        throw new System.NotImplementedException();
+        _effectController.OnApplyEffect(status);
     }
 
     #region Helper Methods
@@ -443,6 +434,16 @@ public abstract class BoltPlayerControllerBase : Bolt.EntityEventListener<IBirfi
     {
         RaycastHit hit;
         return Physics.SphereCast(transform.position, 0.3f, Vector3.down, out hit, _distToGround, CharacterDataStore.JumpMask);
+    }
+
+    public void OnStun(StunEffect effect)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnRemove(Status effect)
+    {
+        _effectController.OnRemoveEffect(effect);
     }
     #endregion
 }

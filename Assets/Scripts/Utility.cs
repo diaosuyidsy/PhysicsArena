@@ -514,3 +514,17 @@ public interface IBodyConfiguration
     Transform PlayerUITransform { get; }
     ShieldController BlockShield { get; }
 }
+
+public interface IEffectable
+{
+    /// <summary>
+    /// 1f is normal running, 0f is minimum
+    /// </summary>
+    /// <value></value>
+    float WalkSpeedMultiplier { get; set; }
+    float RotationSpeedMultiplier { get; set; }
+
+    void OnStun(StunEffect effect);
+
+    void OnRemove(Status effect);
+}

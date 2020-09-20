@@ -557,7 +557,7 @@ Animator:
   m_GameObject: {fileID: 376910390926503535}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b7ed83b9ecc6b7a4caf1dfbc4f2e13b8, type: 2}
+  m_Controller: {fileID: 9100000, guid: 1edce0316209347409be400938ed68c1, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -17186,6 +17186,7 @@ GameObject:
   - component: {fileID: 7659049830179969565}
   - component: {fileID: 4939810170400497415}
   - component: {fileID: 6823215067326608773}
+  - component: {fileID: 9084761285612939573}
   m_Layer: 9
   m_Name: Bolt_Player_Wind
   m_TagString: Team1
@@ -17319,6 +17320,8 @@ MonoBehaviour:
   BlockShield: {fileID: 6700902708683904216}
   PlayerNumber: 6
   PlayerUITransform: {fileID: 376910390926503684}
+  PlayerClassData_Wind: {fileID: 11400000, guid: e2f9866bf97fe5448a999c509c20d1a5,
+    type: 2}
 --- !u!114 &4939810170400497415
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17365,6 +17368,18 @@ MonoBehaviour:
   _center: {x: 0, y: 0, z: 0}
   _boxSize: {x: 0.5, y: 0.5, z: 0.5}
   _sphereRadius: 0.25
+--- !u!114 &9084761285612939573
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5415581923062430295}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3569c6dec83c84144af8fdbea3e41c82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &4265127573299795942
 PrefabInstance:
   m_ObjectHideFlags: 0

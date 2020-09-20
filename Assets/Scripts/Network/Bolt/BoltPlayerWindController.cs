@@ -10,6 +10,7 @@ using Bolt;
 /// </summary>
 public class BoltPlayerWindController : BoltPlayerControllerBase
 {
+    public PlayerClassData_Wind PlayerClassData_Wind;
     private FSM<BoltPlayerWindController> _movementFSM;
     private FSM<BoltPlayerWindController> _actionFSM;
 
@@ -120,7 +121,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
         _movementFSM.LateUpdate();
         _actionFSM.LateUpdate();
     }
-    #region  Movement States
+    #region General Movement States
     protected class MovementState : FSM<BoltPlayerWindController>.State
     {
         protected float _HLAxis;
@@ -210,7 +211,6 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                 Context.state.IdleDowner = false;
         }
     }
-
     protected class MovementRunState : MovementState
     {
         protected override int _stateIndex { get { return 1; } }
@@ -241,7 +241,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
         {
             base.FixedUpdate();
             bool isonground = Context._isGrounded();
-            Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context._walkSpeed;
+            Vector3 targetVelocity = Context.transform.forward * Context.CharacterDataStore.WalkSpeed * Context.WalkSpeedMultiplier;
             Vector3 velocityChange = targetVelocity - Context._rb.velocity;
             velocityChange.x = Mathf.Clamp(velocityChange.x, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
             velocityChange.z = Mathf.Clamp(velocityChange.z, -Context.CharacterDataStore.MaxVelocityChange, Context.CharacterDataStore.MaxVelocityChange);
@@ -254,7 +254,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
 
             Vector3 relPos = Quaternion.AngleAxis(Mathf.Atan2(_HLAxis, _VLAxis * -1f) * Mathf.Rad2Deg, Context.transform.up) * Vector3.forward;
             Quaternion rotation = Quaternion.LookRotation(relPos, Vector3.up);
-            Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed * Context._rotationSpeedMultiplier);
+            Quaternion tr = Quaternion.Slerp(Context.transform.rotation, rotation, Time.deltaTime * Context.CharacterDataStore.MinRotationSpeed * Context.RotationSpeedMultiplier);
             Context.transform.rotation = tr;
             if (Context._frontIsCliff() && isonground)
             {
@@ -273,7 +273,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                 Context.state.Running = false;
         }
     }
-    private class MovementHitUncontrollableState : MovementState
+    protected class MovementHitUncontrollableState : MovementState
     {
         protected override int _stateIndex { get { return 2; } }
 
@@ -298,7 +298,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
             }
         }
     }
-    private class MovementDeadState : MovementState
+    protected class MovementDeadState : MovementState
     {
         private float _startTime;
         private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
@@ -343,10 +343,28 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
             Context.StartCoroutine(Context._deadInvincible);
         }
     }
-
     #endregion
 
-    #region Action State
+    #region Wind Class Specific Movement States
+    protected class MovementFanStrikeRecoveryState : MovementState
+    {
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            if (Context.entity.IsOwner)
+                Context.state.IdleDowner = true;
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            if (Context.entity.IsOwner)
+                Context.state.IdleDowner = false;
+        }
+    }
+    #endregion
+
+    #region General Action State
     protected class ActionState : FSM<BoltPlayerWindController>.State
     {
         protected bool _RightTrigger;
@@ -404,7 +422,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
 
         }
     }
-    private class ActionIdleState : ActionState
+    protected class ActionIdleState : ActionState
     {
         protected override int _stateIndex { get { return 0; } }
 
@@ -416,8 +434,6 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
             base.OnEnter();
             if (Context.entity.IsOwner)
                 Context.state.IdleUpper = true;
-            Context._permaSlow = 0;
-            Context._permaSlowWalkSpeedMultiplier = 1f;
         }
 
         public override void Update()
@@ -429,6 +445,12 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                 _emojiTimer = Time.time + 0.3f;
                 EventManager.Instance.TriggerEvent(new TriggerEmoji(0, Context.gameObject));
             }
+
+            if (_RightTriggerDown)
+            {
+                TransitionTo<ActionFanStrikeAnticipationState>();
+                return;
+            }
         }
 
         public override void OnExit()
@@ -438,7 +460,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                 Context.state.IdleUpper = false;
         }
     }
-    private class ActionHitUnControllableState : ActionState
+    protected class ActionHitUnControllableState : ActionState
     {
         protected override int _stateIndex { get { return 2; } }
 
@@ -476,8 +498,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
             }
         }
     }
-
-    private class ActionDeadState : ActionState
+    protected class ActionDeadState : ActionState
     {
         protected override int _stateIndex { get { return 1; } }
         private float _startTime;
@@ -528,7 +549,116 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                 Context._rb.gameObject.layer = Context._playerBodiesLayer;
 
             }
-            Context._permaSlow = 0;
+        }
+    }
+    #endregion
+
+    #region Wind Class Specific Action States
+    protected class ActionFanStrikeAnticipationState : ActionState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            if (Context.entity.IsOwner)
+            {
+                (Context.state as IWindPlayerState).FanStrikeAnticipationMul = 1f / Context.PlayerClassData_Wind.FanStrikeAnticipationDuration;
+                (Context.state as IWindPlayerState).FanStrikeAnticipation = true;
+            }
+            _timer = Time.timeSinceLevelLoad + Context.PlayerClassData_Wind.FanStrikeAnticipationDuration;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<ActionFanStrikeState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            if (Context.entity.IsOwner)
+                (Context.state as IWindPlayerState).FanStrikeAnticipation = false;
+        }
+    }
+
+    protected class ActionFanStrikeState : ActionState
+    {
+        private float _timer;
+        private SlowEffect _strikeSlowEffect;
+        private RotationSlowEffect _strikeRotationSlowEffect;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            if (Context.entity.IsOwner)
+            {
+                (Context.state as IWindPlayerState).FanStrikeMul = 1f / Context.PlayerClassData_Wind.FanStrikeDuration;
+                (Context.state as IWindPlayerState).FanStrike = true;
+                _strikeSlowEffect = new SlowEffect(0f, Context.PlayerClassData_Wind.FanStrikeSlowPercent, true);
+                _strikeRotationSlowEffect = new RotationSlowEffect(0f, Context.PlayerClassData_Wind.FanStrikeSlowRotatePercent, true);
+                Context.OnImpact(_strikeSlowEffect);
+                Context.OnImpact(_strikeRotationSlowEffect);
+            }
+            _timer = Time.timeSinceLevelLoad + Context.PlayerClassData_Wind.FanStrikeDuration;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<ActionFanStrikeRecoveryState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            base.OnExit();
+            if (Context.entity.IsOwner)
+            {
+                (Context.state as IWindPlayerState).FanStrike = false;
+                Context.OnRemove(_strikeSlowEffect);
+                Context.OnRemove(_strikeRotationSlowEffect);
+            }
+        }
+    }
+
+    protected class ActionFanStrikeRecoveryState : ActionState
+    {
+        private float _timer;
+        public override void OnEnter()
+        {
+            base.OnEnter();
+            if (Context.entity.IsOwner)
+            {
+                (Context.state as IWindPlayerState).FanStrikeRecoveryMul = 1f / Context.PlayerClassData_Wind.FanStrikeRecoveryDuration;
+                (Context.state as IWindPlayerState).FanRecovery = true;
+            }
+            Context._movementFSM.TransitionTo<MovementFanStrikeRecoveryState>();
+            _timer = Time.timeSinceLevelLoad + Context.PlayerClassData_Wind.FanStrikeRecoveryDuration;
+        }
+
+        public override void Update()
+        {
+            base.Update();
+            if (_timer < Time.timeSinceLevelLoad)
+            {
+                TransitionTo<ActionIdleState>();
+                return;
+            }
+        }
+
+        public override void OnExit()
+        {
+            if (Context.entity.IsOwner)
+                (Context.state as IWindPlayerState).FanRecovery = false;
+            Context._movementFSM.TransitionTo<MovementIdleState>();
+            base.OnExit();
         }
     }
     #endregion

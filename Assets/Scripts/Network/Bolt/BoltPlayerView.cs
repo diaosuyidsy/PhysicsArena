@@ -35,8 +35,8 @@ public class BoltPlayerView : MonoBehaviour
     {
         _rb.isKinematic = false;
         // _interpolate = false;
-        _rb.AddForce(force, fm);
-        SetInterpolation(time, 0f);
+        // _rb.AddForce(force, fm);
+        // SetInterpolation(time, 0f);
     }
 
     public void SetInterpolation(float time, float mul)

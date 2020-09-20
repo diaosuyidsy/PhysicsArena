@@ -112,7 +112,7 @@ IEffectable
     bool QD;
     #endregion
 
-    protected BoltPlayerView _playerview;
+    [HideInInspector] public BoltPlayerView _playerview;
     protected EffectController _effectController;
     #region setup
     public override void Attached()
@@ -123,6 +123,7 @@ IEffectable
         {
             entity.TakeControl();
             _rb.isKinematic = false;
+            state.RunningSpeed = 1f;
         }
         else
         {
@@ -130,7 +131,6 @@ IEffectable
             state.AddCallback("ActionStateIndex", _onActionStateIndexChange);
         }
         _playerview.transform.SetParent(null);
-        state.RunningSpeed = 1f;
     }
 
     protected virtual void Awake()
@@ -220,6 +220,11 @@ IEffectable
             cmd.Result.Position = transform.position;
             cmd.Result.Velocity = _rb.velocity;
         }
+    }
+
+    public override void OnEvent(PunchEvent ev)
+    {
+        OnImpact(ev.PunchForce, ForceMode.Impulse, gameObject, ImpactType.Melee);
     }
 
     protected virtual void Update()

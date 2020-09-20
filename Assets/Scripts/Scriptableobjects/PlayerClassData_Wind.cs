@@ -10,4 +10,13 @@ public class PlayerClassData_Wind : ScriptableObject
     public float FanStrikeRecoveryDuration = 0.3f;
     public float FanStrikeSlowPercent = 0.5f;
     public float FanStrikeSlowRotatePercent = 0.8f;
+
+    public float FanStrikeRadius = 0.5f;
+    [Tooltip("To the right of the body")]
+    public float FanStrikeStartRotationAngle = 90f;
+    [Tooltip("To the left of the body")]
+    public float FanStrikeEndRotationAngle = 90f;
+    public float FanStrikeGreyAngle = 30f;
+    public float FanStrikeForce = 50f;
+
 }

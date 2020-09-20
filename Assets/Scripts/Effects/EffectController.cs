@@ -58,7 +58,7 @@ public class EffectController : MonoBehaviour
         float maxRotationSlowPotency = 0f;
         // Deal with slow effect
         // Compare and get the lowest Potency and apply that to the player
-        for (int i = 0; i < EffectList.Count - 1; i++)
+        for (int i = 0; i < EffectList.Count; i++)
         {
             Status effect = EffectList[i];
             if (effect.GetType().Equals(typeof(SlowEffect)))

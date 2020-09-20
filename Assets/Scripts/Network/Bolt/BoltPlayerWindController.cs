@@ -36,8 +36,10 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                 _movementFSM.TransitionTo<MovementHitUncontrollableState>();
                 break;
             case 3:
+                _movementFSM.TransitionTo<MovementDeadState>();
                 break;
             case 4:
+                _movementFSM.TransitionTo<MovementFanStrikeRecoveryState>();
                 break;
             case 5:
                 break;
@@ -67,6 +69,19 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                 break;
             case 2:
                 _actionFSM.TransitionTo<ActionHitUnControllableState>();
+                break;
+            case 3:
+                _actionFSM.TransitionTo<ActionFanStrikeAnticipationState>();
+                break;
+            case 4:
+                _actionFSM.TransitionTo<ActionFanStrikeState>();
+                break;
+            case 5:
+                _actionFSM.TransitionTo<ActionFanStrikeRecoveryState>();
+                break;
+            case 6:
+                break;
+            case 7:
                 break;
             default:
                 _actionFSM.TransitionTo<ActionIdleState>();
@@ -302,7 +317,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
     {
         private float _startTime;
         private float _respawnTime { get { return Services.Config.GameMapData.RespawnTime; } }
-        protected override int _stateIndex { get { return 10; } }
+        protected override int _stateIndex { get { return 3; } }
 
         public override void OnEnter()
         {
@@ -348,6 +363,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
     #region Wind Class Specific Movement States
     protected class MovementFanStrikeRecoveryState : MovementState
     {
+        protected override int _stateIndex { get { return 4; } }
         public override void OnEnter()
         {
             base.OnEnter();
@@ -556,6 +572,8 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
     #region Wind Class Specific Action States
     protected class ActionFanStrikeAnticipationState : ActionState
     {
+        protected override int _stateIndex { get { return 3; } }
+
         private float _timer;
         public override void OnEnter()
         {
@@ -588,9 +606,12 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
 
     protected class ActionFanStrikeState : ActionState
     {
+        protected override int _stateIndex { get { return 4; } }
+
         private float _timer;
         private SlowEffect _strikeSlowEffect;
         private RotationSlowEffect _strikeRotationSlowEffect;
+        private HashSet<GameObject> _hittedObject;
         public override void OnEnter()
         {
             base.OnEnter();
@@ -603,7 +624,61 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                 Context.OnImpact(_strikeSlowEffect);
                 Context.OnImpact(_strikeRotationSlowEffect);
             }
+            _hittedObject = new HashSet<GameObject>();
             _timer = Time.timeSinceLevelLoad + Context.PlayerClassData_Wind.FanStrikeDuration;
+        }
+
+        public override void ExecuteCommand(Command command, bool resetState)
+        {
+            base.ExecuteCommand(command, resetState);
+            if (!resetState)
+                _checkFanHit((BirfiaPlayerCommand)command);
+        }
+
+        private void _checkFanHit(BirfiaPlayerCommand cmd)
+        {
+            // Calculate the current fan rotation forward vector
+            Vector3 fanStartforward = Context.transform.forward;
+            fanStartforward = Quaternion.AngleAxis(Context.PlayerClassData_Wind.FanStrikeStartRotationAngle, Vector3.up) * fanStartforward;
+            float totalAngle = Context.PlayerClassData_Wind.FanStrikeStartRotationAngle + Context.PlayerClassData_Wind.FanStrikeEndRotationAngle;
+            float currentAngle = totalAngle * ((Time.timeSinceLevelLoad - (_timer - Context.PlayerClassData_Wind.FanStrikeDuration)) / Context.PlayerClassData_Wind.FanStrikeDuration);
+            Vector3 fanCurrentforward = Quaternion.AngleAxis(-currentAngle, Vector3.up) * fanStartforward;
+
+            // Bolt Hitscan
+            using (var hits = BoltNetwork.OverlapSphereAll(Context.entity.transform.position, Context.CharacterDataStore.PunchRadius, cmd.ServerFrame))
+            {
+                for (int i = 0; i < hits.count; i++)
+                {
+                    var hit = hits.GetHit(i);
+                    Vector3 hitvectortoself = hit.body.transform.position - Context.entity.transform.position;
+                    if (Vector3.Angle(fanCurrentforward, hitvectortoself) < Context.PlayerClassData_Wind.FanStrikeGreyAngle)
+                    {
+                        // Hit,  TODO: convert to single hit TODO: detect teammate
+                        Vector3 force = hitvectortoself.normalized * Context.PlayerClassData_Wind.FanStrikeForce;
+
+                        var serializer = hit.body.GetComponent<BoltPlayerControllerBase>();
+                        if (serializer != null && serializer != Context.entity.GetComponent<BoltPlayerControllerBase>() && !_hittedObject.Contains(serializer.gameObject))
+                        {
+                            // if (serializer.CanBlock(Context.state.MainTransform.Transform.forward))
+                            // {
+                            //     force *= (-Context.CharacterDataStore.BlockMultiplier);
+                            //     PunchEvent.Post(Context.entity, force, serializer.entity);
+                            //     if (Context.entity.IsOwner)
+                            //         Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(serializer.gameObject, Context.entity.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerController>().PlayerNumber, serializer.PlayerNumber, 1f, true));
+                            // }
+                            // else
+                            // {
+                            _hittedObject.Add(serializer.gameObject);
+                            serializer._playerview.OnForceImpact(0.5f, force);
+                            PunchEvent.Post(serializer.entity, force, Context.entity);
+                            if (Context.entity.IsOwner)
+                                Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerControllerBase>().PlayerNumber, serializer.PlayerNumber, 1f, false));
+                            // }
+
+                        }
+                    }
+                }
+            }
         }
 
         public override void Update()
@@ -630,6 +705,8 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
 
     protected class ActionFanStrikeRecoveryState : ActionState
     {
+        protected override int _stateIndex { get { return 5; } }
+
         private float _timer;
         public override void OnEnter()
         {

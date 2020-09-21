@@ -732,6 +732,11 @@ public class BoltPlayerController : Bolt.EntityEventListener<IBirfiaPlayerState>
     {
         return gameObject;
     }
+
+    public bool CanDefend(Vector3 forwardAngle)
+    {
+        throw new System.NotImplementedException();
+    }
     #endregion
 
     #region Movment States

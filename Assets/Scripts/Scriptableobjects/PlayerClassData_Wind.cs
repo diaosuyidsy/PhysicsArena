@@ -19,4 +19,6 @@ public class PlayerClassData_Wind : ScriptableObject
     public float FanStrikeGreyAngle = 30f;
     public float FanStrikeForce = 50f;
     public float FanStrikeInitialIgnoreAngle = 10f;
+    public bool FanStrikeCanBeDefensed = true;
+    public bool FanStrikeCanBeBlocked = true;
 }

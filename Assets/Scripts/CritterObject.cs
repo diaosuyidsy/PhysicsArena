@@ -51,4 +51,9 @@ public class CritterObject : MonoBehaviour, IHittable
     {
         _rb.velocity = vel;
     }
+
+    public bool CanDefend(Vector3 forwardAngle)
+    {
+        throw new System.NotImplementedException();
+    }
 }

@@ -91,4 +91,9 @@ public class BallController : MonoBehaviour, IHittable
     {
         return gameObject;
     }
+
+    public bool CanDefend(Vector3 forwardAngle)
+    {
+        throw new System.NotImplementedException();
+    }
 }

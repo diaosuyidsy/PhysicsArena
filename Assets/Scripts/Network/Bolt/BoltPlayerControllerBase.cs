@@ -273,9 +273,9 @@ IEffectable
         return false;
     }
 
-    public bool CanBlock(Vector3 forwardAngle)
+    public virtual bool CanBlock(Vector3 forwardAngle)
     {
-        return false;
+        return true;
     }
 
     public virtual void OnImpact(Vector3 force, ForceMode forcemode, GameObject enforcer, ImpactType impactType)
@@ -449,6 +449,11 @@ IEffectable
     public void OnRemove(Status effect)
     {
         _effectController.OnRemoveEffect(effect);
+    }
+
+    public virtual bool CanDefend(Vector3 forwardAngle)
+    {
+        return false;
     }
     #endregion
 }

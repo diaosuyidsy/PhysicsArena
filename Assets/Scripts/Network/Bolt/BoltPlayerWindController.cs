@@ -501,7 +501,10 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
             base.OnEnter();
             _timer = Time.timeSinceLevelLoad + Context._hitUncontrollableTimer;
             if (Context.entity.IsOwner)
+            {
                 Services.BoltEventBroadcaster.OnPunchInterrepted(new PunchInterruptted(Context.gameObject, Context.PlayerNumber));
+                (Context.state as IWindPlayerState).UnControllable = true;
+            }
             myLayer = Context.gameObject.layer;
             Context.gameObject.layer = 19;
             Context._rb.AddForce(Context._hitForceTuple.Force, Context._hitForceTuple.ForceMode);
@@ -510,6 +513,8 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
         public override void OnExit()
         {
             base.OnExit();
+            if (Context.entity.IsOwner)
+                (Context.state as IWindPlayerState).UnControllable = false;
             Context.gameObject.layer = myLayer;
         }
 
@@ -586,6 +591,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
     protected class ActionFanStrikeAnticipationState : ActionState
     {
         protected override int _stateIndex { get { return 3; } }
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
 
         private float _timer;
         public override void OnEnter()
@@ -620,6 +626,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
     protected class ActionFanStrikeState : ActionState
     {
         protected override int _stateIndex { get { return 4; } }
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
 
         private float _timer;
         private SlowEffect _strikeSlowEffect;
@@ -681,12 +688,35 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
                             // }
                             // else
                             // {
-                            _hittedObject.Add(serializer.gameObject);
-                            serializer._playerview.OnForceImpact(0.5f, force);
-                            PunchEvent.Post(serializer.entity, force, Context.entity);
-                            if (Context.entity.IsOwner)
-                                Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject, serializer.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerControllerBase>().PlayerNumber, serializer.PlayerNumber, 1f, false));
                             // }
+                            _hittedObject.Add(serializer.gameObject);
+
+                            if (Context.PlayerClassData_Wind.FanStrikeCanBeBlocked &&
+                            serializer.CanBlock(hitvectortoself))
+                            {
+                                force *= (-Context.CharacterDataStore.BlockMultiplier);
+                                PunchEvent.Post(Context.entity, force, serializer.entity);
+                                if (Context.entity.IsOwner)
+                                    Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(serializer.gameObject, Context.entity.gameObject, force, Context.entity.gameObject.GetComponent<BoltPlayerControllerBase>().PlayerNumber, serializer.PlayerNumber, 1f, true));
+                            }
+                            else if (Context.PlayerClassData_Wind.FanStrikeCanBeDefensed &&
+                            serializer.CanDefend(hitvectortoself))
+                            {
+
+                            }
+                            else
+                            {
+                                serializer._playerview.OnForceImpact(0.5f, force);
+                                PunchEvent.Post(serializer.entity, force, Context.entity);
+                                if (Context.entity.IsOwner)
+                                    Services.BoltEventBroadcaster.OnPlayerHit(new PlayerHit(Context.entity.gameObject,
+                                                                                serializer.gameObject,
+                                                                                force,
+                                                                                Context.entity.gameObject.GetComponent<BoltPlayerControllerBase>().PlayerNumber,
+                                                                                serializer.PlayerNumber,
+                                                                                1f,
+                                                                                false));
+                            }
 
                         }
                     }
@@ -719,6 +749,7 @@ public class BoltPlayerWindController : BoltPlayerControllerBase
     protected class ActionFanStrikeRecoveryState : ActionState
     {
         protected override int _stateIndex { get { return 5; } }
+        public override bool ShouldOnHitTransitToUncontrollableState { get { return true; } }
 
         private float _timer;
         public override void OnEnter()

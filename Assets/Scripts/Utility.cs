@@ -405,6 +405,7 @@ public interface IHittable
     /// <param name="forwardAngle"></param>
     /// <returns></returns>
     bool CanBlock(Vector3 forwardAngle);
+    bool CanDefend(Vector3 forwardAngle);
     /// <summary>
     /// A method to call when directly dealing impact with no blocking possiblity
     /// </summary>
